@@ -1,0 +1,12 @@
+/* 
+  File.strings
+  EsWallet
+
+  Created by chenhao on 2018/7/31.
+  Copyright © 2018年 Facebook. All rights reserved.
+*/
+"open_bt_title" = "Bluetooth is closed";
+"open_bt_title_unauthorized" = "Bluetooth is unauthorized";
+"open_bt_message" = "Bluetooth is necessary for connecting hardware wallet, please open it.";
+"open_bt_button" = "Go to Settings";
+

@@ -1,0 +1,12 @@
+/* 
+  File.strings
+  EsWallet
+
+  Created by chenhao on 2018/7/31.
+  Copyright © 2018年 Facebook. All rights reserved.
+*/
+"open_bt_title" = "蓝牙已关闭";
+"open_bt_title_unauthorized" = "无蓝牙权限";
+"open_bt_message" = "EsWallet 需要使用蓝牙连接硬件钱包。";
+"open_bt_button" = "打开设置";
+

@@ -1,0 +1,27 @@
+{
+  "presets": ["react-native"],
+  "sourceMaps": true,
+  "plugins": [
+    ["babel-plugin-rewrite-require", {
+      "aliases": {
+        "crypto": "crypto-browserify",
+        "vm": "vm-browserify",
+        "stream": "stream-browserify"
+      }
+    }]
+  ],
+  "env": {
+    "TODO": "only for jest, check necessary",
+    "test": {
+      "presets": ["react-native"],
+      "plugins": [["import", { "libraryName": "antd-mobile" }]]
+    },
+    "development": {
+      "presets": ["react-native"],
+      "plugins": [["import", { "libraryName": "antd-mobile" }]]
+    },
+    "production": {
+      "plugins": ["transform-remove-console"]
+    }
+  }
+}
