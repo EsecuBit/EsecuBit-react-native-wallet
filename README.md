@@ -38,6 +38,10 @@ If you want to build release apk, you should modify `android/app/build.gradle`
         }
     }
 ```
+and uncomment it in line 122
+```groovy
+signingConfig signingConfigs.release
+```
 
 ### For iOS
 If you get "undefined symbols" error in debug mode:
