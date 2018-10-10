@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import { StyleSheet, NetInfo, View, Platform, Image, Dimensions, StatusBar, TouchableOpacity, Linking} from 'react-native'
+import { StyleSheet, NetInfo, View, Platform, Image, Dimensions, StatusBar, TouchableOpacity, Linking, BackAndroid} from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {Container, Icon, Title, Button, CardItem, Right, Left, Subtitle, List, Text} from "native-base"
 import Dialog from 'react-native-dialog'
@@ -135,6 +135,12 @@ export default class HomePage extends Component {
       })
   }
 
+  _checkForceUpdate() {
+    this.setState({updateVersionDialogVisible: false})
+    if(this.info !== undefined && this.info.data.isForceUpdate) {
+      AppUtil.exitApp()
+    }
+  }
   _gotoBrowser() {
     if (this.info.data !== null ) {
       Linking.openURL(MOCK_URL+this.info.data.downloadUrl)
@@ -435,7 +441,7 @@ export default class HomePage extends Component {
         <Dialog.Container visible={this.state.updateVersionDialogVisible} style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
           <Dialog.Title>{I18n.t('versionUpdate')}</Dialog.Title>
           <Dialog.Description>{this.state.updateDesc}</Dialog.Description>
-          <Dialog.Button style={{color: Color.ACCENT}} label={I18n.t('cancel')} onPress={() => this.setState({updateVersionDialogVisible: false})}/>
+          <Dialog.Button style={{color: Color.ACCENT}} label={I18n.t('cancel')} onPress={this._checkForceUpdate.bind(this)}/>
           <Dialog.Button style={{color: Color.ACCENT}} label={I18n.t('confirm')} onPress={() => this._gotoBrowser()}/>
         </Dialog.Container>
         <ProgressDialog

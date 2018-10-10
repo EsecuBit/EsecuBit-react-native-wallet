@@ -137,7 +137,7 @@ export default {
   pending: 'Pending',
   invalid: 'Invalid',
   confirming: 'Confirming',
-  checkVersion: 'Check for updates',
+  checkVersion: 'Check For Updates',
   versionUpdate: 'Version Update',
   connectDeviceToGetCOSVersion: 'Please connect device to get cos version'
 

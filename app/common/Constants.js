@@ -9,5 +9,5 @@ export const TOAST_LONG_DURATION = 3000
 
 //api code
 export const RESULT_OK = 0
-export const MOCK_URL = 'http://47.254.16.198:8080/app-update-server/'
+export const MOCK_URL = 'http://39.106.201.178/app-update-server/'
 export const BASE_URL = 'http://www.esecubit.com/'
