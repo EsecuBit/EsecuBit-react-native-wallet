@@ -350,12 +350,12 @@ export default class BTCSendPage extends React.Component {
             <Text style={{fontSize: Dimen.SECONDARY_TEXT, color: Color.ACCENT, textAlignVertical: 'center', marginLeft: Dimen.SPACE, numberOfLines: 3,marginRight: Dimen.SPACE}}>{I18n.t('balance') +': '+ this.state.balance +' ' + this.cryptoCurrencyUnit}</Text>
           </View>
           <Card>
-            <CardItem bordered>
+            <CardItem>
               <Item inlineLabel>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('address')}</Text>
                 <Input
                   selectionColor={Color.ACCENT}
-                  style={{height: 68}}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   ref={refs => this.addressInput = refs}
                   multiline={true} value={this.state.address}
                   onChangeText={text => this.setState({address: text})}
@@ -365,13 +365,14 @@ export default class BTCSendPage extends React.Component {
                 />
               </Item>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Item inlineLabel>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('value')}</Text>
                 <Input
                   selectionColor={Color.ACCENT}
                   placeholder={this.cryptoCurrencyUnit}
                   multiline={true}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   numberOfLines={3}
                   value={this.state.sendValue}
                   returnKeyType='done'
@@ -386,7 +387,7 @@ export default class BTCSendPage extends React.Component {
                 </TouchableOpacity>
               </Item>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Item>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('fee')}</Text>
                 {
@@ -415,12 +416,12 @@ export default class BTCSendPage extends React.Component {
                 </TouchableOpacity>
               </Item>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Item>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('remarks')}</Text>
                 <Input
                   selectionColor={Color.ACCENT}
-                  style={{height: 68}}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   ref={refs => this.addressInput = refs}
                   multiline={true}
                   value={this.state.remarks}

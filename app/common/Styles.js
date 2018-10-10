@@ -116,5 +116,13 @@ export const CommonStyle = StyleSheet.create({
     alignItems: 'center',
     marginLeft: DIMEN_MARGIN_HORIZONTAL + DIMEN_MARGIN_HORIZONTAL,
     height: DIMEN_TOOLBAR_ANDROID,
+  },
+  multlineInputAndroid: {
+    height: 68
+  },
+  multlineInputIOS: {
+    height: 68,
+    paddingTop: 24,
   }
+
 })

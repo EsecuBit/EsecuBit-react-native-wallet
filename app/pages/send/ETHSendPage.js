@@ -393,12 +393,12 @@ export default class ETHSendPage extends React.Component {
             <Text style={{fontSize: Dimen.SECONDARY_TEXT, color: Color.ACCENT, textAlignVertical: 'center', numberOfLines: 3, marginHorizontal: Dimen.SPACE}}>{I18n.t('balance') +': '+ this.state.balance +' ' + this.cryptoCurrencyUnit}</Text>
           </View>
           <Card style={{marginLeft:0,marginRight:0}}>
-            <CardItem bordered>
+            <CardItem>
               <Item>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('address')}</Text>
                 <Input
                   selectionColor={Color.ACCENT}
-                  style={{height: 68}}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   ref={refs => this.addressInput = refs}
                   multiline={true}
                   value={this.state.address}
@@ -409,12 +409,12 @@ export default class ETHSendPage extends React.Component {
                 />
               </Item>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Item inlineLabel>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('value')}</Text>
                 <Input
                   selectionColor={Color.ACCENT}
-                  style={{height: 68}}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   ref={refs => this.valueInput = refs}
                   placeholder={this.cryptoCurrencyUnit}
                   multiline={true}
@@ -471,12 +471,13 @@ export default class ETHSendPage extends React.Component {
                   returnKeyType='done'/>
               </Item>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Item>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>Data</Text>
                 <Input
                   selectionColor={Color.ACCENT}
                   multiline={true}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   numberOfLines={4}
                   value={this.state.ethData}
                   onChangeText={text => this._calculateGasLimit(text)}
@@ -486,12 +487,12 @@ export default class ETHSendPage extends React.Component {
                 />
               </Item>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Item>
                 <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{I18n.t('remarks')}</Text>
                 <Input
                   selectionColor={Color.ACCENT}
-                  style={{height: 68}}
+                  style={Platform.OS === 'android' ? CommonStyle.multlineInputAndroid : CommonStyle.multlineInputIOS}
                   ref={refs => this.addressInput = refs}
                   multiline={true} value={this.state.remarks}
                   onChangeText={text => this.setState({remarks: text})}
