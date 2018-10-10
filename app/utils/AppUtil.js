@@ -1,12 +1,13 @@
 import {version, versionCode} from '../../package.json'
 import { EsWallet } from 'esecubit-wallet-sdk'
-import { Platform } from 'react-native'
+import { Platform, BackAndroid, NativeModules } from 'react-native'
 import I18n from '../lang/i18n'
 import ToastUtil from "./ToastUtil"
 import StringUtil from './StringUtil'
 import { D } from 'esecubit-wallet-sdk'
 import {MOCK_URL, BASE_URL} from '../common/Constants'
 
+const BackIOS = NativeModules.BackIOS
 export default class AppUtil {
   static async checkUpdate() {
     let wallet= new EsWallet()
@@ -34,6 +35,13 @@ export default class AppUtil {
       if (e !== D.error.deviceProtocol) {
         ToastUtil.showShort(e)
       }
+    }
+  }
+  static exitApp() {
+    if(Platform.OS === 'android') {
+      BackAndroid.exitApp()
+    }else{
+      BackIOS.exitApp()
     }
   }
 }
