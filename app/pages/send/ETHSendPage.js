@@ -386,7 +386,7 @@ export default class ETHSendPage extends React.Component {
 
   render() {
     return (
-      <Container style={CommonStyle.layoutBottom}>
+      <Container>
         <SendToolbar coinType='ETH' navigation={this.props.navigation} />
         <Content padder>
           <View style={{marginVertical: Dimen.SPACE}}>

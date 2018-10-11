@@ -343,7 +343,7 @@ export default class BTCSendPage extends React.Component {
 
   render() {
     return (
-      <Container style={CommonStyle.layoutBottom}>
+      <Container>
         <SendToolbar coinType='BTC' navigation={this.props.navigation}/>
         <Content padder>
           <View style={{marginTop: Dimen.SPACE, marginBottom: Dimen.SPACE}}>
