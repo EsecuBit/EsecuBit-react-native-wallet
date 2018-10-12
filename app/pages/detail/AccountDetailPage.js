@@ -1,9 +1,8 @@
 import React from 'react'
-import {View, StyleSheet, RefreshControl, Dimensions, Platform, TextInput, Clipboard, DeviceEventEmitter, ActionSheetIOS, Image, StatusBar, TouchableWithoutFeedback} from 'react-native'
+import {View, StyleSheet, RefreshControl, Dimensions, Platform, TextInput, DeviceEventEmitter, ActionSheetIOS, Image, StatusBar} from 'react-native'
 import I18n from '../../lang/i18n'
-import {Button, Container, Left, Right, Icon, List, ListItem, Content, CheckBox, Body, CardItem, Text} from 'native-base'
+import {Button, Container, Icon, List, ListItem, Content, CardItem, Text} from 'native-base'
 import PopupDialog from 'react-native-popup-dialog'
-import QrCode from 'react-native-qrcode'
 import BigInteger from 'bigi'
 import {isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import EsAccountHelper from "../../EsAccountHelper"
@@ -13,7 +12,6 @@ import ToastUtil from '../../utils/ToastUtil'
 import Menu, {MenuItem} from "react-native-material-menu"
 import Dialog from "react-native-dialog"
 import BtTransmitter from '../../device/BtTransmitter'
-import {TOAST_SHORT_DURATION} from "../../common/Constants"
 import StringUtil from '../../utils/StringUtil'
 
 const deviceW = Dimensions.get('window').width
@@ -40,22 +38,17 @@ export default class AccountDetailPage extends React.Component {
 
     this.state = {
       isShowBottom: true,
-      data: [],//存储列表使用的数据
-      refreshing: false,//当前的刷新状态
-      address: '',
+      data: [],
+      refreshing: false,
       accountBalance: '',
       coinType: D.isBtc(EsAccountHelper.getInstance().getAccount()['coinType']) ? D.supportedCoinTypes()[0] : D.supportedCoinTypes()[1],
       isShowDetail: false,
       dMemo: '',
-      bottomDisplay: 'flex',
       renameDialogVisible: false,
       accountName: this.account.label,
-      showQrCode: false,
-      selectStoreAddress: false,
       containerBgColor: Color.CONTAINER_BG,
       legalCurrencyBalance: ''
     }
-    this._setClipboardContent.bind(this)
   }
 
   componentDidMount() {
@@ -69,7 +62,7 @@ export default class AccountDetailPage extends React.Component {
     _that._getTxInfos()
     let minimumUnit = D.isBtc(this.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
     //listenTxInfo
-    _that.wallet.listenTxInfo(async (errCode, txInfo) => {
+    _that.wallet.listenTxInfo(async () => {
       console.log("listenTxInfo _getTxInfos")
       await _that._getTxInfos()
       let balance = _that.wallet.convertValue(_that.coinType, _that.account.balance, minimumUnit, _that.cryptoCurrencyUnit)
@@ -112,26 +105,16 @@ export default class AccountDetailPage extends React.Component {
     }
   }
 
-  async _showAddressDialog() {
+  async _gotoAddressDetailPage() {
     let deviceState = await this.transmitter.getState()
     if (deviceState === BtTransmitter.disconnected) {
       ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
       return
     }
-    this._getAddress(this.state.selectStoreAddress)
-    this.popupDialog.show()
+    this.props.navigation.navigate('AddressDetail')
   }
 
-  async _getAddress(shouldStoreAddress) {
-    try {
-      let address = await this.account.getAddress(shouldStoreAddress)
-      this.setState({address: address})
-    } catch (error) {
-      console.warn('getAddress', error)
-      ToastUtil.showLong(I18n.t('getAddressError'))
-    }
-  }
-
+ 
   _onRefresh() {
     this.setState({
       refreshing: true,
@@ -160,7 +143,6 @@ export default class AccountDetailPage extends React.Component {
     let price = "0"
     let temp = ''
     let symbol = ''
-    let unit = ''
     let priceColor = Color.ACCENT
     let isToSelf = false
     let rowHeight = 0
@@ -168,7 +150,7 @@ export default class AccountDetailPage extends React.Component {
     let confirmStr = ''
     let confirmColor = Color.ACCENT
 
-    rowData.showAddresses.forEach(function (item, index, array) {
+    rowData.showAddresses.forEach(function (item, index) {
       let addr = ''
       if (item === 'self' || item === 'Self' || item === 'SELF') {
         addr = item
@@ -194,10 +176,8 @@ export default class AccountDetailPage extends React.Component {
     }
 
     if (D.isBtc(rowData.coinType)) {
-      unit = this.cryptoCurrencyUnit
       price = this._getBTCPrice(rowData, isToSelf)
     } else {
-      unit = this.cryptoCurrencyUnit
       price = this._getETHPrice(rowData, isToSelf)
     }
 
@@ -312,7 +292,7 @@ export default class AccountDetailPage extends React.Component {
     let addr = ''
     this.rowData = rowData
 
-    rowData.showAddresses.forEach(function (item, index, array) {
+    rowData.showAddresses.forEach(function (item, index) {
       // debugger
       if (item === 'self' || item === 'Self' || item === 'SELF') {
         isToSelf = true
@@ -420,14 +400,6 @@ export default class AccountDetailPage extends React.Component {
       .catch(error => ToastUtil.showErrorMsgLong(error))
   }
 
-  _setClipboardContent(addr) {
-    try {
-      Clipboard.setString(addr)
-      ToastUtil.show(I18n.t('copySuccess', TOAST_SHORT_DURATION))
-    } catch (error) {
-      ToastUtil.showLong(I18n.t('copyFailed'))
-    }
-  }
 
   _showRenameAccountDialog() {
     this.moreMenu.hide()
@@ -460,12 +432,7 @@ export default class AccountDetailPage extends React.Component {
       .catch(error => ToastUtil.showErrorMsgLong(error))
   }
 
-  async _handleStoreAddress() {
-    await this.setState({selectStoreAddress: !this.state.selectStoreAddress})
-    if (this.state.selectStoreAddress === true) {
-      this._getAddress(this.state.selectStoreAddress)
-    }
-  }
+
 
   _handleTransactionDetailDismiss() {
     //lose focus
@@ -573,50 +540,6 @@ export default class AccountDetailPage extends React.Component {
         </View>
         <PopupDialog
           ref={(popupDialog) => {
-            this.popupDialog = popupDialog;
-          }}
-          width={0.8}
-          height={D.isBtc(this.coinType) ? 455 : 415}
-          containerStyle={{backgroundColor: '#E0E0E0'}}
-          onDismissed={() => {
-            this.setState({
-              bottomDisplay: 'flex',
-            })
-          }}
-          onShown={() => {
-            this.setState({
-              bottomDisplay: 'none',
-            })
-          }}>
-          <View style={customStyle.qrCodeWrapper}>
-            <Text style={CommonStyle.secondaryText}>{I18n.t('showAddressTip')}</Text>
-            <TouchableWithoutFeedback onLongPress={() => this._setClipboardContent(this.state.address.address)}>
-              <View style={customStyle.qrCodeView}>
-                <QrCode
-                  value={this.state.address.qrAddress}
-                  size={240}
-                  bgColor="black"
-                  fgColor='white'
-                />
-              </View>
-            </TouchableWithoutFeedback>
-
-            {
-              D.isBtc(this.coinType)
-                ? <View style={customStyle.checkboxWrpper}>
-                  <Left><CheckBox style={{justifyContent: 'center'}} checked={this.state.selectStoreAddress} onPress={() => this._handleStoreAddress()}/></Left>
-                  <Body style={{flex: 3}}><Text style={CommonStyle.privateText}>{I18n.t('saveAddress')}</Text></Body>
-                  <Right/>
-                </View>
-                : null
-            }
-            <Text style={[CommonStyle.privateText, customStyle.addressText]}>{this.state.address.address}</Text>
-            <Text style={customStyle.remindText}>{I18n.t('copyRemind')}</Text>
-          </View>
-        </PopupDialog>
-
-        <PopupDialog
-          ref={(popupDialog) => {
             this.transactionDetailDialog = popupDialog
           }}
           width={0.9}
@@ -662,9 +585,8 @@ export default class AccountDetailPage extends React.Component {
 
               <View style={customStyle.detailCell}>
                 <Text style={customStyle.detailCellLeftText}>{I18n.t('memo')}</Text>
-                {/*<Text style={[customStyle.detailCellRightText,{width: deviceW*0.9*0.7, marginLeft: 10}]} ellipsizeMode='middle' numberOfLines={1}>123</Text>*/}
                 <TextInput
-                  selectionColor='#EBBD36'
+                  selectionColor={Color.ACCENT}
                   placeholder={I18n.t('addMemo')}
                   style={[customStyle.detailCellInput, {height: this.memoHeight}]}
                   returnKeyType='done'
@@ -755,7 +677,7 @@ export default class AccountDetailPage extends React.Component {
           </Content>
         </PopupDialog>
         <View
-          style={[customStyle.bottom, {display: this.state.bottomDisplay}]}>
+          style={customStyle.bottom}>
           <Button full light style={customStyle.sendButton} onPress={() => {
             this._gotoSendPage()
           }}>
@@ -763,7 +685,7 @@ export default class AccountDetailPage extends React.Component {
             <Text style={customStyle.btnSendText}>{I18n.t('send')}</Text>
           </Button>
           <Button full warning style={customStyle.receiveButton} onPress={() => {
-            this._showAddressDialog()
+            this._gotoAddressDetailPage()
           }}>
             <Icon name='download'/>
             <Text style={customStyle.btnReceiveText}>{I18n.t('receive')}</Text>
@@ -781,15 +703,6 @@ const customStyle = StyleSheet.create({
     flex: 0,
     flexDirection: 'row'
   },
-  sectionHeaderText: {
-    fontSize: Dimen.SECONDARY_TEXT,
-    color: Color.SECONDARY_TEXT,
-    flex: 1,
-    textAlignVertical: 'center'
-  },
-  sectionHeaderDropdown: {
-    flex: 1
-  },
   listView: {
     flex: 1,
     // marginTop: 0,
@@ -798,9 +711,6 @@ const customStyle = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     // height:50,
-  },
-  itemLeft: {
-    flex: 1,
   },
   leftText: {
     color: Color.PRIMARY_TEXT,
@@ -831,71 +741,21 @@ const customStyle = StyleSheet.create({
     backgroundColor: Color.TEXT_ICONS
   },
   receiveButton: {
-    // marginLeft: DIMEN_SPACE,
     flex: 1,
     flexDirection: 'row',
     height: 55,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  qrCodeWrapper: {
-    flex: 1,
-    margin: Dimen.MARGIN_HORIZONTAL
-  },
-  qrCodeView: {
-    marginTop: Dimen.SPACE,
-    alignItems: 'center',
-  },
-  qrCodeHintText: {
-    textAlign: 'center',
-
-  },
-  addressText: {
-    marginHorizontal: Dimen.MARGIN_HORIZONTAL,
-    marginTop: Dimen.SPACE,
-    // marginBottom: DIMEN_SPACE,
-    height: 45
-  },
-  remindText: {
-    marginHorizontal: Dimen.MARGIN_HORIZONTAL,
-    marginTop: Dimen.SPACE,
-    height: 40,
-    fontSize: Dimen.SECONDARY_TEXT,
-    color: Color.SECONDARY_TEXT,
-    textAlignVertical: 'center',
-    textAlign: 'center'
-  },
-  btnText: {
-    flex: 1,
-    textAlign: 'center',
-    color: Color.TEXT_ICONS,
-    fontSize: Dimen.PRIMARY_TEXT
-  },
   btnSendText: {
-    // flex: 1,
-    // textAlign: 'center',
     color: Color.PRIMARY_TEXT,
     fontSize: Dimen.PRIMARY_TEXT,
     marginLeft: -5,
   },
   btnReceiveText: {
-    // flex: 1,
-    // textAlign: 'center',
     color: Color.TEXT_ICONS,
     fontSize: Dimen.PRIMARY_TEXT,
     marginLeft: -5,
-  },
-  copyBtn: {
-    width: deviceW * 0.8 - 2 * Dimen.MARGIN_HORIZONTAL,
-    height: 40,
-    alignItems: 'center',
-    marginBottom: Dimen.MARGIN_VERTICAL
-  },
-  copyBtnText: {
-    flex: 1,
-    textAlign: 'center',
-    color: Color.TEXT_ICONS,
-    fontSize: 18
   },
   listTitleText: {
     marginLeft: 25,
@@ -903,8 +763,7 @@ const customStyle = StyleSheet.create({
     color: Color.SECONDARY_TEXT,
     fontSize: Dimen.SECONDARY_TEXT
   },
-
-  //详情页弹框style
+  //detail popup dialog
   detailCell: {
     width: deviceW * 0.9,
     height: 45,
@@ -938,13 +797,6 @@ const customStyle = StyleSheet.create({
     borderWidth: 0,
     paddingLeft: 5,
     paddingRight: 5,
-  },
-  checkboxWrpper: {
-    marginLeft: Dimen.MARGIN_HORIZONTAL,
-    marginTop: Dimen.SPACE,
-    height: 40,
-    flexDirection: 'row',
-    justifyContent: 'center',
   },
   resendBtnWrapper: {
     height: 50,

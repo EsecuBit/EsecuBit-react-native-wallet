@@ -8,6 +8,7 @@ import ScanQrCodePage from "../pages/send/ScanQrCodePage"
 import SettingsPage from "../pages/settings/SettingsPage"
 import NewAccountPage from '../pages/home/NewAccountPage'
 import HandlerPage from "../pages/splash/HandlerPage"
+import AddressDetailPage from "../pages/detail/AddressDetailPage"
 
 export default {
   Handler: {
@@ -39,5 +40,8 @@ export default {
   },
   Settings: {
     screen: SettingsPage
+  },
+  AddressDetail: {
+    screen: AddressDetailPage
   }
 }
