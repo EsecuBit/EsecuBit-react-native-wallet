@@ -11,6 +11,7 @@ import  ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from "../../components/SendToolbar"
 import Dialog from "react-native-dialog"
 import StringUtil from "../../utils/StringUtil"
+import SendButton from '../../components/SendButton';
 
 const platform = Platform.OS
 
@@ -478,30 +479,9 @@ export default class BTCSendPage extends React.Component {
           <Dialog.Description>{I18n.t('deviceLimitTips') + this.state.totalCostCryptoCurrency + ' ' +this.cryptoCurrencyUnit}</Dialog.Description>
           <Dialog.Button style={{color: Color.ACCENT}} label={I18n.t('confirm')} onPress={() => this.setState({deviceLimitDialogVisible: false})}/>
         </Dialog.Container>
-        <Footer>
-          <FooterTab>
-            <Button full style={{backgroundColor: "#EDBD39"}} onPress={this._send.bind(this)}
-            >
-              <Text style={[customStyle.btnText,{color: Color.TEXT_ICONS, marginTop:platform === "ios" ? 15 : 0}]}>{I18n.t('send')}</Text>
-            </Button>
-          </FooterTab>
-        </Footer>
+        <SendButton onPress={this._send.bind(this)}/>
       </Container>
     )
   }
 }
-
-const customStyle = StyleSheet.create({
-
-  sendBtn: {
-    marginVertical: Dimen.MARGIN_VERTICAL,
-    backgroundColor: Color.ACCENT
-  },
-  btnText: {
-    flex: 1,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontSize: Dimen.PRIMARY_TEXT
-  }
-})
 

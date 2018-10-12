@@ -11,6 +11,7 @@ import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from "../../components/SendToolbar"
 import {CommonStyle} from '../../common/Styles'
 import StringUtil from "../../utils/StringUtil"
+import SendButton from '../../components/SendButton';
 
 const platform = Platform.OS
 
@@ -540,34 +541,13 @@ export default class ETHSendPage extends React.Component {
           <MaterialDialog
             title={I18n.t('transacting')}
             visible={this.state.sendDialogVisible}
-            onCancel={() => {
-            }}>
+            onCancel={() => {}}>
             <Text style={{color: Color.PRIMARY_TEXT}}>{I18n.t('pleaseInputPassword')}</Text>
           </MaterialDialog>
         </Content>
-        <Footer>
-          <FooterTab>
-            <Button full  style={{backgroundColor: Color.ACCENT}} onPress={this._send.bind(this)}>
-              <Text style={[customStyle.btnText, {color: Color.TEXT_ICONS ,marginTop:platform === "ios" ? 15 : 0}]}>{I18n.t('send')}</Text>
-            </Button>
-          </FooterTab>
-        </Footer>
+        <SendButton onPress={this._send.bind(this)} />
       </Container>
     )
   }
 }
-const customStyle = StyleSheet.create({
-
-  sendBtn: {
-    marginVertical: Dimen.MARGIN_VERTICAL,
-    backgroundColor: Color.ACCENT
-  },
-  btnText: {
-    flex: 1,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    // color: COLOR_TEXT_ICONS,
-    fontSize: Dimen.PRIMARY_TEXT
-  }
-})
 
