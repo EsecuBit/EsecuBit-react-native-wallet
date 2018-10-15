@@ -13,6 +13,7 @@ import Menu, {MenuItem} from "react-native-material-menu"
 import Dialog from "react-native-dialog"
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
+import AccountOperateBar from '../../components/AccountOperateBottomBar'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS;
@@ -37,16 +38,13 @@ export default class AccountDetailPage extends React.Component {
     this.transmitter = new BtTransmitter()
 
     this.state = {
-      isShowBottom: true,
       data: [],
       refreshing: false,
       accountBalance: '',
-      coinType: D.isBtc(EsAccountHelper.getInstance().getAccount()['coinType']) ? D.supportedCoinTypes()[0] : D.supportedCoinTypes()[1],
-      isShowDetail: false,
+      isShowBottomBar: true,
       dMemo: '',
       renameDialogVisible: false,
       accountName: this.account.label,
-      containerBgColor: Color.CONTAINER_BG,
       legalCurrencyBalance: ''
     }
   }
@@ -386,8 +384,6 @@ export default class AccountDetailPage extends React.Component {
     } else {
       this.dSmartContract = 'none'
     }
-
-    this.setState({isShowDetail: true})
     this.transactionDetailDialog.show()
   }
 
@@ -438,7 +434,7 @@ export default class AccountDetailPage extends React.Component {
     //lose focus
     this.memoTextInput.blur()
     this.setState({
-      bottomDisplay: 'flex'
+      isShowBottomBar: true
     })
     if (this.state.dMemo !== '') {
       this.dTxInfo.comment = this.state.dMemo;
@@ -539,13 +535,11 @@ export default class AccountDetailPage extends React.Component {
           />
         </View>
         <PopupDialog
-          ref={(popupDialog) => {
-            this.transactionDetailDialog = popupDialog
-          }}
+          ref={(popupDialog) => { this.transactionDetailDialog = popupDialog}}
           width={0.9}
           height={D.isBtc(this.coinType) ? BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT : ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT}
           onDismissed={() => this._handleTransactionDetailDismiss()}
-          onShown={() => this.setState({bottomDisplay: 'none'})}
+          onShown={() => this.setState({isShowBottomBar: false})}
         >
           <Content>
             <View style={{flex: 1}}>
@@ -676,21 +670,7 @@ export default class AccountDetailPage extends React.Component {
             }
           </Content>
         </PopupDialog>
-        <View
-          style={customStyle.bottom}>
-          <Button full light style={customStyle.sendButton} onPress={() => {
-            this._gotoSendPage()
-          }}>
-            <Icon name='send'/>
-            <Text style={customStyle.btnSendText}>{I18n.t('send')}</Text>
-          </Button>
-          <Button full warning style={customStyle.receiveButton} onPress={() => {
-            this._gotoAddressDetailPage()
-          }}>
-            <Icon name='download'/>
-            <Text style={customStyle.btnReceiveText}>{I18n.t('receive')}</Text>
-          </Button>
-        </View>
+        <AccountOperateBar leftOnPress={this._gotoSendPage.bind(this)} rightOnPress={this._gotoAddressDetailPage.bind(this)} visible={this.state.isShowBottomBar}/>
       </Container>
     )
   }
@@ -722,40 +702,6 @@ const customStyle = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: Color.DIVIDER
-  },
-  bottom: {
-    // paddingHorizontal: DIMEN_MARGIN_HORIZONTAL,
-    marginTop: Dimen.SPACE,
-    height: 55,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  sendButton: {
-    flex: 1,
-    flexDirection: 'row',
-    width: deviceW * 0.5,
-    height: 55,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Color.TEXT_ICONS
-  },
-  receiveButton: {
-    flex: 1,
-    flexDirection: 'row',
-    height: 55,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  btnSendText: {
-    color: Color.PRIMARY_TEXT,
-    fontSize: Dimen.PRIMARY_TEXT,
-    marginLeft: -5,
-  },
-  btnReceiveText: {
-    color: Color.TEXT_ICONS,
-    fontSize: Dimen.PRIMARY_TEXT,
-    marginLeft: -5,
   },
   listTitleText: {
     marginLeft: 25,
