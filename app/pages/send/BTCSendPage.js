@@ -60,6 +60,9 @@ export default class BTCSendPage extends React.Component {
         remarks: this.txInfo.comment,
         sendValue: this.esWallet.convertValue(this.coinType, value, D.unit.btc.satoshi, this.cryptoCurrencyUnit)
       })
+      if (this.account.balance === '0') {
+        ToastUtil.showShort(I18n.t('balanceNotEnough'))
+      }
       this.oldTxId = this.txInfo.txId
     }
   }
@@ -84,7 +87,6 @@ export default class BTCSendPage extends React.Component {
       let data = await this.account.getTxInfos()
       let txInfo = data.txInfos[0]
 
-      console.log('22222', data,txInfo)
       if (this.state.remarks !== undefined && this.state.remarks !== '') {
         console.log('111111', this.state.remarks)
         txInfo.comment = this.state.remarks
