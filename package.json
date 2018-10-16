@@ -18,7 +18,8 @@
     "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && npm cache verify",
     "clean-start": "npm run verify && npm run rc-start",
     "fresh-install": "rm -rf $TMPDIR/react-* && watchman watch-del-all && rm -rf ios/build/ModuleCache/* && rm -rf node_modules/ && npm cache verify && npm install",
-    "fresh-start": "npm run fresh-install && npm run rc-start"
+    "fresh-start": "npm run fresh-install && npm run rc-start",
+    "bundle-ios":"node node_modules/react-native/local-cli/cli.js bundle --entry-file index.ios.js --platform ios --dev false --bundle-output ./ios/bundle/index.ios.jsbundle --assets-dest ./ios/bundle"
   },
   "dependencies": {
     "ac-qrcode-rn": "^0.2.1",
