@@ -1,5 +1,5 @@
 export const BTC_COINTYPE = 'btc'
-export const ETH_COINTYPE = 'eth' 
+export const ETH_COINTYPE = 'eth'
 export const LEGAL_CURRENCY_UNIT_KEY = 'defaultLegalCurrency'
 export const ETH_UNIT_KEY = 'eth'
 export const BTC_UNIT_KEY = 'btc'

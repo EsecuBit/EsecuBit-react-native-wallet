@@ -563,7 +563,6 @@ export default class AccountDetailPage extends React.Component {
     this.transactionDetailDialog.dismiss()
     let param = this.navigateParam
     param['txInfo'] = this.rowData
-    console.log("resend1", param)
     if (D.isBtc(this.coinType)) {
       this.props.navigation.navigate('BTCSend', param)
     } else {

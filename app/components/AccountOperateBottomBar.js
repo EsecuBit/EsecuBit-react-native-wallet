@@ -15,7 +15,7 @@ export default class AccountOperateBottomBar extends PureComponent {
   render() {
     const { leftOnPress, rightOnPress, visible } = this.props
     return (
-      <View style={[styles.bottom,{display: visible ? 'flex' : 'none'}]}>
+      <View style={[styles.bottom, { display: visible ? 'flex' : 'none' }]}>
         <Button full light style={styles.sendButton} onPress={leftOnPress}>
           <Icon name="send" />
           <Text style={styles.btnSendText}>{I18n.t('send')}</Text>
@@ -24,8 +24,7 @@ export default class AccountOperateBottomBar extends PureComponent {
           full
           warning
           style={styles.receiveButton}
-          onPress={rightOnPress}
-        >
+          onPress={rightOnPress}>
           <Icon name="download" />
           <Text style={styles.btnReceiveText}>{I18n.t('receive')}</Text>
         </Button>
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
     height: 55,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   sendButton: {
     flex: 1,

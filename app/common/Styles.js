@@ -9,8 +9,8 @@ const COLOR_SECONDARY_TEXT = '#666666'
 const COLOR_HINT_TEXT = '#C0C0C0'
 const COLOR_DIVIDER = '#EBEBEB'
 const COLOR_SECTION = '#E9E9EF'
-const COLOR_INCREASE = "#00bfa5"
-const COLOR_REDUCED = "#e53935"
+const COLOR_INCREASE = '#00bfa5'
+const COLOR_REDUCED = '#e53935'
 const COLOR_PRESSED = '#c8c7cc'
 const COLOR_BITCOIN = '#FCAB2E'
 const COLOR_ETH = '#5A799B'
@@ -41,7 +41,6 @@ export const Color = {
   MASK: COLOR_MASK
 }
 
-
 const DIMEN_SECONDAT_TEXT = 14
 const DIMEN_PRIMARY_TEXT = 17
 const DIMEN_SPACE = 8
@@ -65,13 +64,11 @@ export const Dimen = {
   SAFEAREA_PADDING: DIMEN_IPHONEX_SAFEAREA_PADDING
 }
 
-
-
-const deviceHeight = Dimensions.get("window").height;
-const deviceWidth = Dimensions.get("window").width;
-const platform = Platform.OS;
+const deviceHeight = Dimensions.get('window').height
+const deviceWidth = Dimensions.get('window').width
+const platform = Platform.OS
 export const isIphoneX =
-  platform === "ios" && (deviceHeight === 812 || deviceWidth === 812);
+  platform === 'ios' && (deviceHeight === 812 || deviceWidth === 812)
 
 export const CommonStyle = StyleSheet.create({
   privateText: {
@@ -90,15 +87,15 @@ export const CommonStyle = StyleSheet.create({
     height: 1,
     backgroundColor: COLOR_DIVIDER
   },
-  layoutBottom:{
+  layoutBottom: {
     paddingBottom: isIphoneX ? DIMEN_IPHONEX_SAFEAREA_PADDING : 0
   },
-  cardStyle:{
-    borderTopLeftRadius: DIMEN_CORNER, 
-    borderTopRightRadius: DIMEN_CORNER, 
-    borderBottomLeftRadius: DIMEN_CORNER, 
+  cardStyle: {
+    borderTopLeftRadius: DIMEN_CORNER,
+    borderTopRightRadius: DIMEN_CORNER,
+    borderBottomLeftRadius: DIMEN_CORNER,
     borderBottomRightRadius: DIMEN_CORNER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     elevation: 3,
     height: DIMEN_CARD_HEIGHT,
     marginLeft: 10,
@@ -107,22 +104,21 @@ export const CommonStyle = StyleSheet.create({
     marginBottom: DIMEN_SPACE
   },
   toolbarIOS: {
-    justifyContent:'center',
-    height: DIMEN_TOOLBAR_IOS,
+    justifyContent: 'center',
+    height: DIMEN_TOOLBAR_IOS
   },
   toolbarAndroid: {
-    justifyContent:'center',
+    justifyContent: 'center',
     flex: 3,
     alignItems: 'center',
     marginLeft: DIMEN_MARGIN_HORIZONTAL + DIMEN_MARGIN_HORIZONTAL,
-    height: DIMEN_TOOLBAR_ANDROID,
+    height: DIMEN_TOOLBAR_ANDROID
   },
   multlineInputAndroid: {
     height: 68
   },
   multlineInputIOS: {
     height: 68,
-    paddingTop: 24,
+    paddingTop: 24
   }
-
 })

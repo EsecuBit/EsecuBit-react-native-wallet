@@ -1,18 +1,17 @@
 import React, { Component } from 'react'
 import { DeviceEventEmitter, Dimensions, Platform, View } from 'react-native'
-import { Container} from 'native-base'
+import { Container } from 'native-base'
 import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
-import {Color} from '../../common/Styles'
+import { Color } from '../../common/Styles'
 
 const platform = Platform.OS
-export default class ScanQrCodePage extends Component{
-
+export default class ScanQrCodePage extends Component {
   constructor(props) {
     super(props)
     this.hadReceiveResult = false
-    this.isIPhone = (platform === "ios")
+    this.isIPhone = platform === 'ios'
     this.deviceW = Dimensions.get('window').width
   }
   _qrCodeReceived(e) {
@@ -26,36 +25,37 @@ export default class ScanQrCodePage extends Component{
 
   _renderTopBar() {
     let _that = this
-    return (
-      _that.isIPhone ?
-        null
-        :
-        <Button light transparent onPress={() => _that.props.navigation.pop()}>
-          <Icon name='close' color={Color.DIVIDER} />
-        </Button>
+    return _that.isIPhone ? null : (
+      <Button light transparent onPress={() => _that.props.navigation.pop()}>
+        <Icon name="close" color={Color.DIVIDER} />
+      </Button>
     )
   }
   _renderBottomBar() {
     let _that = this
-    return(
-      _that.isIPhone ?
-        <View style={{ justifyContent:'center', alignItems: 'center'}}>
-          <View>
-            <Button light transparent onPress={() => _that.props.navigation.pop()}>
-              <Icon  name='x' type='Feather' style={{ backgroundColor: 'transparent', color: Color.ACCENT}}/>
-            </Button>
-          </View>
+    return _that.isIPhone ? (
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <View>
+          <Button
+            light
+            transparent
+            onPress={() => _that.props.navigation.pop()}>
+            <Icon
+              name="x"
+              type="Feather"
+              style={{ backgroundColor: 'transparent', color: Color.ACCENT }}
+            />
+          </Button>
         </View>
-        : null
-    )
-
+      </View>
+    ) : null
   }
   render() {
     return (
       <Container>
         <QRScannerView
           hintTextPosition={this.isIPhone ? 150 : 120}
-          hintTextStyle={{color:Color.HINT_TEXT}}
+          hintTextStyle={{ color: Color.HINT_TEXT }}
           maskColor={Color.MASK}
           hintText={I18n.t('qrCodeHintText')}
           borderWidth={0}

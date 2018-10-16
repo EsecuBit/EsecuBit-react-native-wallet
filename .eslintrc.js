@@ -40,7 +40,8 @@ module.exports = {
           checkLoops: false
       }
     ],
-      "react-app/react/react-in-jsx-scope": ["warn"]
+      "react-app/react/react-in-jsx-scope": ["warn"],
+      "react/prop-types": ["error", { "ignore": ["navigation"] }]
     
     },
     "env": {

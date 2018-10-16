@@ -61,19 +61,19 @@ export default class AddressDetailPage extends PureComponent {
   render() {
     return (
       <PopupDialog
-        ref={popupDialog => {this.popupDialog = popupDialog}}
+        ref={popupDialog => {
+          this.popupDialog = popupDialog
+        }}
         width={0.8}
         height={D.isBtc(this.coinType) ? 455 : 415}
         containerStyle={{ backgroundColor: '#E0E0E0' }}
-        onDismissed={() => this.props.navigation.pop()}
-      >
+        onDismissed={() => this.props.navigation.pop()}>
         <View style={styles.qrCodeWrapper}>
           <Text style={CommonStyle.secondaryText}>
             {I18n.t('showAddressTip')}
           </Text>
           <TouchableWithoutFeedback
-            onLongPress={() => this._setClipboardContent(this.state.address)}
-          >
+            onLongPress={() => this._setClipboardContent(this.state.address)}>
             <View style={styles.qrCodeView}>
               <QrCode
                 value={this.state.address}
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     marginTop: Dimen.SPACE,
     height: 40,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   addressText: {
     marginHorizontal: Dimen.MARGIN_HORIZONTAL,
