@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   View,
-  StyleSheet,
   Platform,
   DeviceEventEmitter,
   TouchableOpacity
@@ -13,9 +12,6 @@ import {
   Content,
   Icon,
   Text,
-  Button,
-  Footer,
-  FooterTab,
   Card,
   CardItem,
   Item,
@@ -133,7 +129,7 @@ export default class BTCSendPage extends React.Component {
   async _getSuggestedFee() {
     let fees = await this.account.getSuggestedFee()
     this.setState({ fees: Object.values(fees) })
-    this._convertToSuggestedFeeTip(this.coinType, fees)
+    this._convertToSuggestedFeeTip(fees)
     this.setState({ selectedFeeTip: this.state.feesTip[0].value })
     this.setState({ selectedFee: this.state.fees[0] })
   }
@@ -142,7 +138,7 @@ export default class BTCSendPage extends React.Component {
    * @param {string} coinType
    * @param {Object} fees
    */
-  _convertToSuggestedFeeTip(coinType, fees) {
+  _convertToSuggestedFeeTip(fees) {
     // 3 level fee for BTC
     let feeLevel = 3
     let feeKeys = Object.keys(fees)
@@ -551,7 +547,7 @@ export default class BTCSendPage extends React.Component {
                     fontSize={14}
                     itemTextStyle={{ textAlign: 'center', flex: 0 }}
                     value={this.state.selectedFeeTip}
-                    onChangeText={(value, index, data) => {
+                    onChangeText={(value, index) => {
                       this._calculateBTCFee(this.state.fees[index].toString())
                     }}
                   />

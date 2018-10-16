@@ -1,5 +1,5 @@
-import ToastUtil from "./ToastUtil";
-import I18n from "../lang/i18n";
+import ToastUtil from './ToastUtil'
+import I18n from '../lang/i18n'
 
 export default class StringUtil {
   /**
@@ -8,20 +8,23 @@ export default class StringUtil {
    * @returns {string}
    */
   static formatLegalCurrency(num) {
-    num = num.toString().replace(/\$|\,/g,'')
-    if(isNaN(num)) {
-      num = "0";
+    num = num.toString().replace(/\$|\,/g, '')
+    if (isNaN(num)) {
+      num = '0'
     }
-    num = Math.floor(num*100+0.50000000001)
-    let cents = num%100
-    num = Math.floor(num/100).toString()
-    if(cents<10) {
-      cents = "0" + cents
+    num = Math.floor(num * 100 + 0.50000000001)
+    let cents = num % 100
+    num = Math.floor(num / 100).toString()
+    if (cents < 10) {
+      cents = '0' + cents
     }
-    for (let i = 0; i < Math.floor((num.length-(1+i))/3); i++) {
-      num = num.substring(0,num.length-(4*i+3))+','+ num.substring(num.length-(4*i+3))
+    for (let i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++) {
+      num =
+        num.substring(0, num.length - (4 * i + 3)) +
+        ',' +
+        num.substring(num.length - (4 * i + 3))
     }
-    return  num + '.' + cents;
+    return num + '.' + cents
   }
 
   /**
@@ -47,7 +50,7 @@ export default class StringUtil {
    */
   static removeOxHexString(data) {
     if (data.startsWith('0x')) {
-      data = data.slice(2,data.length)
+      data = data.slice(2, data.length)
     }
     return data
   }
@@ -59,24 +62,32 @@ export default class StringUtil {
    */
   static removeNegativeSymbol(data) {
     if (data.startsWith('-')) {
-      data = data.slice(1,data.length)
+      data = data.slice(1, data.length)
     }
     return data
   }
 
   /**
    * Format timestamp to date(yyyy-MM-dd:HH:mm:ss)
-   * @param {string} time 
+   * @param {string} time
    */
-  static formatTimeStamp (time) {
+  static formatTimeStamp(time) {
     let date = new Date(time)
     let yyyy = date.getFullYear()
     let month = date.getMonth() + 1
     let MM = parseInt(month / 10) ? month : '0' + month
-    let dd = parseInt(date.getDate() / 10) ? date.getDate() : '0' + date.getDate()
-    let HH = parseInt(date.getHours() / 10) ? date.getHours() : '0' + date.getHours()
-    let mm = parseInt(date.getMinutes() / 10) ? date.getMinutes() : '0' + date.getMinutes()
-    let ss = parseInt(date.getSeconds() / 10) ? date.getSeconds() : '0' + date.getSeconds()
+    let dd = parseInt(date.getDate() / 10)
+      ? date.getDate()
+      : '0' + date.getDate()
+    let HH = parseInt(date.getHours() / 10)
+      ? date.getHours()
+      : '0' + date.getHours()
+    let mm = parseInt(date.getMinutes() / 10)
+      ? date.getMinutes()
+      : '0' + date.getMinutes()
+    let ss = parseInt(date.getSeconds() / 10)
+      ? date.getSeconds()
+      : '0' + date.getSeconds()
     let arr = []
     arr.push(yyyy)
     arr.push('-')
@@ -109,7 +120,7 @@ export default class StringUtil {
   }
 
   static isHexString(text) {
-    if (text && (!/^(0[xX])?[0-9a-fA-F]+$/.test(text))) {
+    if (text && !/^(0[xX])?[0-9a-fA-F]+$/.test(text)) {
       ToastUtil.showLong(I18n.t('isNotHexString'))
       return false
     }
@@ -117,12 +128,17 @@ export default class StringUtil {
   }
 
   static jsonToFormData(body) {
-    let EQUAL = "=";
-    let AMP = "&";
+    let EQUAL = '='
+    let AMP = '&'
     return Object.keys(body)
-      .map(key => Array.isArray(body[key])
-        ? body[key].map(value => key + EQUAL + encodeURIComponent(value)).join(AMP)
-        : key + EQUAL + encodeURIComponent(body[key])
-      ).join(AMP)
+      .map(
+        key =>
+          Array.isArray(body[key])
+            ? body[key]
+              .map(value => key + EQUAL + encodeURIComponent(value))
+              .join(AMP)
+            : key + EQUAL + encodeURIComponent(body[key])
+      )
+      .join(AMP)
   }
 }

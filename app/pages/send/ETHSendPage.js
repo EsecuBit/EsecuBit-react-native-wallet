@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   View,
-  StyleSheet,
   Platform,
   DeviceEventEmitter,
   TouchableOpacity
@@ -13,9 +12,6 @@ import {
   Content,
   Icon,
   Text,
-  Button,
-  Footer,
-  FooterTab,
   Card,
   CardItem,
   Item,
@@ -581,7 +577,7 @@ export default class ETHSendPage extends React.Component {
                     value={this.state.selectedFeeTip}
                     itemTextStyle={{ textAlign: 'center', flex: 0 }}
                     fontSize={14}
-                    onChangeText={(value, index, data) =>
+                    onChangeText={(value, index) =>
                       this._calculateETHFee(
                         this.state.fees[index],
                         this.state.gasLimit

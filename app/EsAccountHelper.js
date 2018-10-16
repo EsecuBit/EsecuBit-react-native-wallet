@@ -1,5 +1,4 @@
-
-let EsAccountHelper = (function(){
+let EsAccountHelper = (function() {
   let esAccount = null
   let instance = null
 
@@ -17,12 +16,12 @@ let EsAccountHelper = (function(){
     }
   }
   return {
-    getInstance: function () {
+    getInstance: function() {
       if (!instance) {
         instance = new Init()
       }
       return instance
     }
   }
-})();
+})()
 export default EsAccountHelper

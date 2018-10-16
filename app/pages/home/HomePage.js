@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import {
-  StyleSheet,
   NetInfo,
   View,
   Platform,
@@ -8,9 +7,7 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
-  Linking,
-  BackAndroid
-} from 'react-native'
+  Linking} from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
   Container,

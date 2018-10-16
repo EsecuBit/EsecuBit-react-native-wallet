@@ -4,43 +4,52 @@ global.navigator = global.navigator || {}
 global.window = global.window || {}
 
 // asyncToGenerator
-var babelHelpers = global.babelHelpers = {};
-babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-};
+var babelHelpers = (global.babelHelpers = {})
+babelHelpers.typeof =
+  typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
+    ? function(obj) {
+      return typeof obj
+    }
+    : function(obj) {
+      return obj && typeof Symbol === 'function' && obj.constructor === Symbol
+        ? 'symbol'
+        : typeof obj
+    }
 
-babelHelpers.jsx = function () {
-  var REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7;
+babelHelpers.jsx = (function() {
+  var REACT_ELEMENT_TYPE =
+    (typeof Symbol === 'function' &&
+      Symbol.for &&
+      Symbol.for('react.element')) ||
+    0xeac7
   return function createRawReactElement(type, props, key, children) {
-    var defaultProps = type && type.defaultProps;
-    var childrenLength = arguments.length - 3;
+    var defaultProps = type && type.defaultProps
+    var childrenLength = arguments.length - 3
 
     if (!props && childrenLength !== 0) {
-      props = {};
+      props = {}
     }
 
     if (props && defaultProps) {
       for (var propName in defaultProps) {
         if (props[propName] === void 0) {
-          props[propName] = defaultProps[propName];
+          props[propName] = defaultProps[propName]
         }
       }
     } else if (!props) {
-      props = defaultProps || {};
+      props = defaultProps || {}
     }
 
     if (childrenLength === 1) {
-      props.children = children;
+      props.children = children
     } else if (childrenLength > 1) {
-      var childArray = Array(childrenLength);
+      var childArray = Array(childrenLength)
 
       for (var i = 0; i < childrenLength; i++) {
-        childArray[i] = arguments[i + 3];
+        childArray[i] = arguments[i + 3]
       }
 
-      props.children = childArray;
+      props.children = childArray
     }
 
     return {
@@ -50,146 +59,154 @@ babelHelpers.jsx = function () {
       ref: null,
       props: props,
       _owner: null
-    };
-  };
-}();
+    }
+  }
+})()
 
-babelHelpers.asyncToGenerator = function (fn) {
-  return function () {
-    var gen = fn.apply(this, arguments);
-    return new Promise(function (resolve, reject) {
+babelHelpers.asyncToGenerator = function(fn) {
+  return function() {
+    var gen = fn.apply(this, arguments)
+    return new Promise(function(resolve, reject) {
       function step(key, arg) {
         try {
-          var info = gen[key](arg);
-          var value = info.value;
+          var info = gen[key](arg)
+          var value = info.value
         } catch (error) {
-          reject(error);
-          return;
+          reject(error)
+          return
         }
 
         if (info.done) {
-          resolve(value);
+          resolve(value)
         } else {
-          return Promise.resolve(value).then(function (value) {
-            return step("next", value);
-          }, function (err) {
-            return step("throw", err);
-          });
+          return Promise.resolve(value).then(
+            function(value) {
+              return step('next', value)
+            },
+            function(err) {
+              return step('throw', err)
+            }
+          )
         }
       }
 
-      return step("next");
-    });
-  };
-};
-
-babelHelpers.classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
+      return step('next')
+    })
   }
-};
+}
 
-babelHelpers.createClass = function () {
+babelHelpers.classCallCheck = function(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function')
+  }
+}
+
+babelHelpers.createClass = (function() {
   function defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
+      var descriptor = props[i]
+      descriptor.enumerable = descriptor.enumerable || false
+      descriptor.configurable = true
+      if ('value' in descriptor) descriptor.writable = true
+      Object.defineProperty(target, descriptor.key, descriptor)
     }
   }
 
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
+  return function(Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps)
+    if (staticProps) defineProperties(Constructor, staticProps)
+    return Constructor
+  }
+})()
 
-babelHelpers.defineEnumerableProperties = function (obj, descs) {
+babelHelpers.defineEnumerableProperties = function(obj, descs) {
   for (var key in descs) {
-    var desc = descs[key];
-    desc.configurable = desc.enumerable = true;
-    if ("value" in desc) desc.writable = true;
-    Object.defineProperty(obj, key, desc);
+    var desc = descs[key]
+    desc.configurable = desc.enumerable = true
+    if ('value' in desc) desc.writable = true
+    Object.defineProperty(obj, key, desc)
   }
 
-  return obj;
-};
+  return obj
+}
 
-babelHelpers.defaults = function (obj, defaults) {
-  var keys = Object.getOwnPropertyNames(defaults);
+babelHelpers.defaults = function(obj, defaults) {
+  var keys = Object.getOwnPropertyNames(defaults)
 
   for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    var value = Object.getOwnPropertyDescriptor(defaults, key);
+    var key = keys[i]
+    var value = Object.getOwnPropertyDescriptor(defaults, key)
 
     if (value && value.configurable && obj[key] === undefined) {
-      Object.defineProperty(obj, key, value);
+      Object.defineProperty(obj, key, value)
     }
   }
 
-  return obj;
-};
+  return obj
+}
 
-babelHelpers.defineProperty = function (obj, key, value) {
+babelHelpers.defineProperty = function(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
       enumerable: true,
       configurable: true,
       writable: true
-    });
+    })
   } else {
-    obj[key] = value;
+    obj[key] = value
   }
 
-  return obj;
-};
+  return obj
+}
 
-babelHelpers.extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
+babelHelpers.extends =
+  Object.assign ||
+  function(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i]
 
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key]
+        }
       }
     }
-  }
 
-  return target;
-};
+    return target
+  }
 
 babelHelpers.get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
+  if (object === null) object = Function.prototype
+  var desc = Object.getOwnPropertyDescriptor(object, property)
 
   if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
+    var parent = Object.getPrototypeOf(object)
 
     if (parent === null) {
-      return undefined;
+      return undefined
     } else {
-      return get(parent, property, receiver);
+      return get(parent, property, receiver)
     }
-  } else if ("value" in desc) {
-    return desc.value;
+  } else if ('value' in desc) {
+    return desc.value
   } else {
-    var getter = desc.get;
+    var getter = desc.get
 
     if (getter === undefined) {
-      return undefined;
+      return undefined
     }
 
-    return getter.call(receiver);
+    return getter.call(receiver)
   }
-};
+}
 
-babelHelpers.inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+babelHelpers.inherits = function(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError(
+      'Super expression must either be null or a function, not ' +
+        typeof superClass
+    )
   }
 
   subClass.prototype = Object.create(superClass && superClass.prototype, {
@@ -199,184 +216,211 @@ babelHelpers.inherits = function (subClass, superClass) {
       writable: true,
       configurable: true
     }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
+  })
+  if (superClass)
+    Object.setPrototypeOf
+      ? Object.setPrototypeOf(subClass, superClass)
+      : (subClass.__proto__ = superClass)
+}
 
-babelHelpers.instanceof = function (left, right) {
-  if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
-    return right[Symbol.hasInstance](left);
+babelHelpers.instanceof = function(left, right) {
+  if (
+    right != null &&
+    typeof Symbol !== 'undefined' &&
+    right[Symbol.hasInstance]
+  ) {
+    return right[Symbol.hasInstance](left)
   } else {
-    return left instanceof right;
+    return left instanceof right
   }
-};
+}
 
-babelHelpers.interopRequireDefault = function (obj) {
-  return obj && obj.__esModule ? obj : {
-    default: obj
-  };
-};
+babelHelpers.interopRequireDefault = function(obj) {
+  return obj && obj.__esModule
+    ? obj
+    : {
+      default: obj
+    }
+}
 
-babelHelpers.interopRequireWildcard = function (obj) {
+babelHelpers.interopRequireWildcard = function(obj) {
   if (obj && obj.__esModule) {
-    return obj;
+    return obj
   } else {
-    var newObj = {};
+    var newObj = {}
 
     if (obj != null) {
       for (var key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        if (Object.prototype.hasOwnProperty.call(obj, key))
+          newObj[key] = obj[key]
       }
     }
 
-    newObj.default = obj;
-    return newObj;
+    newObj.default = obj
+    return newObj
   }
-};
+}
 
-babelHelpers.newArrowCheck = function (innerThis, boundThis) {
+babelHelpers.newArrowCheck = function(innerThis, boundThis) {
   if (innerThis !== boundThis) {
-    throw new TypeError("Cannot instantiate an arrow function");
+    throw new TypeError('Cannot instantiate an arrow function')
   }
-};
+}
 
-babelHelpers.objectDestructuringEmpty = function (obj) {
-  if (obj == null) throw new TypeError("Cannot destructure undefined");
-};
+babelHelpers.objectDestructuringEmpty = function(obj) {
+  if (obj == null) throw new TypeError('Cannot destructure undefined')
+}
 
-babelHelpers.objectWithoutProperties = function (obj, keys) {
-  var target = {};
+babelHelpers.objectWithoutProperties = function(obj, keys) {
+  var target = {}
 
   for (var i in obj) {
-    if (keys.indexOf(i) >= 0) continue;
-    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-    target[i] = obj[i];
+    if (keys.indexOf(i) >= 0) continue
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue
+    target[i] = obj[i]
   }
 
-  return target;
-};
+  return target
+}
 
-babelHelpers.possibleConstructorReturn = function (self, call) {
+babelHelpers.possibleConstructorReturn = function(self, call) {
   if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    throw new ReferenceError(
+      "this hasn't been initialised - super() hasn't been called"
+    )
   }
 
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
+  return call && (typeof call === 'object' || typeof call === 'function')
+    ? call
+    : self
+}
 
-babelHelpers.selfGlobal = typeof global === "undefined" ? self : global;
+babelHelpers.selfGlobal = typeof global === 'undefined' ? self : global
 
 babelHelpers.set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
+  var desc = Object.getOwnPropertyDescriptor(object, property)
 
   if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
+    var parent = Object.getPrototypeOf(object)
 
     if (parent !== null) {
-      set(parent, property, value, receiver);
+      set(parent, property, value, receiver)
     }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
+  } else if ('value' in desc && desc.writable) {
+    desc.value = value
   } else {
-    var setter = desc.set;
+    var setter = desc.set
 
     if (setter !== undefined) {
-      setter.call(receiver, value);
+      setter.call(receiver, value)
     }
   }
 
-  return value;
-};
+  return value
+}
 
-babelHelpers.slicedToArray = function () {
+babelHelpers.slicedToArray = (function() {
   function sliceIterator(arr, i) {
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _e = undefined;
+    var _arr = []
+    var _n = true
+    var _d = false
+    var _e = undefined
 
     try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-        _arr.push(_s.value);
+      for (
+        var _i = arr[Symbol.iterator](), _s;
+        !(_n = (_s = _i.next()).done);
+        _n = true
+      ) {
+        _arr.push(_s.value)
 
-        if (i && _arr.length === i) break;
+        if (i && _arr.length === i) break
       }
     } catch (err) {
-      _d = true;
-      _e = err;
+      _d = true
+      _e = err
     } finally {
       try {
-        if (!_n && _i["return"]) _i["return"]();
+        if (!_n && _i['return']) _i['return']()
       } finally {
-        if (_d) throw _e;
+        if (_d) throw _e
       }
     }
 
-    return _arr;
+    return _arr
   }
 
-  return function (arr, i) {
+  return function(arr, i) {
     if (Array.isArray(arr)) {
-      return arr;
+      return arr
     } else if (Symbol.iterator in Object(arr)) {
-      return sliceIterator(arr, i);
+      return sliceIterator(arr, i)
     } else {
-      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      throw new TypeError(
+        'Invalid attempt to destructure non-iterable instance'
+      )
     }
-  };
-}();
+  }
+})()
 
-babelHelpers.slicedToArrayLoose = function (arr, i) {
+babelHelpers.slicedToArrayLoose = function(arr, i) {
   if (Array.isArray(arr)) {
-    return arr;
+    return arr
   } else if (Symbol.iterator in Object(arr)) {
-    var _arr = [];
+    var _arr = []
 
-    for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-      _arr.push(_step.value);
+    for (
+      var _iterator = arr[Symbol.iterator](), _step;
+      !(_step = _iterator.next()).done;
 
-      if (i && _arr.length === i) break;
+    ) {
+      _arr.push(_step.value)
+
+      if (i && _arr.length === i) break
     }
 
-    return _arr;
+    return _arr
   } else {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    throw new TypeError('Invalid attempt to destructure non-iterable instance')
   }
-};
+}
 
-babelHelpers.taggedTemplateLiteral = function (strings, raw) {
-  return Object.freeze(Object.defineProperties(strings, {
-    raw: {
-      value: Object.freeze(raw)
-    }
-  }));
-};
+babelHelpers.taggedTemplateLiteral = function(strings, raw) {
+  return Object.freeze(
+    Object.defineProperties(strings, {
+      raw: {
+        value: Object.freeze(raw)
+      }
+    })
+  )
+}
 
-babelHelpers.taggedTemplateLiteralLoose = function (strings, raw) {
-  strings.raw = raw;
-  return strings;
-};
+babelHelpers.taggedTemplateLiteralLoose = function(strings, raw) {
+  strings.raw = raw
+  return strings
+}
 
-babelHelpers.temporalRef = function (val, name, undef) {
+babelHelpers.temporalRef = function(val, name, undef) {
   if (val === undef) {
-    throw new ReferenceError(name + " is not defined - temporal dead zone");
+    throw new ReferenceError(name + ' is not defined - temporal dead zone')
   } else {
-    return val;
+    return val
   }
-};
+}
 
-babelHelpers.temporalUndefined = {};
+babelHelpers.temporalUndefined = {}
 
-babelHelpers.toArray = function (arr) {
-  return Array.isArray(arr) ? arr : Array.from(arr);
-};
+babelHelpers.toArray = function(arr) {
+  return Array.isArray(arr) ? arr : Array.from(arr)
+}
 
-babelHelpers.toConsumableArray = function (arr) {
+babelHelpers.toConsumableArray = function(arr) {
   if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++)
+      arr2[i] = arr[i]
 
-    return arr2;
+    return arr2
   } else {
-    return Array.from(arr);
+    return Array.from(arr)
   }
-};
+}
