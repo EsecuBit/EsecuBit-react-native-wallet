@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 
 const deviceW = Dimensions.get('window').width
 
-export default class AccountOperateBar extends PureComponent {
+export default class AccountOperateBottomBar extends PureComponent {
   constructor() {
     super()
   }
@@ -70,12 +70,12 @@ const styles = StyleSheet.create({
   }
 })
 
-AccountOperateBar.prototypes = {
+AccountOperateBottomBar.prototypes = {
   leftOnPress: PropTypes.func,
   rightOnPress: PropTypes.func,
   visible: PropTypes.bool
 }
 
-AccountOperateBar.defaultProps = {
+AccountOperateBottomBar.defaultProps = {
   visible: true
 }
