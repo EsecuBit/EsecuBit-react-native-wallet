@@ -9,6 +9,7 @@ import SettingsPage from '../pages/settings/SettingsPage'
 import NewAccountPage from '../pages/home/NewAccountPage'
 import HandlerPage from '../pages/splash/HandlerPage'
 import AddressDetailPage from '../pages/detail/AddressDetailPage'
+import EOSSendPage from '../pages/send/EOSSendPage'
 
 export default {
   Handler: {
@@ -43,5 +44,8 @@ export default {
   },
   AddressDetail: {
     screen: AddressDetailPage
+  },
+  EOSSend: {
+    screen: EOSSendPage
   }
 }

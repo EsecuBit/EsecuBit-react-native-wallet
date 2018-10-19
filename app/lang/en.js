@@ -139,6 +139,7 @@ export default {
   confirming: 'Confirming',
   checkVersion: 'Check For Updates',
   versionUpdate: 'Version Update',
-  connectDeviceToGetCOSVersion: 'Please connect device to get cos version'
+  connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
+  accountName: 'Account Name'
 
 }

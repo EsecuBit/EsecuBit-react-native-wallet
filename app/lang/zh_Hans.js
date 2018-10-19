@@ -140,5 +140,6 @@ export default {
   confirming: '确认中',
   checkVersion: '检查更新',
   versionUpdate: '版本更新',
-  connectDeviceToGetCOSVersion: '请先连接设备获取COS版本信息'
+  connectDeviceToGetCOSVersion: '请先连接设备获取COS版本信息',
+  accountName: '帐户名'
 }
