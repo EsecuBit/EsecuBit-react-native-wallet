@@ -141,5 +141,6 @@ export default {
   checkVersion: '检查更新',
   versionUpdate: '版本更新',
   connectDeviceToGetCOSVersion: '请先连接设备获取COS版本信息',
-  accountName: '帐户名'
+  accountName: '帐户名',
+  accountAssets: '帐户资产'
 }

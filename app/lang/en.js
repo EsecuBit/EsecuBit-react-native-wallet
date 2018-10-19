@@ -140,6 +140,7 @@ export default {
   checkVersion: 'Check For Updates',
   versionUpdate: 'Version Update',
   connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
-  accountName: 'Account Name'
+  accountName: 'Account Name',
+  accountAssets: 'Account Assets'
 
 }

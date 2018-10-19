@@ -10,6 +10,7 @@ import NewAccountPage from '../pages/home/NewAccountPage'
 import HandlerPage from '../pages/splash/HandlerPage'
 import AddressDetailPage from '../pages/detail/AddressDetailPage'
 import EOSSendPage from '../pages/send/EOSSendPage'
+import EosAssetsDetailPage from '../pages/detail/EosAssetsDetailPage'
 
 export default {
   Handler: {
@@ -47,5 +48,8 @@ export default {
   },
   EOSSend: {
     screen: EOSSendPage
+  },
+  EOSAssets: {
+    screen: EosAssetsDetailPage
   }
 }
