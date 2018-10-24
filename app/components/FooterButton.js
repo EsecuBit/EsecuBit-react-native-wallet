@@ -3,7 +3,6 @@ import { StyleSheet, Platform } from 'react-native'
 import { Footer, FooterTab, Button, Text } from 'native-base'
 import PropTypes from 'prop-types'
 import { Dimen, Color } from '../common/Styles'
-import I18n from '../lang/i18n'
 
 const platform = Platform.OS
 const styles = StyleSheet.create({
@@ -12,22 +11,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     fontSize: Dimen.PRIMARY_TEXT,
-    color: Color.TEXT_ICONS,
     marginTop: platform === 'ios' ? 15 : 0
-  }
+  },
 })
-export default class SendButton extends PureComponent {
+export default class FooterButton extends PureComponent {
   render() {
-    const { title, textStyle, onPress, backgroundColor, disabled } = this.props
+    const { title, onPress, disabled } = this.props
     return (
       <Footer>
         <FooterTab>
           <Button
             full
-            style={{ backgroundColor: backgroundColor }}
+            style={{backgroundColor: disabled ? Color.DISABLE_BG : Color.ACCENT}}
             onPress={onPress}
             disabled={disabled}>
-            <Text style={textStyle}>{title}</Text>
+            <Text style={[styles.btnText, {color: disabled ? Color.SECONDARY_TEXT : Color.TEXT_ICONS}]}>{title}</Text>
           </Button>
         </FooterTab>
       </Footer>
@@ -35,17 +33,13 @@ export default class SendButton extends PureComponent {
   }
 }
 
-SendButton.prototypes = {
+FooterButton.prototypes = {
   title: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  textStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   onPress: PropTypes.func,
   disabled: PropTypes.bool
 }
 
-SendButton.defaultProps = {
-  title: I18n.t('send'),
-  textStyle: styles.btnText,
-  backgroundColor: Color.ACCENT,
+FooterButton.defaultProps = {
+  title: '',
   disabled: false
 }

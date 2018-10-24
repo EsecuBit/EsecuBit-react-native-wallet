@@ -25,7 +25,7 @@ import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import { CommonStyle } from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
-import SendButton from '../../components/SendButton'
+import FooterButton from '../../components/FooterButton'
 
 const platform = Platform.OS
 
@@ -753,7 +753,7 @@ export default class ETHSendPage extends React.Component {
             </Text>
           </MaterialDialog>
         </Content>
-        <SendButton onPress={this._send.bind(this)} />
+        <FooterButton onPress={this._send.bind(this)} title='Send'/>
       </Container>
     )
   }

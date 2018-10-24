@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Text } from 'react-native'
 import { View, Container, Content, Item, Input, Label, Card, CardItem } from 'native-base'
 import BaseToolbar from '../../components/BaseToolbar'
-import SendButton from '../../components/SendButton'
+import FooterButton from '../../components/FooterButton'
 import { Color, Dimen } from '../../common/Styles'
 
 export default class EOSAssetsUnStakePage extends Component {
@@ -41,7 +41,7 @@ export default class EOSAssetsUnStakePage extends Component {
             </CardItem>
           </Card>
         </Content>
-        <SendButton title="UnStake" />
+        <FooterButton title="UnStake" />
       </Container>
     )
   }

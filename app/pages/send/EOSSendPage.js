@@ -11,7 +11,7 @@ import {
 } from 'native-base'
 import { TouchableOpacity, Platform } from 'react-native'
 import SendToolbar from '../../components/SendToolbar'
-import SendButton from '../../components/SendButton'
+import FooterButton from '../../components/FooterButton'
 import { Color, Dimen, CommonStyle } from '../../common/Styles'
 import I18n from '../../lang/i18n'
 
@@ -159,7 +159,7 @@ export default class EOSSendPage extends Component {
             </CardItem>
           </Card>
         </Content>
-        <SendButton onPress={this._send.bind(this)} />
+        <FooterButton onPress={this._send.bind(this)} title='Send'/>
       </Container>
     )
   }

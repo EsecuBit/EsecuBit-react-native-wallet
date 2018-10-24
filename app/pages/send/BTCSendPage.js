@@ -25,7 +25,7 @@ import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import Dialog from 'react-native-dialog'
 import StringUtil from '../../utils/StringUtil'
-import SendButton from '../../components/SendButton'
+import FooterButton from '../../components/FooterButton'
 
 const platform = Platform.OS
 
@@ -681,7 +681,7 @@ export default class BTCSendPage extends React.Component {
             onPress={() => this.setState({ deviceLimitDialogVisible: false })}
           />
         </Dialog.Container>
-        <SendButton onPress={this._send.bind(this)} />
+        <FooterButton onPress={this._send.bind(this)} title='Send'/>
       </Container>
     )
   }
