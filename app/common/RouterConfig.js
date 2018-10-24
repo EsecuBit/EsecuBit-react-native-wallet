@@ -11,7 +11,9 @@ import HandlerPage from '../pages/splash/HandlerPage'
 import AddressDetailPage from '../pages/detail/AddressDetailPage'
 import EOSSendPage from '../pages/send/EOSSendPage'
 import EosAssetsDetailPage from '../pages/detail/EosAssetsDetailPage'
-import EOSKeyDetailPage from '../pages/detail/EOSKeyDetailPage'
+import EOSKeyDetailPage from '../page/detail/EOSKeyDetailPage'
+import EOSAssetsStakePage from '../page/detail/EOSAssetsStakePage'
+import EOSAssetsUnStakePage from '../page/detail/EOSAssetsUnStakePage'
 
 export default {
   Handler: {
@@ -55,5 +57,11 @@ export default {
   },
   EOSKeyDetail: {
     screen: EOSKeyDetailPage
+  },
+  EOSAssetsStake: {
+    screen: EOSAssetsStakePage
+  },
+  EOSAssetsUnstake: {
+    screen: EOSAssetsUnStakePage
   }
 }
