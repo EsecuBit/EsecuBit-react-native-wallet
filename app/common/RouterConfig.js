@@ -14,6 +14,7 @@ import EosAssetsDetailPage from '../pages/detail/EosAssetsDetailPage'
 import EOSKeyDetailPage from '../page/detail/EOSKeyDetailPage'
 import EOSAssetsStakePage from '../page/detail/EOSAssetsStakePage'
 import EOSAssetsUnStakePage from '../page/detail/EOSAssetsUnStakePage'
+import EOSNetworkSettingPage from '../pages/settings/EOSNetworkSettingPage'
 
 export default {
   Handler: {
@@ -63,5 +64,8 @@ export default {
   },
   EOSAssetsUnstake: {
     screen: EOSAssetsUnStakePage
+  },
+  EOSNetworkSetting: {
+    screen: EOSNetworkSettingPage
   }
 }
