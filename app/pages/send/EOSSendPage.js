@@ -1,31 +1,42 @@
 import React, { Component } from 'react'
-import {
-  View,
-  Text,
-  Container,
-  Content,
-  Card,
-  CardItem,
-  Input,
-  Item
-} from 'native-base'
-import { TouchableOpacity, Platform } from 'react-native'
-import SendToolbar from '../../components/SendToolbar'
+import { View, Text, Container, Content, Card } from 'native-base'
+import { StyleSheet } from 'react-native'
+import { Color, Dimen } from '../../common/Styles'
 import FooterButton from '../../components/FooterButton'
-import { Color, Dimen, CommonStyle } from '../../common/Styles'
-import I18n from '../../lang/i18n'
-
-const platform = Platform.OS
+import ValueInput from '../../components/ValueInput'
+import AccountNameInput from '../../components/AccountNameInput'
+import MemoInput from '../../components/MemoInput'
+import SendToolbar from '../../components/SendToolbar'
 
 export default class EOSSendPage extends Component {
   constructor() {
     super()
     this.state = {
-      address: '',
+      accountName: '',
       sendValue: '',
       balance: '',
-      remarks: ''
+      memo: '',
+      disableFooterBtn: true
     }
+  }
+
+  async _handleAccountNameInput(text) {
+    this.setState({ accountName: text })
+    this._checkFormData()
+  }
+
+  _handleSendValueInput(text) {
+    this.setState({ sendValue: text })
+    this._checkFormData()
+  }
+
+  _handleSendValueItemClick(value) {
+    //TODO: handle value percentage click
+  }
+
+  async _checkFormData() {
+    let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
+    await this.setState({ disableFooterBtn: !result })
   }
 
   _buildEOSMaxAmountForm() {}
@@ -40,127 +51,45 @@ export default class EOSSendPage extends Component {
         <SendToolbar coinType="EOS" />
         <Content>
           <View style={{ marginTop: Dimen.SPACE, marginBottom: Dimen.SPACE }}>
-            <Text
-              style={{
-                fontSize: Dimen.SECONDARY_TEXT,
-                color: Color.ACCENT,
-                textAlignVertical: 'center',
-                marginLeft: Dimen.SPACE,
-                numberOfLines: 3,
-                marginRight: Dimen.SPACE
-              }}
-            >
-              {I18n.t('balance') +
-                ': ' +
-                this.state.balance +
-                ' ' +
-                this.cryptoCurrencyUnit}
+            <Text style={styles.balanceText}>
+              {'Balance' + ': ' + this.state.balance + ' ' + this.cryptoCurrencyUnit}
             </Text>
           </View>
           <Card>
-            <CardItem>
-              <Item inlineLabel>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}
-                >
-                  {I18n.t('accountName')}
-                </Text>
-                <Input
-                  selectionColor={Color.ACCENT}
-                  style={
-                    Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
-                  }
-                  ref={refs => (this.addressInput = refs)}
-                  multiline={true}
-                  value={this.state.address}
-                  onChangeText={text => this.setState({ address: text })}
-                  keyboardType="email-address"
-                  returnKeyType="done"
-                  blurOnSubmit={true}
-                />
-              </Item>
-            </CardItem>
-            <CardItem>
-              <Item inlineLabel>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}
-                >
-                  {I18n.t('value')}
-                </Text>
-                <Input
-                  selectionColor={Color.ACCENT}
-                  placeholder={this.cryptoCurrencyUnit}
-                  multiline={true}
-                  style={
-                    Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
-                  }
-                  numberOfLines={3}
-                  value={this.state.sendValue}
-                  returnKeyType="done"
-                  onChangeText={text => {
-                    this._calculateSendValue(text).catch(err =>
-                      console.log(err)
-                    )
-                  }}
-                  keyboardType={
-                    platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'
-                  }
-                  blurOnSubmit={true}
-                />
-                <TouchableOpacity
-                  style={{ marginLeft: Dimen.SPACE, alignSelf: 'auto' }}
-                  onPress={() => this._maxAmount(this)}
-                >
-                  <Text
-                    style={{
-                      color: Color.ACCENT,
-                      fontSize: Dimen.PRIMARY_TEXT
-                    }}
-                  >
-                    MAX
-                  </Text>
-                </TouchableOpacity>
-              </Item>
-            </CardItem>
-            <CardItem>
-              <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
-                  {I18n.t('remarks')}
-                </Text>
-                <Input
-                  selectionColor={Color.ACCENT}
-                  style={
-                    Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
-                  }
-                  ref={refs => (this.addressInput = refs)}
-                  multiline={true}
-                  value={this.state.remarks}
-                  onChangeText={text => this.setState({ remarks: text })}
-                  returnKeyType="done"
-                  blurOnSubmit={true}
-                />
-              </Item>
-            </CardItem>
+            <AccountNameInput
+              ref={ref => (this.accountNameInput = ref)}
+              onChangeText={text => this._handleAccountNameInput(text)}
+            />
+            <ValueInput
+              ref={ref => (this.valueInput = ref)}
+              placeholder="EOS"
+              onChangeText={text => this._handleSendValueInput(text)}
+              onItemClick={text => this._handleSendValueItemClick(text)}
+              value={this.state.sendValue}
+            />
+            <MemoInput
+              onChangeText={text => this.setState({ memo: text })}
+              placeholder="( Optional )"
+              value={this.state.memo}
+            />
           </Card>
         </Content>
-        <FooterButton onPress={this._send.bind(this)} title='Send'/>
+        <FooterButton
+          onPress={this._send.bind(this)}
+          title="Send"
+          disabled={this.state.disableFooterBtn}
+        />
       </Container>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  balanceText: {
+    fontSize: Dimen.SECONDARY_TEXT,
+    color: Color.ACCENT,
+    textAlignVertical: 'center',
+    marginLeft: Dimen.MARGIN_HORIZONTAL,
+    padding: 3
+  }
+})
