@@ -38,7 +38,7 @@ export default class ValueInput extends PureComponent {
   }
 
   render() {
-    const { placeholder, onItemClick, ref } = this.props
+    const { placeholder, onItemClick } = this.props
     return (
       <CardItem style={{ flexDirection: 'column' }}>
         <InputGroup
@@ -73,7 +73,7 @@ export default class ValueInput extends PureComponent {
             />
           ) : null}
         </InputGroup>
-        <PercentageBar onItemClick={onItemClick} />
+        <PercentageBar onItemClick={onItemClick} type="percent" data={[0.1, 0.3, 0.5, 0.7, 1]} />
       </CardItem>
     )
   }

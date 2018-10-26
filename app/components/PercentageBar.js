@@ -9,36 +9,47 @@ const styles = StyleSheet.create({
     marginLeft: Dimen.SPACE,
     marginTop: Dimen.SPACE,
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     borderColor: Color.ACCENT,
-    padding: 4
+    padding: 4,
+    backgroundColor: Color.ACCENT
   },
   text: {
     textAlign: 'center',
     textAlignVertical: 'center',
-    color: Color.PRIMARY_TEXT
+    color: Color.TEXT_ICONS
   }
 })
 
 export default class PercentageBar extends PureComponent {
   render() {
-    const { onItemClick } = this.props
+    const { data, type, onItemClick } = this.props
     return (
       <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
-        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick('0.1')}>
-          <Text style={styles.text}>10%</Text>
+        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick(String(data[0]))}>
+          <Text style={styles.text}>
+            {type === 'normal' ? '+ ' + data[0] : data[0] * 100 + '%'}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick('0.3')}>
-          <Text style={styles.text}>30%</Text>
+        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick(String(data[1]))}>
+          <Text style={styles.text}>
+            {type === 'normal' ? '+ ' + data[1] : data[1] * 100 + '%'}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick('0.5')}>
-          <Text style={styles.text}>50%</Text>
+        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick(String(data[2]))}>
+          <Text style={styles.text}>
+            {type === 'normal' ? '+ ' + data[2] : data[2] * 100 + '%'}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick('0.7')}>
-          <Text style={styles.text}>70%</Text>
+        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick(String(data[3]))}>
+          <Text style={styles.text}>
+            {type === 'normal' ? '+ ' + data[3] : data[3] * 100 + '%'}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick('1')}>
-          <Text style={styles.text}>100%</Text>
+        <TouchableOpacity style={styles.textWrapper} onPress={() => onItemClick(String(data[4]))}>
+          <Text style={styles.text}>
+            {type === 'normal' ? '+ ' + data[4] : data[4] * 100 + '%'}
+          </Text>
         </TouchableOpacity>
       </View>
     )
@@ -46,5 +57,12 @@ export default class PercentageBar extends PureComponent {
 }
 
 PercentageBar.prototypes = {
-  onItemClick: PropTypes.func.isRequired
+  onItemClick: PropTypes.func.isRequired,
+  type: PropTypes.oneOf(['normal', 'percent']).isRequired,
+  data: PropTypes.array.isRequired
+}
+
+PercentageBar.defaultProps = {
+  type: 'percent',
+  data: []
 }
