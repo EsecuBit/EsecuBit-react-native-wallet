@@ -10,10 +10,9 @@ import NewAccountPage from '../pages/home/NewAccountPage'
 import HandlerPage from '../pages/splash/HandlerPage'
 import AddressDetailPage from '../pages/detail/AddressDetailPage'
 import EOSSendPage from '../pages/send/EOSSendPage'
-import EosAssetsDetailPage from '../pages/detail/EosAssetsDetailPage'
+import EOSResourcesDetailPage from '../pages/detail/EOSResourcesDetailPage'
 import EOSKeyDetailPage from '../page/detail/EOSKeyDetailPage'
-import EOSAssetsStakePage from '../page/detail/EOSAssetsStakePage'
-import EOSAssetsUnStakePage from '../page/detail/EOSAssetsUnStakePage'
+import EOSBandWidthManagePage from '../page/detail/EOSBandWidthManagePage'
 import EOSNetworkSettingPage from '../pages/settings/EOSNetworkSettingPage'
 
 export default {
@@ -54,16 +53,13 @@ export default {
     screen: EOSSendPage
   },
   EOSAssets: {
-    screen: EosAssetsDetailPage
+    screen: EOSResourcesDetailPage
   },
   EOSKeyDetail: {
     screen: EOSKeyDetailPage
   },
-  EOSAssetsStake: {
-    screen: EOSAssetsStakePage
-  },
-  EOSAssetsUnstake: {
-    screen: EOSAssetsUnStakePage
+  EOSBandWidthManage: {
+    screen: EOSBandWidthManagePage
   },
   EOSNetworkSetting: {
     screen: EOSNetworkSettingPage

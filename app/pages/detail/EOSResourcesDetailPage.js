@@ -5,7 +5,7 @@ import BaseToolbar from '../../components/BaseToolbar'
 import { Color, Dimen } from '../../common/Styles'
 import AssetsProgressBar from '../../components/AssetsProgresBar'
 
-export default class EosAssetsDetailPage extends Component {
+export default class EOSResourcesDetailPage extends Component {
   render() {
     return (
       <Container>

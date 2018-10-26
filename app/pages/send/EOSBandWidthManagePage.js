@@ -5,11 +5,11 @@ import BaseToolbar from '../../components/BaseToolbar'
 import FooterButton from '../../components/FooterButton'
 import { Color, Dimen } from '../../common/Styles'
 
-export default class EOSAssetsUnStakePage extends Component {
+export default class EOSBandWidthManagePage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title="UnStake" />
+        <BaseToolbar title="Stake" />
         <Content contentContainerStyle={{ flex: 1 }}>
           <Card padder>
             <CardItem style={{ flexDirection: 'column', alignItems: 'flex-start' }} padder>
@@ -41,7 +41,7 @@ export default class EOSAssetsUnStakePage extends Component {
             </CardItem>
           </Card>
         </Content>
-        <FooterButton title="UnStake" />
+        <FooterButton title="Stake" />
       </Container>
     )
   }
