@@ -64,10 +64,6 @@ import com.android.build.OutputFile
  *   extraPackagerArgs: []
  * ]
  */
-project.ext.react = [
-        bundleAssetName: "index.android.bundle",
-        bundleInDebug: true
-]
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
