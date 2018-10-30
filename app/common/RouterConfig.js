@@ -11,8 +11,8 @@ import HandlerPage from '../pages/splash/HandlerPage'
 import AddressDetailPage from '../pages/detail/AddressDetailPage'
 import EOSSendPage from '../pages/send/EOSSendPage'
 import EOSResourcesDetailPage from '../pages/detail/EOSResourcesDetailPage'
-import EOSKeyDetailPage from '../page/detail/EOSKeyDetailPage'
-import EOSBandWidthManagePage from '../page/detail/EOSBandWidthManagePage'
+import EOSKeyDetailPage from '../pages/detail/EOSKeyDetailPage'
+import EOSBandWidthManagePage from '../pages/send/EOSBandWidthManagePage'
 import EOSNetworkSettingPage from '../pages/settings/EOSNetworkSettingPage'
 
 export default {

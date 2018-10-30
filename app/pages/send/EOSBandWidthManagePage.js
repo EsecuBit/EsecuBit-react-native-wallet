@@ -14,7 +14,7 @@ import {
 } from 'native-base'
 import BaseToolbar from '../../components/BaseToolbar'
 import FooterButton from '../../components/FooterButton'
-import { Color, Dimen } from '../../common/Styles'
+import { Color } from '../../common/Styles'
 import PercentageBar from '../../components/PercentageBar'
 import StringUtil from '../../utils/StringUtil'
 
