@@ -187,7 +187,7 @@ export default class NewAccountPage extends Component {
             </TouchableOpacity>
           </Right>
         </CardItem>
-        <CardItem
+        {/* <CardItem
           button
           style={CommonStyle.cardStyle}
           onPress={() => {
@@ -216,7 +216,7 @@ export default class NewAccountPage extends Component {
               </Text>
             </TouchableOpacity>
           </Right>
-        </CardItem>
+        </CardItem> */}
         <Dialog.Container visible={_that.state.newAccountDialogVisible}>
           <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
           <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>

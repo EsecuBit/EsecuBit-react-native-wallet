@@ -16,7 +16,7 @@ export class EsecuBitApp extends React.Component {
     // enable hardware wallet, default software wallet
     D.test.jsWallet = false
     Provider.DB = RealmDB
-    Provider.HardTransmitter = BtTransmitter
+    Provider.Transmitters.push(BtTransmitter)
     this.wallet = new EsWallet()
     //黄色Warnings框开关
     console.disableYellowBox = true

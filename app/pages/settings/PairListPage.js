@@ -108,10 +108,7 @@ export default class PairListPage extends React.Component {
     let devices = new Set()
     let _that = this
     _that.transmitter.startScan((error, info) => {
-      if (
-        info.sn !== null &&
-        (info.sn.startsWith('ES12') || info.sn.startsWith('ES13'))
-      ) {
+      if (info.sn !== null) {
         devices.add(info)
       }
       _that.setState({
@@ -164,8 +161,7 @@ export default class PairListPage extends React.Component {
   }
 
   render() {
-    let bgHeight =
-      platform === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
+    let bgHeight = platform === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
     let height = platform === 'ios' ? 64 : 56
     if (isIphoneX) {
       height = 88
@@ -203,10 +199,7 @@ export default class PairListPage extends React.Component {
                       onPress={() => {
                         this.props.navigation.pop()
                       }}>
-                      <Icon
-                        name="ios-arrow-back"
-                        style={{ color: Color.TEXT_ICONS }}
-                      />
+                      <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
                     </Button>
                   ) : null}
                 </View>
@@ -224,8 +217,7 @@ export default class PairListPage extends React.Component {
             </View>
             <View
               style={{
-                marginLeft:
-                  I18n.locale === 'zh-Hans-CN' ? deviceW * 0.37 : deviceW * 0.14
+                marginLeft: I18n.locale === 'zh-Hans-CN' ? deviceW * 0.37 : deviceW * 0.14
               }}>
               <Text
                 style={{

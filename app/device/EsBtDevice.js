@@ -52,7 +52,7 @@ class EsBtDevice {
 
   sendApdu(apdu) {
     if (typeof apdu !== 'string') apdu = apdu.toString('hex')
-    return this._device.sendApdu(apdu, true)
+    return this._device.sendApdu(apdu, false)
       .then(response => Buffer.from(response, 'hex'))
       .catch((e) => {
         console.warn('sendApdu got error', e)

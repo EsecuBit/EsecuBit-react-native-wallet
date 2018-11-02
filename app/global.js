@@ -2,6 +2,7 @@ global.Buffer = global.Buffer || require('buffer').Buffer
 global.process.version = '1.0'
 global.navigator = global.navigator || {}
 global.window = global.window || {}
+global.chrome = global.chrome || undefined
 
 // asyncToGenerator
 var babelHelpers = (global.babelHelpers = {})

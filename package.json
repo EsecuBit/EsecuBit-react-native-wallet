@@ -19,7 +19,7 @@
     "clean-start": "npm run verify && npm run rc-start",
     "fresh-install": "rm -rf $TMPDIR/react-* && watchman watch-del-all && rm -rf ios/build/ModuleCache/* && rm -rf node_modules/ && npm cache verify && npm install",
     "fresh-start": "npm run fresh-install && npm run rc-start",
-    "bundle-ios":"node node_modules/react-native/local-cli/cli.js bundle --entry-file index.ios.js --platform ios --dev false --bundle-output ./ios/bundle/index.ios.jsbundle --assets-dest ./ios/bundle"
+    "bundle-ios": "node node_modules/react-native/local-cli/cli.js bundle --entry-file index.ios.js --platform ios --dev false --bundle-output ./ios/bundle/index.ios.jsbundle --assets-dest ./ios/bundle"
   },
   "dependencies": {
     "ac-qrcode-rn": "^0.2.1",
@@ -27,7 +27,7 @@
     "bigi": "^1.4.2",
     "buffer": "^5.2.0",
     "crypto-browserify": "^3.12.0",
-    "esecubit-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git",
+    "esecubit-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop",
     "events": "^3.0.0",
     "jsc-android": "^216113.0.0",
     "native-base": "^2.8.0",

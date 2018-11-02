@@ -48,14 +48,14 @@ export default class HomePage extends Component {
     this.offlineMode = this.props.navigation.state.params.offlineMode
 
     //account
-    ;(this.newAccountType = BTC_COINTYPE),
-    (this.newAccountName = ''),
-    (this.btcAccounts = []),
-    (this.ethAccounts = []),
+    this.newAccountType = BTC_COINTYPE
+    this.newAccountName = ''
+    this.btcAccounts = []
+    // this.ethAccounts = []
     //coinType
-    (this.supportCoinType = D.supportedCoinTypes()),
-    (this.btcCoinType = this.supportCoinType[0])
-    this.ethCoinType = this.supportCoinType[1]
+    this.supportCoinType = D.supportedCoinTypes()
+    this.btcCoinType = this.supportCoinType[0]
+    // this.ethCoinType = this.supportCoinType[1]
 
     this.btTransmitter = new BtTransmitter()
     this.wallet = new EsWallet()
@@ -152,7 +152,7 @@ export default class HomePage extends Component {
       .then(info => {
         console.log('checkVersion', info)
         this.info = info
-        if (info.errorCode === RESULT_OK) {
+        if (info != undefined && info.errorCode === RESULT_OK) {
           if (info.data !== null) {
             this.setState({
               updateDesc: info.data.description,
@@ -163,7 +163,7 @@ export default class HomePage extends Component {
       })
       .catch(e => {
         console.log('checkVersion error', e)
-        ToastUtil.showShort(e)
+        ToastUtil.showErrorMsgShort(e)
       })
   }
 
@@ -208,8 +208,8 @@ export default class HomePage extends Component {
     let btcUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.btcCoinType)
     this.setState({ btcUnit: btcUnit })
     //eth
-    let ethUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.ethCoinType)
-    this.setState({ ethUnit: ethUnit })
+    // let ethUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.ethCoinType)
+    // this.setState({ ethUnit: ethUnit })
     //legal currency
     let legalCurrency = await PreferenceUtil.getCurrencyUnit(
       LEGAL_CURRENCY_UNIT_KEY
@@ -243,9 +243,9 @@ export default class HomePage extends Component {
       }
       this.setState({ accounts: accounts })
       let btcAccounts = this._getCoinAccounts(this.btcCoinType, accounts)
-      let ethAccounts = this._getCoinAccounts(this.ethCoinType, accounts)
+      // let ethAccounts = this._getCoinAccounts(this.ethCoinType, accounts)
       this.btcAccounts = btcAccounts
-      this.ethAccounts = ethAccounts
+      // this.ethAccounts = ethAccounts
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -269,23 +269,23 @@ export default class HomePage extends Component {
     this.btcAccounts.map(item => {
       btcBalance = btcBalance.add(new BigInteger(item.balance))
     })
-    this.ethAccounts.map(item => {
-      ethBalance = ethBalance.add(new BigInteger(item.balance))
-    })
+    // this.ethAccounts.map(item => {
+    //   ethBalance = ethBalance.add(new BigInteger(item.balance))
+    // })
     btcBalance = this.wallet.convertValue(
       this.btcCoinType,
       btcBalance.toString(10),
       D.unit.btc.satoshi,
       legalCurrencyUnit
     )
-    ethBalance = this.wallet.convertValue(
-      this.ethCoinType,
-      ethBalance.toString(10),
-      D.unit.eth.Wei,
-      legalCurrencyUnit
-    )
+    // ethBalance = this.wallet.convertValue(
+    //   this.ethCoinType,
+    //   ethBalance.toString(10),
+    //   D.unit.eth.Wei,
+    //   legalCurrencyUnit
+    // )
     let totalLegalCurrencyBalance =
-      parseFloat(btcBalance) + parseFloat(ethBalance)
+      parseFloat(btcBalance)
     //format balance
     totalLegalCurrencyBalance = StringUtil.formatLegalCurrency(
       Number(totalLegalCurrencyBalance).toFixed(2)
@@ -304,18 +304,18 @@ export default class HomePage extends Component {
       legalCurrencyUnit
     )
     // 1 ETH = ? legal currency
-    let ethExchangeRate = this.wallet.convertValue(
-      this.ethCoinType,
-      '1000000000000000000',
-      D.unit.eth.Wei,
-      legalCurrencyUnit
-    )
+    // let ethExchangeRate = this.wallet.convertValue(
+    //   this.ethCoinType,
+    //   '1000000000000000000',
+    //   D.unit.eth.Wei,
+    //   legalCurrencyUnit
+    // )
     this.setState({
       btcExchangeRate: StringUtil.formatLegalCurrency(btcExchangeRate)
     })
-    this.setState({
-      ethExchangeRate: StringUtil.formatLegalCurrency(ethExchangeRate)
-    })
+    // this.setState({
+    //   ethExchangeRate: StringUtil.formatLegalCurrency(ethExchangeRate)
+    // })
   }
 
   /**

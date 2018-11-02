@@ -7,6 +7,7 @@ import com.excelsecu.eshdwallet.IEsDeviceState;
 import com.excelsecu.eshdwallet.IEsHDWallet;
 import com.excelsecu.transmit.EsDevice;
 import com.excelsecu.transmit.EsException;
+import com.excelsecu.transmit.EsTransmitterJni;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -209,7 +210,9 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
       // communication timeout
       throw new EsException(28667);
     }
-    int error = esDevice.sendEncApdu(apdu, apdu.length, response, responseLength);
+
+//    int error = esDevice.sendEncApdu(apdu, apdu.length, response, responseLength);
+    int error = EsTransmitterJni.sendSlotApdu(apdu,apdu.length,response,responseLength,false);
     if (error != 0) {
       throw new EsException(error);
     }

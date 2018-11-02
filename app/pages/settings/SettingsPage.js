@@ -265,7 +265,7 @@ export default class SettingsPage extends Component {
               </Right>
             </CardItem>
             <View style={CommonStyle.divider} />
-            <CardItem
+            {/* <CardItem
               bordered
               button
               onPress={() => this.setState({ ethDialogVisible: true })}>
@@ -278,7 +278,7 @@ export default class SettingsPage extends Component {
                   <Icon name="ios-arrow-forward" />
                 </View>
               </Right>
-            </CardItem>
+            </CardItem> */}
             <CardItem
               header
               bordered

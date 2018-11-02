@@ -40,6 +40,9 @@ class BtTransmitter {
     }
   }
 
+  async reset() {
+  }
+
   /**
    * return: Promise
    */
