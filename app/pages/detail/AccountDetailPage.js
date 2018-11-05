@@ -22,6 +22,7 @@ import AccountOperateBottomBar from '../../components/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/AccountDetailHeader'
 import PreferenceUtil from "../../utils/PreferenceUtil"
 import {LEGAL_CURRENCY_UNIT_KEY} from "../../common/Constants"
+import {connect} from 'react-redux'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
@@ -29,11 +30,11 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 434
 const ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT = 520
 
-export default class AccountDetailPage extends React.Component {
+class AccountDetailPage extends React.Component {
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
-    this.account = EsAccountHelper.getInstance().getAccount()
+    this.account = props.account
     this.navigateParam = {
       coinType: this.account.coinType,
       cryptoCurrencyUnit: this.cryptoCurrencyUnit,
@@ -706,6 +707,7 @@ export default class AccountDetailPage extends React.Component {
   }
 }
 
+
 const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: Dimen.MARGIN_HORIZONTAL,
@@ -800,3 +802,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   }
 })
+
+const mapStateToProps = state => ({
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
+  cryptoCurrencyUnit: state.SettingsReducer.cryptoCurrencyUnit,
+  account: state.AccountReducer.account,
+})
+
+const AccountDetail = connect(mapStateToProps)(AccountDetailPage)
+export default AccountDetail

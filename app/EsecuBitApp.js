@@ -1,14 +1,16 @@
 import {} from './global'
 import React from 'react'
-import { Root } from 'native-base'
 import { D, Provider } from 'esecubit-wallet-sdk'
 import RealmDB from './db/RealmDB'
 import BtTransmitter from './device/BtTransmitter'
-import { createStackNavigator } from 'react-navigation'
-import RouterConfig from './common/RouterConfig'
 import { EsWallet } from 'esecubit-wallet-sdk'
+import { Provider as StoreProvider } from 'react-redux'
+import AppNavigation from './AppNavigation'
+import store from './store'
 
-export class EsecuBitApp extends React.Component {
+
+
+export default class EsecuBitApp extends React.Component {
   constructor(props) {
     super(props)
     // test net
@@ -24,19 +26,9 @@ export class EsecuBitApp extends React.Component {
 
   render() {
     return (
-      <Root>
-        <EsecuBitNavigator />
-      </Root>
+      <StoreProvider store={store}>
+        <AppNavigation />
+      </StoreProvider>
     )
   }
 }
-
-const EsecuBitNavigator = createStackNavigator(RouterConfig, {
-  navigationOptions: {
-    header: null
-  },
-  // initialRouteName: 'Splash',
-  swipeEnabled: false,
-  animationEnabled: false
-})
-export default EsecuBitNavigator

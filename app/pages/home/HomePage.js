@@ -7,7 +7,8 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
-  Linking} from 'react-native'
+  Linking
+} from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
   Container,
@@ -24,13 +25,7 @@ import {
 import Dialog from 'react-native-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import EsAccountHelper from '../../EsAccountHelper'
-import {
-  BTC_COINTYPE,
-  LEGAL_CURRENCY_UNIT_KEY,
-  RESULT_OK,
-  MOCK_URL
-} from '../../common/Constants'
+import { BTC_COINTYPE, LEGAL_CURRENCY_UNIT_KEY, RESULT_OK, MOCK_URL } from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import BigInteger from 'bigi'
 import ToastUtil from '../../utils/ToastUtil'
@@ -38,23 +33,27 @@ import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import { ProgressDialog } from 'react-native-simple-dialogs'
 import AppUtil from '../../utils/AppUtil'
+import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
+import {setAccount} from '../../actions/AccountAction'
+import { connect } from 'react-redux'
+
 
 const platform = Platform.OS
 
-export default class HomePage extends Component {
+class HomePage extends Component {
   constructor(props) {
     super(props)
     //offlineMode
     this.offlineMode = this.props.navigation.state.params.offlineMode
 
     //account
-    ;(this.newAccountType = BTC_COINTYPE),
-    (this.newAccountName = ''),
-    (this.btcAccounts = []),
-    (this.ethAccounts = []),
+    this.newAccountType = BTC_COINTYPE
+    this.newAccountName = ''
+    this.btcAccounts = []
+    this.ethAccounts = []
     //coinType
-    (this.supportCoinType = D.supportedCoinTypes()),
-    (this.btcCoinType = this.supportCoinType[0])
+    this.supportCoinType = D.supportedCoinTypes()
+    this.btcCoinType = this.supportCoinType[0]
     this.ethCoinType = this.supportCoinType[1]
 
     this.btTransmitter = new BtTransmitter()
@@ -103,18 +102,12 @@ export default class HomePage extends Component {
       }
     })
     if (platform !== 'ios') {
-      NetInfo.addEventListener(
-        'networkChange',
-        this._handleConnectivityChange.bind(this)
-      )
+      NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
     }
   }
 
   componentWillUnmount() {
-    NetInfo.removeEventListener(
-      'networkChange',
-      this._handleConnectivityChange.bind(this)
-    )
+    NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
   }
 
   _handleConnectivityChange(status) {
@@ -134,10 +127,7 @@ export default class HomePage extends Component {
     this._initListener()
     this.props.navigation.addListener('didFocus', () => {
       if (platform === 'ios') {
-        NetInfo.addEventListener(
-          'networkChange',
-          this._handleConnectivityChange.bind(this)
-        )
+        NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
       }
       this._updateUI()
     })
@@ -173,6 +163,7 @@ export default class HomePage extends Component {
       AppUtil.exitApp()
     }
   }
+
   _gotoBrowser() {
     if (this.info.data !== null) {
       Linking.openURL(MOCK_URL + this.info.data.downloadUrl)
@@ -211,9 +202,7 @@ export default class HomePage extends Component {
     let ethUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.ethCoinType)
     this.setState({ ethUnit: ethUnit })
     //legal currency
-    let legalCurrency = await PreferenceUtil.getCurrencyUnit(
-      LEGAL_CURRENCY_UNIT_KEY
-    )
+    let legalCurrency = await PreferenceUtil.getCurrencyUnit(LEGAL_CURRENCY_UNIT_KEY)
     this.setState({ legalCurrencyUnit: legalCurrency })
   }
 
@@ -234,10 +223,7 @@ export default class HomePage extends Component {
       if (Array.isArray(accounts) && accounts.length === 0) {
         accounts = this.accountsCache
         console.log('sdsdsd000', accounts, this.accountsCache)
-      } else if (
-        Array.isArray(this.accountsCache) &&
-        this.accountsCache.length === 0
-      ) {
+      } else if (Array.isArray(this.accountsCache) && this.accountsCache.length === 0) {
         this.accountsCache = accounts
         console.log('asdadasd', this.accountsCache, accounts)
       }
@@ -284,8 +270,7 @@ export default class HomePage extends Component {
       D.unit.eth.Wei,
       legalCurrencyUnit
     )
-    let totalLegalCurrencyBalance =
-      parseFloat(btcBalance) + parseFloat(ethBalance)
+    let totalLegalCurrencyBalance = parseFloat(btcBalance) + parseFloat(ethBalance)
     //format balance
     totalLegalCurrencyBalance = StringUtil.formatLegalCurrency(
       Number(totalLegalCurrencyBalance).toFixed(2)
@@ -295,36 +280,34 @@ export default class HomePage extends Component {
     })
   }
 
-  async _getExchangeRate(legalCurrencyUnit) {
-    // 1 BTC = ? legal currency
-    let btcExchangeRate = this.wallet.convertValue(
-      this.btcCoinType,
-      '100000000',
-      D.unit.btc.satoshi,
-      legalCurrencyUnit
-    )
-    // 1 ETH = ? legal currency
-    let ethExchangeRate = this.wallet.convertValue(
-      this.ethCoinType,
-      '1000000000000000000',
-      D.unit.eth.Wei,
-      legalCurrencyUnit
-    )
-    this.setState({
-      btcExchangeRate: StringUtil.formatLegalCurrency(btcExchangeRate)
-    })
-    this.setState({
-      ethExchangeRate: StringUtil.formatLegalCurrency(ethExchangeRate)
-    })
-  }
+  // async _getExchangeRate(legalCurrencyUnit) {
+  //   // 1 BTC = ? legal currency
+  //   let btcExchangeRate = this.wallet.convertValue(
+  //     this.btcCoinType,
+  //     '100000000',
+  //     D.unit.btc.satoshi,
+  //     legalCurrencyUnit
+  //   )
+  //   // 1 ETH = ? legal currency
+  //   let ethExchangeRate = this.wallet.convertValue(
+  //     this.ethCoinType,
+  //     '1000000000000000000',
+  //     D.unit.eth.Wei,
+  //     legalCurrencyUnit
+  //   )
+  //   this.setState({
+  //     btcExchangeRate: StringUtil.formatLegalCurrency(btcExchangeRate)
+  //   })
+  //   this.setState({
+  //     ethExchangeRate: StringUtil.formatLegalCurrency(ethExchangeRate)
+  //   })
+  // }
 
   /**
    * only support new BTC account and ETH account
    */
   async _newAccount() {
-    let coinType = D.isBtc(this.newAccountType)
-      ? this.btcCoinType
-      : this.ethCoinType
+    let coinType = D.isBtc(this.newAccountType) ? this.btcCoinType : this.ethCoinType
     if (this.newAccountName === null) {
       ToastUtil.showLong(I18n.t('emptyAccountNameError'))
       return
@@ -370,38 +353,16 @@ export default class HomePage extends Component {
     let _that = this
     //TODO use EventEmitter
     // DeviceEventEmitter.emit('account', item)
-    EsAccountHelper.getInstance().bindAccount(item)
-    _that.props.navigation.navigate('Detail', {
-      coinType: item.coinType,
-      legalCurrencyUnit: this.state.legalCurrencyUnit,
-      btcUnit: this.state.btcUnit,
-      ethUnit: this.state.ethUnit,
-      balance: item.balance
-    })
-  }
-
-  /**
-   *  Swiping up, the Fab will be gone. Conversely, it will be visible
-   * @param event
-   * @private
-   */
-  _handleScrollEvent(event) {
-    let y = event.nativeEvent.contentOffset.y
-    let offset = y - this.currenyY
-    let touchSlop = 8
-    if (offset < 0 && Math.abs(offset) > touchSlop) {
-      this.setState({ fabVisible: true, fabActive: false })
-    } else if (offset > 0 && Math.abs(offset) > touchSlop) {
-      this.setState({ fabVisible: false })
-    }
-    this.currenyY = y
+    
+    setAccount(item)
+    setCryptoCurrencyUnit(D.isBtc(item.coinType) ? this.state.btcUnit : this.state.ethUnit)
+    setLegalCurrencyUnit(this.state.legalCurrencyUnit)
+    _that.props.navigation.navigate('Detail')
   }
 
   _renderRow(item) {
     let fromUnit = D.isBtc(item.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-    let toUnit = D.isBtc(item.coinType)
-      ? this.state.btcUnit
-      : this.state.ethUnit
+    let toUnit = D.isBtc(item.coinType) ? this.state.btcUnit : this.state.ethUnit
     let cryptoCurrencyBalance = this.wallet.convertValue(
       item.coinType,
       item.balance,
@@ -419,10 +380,7 @@ export default class HomePage extends Component {
       .toString()
 
     return (
-      <CardItem
-        button
-        style={CommonStyle.cardStyle}
-        onPress={() => this._gotoDetailPage(item)}>
+      <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(item)}>
         <Left style={{ flexDirection: 'row' }}>
           {D.isBtc(item.coinType) ? (
             <Icon
@@ -437,9 +395,7 @@ export default class HomePage extends Component {
               style={{ width: 28, height: 28, color: Color.ETH }}
             />
           )}
-          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>
-            {item.label}
-          </Title>
+          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>{item.label}</Title>
         </Left>
         <View>
           <Subtitle
@@ -448,9 +404,7 @@ export default class HomePage extends Component {
               color: Color.PRIMARY_TEXT,
               textAlign: 'right'
             }}>
-            {StringUtil.formatCryptoCurrency(cryptoCurrencyBalance) +
-              ' ' +
-              toUnit}
+            {StringUtil.formatCryptoCurrency(cryptoCurrencyBalance) + ' ' + toUnit}
           </Subtitle>
           <Subtitle
             style={{
@@ -458,9 +412,7 @@ export default class HomePage extends Component {
               color: Color.LIGHT_PARIMARY,
               textAlign: 'right'
             }}>
-            {StringUtil.formatLegalCurrency(
-              Number(legalCurrencyBalance).toFixed(2)
-            ) +
+            {StringUtil.formatLegalCurrency(Number(legalCurrencyBalance).toFixed(2)) +
               ' ' +
               this.state.legalCurrencyUnit}
           </Subtitle>
@@ -478,9 +430,7 @@ export default class HomePage extends Component {
     return (
       <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
         <View style={{ height: 205 }}>
-          <Image
-            style={{ height: 205 }}
-            source={require('../../imgs/bg_home.png')}>
+          <Image style={{ height: 205 }} source={require('../../imgs/bg_home.png')}>
             <View style={{ height: height }}>
               <View
                 style={{
@@ -502,9 +452,7 @@ export default class HomePage extends Component {
                     marginLeft: Dimen.MARGIN_HORIZONTAL,
                     marginTop: isIphoneX ? 20 : 0
                   }}>
-                  <Button
-                    transparent
-                    onPress={() => _that.props.navigation.navigate('Settings')}>
+                  <Button transparent onPress={() => _that.props.navigation.navigate('Settings')}>
                     <Image
                       source={require('../../imgs/ic_menu.png')}
                       style={{ width: 20, height: 20 }}
@@ -591,9 +539,7 @@ export default class HomePage extends Component {
             </View>
           </Image>
         </View>
-        {_that.state.networkConnected
-          ? null
-          : ToastUtil.showShort(I18n.t('networkNotAvailable'))}
+        {_that.state.networkConnected ? null : ToastUtil.showShort(I18n.t('networkNotAvailable'))}
         {!_that.state.deviceConnected && _that.state.showDeviceConnectCard ? (
           <CardItem
             button
@@ -606,9 +552,7 @@ export default class HomePage extends Component {
               CommonStyle.cardStyle
             ]}>
             <View style={{ flexDirection: 'column' }}>
-              <Text style={CommonStyle.secondaryText}>
-                {I18n.t('pleaseConnectDeviceToSync')}
-              </Text>
+              <Text style={CommonStyle.secondaryText}>{I18n.t('pleaseConnectDeviceToSync')}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
               <Left>
@@ -620,9 +564,7 @@ export default class HomePage extends Component {
                       offlineMode: true
                     })
                   }>
-                  <Text style={{ color: Color.ACCENT }}>
-                    {I18n.t('cancel')}
-                  </Text>
+                  <Text style={{ color: Color.ACCENT }}>{I18n.t('cancel')}</Text>
                 </Button>
               </Left>
               <Right>
@@ -633,18 +575,13 @@ export default class HomePage extends Component {
                       hasBackBtn: true
                     })
                   }>
-                  <Text style={{ color: Color.ACCENT }}>
-                    {I18n.t('confirm')}
-                  </Text>
+                  <Text style={{ color: Color.ACCENT }}>{I18n.t('confirm')}</Text>
                 </Button>
               </Right>
             </View>
           </CardItem>
         ) : null}
-        <List
-          dataArray={_that.state.accounts}
-          renderRow={_that._renderRow.bind(this)}
-        />
+        <List dataArray={_that.state.accounts} renderRow={_that._renderRow.bind(this)} />
         <Dialog.Container visible={_that.state.newAccountDialogVisible}>
           <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
           <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>
@@ -677,11 +614,23 @@ export default class HomePage extends Component {
             onPress={() => this._gotoBrowser()}
           />
         </Dialog.Container>
-        <ProgressDialog
-          visible={_that.state.newAccountWaitDialog}
-          message={I18n.t('addAccount')}
-        />
+        <ProgressDialog visible={_that.state.newAccountWaitDialog} message={I18n.t('addAccount')} />
       </Container>
     )
   }
 }
+
+const mapStateToProps = state => ({
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
+  cryptoCurrencyUnit: state.SettingsReducer.cryptoCurrencyUnit,
+  account: state.AccountReducer.account,
+})
+
+const mapDispatchToProps = {
+  setCryptoCurrencyUnit,
+  setLegalCurrencyUnit,
+  setAccount
+}
+
+const Home = connect(mapStateToProps, mapDispatchToProps)(HomePage)
+export default Home
