@@ -4,8 +4,8 @@ import NavigationReducer from './NavigationReducer'
 import AccountReducer from './AccountReducer'
 
 const AppReducer = combineReducers({
+  nav: NavigationReducer,
+  AccountReducer,
   SettingsReducer,
-  NavigationReducer,
-  AccountReducer
 });
 export default AppReducer

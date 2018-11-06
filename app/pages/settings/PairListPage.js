@@ -17,7 +17,7 @@ import PreferenceUtil from '../../utils/PreferenceUtil'
 import Dialog from 'react-native-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { ProgressDialog } from 'react-native-simple-dialogs'
-import { NavigationActions, StackActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
 const deviceW = Dimensions.get('window').width
 const deviceH = Dimensions.get('window').height
@@ -42,7 +42,8 @@ export default class PairListPage extends React.Component {
 
   componentDidMount() {
     let _that = this
-    this.props.navigation.addListener('didFocus', async () => {
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers 
+    this.props.navigation.addListener('willFocus', async () => {
       _that._listenTransmitter()
       await _that.setState({ deviceList: [] })
       _that._findDefaultDevice()
@@ -86,7 +87,7 @@ export default class PairListPage extends React.Component {
         _that.setState({ connectDialogVisible: false })
         console.log('connected device info', this.connectDeviceInfo)
         PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-        const resetAction = StackActions.reset({
+        const resetAction = NavigationActions.reset({
           index: 0,
           actions: [NavigationActions.navigate({ routeName: 'Splash' })]
         })

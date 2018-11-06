@@ -125,7 +125,8 @@ class HomePage extends Component {
 
   componentDidMount() {
     this._initListener()
-    this.props.navigation.addListener('didFocus', () => {
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers 
+    this.props.navigation.addListener('willFocus', () => {
       if (platform === 'ios') {
         NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
       }

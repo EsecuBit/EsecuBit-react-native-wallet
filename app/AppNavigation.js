@@ -2,19 +2,22 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { addNavigationHelpers } from 'react-navigation'
 import Router from './router/Router'
+import {createReduxBoundAddListener} from 'react-navigation-redux-helpers'
 
+
+const addListener = createReduxBoundAddListener("root");
 class AppNavigation extends Component {
   render() {
-    const { navigationState, dispatch } = this.props
+    const { nav, dispatch } = this.props
     return (
-      <Router navigation={addNavigationHelpers({ dispatch, state: navigationState })} />
+      <Router navigation={addNavigationHelpers({ dispatch, state: nav, addListener })} />
     )
   }
 }
 
 const mapStateToProps = state => {
   return {
-    navigationState: state.NavigationReducer
+    nav: state.nav
   }
 }
 

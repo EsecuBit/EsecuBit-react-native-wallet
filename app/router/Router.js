@@ -5,7 +5,7 @@ const EsecuBitNavigator = StackNavigator(RouterConfig, {
   navigationOptions: {
     header: null
   },
-  // initialRouteName: 'Splash',
+  initialRouteName: 'Handler',
   swipeEnabled: false,
   animationEnabled: false
 })

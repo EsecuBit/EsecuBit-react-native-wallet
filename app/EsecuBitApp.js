@@ -5,9 +5,8 @@ import RealmDB from './db/RealmDB'
 import BtTransmitter from './device/BtTransmitter'
 import { EsWallet } from 'esecubit-wallet-sdk'
 import { Provider as StoreProvider } from 'react-redux'
-import AppNavigation from './AppNavigation'
 import store from './store'
-
+import AppNavigation from './AppNavigation'
 
 
 export default class EsecuBitApp extends React.Component {

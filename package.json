@@ -45,6 +45,7 @@
     "react-native-simple-dialogs": "^0.4.0",
     "react-native-vector-icons": "^4.6.0",
     "react-navigation": "^1.5.11",
+    "react-navigation-redux-helpers": "^1.1.2",
     "react-redux": "^5.1.0",
     "realm": "^2.18.0",
     "redux": "^4.0.1",

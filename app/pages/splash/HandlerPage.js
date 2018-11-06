@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { View, Image, Dimensions } from 'react-native'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import { StackActions, NavigationActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation'
 const deviceW = Dimensions.get('window').width
 export default class HandlerPage extends Component {
   constructor(props) {
@@ -26,7 +26,7 @@ export default class HandlerPage extends Component {
     this.esWallet
       .enterOfflineMode()
       .then(() => {
-        const resetAction = StackActions.reset({
+        const resetAction = NavigationActions.reset({
           index: 0,
           actions: [
             NavigationActions.navigate({
