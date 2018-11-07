@@ -46,7 +46,9 @@ module.exports = {
     
     },
     "env": {
-      "amd": true
+      "amd": true,
+      "browser": true,
+      "node": true
     },
     "globals": {
         "global": true,
