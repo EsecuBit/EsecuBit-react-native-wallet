@@ -1,15 +1,24 @@
-import {SET_CRYPTO_CURRENCY_UNIT, SET_LEGAL_CURRENCY_UNIT} from "../actions/ActionType"
+import ActionType from '../actions/ActionType'
 
-const initialState = {cryptoCurrencyUnit: '', legalCurrencyUnit: ''}
+const initialState = {
+  btcUnit: '',
+  ethUnit: '',
+  legalCurrencyUnit: ''
+}
 
 export default function settingsReducer(state = initialState, action) {
-  switch(action.type) {
-    case SET_CRYPTO_CURRENCY_UNIT:
+  switch (action.type) {
+    case ActionType.SET_BTC_UNIT:
       return {
         ...state,
-        cryptoCurrencyUnit: action.unit
+        btcUnit: action.unit
       }
-    case SET_LEGAL_CURRENCY_UNIT:
+    case ActionType.SET_ETH_UNIT:
+      return {
+        ...state,
+        ethUnit: action.unit
+      }
+    case ActionType.SET_LEGAL_CURRENCY_UNIT:
       return {
         ...state,
         legalCurrencyUnit: action.unit

@@ -1,10 +1,10 @@
-import {SET_ACCOUNT} from "../actions/ActionType";
+import ActionType from "../actions/ActionType";
 
 const initialState = {account: {}}
 
 export default function accountReducer(state = initialState, action) {
   switch(action.type) {
-    case SET_ACCOUNT:
+    case ActionType.SET_ACCOUNT:
       return {
         ...state,
         account: action.account

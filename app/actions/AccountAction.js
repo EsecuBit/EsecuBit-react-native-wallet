@@ -1,8 +1,8 @@
-import { SET_ACCOUNT } from './ActionType'
+import ActionType from './ActionType'
 
 export function setAccount(account) {
   return {
-    type: SET_ACCOUNT,
-    account
+    type: ActionType.SET_ACCOUNT,
+    account: account
   }
 }
