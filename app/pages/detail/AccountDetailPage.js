@@ -6,13 +6,13 @@ import {
   Dimensions,
   Platform,
   TextInput,
-  DeviceEventEmitter} from 'react-native'
+  DeviceEventEmitter
+} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
 import PopupDialog from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
-import EsAccountHelper from '../../EsAccountHelper'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import Dialog from 'react-native-dialog'
@@ -20,9 +20,7 @@ import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AccountOperateBottomBar from '../../components/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/AccountDetailHeader'
-import PreferenceUtil from "../../utils/PreferenceUtil"
-import {LEGAL_CURRENCY_UNIT_KEY} from "../../common/Constants"
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
@@ -35,49 +33,33 @@ class AccountDetailPage extends React.Component {
     super(props)
     this.wallet = new EsWallet()
     this.account = props.account
-    this.navigateParam = {
-      coinType: this.account.coinType,
-      cryptoCurrencyUnit: this.cryptoCurrencyUnit,
-      legalCurrencyUnit: this.legalCurrencyUnit
-    }
     //transmitter
     this.transmitter = new BtTransmitter()
-
     this.state = {
       data: [],
       refreshing: false,
       isShowBottomBar: true,
       dMemo: '',
-      renameDialogVisible: false,
+      renameDialogVisible: false
     }
+    this.cryptoCurrencyUnit = D.isBtc(this.account.coinType) ? props.btcUnit : props.ethUnit
   }
-
-  async componentWillMount() {
-    await this._getUnit()
-  }
-
 
   componentDidMount() {
     let _that = this
     _that._getTxInfos()
-    _that.wallet.listenTxInfo(async () => {
+    _that.wallet.listenTxInfo(() => {
       console.log('listen TxInfo')
-      await _that._getTxInfos()
-      this.accountHeader.updateBalance(this.account.balance)
+      _that._getTxInfos()
     })
-    _that._initListener()
+    // _that._initListener()
   }
 
-  async _getUnit() {
-    this.cryptoCurrencyUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.account.coinType)
-    this.legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(LEGAL_CURRENCY_UNIT_KEY)
-  }
-
-  _initListener() {
-    DeviceEventEmitter.addListener('balance', () => {
-      this.accountHeader.updateBalance(this.account.balance)
-    })
-  }
+  // _initListener() {
+  //   DeviceEventEmitter.addListener('balance', () => {
+  //     this.accountHeader.updateBalance(this.account.balance)
+  //   })
+  // }
 
   async _gotoSendPage() {
     let deviceState = await this.transmitter.getState()
@@ -86,9 +68,9 @@ class AccountDetailPage extends React.Component {
       return
     }
     if (D.isBtc(this.account.coinType)) {
-      this.props.navigation.navigate('BTCSend', this.navigateParam)
+      this.props.navigation.navigate('BTCSend')
     } else if (D.isEth(this.account.coinType)) {
-      this.props.navigation.navigate('ETHSend', this.navigateParam)
+      this.props.navigation.navigate('ETHSend')
     }
   }
 
@@ -439,13 +421,11 @@ class AccountDetailPage extends React.Component {
   }
 
   _getTxInfos() {
-    EsAccountHelper.getInstance()
-      .getAccount()
+    this.account
       .getTxInfos()
       .then(txInfos => this.setState({ data: txInfos.txInfos }))
       .catch(error => ToastUtil.showErrorMsgLong(error))
   }
-
 
   _renameAccount() {
     this.account
@@ -478,12 +458,16 @@ class AccountDetailPage extends React.Component {
 
   _gotoResendPage() {
     this.transactionDetailDialog.dismiss()
-    let param = this.navigateParam
-    param['txInfo'] = this.rowData
-    if (D.isBtc(this.account.coinType)) {
-      this.props.navigation.navigate('BTCSend', param)
-    } else {
-      this.props.navigation.navigate('ETHSend', param)
+    let param = { txInfo: this.rowData }
+    switch (true) {
+      case D.isBtc(this.account.coinType):
+        this.props.navigation.navigate('BTCSend', param)
+        break
+      case D.isEth(this.account.coinType):
+        this.props.navigation.navigate('ETHSend', param)
+        break
+      default:
+        break
     }
   }
 
@@ -491,8 +475,7 @@ class AccountDetailPage extends React.Component {
     return (
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
-          ref={ref => this.accountHeader = ref}
-          account={this.account}
+          ref={ref => (this.accountHeader = ref)}
           onHideMenu={() => this.setState({ renameDialogVisible: true })}
           navigation={this.props.navigation}
         />
@@ -707,7 +690,6 @@ class AccountDetailPage extends React.Component {
   }
 }
 
-
 const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: Dimen.MARGIN_HORIZONTAL,
@@ -805,8 +787,9 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
-  cryptoCurrencyUnit: state.SettingsReducer.cryptoCurrencyUnit,
-  account: state.AccountReducer.account,
+  btcUnit: state.SettingsReducer.btcUnit,
+  ethUnit: state.SettingsReducer.ethUnit,
+  account: state.AccountReducer.account
 })
 
 const AccountDetail = connect(mapStateToProps)(AccountDetailPage)

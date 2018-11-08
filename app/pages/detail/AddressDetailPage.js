@@ -12,18 +12,17 @@ import QrCode from 'react-native-qrcode'
 import I18n from '../../lang/i18n'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
-import EsAccountHelper from '../../EsAccountHelper'
-import { TOAST_SHORT_DURATION } from '../../common/Constants'
+import { connect } from 'react-redux'
 
-export default class AddressDetailPage extends PureComponent {
-  constructor() {
+class AddressDetailPage extends PureComponent {
+  constructor(props) {
     super()
     this.state = {
       address: '',
       storeAddress: false
     }
     this.eswallet = new EsWallet()
-    this.account = EsAccountHelper.getInstance().getAccount()
+    this.account = props.account
     this.coinType = this.account.coinType
   }
 
@@ -52,7 +51,7 @@ export default class AddressDetailPage extends PureComponent {
   _setClipboardContent(addr) {
     try {
       Clipboard.setString(addr)
-      ToastUtil.show(I18n.t('copySuccess', TOAST_SHORT_DURATION))
+      ToastUtil.showShort(I18n.t('copySuccess'))
     } catch (error) {
       ToastUtil.showLong(I18n.t('copyFailed'))
     }
@@ -132,7 +131,6 @@ const styles = StyleSheet.create({
   addressText: {
     marginHorizontal: Dimen.MARGIN_HORIZONTAL,
     marginTop: Dimen.SPACE,
-    // marginBottom: DIMEN_SPACE,
     height: 45
   },
   remindText: {
@@ -145,3 +143,10 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   }
 })
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account
+})
+
+const AddressDetail = connect(mapStateToProps)(AddressDetailPage)
+export default  AddressDetail

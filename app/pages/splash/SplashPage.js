@@ -41,7 +41,6 @@ export default class SplashPage extends Component {
         _that.props.navigation.pop()
       }
       if (status === D.status.syncFinish) {
-        console.log('SplashPage D.status.syncFinish')
         _that.setState({ syncDialogVisible: false })
         _that.props.navigation.replace('Home', { offlineMode: false })
       }
@@ -56,7 +55,6 @@ export default class SplashPage extends Component {
   }
 
   componentWillUnmount() {
-    console.log('splash dialog')
     this.setState({ syncDialogVisible: false })
   }
 

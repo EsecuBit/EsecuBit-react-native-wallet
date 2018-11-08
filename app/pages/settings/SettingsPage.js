@@ -37,12 +37,14 @@ import Dialog from 'react-native-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { Color, Dimen, CommonStyle } from '../../common/Styles'
 import AppUtil from '../../utils/AppUtil'
+import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
+import { connect } from 'react-redux'
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 const platform = Platform.OS
 
-export default class SettingsPage extends Component {
+class SettingsPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -50,13 +52,13 @@ export default class SettingsPage extends Component {
       appVersion: version,
       cosVersion: '1.0.0',
       //dialog
-      legalCurrencyLabel: '',
+      legalCurrencyLabel: props.legalCurrencyUnit,
       legalCurrencyIndex: 0,
       legalCurrencyDialogVisible: false,
-      btcLabel: '',
+      btcLabel: props.btcUnit,
       btcIndex: 0,
       btcDialogVisible: false,
-      ethLabel: '',
+      ethLabel: props.ethUnit,
       ethIndex: 0,
       ethDialogVisible: false,
       disConnectDialogVisible: false,
@@ -71,7 +73,6 @@ export default class SettingsPage extends Component {
 
   componentDidMount() {
     this._listenDeviceStatus()
-    this._getCurrencyPreference()
   }
 
   _listenDeviceStatus() {
@@ -99,19 +100,20 @@ export default class SettingsPage extends Component {
       })
   }
 
-  _getCurrencyPreference() {
-    PreferenceUtil.getCurrencyUnit(LEGAL_CURRENCY_UNIT_KEY).then(value =>
-      this.setState({ legalCurrencyLabel: value })
-    )
-    PreferenceUtil.getCryptoCurrencyUnit(ETH_UNIT_KEY).then(value =>
-      this.setState({ ethLabel: value })
-    )
-    PreferenceUtil.getCryptoCurrencyUnit(BTC_UNIT_KEY).then(value =>
-      this.setState({ btcLabel: value })
-    )
-  }
-
   _updateCurrencyPreference(key, value, index) {
+    switch (key) {
+      case LEGAL_CURRENCY_UNIT_KEY:
+        this.props.setLegalCurrencyUnit(value)
+        break
+      case BTC_UNIT_KEY:
+        this.props.setCryptoCurrencyUnit('btc', value)
+        break
+      case ETH_UNIT_KEY:
+        this.props.setCryptoCurrencyUnit('eth', value)
+        break
+      default:
+        break
+    }
     PreferenceUtil.updateCurrencyUnit(key, value, index)
   }
 
@@ -162,11 +164,7 @@ export default class SettingsPage extends Component {
   render() {
     let _that = this
     return (
-      <Container
-        style={[
-          CommonStyle.layoutBottom,
-          { backgroundColor: Color.CONTAINER_BG }
-        ]}>
+      <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <Header style={{ backgroundColor: '#1D1D1D' }}>
           <StatusBar
             barStyle={platform === 'ios' ? 'light-content' : 'default'}
@@ -177,12 +175,7 @@ export default class SettingsPage extends Component {
               <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
             </Button>
           </Left>
-          <View
-            style={
-              platform === 'ios'
-                ? CommonStyle.toolbarIOS
-                : CommonStyle.toolbarAndroid
-            }>
+          <View style={platform === 'ios' ? CommonStyle.toolbarIOS : CommonStyle.toolbarAndroid}>
             <Text
               style={{
                 color: Color.ACCENT,
@@ -196,10 +189,7 @@ export default class SettingsPage extends Component {
         </Header>
         <Content style={{ backgroundColor: Color.CONTAINER_BG }}>
           <Card style={{ flex: 1 }}>
-            <CardItem
-              header
-              bordered
-              style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={customStyle.headerText}>{I18n.t('device')}</Text>
             </CardItem>
             <CardItem
@@ -209,8 +199,8 @@ export default class SettingsPage extends Component {
                 this.isConnected
                   ? ToastUtil.showShort(I18n.t('hasConnected'))
                   : _that.props.navigation.navigate('PairList', {
-                    hasBackBtn: true
-                  })
+                      hasBackBtn: true
+                    })
               }}>
               <Text>{I18n.t('connectDevice')}</Text>
               <Right>
@@ -227,18 +217,13 @@ export default class SettingsPage extends Component {
                 <Icon name="ios-arrow-forward" />
               </Right>
             </CardItem>
-            <CardItem
-              header
-              bordered
-              style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={customStyle.headerText}>{I18n.t('currency')}</Text>
             </CardItem>
             <CardItem
               bordered
               button
-              onPress={() =>
-                _that.setState({ legalCurrencyDialogVisible: true })
-              }>
+              onPress={() => _that.setState({ legalCurrencyDialogVisible: true })}>
               <Text>{I18n.t('legalCurrency')}</Text>
               <Right>
                 <View style={{ flexDirection: 'row' }}>
@@ -250,10 +235,7 @@ export default class SettingsPage extends Component {
               </Right>
             </CardItem>
             <View style={CommonStyle.divider} />
-            <CardItem
-              bordered
-              button
-              onPress={() => this.setState({ btcDialogVisible: true })}>
+            <CardItem bordered button onPress={() => this.setState({ btcDialogVisible: true })}>
               <Text>{I18n.t('btc')}</Text>
               <Right>
                 <View style={{ flexDirection: 'row' }}>
@@ -265,10 +247,7 @@ export default class SettingsPage extends Component {
               </Right>
             </CardItem>
             <View style={CommonStyle.divider} />
-            <CardItem
-              bordered
-              button
-              onPress={() => this.setState({ ethDialogVisible: true })}>
+            <CardItem bordered button onPress={() => this.setState({ ethDialogVisible: true })}>
               <Text>{I18n.t('eth')}</Text>
               <Right>
                 <View style={{ flexDirection: 'row' }}>
@@ -279,10 +258,7 @@ export default class SettingsPage extends Component {
                 </View>
               </Right>
             </CardItem>
-            <CardItem
-              header
-              bordered
-              style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={customStyle.headerText}>{I18n.t('about')}</Text>
             </CardItem>
             <CardItem bordered button onPress={() => this._checkVersion()}>
@@ -322,17 +298,12 @@ export default class SettingsPage extends Component {
           onOk={result => {
             let label = result.selectedItem.label
             let index = result.selectedItem.value
-            this._updateCurrencyPreference(
-              LEGAL_CURRENCY_UNIT_KEY,
-              label,
-              index
-            )
+            this._updateCurrencyPreference(LEGAL_CURRENCY_UNIT_KEY, label, index)
             this.setState({
               legalCurrencyDialogVisible: false,
               legalCurrencyLabel: label,
               legalCurrencyIndex: index
             })
-            DeviceEventEmitter.emit('legalCurrency', label)
           }}
         />
         <SinglePickerMaterialDialog
@@ -355,9 +326,7 @@ export default class SettingsPage extends Component {
               btcDialogVisible: false,
               btcLabel: label,
               btcIndex: index
-            })
-            console.log('emit', label)
-            DeviceEventEmitter.emit('btc', label)
+            })  
           }}
         />
         <SinglePickerMaterialDialog
@@ -381,8 +350,6 @@ export default class SettingsPage extends Component {
               ethLabel: label,
               ethIndex: index
             })
-            console.log('emit', label)
-            DeviceEventEmitter.emit('eth', label)
           }}
         />
 
@@ -429,3 +396,20 @@ const customStyle = StyleSheet.create({
     fontSize: Dimen.SECONDARY_TEXT
   }
 })
+
+const mapStateToProps = state => ({
+  btcUnit: state.SettingsReducer.btcUnit,
+  ethUnit: state.SettingsReducer.ethUnit,
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
+})
+
+const mapDispatchToProps = {
+  setCryptoCurrencyUnit,
+  setLegalCurrencyUnit
+}
+
+const Settings = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SettingsPage)
+export default Settings

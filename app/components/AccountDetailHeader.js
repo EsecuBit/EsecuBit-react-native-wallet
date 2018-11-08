@@ -5,49 +5,51 @@ import StringUtil from '../utils/StringUtil'
 import { Button, Icon, Text } from 'native-base'
 import Menu, { MenuItem } from 'react-native-material-menu'
 import I18n from '../lang/i18n'
-import CoinUtil from '../utils/CoinUtil'
 import PropTypes from 'prop-types'
-import PreferenceUtil from '../utils/PreferenceUtil'
-import { LEGAL_CURRENCY_UNIT_KEY } from '../common/Constants'
+import { connect } from 'react-redux'
+import { EsWallet, D } from 'esecubit-wallet-sdk'
+
 
 const platform = Platform.OS
 const deviceW = Dimensions.get('window').width
-export default class AccountDetailHeader extends PureComponent {
+class AccountDetailHeader extends PureComponent {
   constructor(props) {
     super(props)
     this.account = props.account
+    this.wallet = new EsWallet()
+    this.cryptoCurrencyUnit = D.isBtc(this.account.coinType) ? props.btcUnit : props.ethUnit
     this.state = {
       accountName: this.account.label,
       cryptoCurrencyBalance: '0',
       legalCurrencyBalance: '0',
-      cryptoCurrencyUnit: 'BTC',
-      legalCurrencyUnit: 'USD'
     }
   }
 
   componentDidMount() {
-    this._getUnit()
     this._getBalance(this.account.balance)
   }
 
-  async _getBalance(balance) {
-    let cryptoCurrencyBalance = await CoinUtil.minimumCryptoCurrencyToDefautCurrency(this.account.coinType, balance)
-    let legalCurrencyBalance = await CoinUtil.minimumCryptoCurrencyToLegalCurrency(this.account.coinType, balance)
+  _getBalance(balance) {
+    let fromUnit = ''
+    let toUnit = ''
+    if (D.isBtc(this.account.coinType)) {
+      fromUnit = D.unit.btc.satoshi
+      toUnit = this.props.btcUnit
+    }else {
+      fromUnit = D.unit.eth.Wei
+      toUnit = this.props.ethUnit
+    }
+    let cryptoCurrencyBalance =  this.wallet.convertValue(this.account.coinType, balance, fromUnit, toUnit)
+    let legalCurrencyBalance =  this.wallet.convertValue(this.account.coinType, balance, fromUnit, this.props.legalCurrencyUnit)
     this.setState({legalCurrencyBalance: legalCurrencyBalance, cryptoCurrencyBalance: cryptoCurrencyBalance})
   }
 
-  async _getUnit() {
-    this.setState({cryptoCurrencyUnit: cryptoCurrencyUnit, legalCurrencyUnit: legalCurrencyUnit})
-  }
 
   _hideMenu() {
     this.moreMenu.hide()
     this.props.onHideMenu()
   }
 
-  updateBalance(balance) {
-    this._getBalance(balance)
-  }
 
   updateAccountName(name) {
     //EOS not support rename account
@@ -131,12 +133,12 @@ export default class AccountDetailHeader extends PureComponent {
                 backgroundColor: 'transparent'
               }}>
               <Text style={styles.accountBalanceText}>{this.state.cryptoCurrencyBalance}</Text>
-              <Text style={styles.cryptoCurrencyUnitText}>{this.state.cryptoCurrencyUnit}</Text>
+              <Text style={styles.cryptoCurrencyUnitText}>{this.cryptoCurrencyUnit}</Text>
             </View>
             <Text style={styles.legalCurrencyBalanceText} numberOfLines={1} ellipsizeMode="middle">
               {StringUtil.formatLegalCurrency(Number(this.state.legalCurrencyBalance).toFixed(2)) +
                 ' ' +
-                this.state.legalCurrencyUnit}
+                this.props.legalCurrencyUnit}
             </Text>
           </View>
         </Image>
@@ -181,3 +183,12 @@ const styles = StyleSheet.create({
     fontSize: Dimen.SECONDARY_TEXT
   }
 })
+
+const mapStateToProps = state => ({
+  btcUnit: state.SettingsReducer.btcUnit,
+  ethUnit: state.SettingsReducer.ethUnit,
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
+  account: state.AccountReducer.account
+})
+
+export default connect(mapStateToProps)(AccountDetailHeader)

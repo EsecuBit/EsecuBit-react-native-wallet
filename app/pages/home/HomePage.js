@@ -25,18 +25,15 @@ import {
 import Dialog from 'react-native-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import { BTC_COINTYPE, LEGAL_CURRENCY_UNIT_KEY, RESULT_OK, MOCK_URL } from '../../common/Constants'
-import PreferenceUtil from '../../utils/PreferenceUtil'
+import { BTC_COINTYPE, RESULT_OK, MOCK_URL } from '../../common/Constants'
 import BigInteger from 'bigi'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import { ProgressDialog } from 'react-native-simple-dialogs'
 import AppUtil from '../../utils/AppUtil'
-import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
-import {setAccount} from '../../actions/AccountAction'
+import { setAccount } from '../../actions/AccountAction'
 import { connect } from 'react-redux'
-
 
 const platform = Platform.OS
 
@@ -61,26 +58,12 @@ class HomePage extends Component {
     this._newAccount.bind(this)
 
     this.state = {
+      accounts: [],
       //new account
-      fabActive: false,
-      fabVisible: true,
       newAccountDialogVisible: false,
       newAccountWaitDialog: false,
-
-      //accounts
-      accounts: [],
+      //total balance
       totalLegalCurrencyBalance: '0.00',
-
-      //currency unit
-      legalCurrencyUnit: '',
-      btcUnit: '',
-      ethUnit: '',
-
-      //exchange rate
-      btcExchangeRate: '0.00',
-      ethExchangeRate: '0.00',
-      btcAccountsBalance: '',
-      ethAccountsBalance: '',
       //state
       networkConnected: true,
       deviceConnected: !this.offlineMode,
@@ -88,9 +71,6 @@ class HomePage extends Component {
       syncIndicatorVisible: false,
       updateVersionDialogVisible: false
     }
-    //scroll y coordinate
-    this.currenyY = 0
-    this.accountsCache = []
     this.deviceW = Dimensions.get('window').width
   }
 
@@ -125,7 +105,7 @@ class HomePage extends Component {
 
   componentDidMount() {
     this._initListener()
-    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers 
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
     this.props.navigation.addListener('willFocus', () => {
       if (platform === 'ios') {
         NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
@@ -143,7 +123,7 @@ class HomePage extends Component {
       .then(info => {
         console.log('checkVersion', info)
         this.info = info
-        if (info.errorCode === RESULT_OK) {
+        if (info && info.errorCode === RESULT_OK) {
           if (info.data !== null) {
             this.setState({
               updateDesc: info.data.description,
@@ -174,37 +154,19 @@ class HomePage extends Component {
 
   _initListener() {
     //device status
-    this.btTransmitter.listenStatus(async (error, status) => {
+    this.btTransmitter.listenStatus((error, status) => {
       if (status === BtTransmitter.disconnected) {
         this.setState({ deviceConnected: false, showDeviceConnectCard: true })
       }
       if (status === BtTransmitter.connected) {
         this.setState({ deviceConnected: true, showDeviceConnectCard: false })
       }
-      console.log(
-        'deviceStatus listener',
-        this.state.deviceConnected,
-        this.state.showDeviceConnectCard
-      )
     })
   }
 
   async _updateUI() {
-    await this._getCurrencyPreference()
     await this._refreshAccounts()
-    this._getTotalLegalCurrencyBalance(this.state.legalCurrencyUnit)
-  }
-
-  async _getCurrencyPreference() {
-    //btc
-    let btcUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.btcCoinType)
-    this.setState({ btcUnit: btcUnit })
-    //eth
-    let ethUnit = await PreferenceUtil.getCryptoCurrencyUnit(this.ethCoinType)
-    this.setState({ ethUnit: ethUnit })
-    //legal currency
-    let legalCurrency = await PreferenceUtil.getCurrencyUnit(LEGAL_CURRENCY_UNIT_KEY)
-    this.setState({ legalCurrencyUnit: legalCurrency })
+    this._getTotalLegalCurrencyBalance(this.props.legalCurrencyUnit)
   }
 
   _refreshAccounts() {
@@ -281,29 +243,6 @@ class HomePage extends Component {
     })
   }
 
-  // async _getExchangeRate(legalCurrencyUnit) {
-  //   // 1 BTC = ? legal currency
-  //   let btcExchangeRate = this.wallet.convertValue(
-  //     this.btcCoinType,
-  //     '100000000',
-  //     D.unit.btc.satoshi,
-  //     legalCurrencyUnit
-  //   )
-  //   // 1 ETH = ? legal currency
-  //   let ethExchangeRate = this.wallet.convertValue(
-  //     this.ethCoinType,
-  //     '1000000000000000000',
-  //     D.unit.eth.Wei,
-  //     legalCurrencyUnit
-  //   )
-  //   this.setState({
-  //     btcExchangeRate: StringUtil.formatLegalCurrency(btcExchangeRate)
-  //   })
-  //   this.setState({
-  //     ethExchangeRate: StringUtil.formatLegalCurrency(ethExchangeRate)
-  //   })
-  // }
-
   /**
    * only support new BTC account and ETH account
    */
@@ -324,7 +263,7 @@ class HomePage extends Component {
       return
     }
 
-    //添加账号等待框延迟显示，防止跟newAccountDialog渲染冲突而不显示，经测试，延迟时间至少300毫秒才有效
+    //For iOS, only delay >300ms the dialog can be showed
     setTimeout(() => {
       this.setState({ newAccountWaitDialog: true })
     }, 400)
@@ -351,19 +290,13 @@ class HomePage extends Component {
   }
 
   _gotoDetailPage(item) {
-    let _that = this
-    //TODO use EventEmitter
-    // DeviceEventEmitter.emit('account', item)
-    
-    setAccount(item)
-    setCryptoCurrencyUnit(D.isBtc(item.coinType) ? this.state.btcUnit : this.state.ethUnit)
-    setLegalCurrencyUnit(this.state.legalCurrencyUnit)
-    _that.props.navigation.navigate('Detail')
+    this.props.setAccount(item)
+    this.props.navigation.navigate('Detail')
   }
 
   _renderRow(item) {
     let fromUnit = D.isBtc(item.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-    let toUnit = D.isBtc(item.coinType) ? this.state.btcUnit : this.state.ethUnit
+    let toUnit = D.isBtc(item.coinType) ? this.props.btcUnit : this.props.ethUnit
     let cryptoCurrencyBalance = this.wallet.convertValue(
       item.coinType,
       item.balance,
@@ -374,7 +307,7 @@ class HomePage extends Component {
       item.coinType,
       item.balance,
       fromUnit,
-      this.state.legalCurrencyUnit
+      this.props.legalCurrencyUnit
     )
     legalCurrencyBalance = Number(legalCurrencyBalance)
       .toFixed(2)
@@ -415,7 +348,7 @@ class HomePage extends Component {
             }}>
             {StringUtil.formatLegalCurrency(Number(legalCurrencyBalance).toFixed(2)) +
               ' ' +
-              this.state.legalCurrencyUnit}
+              this.props.legalCurrencyUnit}
           </Subtitle>
         </View>
       </CardItem>
@@ -534,7 +467,7 @@ class HomePage extends Component {
                     marginTop: Dimen.SPACE,
                     marginLeft: Dimen.SPACE
                   }}>
-                  {_that.state.legalCurrencyUnit}
+                  {_that.props.legalCurrencyUnit}
                 </Text>
               </View>
             </View>
@@ -622,16 +555,17 @@ class HomePage extends Component {
 }
 
 const mapStateToProps = state => ({
+  btcUnit: state.SettingsReducer.btcUnit,
+  ethUnit: state.SettingsReducer.ethUnit,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
-  cryptoCurrencyUnit: state.SettingsReducer.cryptoCurrencyUnit,
-  account: state.AccountReducer.account,
 })
 
 const mapDispatchToProps = {
-  setCryptoCurrencyUnit,
-  setLegalCurrencyUnit,
   setAccount
 }
 
-const Home = connect(mapStateToProps, mapDispatchToProps)(HomePage)
+const Home = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HomePage)
 export default Home

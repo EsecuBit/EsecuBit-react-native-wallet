@@ -19,26 +19,24 @@ import {
 } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
-import EsAccountHelper from '../../EsAccountHelper'
 import { MaterialDialog } from 'react-native-material-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import { CommonStyle } from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
 import FooterButton from '../../components/FooterButton'
+import { connect } from 'react-redux'
 
 const platform = Platform.OS
 
-export default class ETHSendPage extends React.Component {
+class ETHSendPage extends React.Component {
   constructor(props) {
     super(props)
-    this.account = EsAccountHelper.getInstance().getAccount()
+    this.account = props.account
     this.coinType = this.account.coinType
     this.esWallet = new EsWallet()
-    const { params } = props.navigation.state
-    this.legalCurrencyUnit = params.legalCurrencyUnit
-    this.cryptoCurrencyUnit = params.cryptoCurrencyUnit
-    this.txInfo = params.txInfo
+    this.legalCurrencyUnit = props.legalCurrencyUnit
+    this.cryptoCurrencyUnit = props.ethUnit
     this.minimumUnit = D.unit.eth.Wei
     //prevent duplicate send
     this.lockSend = false
@@ -69,6 +67,10 @@ export default class ETHSendPage extends React.Component {
   }
 
   _fillResendData() {
+    const { params }= this.props.navigation.state
+    if (params) {
+      this.txInfo = params.txInfo
+    }
     if (this.txInfo !== undefined) {
       let value = this.txInfo.outputs[0].value
       value = value.toString()
@@ -758,3 +760,9 @@ export default class ETHSendPage extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account,
+  ethUnit: state.SettingsReducer.ethUnit
+})
+export default connect(mapStateToProps)(ETHSendPage)
