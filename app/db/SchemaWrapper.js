@@ -2,7 +2,7 @@ import {D} from 'esecubit-wallet-sdk'
 
 const wrappers = {
   wraps (array) {
-    if (Array.isArray(array)) {
+    if (!Array.isArray(array)) {
       console.warn('try to unwrap a non-array object', array)
       throw D.error.invalidParams
     }
@@ -10,7 +10,7 @@ const wrappers = {
   },
 
   unwraps (array) {
-    if (Array.isArray(array)) {
+    if (!Array.isArray(array)) {
       console.warn('try to unwrap a non-array object', array)
       throw D.error.invalidParams
     }
@@ -33,12 +33,12 @@ const account = {
     return account
   }
 }
-account.prototype = wrappers
 
 const addressInfo = {
   wrap (addressInfo) {
     addressInfo = D.copy(addressInfo)
     addressInfo.txs = JSON.stringify(addressInfo.txs)
+    addressInfo.accountId_path = addressInfo.accountId + '_' + addressInfo.path
     return addressInfo
   },
 
@@ -48,7 +48,6 @@ const addressInfo = {
     return addressInfo
   }
 }
-addressInfo.prototype = wrappers
 
 const txInfo = {
   wrap (txInfo) {
@@ -70,7 +69,6 @@ const txInfo = {
     return txInfo
   }
 }
-txInfo.prototype = wrappers
 
 const utxo = {
   wrap (utxo) {
@@ -85,7 +83,6 @@ const utxo = {
     return D.copy(utxo)
   }
 }
-utxo.prototype = wrappers
 
 const fee = {
   wrap (fee) {
@@ -100,7 +97,6 @@ const fee = {
     return fee
   }
 }
-fee.prototype = wrappers
 
 const exchange = {
   wrap (exchange) {
@@ -115,7 +111,12 @@ const exchange = {
     return exchange
   }
 }
-exchange.prototype = wrappers
 
 
-export default {account, addressInfo, txInfo, utxo, fee, exchange}
+let exports = {account, addressInfo, txInfo, utxo, fee, exchange}
+Object.values(exports).forEach(item => {
+  item.wraps = wrappers.wraps
+  item.unwraps = wrappers.unwraps
+});
+
+export default exports

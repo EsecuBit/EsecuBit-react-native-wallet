@@ -49,7 +49,11 @@ class HandlerPage extends Component {
       })
       .catch(e => {
         if (e === D.error.offlineModeNotAllowed) {
-          this.props.navigation.replace('PairList', { hasBackBtc: false })
+          if (D.test.jsWallet) {
+            this.props.navigation.replace('Splash')
+          }else{
+            this.props.navigation.replace('PairList', { hasBackBtc: false })
+          }
           console.warn('offlineModeNotAllowed')
           return
         }

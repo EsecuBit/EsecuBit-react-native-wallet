@@ -1,7 +1,8 @@
 export default {
   name: 'AddressInfo',
-  primaryKey: 'address',
+  primaryKey: 'accountId_path',
   properties: {
+    accountId_path: {type: 'string', indexed: true},
     address: { type: 'string', indexed: true},
     accountId: { type: 'string', indexed: true },
     coinType: 'string',
