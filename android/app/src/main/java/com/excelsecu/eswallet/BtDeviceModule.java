@@ -135,7 +135,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
     mWorkExecutor.execute(new Runnable() {
       @Override
       public void run() {
-        mEsWallet.connect(finalInfo.device, finalInfo.scanRecord, new IEsHDWallet.OnResponseListener<Boolean>() {
+        mEsWallet.connect(finalInfo.device.getName(), new IEsHDWallet.OnResponseListener<Boolean>() {
           @Override
           public void response(int error, Boolean isConnected) {
             int status = isConnected ? STATUS_CONNECTED : STATUS_DISCONNECTED;

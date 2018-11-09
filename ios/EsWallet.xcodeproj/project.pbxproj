@@ -55,7 +55,7 @@
 		899C1DF371ED4289938A517C /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6B88FEE5FF5498F81D3ABB6 /* libRNCamera.a */; };
 		920C5FC27C20421CBFBD42E6 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */; };
 		936D0EE97B9A462EA33B3116 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */; };
-		9B11FA272195322600A77997 /* bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B11FA262195322600A77997 /* bundle */; };
+		9B870B7A2195625E00FBE18A /* bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B870B792195625E00FBE18A /* bundle */; };
 		9BA72AEF216DA047007E215C /* BackIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA72AEE216DA047007E215C /* BackIOS.m */; };
 		9BBE256547B84A218CD45363 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7A69D490A6854312A9C2672B /* Octicons.ttf */; };
 		A0DA747E0C6F4BADB251B1C6 /* libRNI18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D615EF93173248719DF93C5C /* libRNI18n.a */; };
@@ -373,7 +373,7 @@
 		8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		8D7F0B08CE9744D1AA8DDBF7 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		9B11FA262195322600A77997 /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
+		9B870B792195625E00FBE18A /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
 		9BA72AEE216DA047007E215C /* BackIOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackIOS.m; sourceTree = "<group>"; };
 		A1E559E5AD134D9883EEAE55 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		AA7FEA692A6C4699BED6B893 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
@@ -527,7 +527,7 @@
 		13B07FAE1A68108700A75B9A /* EsWallet */ = {
 			isa = PBXGroup;
 			children = (
-				9B11FA262195322600A77997 /* bundle */,
+				9B870B792195625E00FBE18A /* bundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -1192,7 +1192,7 @@
 				7260E7C569D744E1B06938E8 /* Foundation.ttf in Resources */,
 				E1EEB4AB4AA34E5AAB0EC4FF /* Ionicons.ttf in Resources */,
 				936D0EE97B9A462EA33B3116 /* MaterialCommunityIcons.ttf in Resources */,
-				9B11FA272195322600A77997 /* bundle in Resources */,
+				9B870B7A2195625E00FBE18A /* bundle in Resources */,
 				C891630A207E48909DB7EC06 /* MaterialIcons.ttf in Resources */,
 				9BBE256547B84A218CD45363 /* Octicons.ttf in Resources */,
 				63A150D0B87B4B279A5EDDAF /* Roboto_medium.ttf in Resources */,
