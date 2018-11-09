@@ -73,12 +73,12 @@ class RealmDB extends IDatabase {
     return Realm.open(this._config)
       .then(realm => {
         let accounts = realm.objects('Account').filtered(filterQuery).slice()
-        return wrapper.account.unwraps(accounts)
+        return wrapper.account.unwrap(accounts)
       })
   }
 
   updateAccount(account) {
-    account = wrapper.account.wraps(account)
+    account = wrapper.account.wrap(account)
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)
     }))
@@ -105,14 +105,14 @@ class RealmDB extends IDatabase {
         let total = allTxs.length
         let startIndex = filter.startIndex || 0
         let endIndex = filter.endIndex || total
-        let txInfos = wrapper.txInfo.unwraps(allTxs.slice(startIndex, endIndex))
+        let txInfos = wrapper.txInfo.unwrap(allTxs.slice(startIndex, endIndex))
         return { total, txInfos }
       })
   }
 
   newAddressInfos(account, addressInfos) {
     account = wrapper.account.wrap(account)
-    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    addressInfos = wrapper.addressInfo.wrap(addressInfos)
     return Realm.open(this._config).then(realm => {
       realm.write(() => {
         realm.create('Account', account, true)
@@ -141,9 +141,9 @@ class RealmDB extends IDatabase {
 
   newTx(account, addressInfos, txInfo, utxos = []) {
     account = wrapper.account.wrap(account)
-    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    addressInfos = wrapper.addressInfo.wrap(addressInfos)
     txInfo = wrapper.txInfo.wrap(txInfo)
-    utxos = wrapper.utxo.wraps(utxos)
+    utxos = wrapper.utxo.wrap(utxos)
 
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)
@@ -155,10 +155,10 @@ class RealmDB extends IDatabase {
 
   removeTx (account, addressInfos, txInfo, updateUtxos = [], removeUtxos = []) {
     account = wrapper.account.wrap(account)
-    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    addressInfos = wrapper.addressInfo.wrap(addressInfos)
     txInfo = wrapper.txInfo.wrap(txInfo)
-    updateUtxos = wrapper.utxo.wraps(updateUtxos)
-    removeUtxos = wrapper.utxo.wraps(removeUtxos)
+    updateUtxos = wrapper.utxo.wrap(updateUtxos)
+    removeUtxos = wrapper.utxo.wrap(removeUtxos)
 
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)

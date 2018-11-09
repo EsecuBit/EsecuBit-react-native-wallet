@@ -8,7 +8,7 @@ export default {
     path: 'string',
     type: 'string', // external / change
     index: 'int',
-    txs: 'string', // json array, not using string[] because empty array [] will become {} after set and get
+    txs: 'string?', // json array, not using string[] because empty array [] will become {} after set and get
 
     // eos only
     registered: 'bool?',
