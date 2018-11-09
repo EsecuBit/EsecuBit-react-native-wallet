@@ -45,7 +45,7 @@
     "react-native-simple-dialogs": "^0.4.0",
     "react-native-vector-icons": "^4.6.0",
     "react-navigation": "^2.12.0",
-    "realm": "^2.14.1",
+    "realm": "^2.16.0",
     "stream-browserify": "^2.0.1",
     "vm-browserify": "^1.1.0"
   },

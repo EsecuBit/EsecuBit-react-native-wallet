@@ -33,7 +33,7 @@ export default class AppUtil {
     } catch (e) {
       console.log('checkUpdate error', e)
       if (e !== D.error.deviceProtocol) {
-        ToastUtil.showShort(e)
+        // ToastUtil.showShort(e)
       }
     }
   }
