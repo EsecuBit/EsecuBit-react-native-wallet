@@ -64,10 +64,6 @@ import com.android.build.OutputFile
  *   extraPackagerArgs: []
  * ]
  */
-project.ext.react = [
-        bundleAssetName: "index.android.bundle",
-        bundleInDebug: true
-]
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
@@ -102,7 +98,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.9"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

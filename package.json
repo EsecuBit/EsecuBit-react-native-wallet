@@ -1,7 +1,7 @@
 {
   "name": "EsecuBit",
-  "version": "0.1.8",
-  "versionCode": 2,
+  "version": "0.1.9",
+  "versionCode": 3,
   "author": "EsecuBit",
   "private": true,
   "description": "EsecuBit Wallet App",
@@ -27,7 +27,7 @@
     "bigi": "^1.4.2",
     "buffer": "^5.2.0",
     "crypto-browserify": "^3.12.0",
-    "esecubit-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop",
+    "esecubit-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git",
     "events": "^3.0.0",
     "jsc-android": "^216113.0.0",
     "native-base": "^2.8.0",
