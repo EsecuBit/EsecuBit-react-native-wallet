@@ -30,7 +30,6 @@ import BigInteger from 'bigi'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
-import { ProgressDialog } from 'react-native-simple-dialogs'
 import AppUtil from '../../utils/AppUtil'
 import { setAccount } from '../../actions/AccountAction'
 import { connect } from 'react-redux'
@@ -44,8 +43,6 @@ class HomePage extends Component {
     this.offlineMode = this.props.navigation.state.params.offlineMode
 
     //account
-    this.newAccountType = BTC_COINTYPE
-    this.newAccountName = ''
     this.btcAccounts = []
     this.ethAccounts = []
     //coinType
@@ -55,13 +52,9 @@ class HomePage extends Component {
 
     this.btTransmitter = new BtTransmitter()
     this.wallet = new EsWallet()
-    this._newAccount.bind(this)
 
     this.state = {
       accounts: [],
-      //new account
-      newAccountDialogVisible: false,
-      newAccountWaitDialog: false,
       //total balance
       totalLegalCurrencyBalance: '0.00',
       //state
@@ -201,16 +194,6 @@ class HomePage extends Component {
     }
   }
 
-  _getCoinAccounts(coinType, accounts) {
-    let coinAccounts = []
-    accounts.map(item => {
-      if (item.coinType.indexOf(coinType) != -1) {
-        coinAccounts.push(item)
-      }
-    })
-    return coinAccounts
-  }
-
   _getTotalLegalCurrencyBalance(legalCurrencyUnit) {
     let ethBalance = new BigInteger('0')
     let btcBalance = new BigInteger('0')
@@ -243,51 +226,7 @@ class HomePage extends Component {
     })
   }
 
-  /**
-   * only support new BTC account and ETH account
-   */
-  async _newAccount() {
-    let coinType = D.isBtc(this.newAccountType) ? this.btcCoinType : this.ethCoinType
-    if (this.newAccountName === null) {
-      ToastUtil.showLong(I18n.t('emptyAccountNameError'))
-      return
-    }
-    if (!this._canNewAccount(coinType)) {
-      ToastUtil.showLong(I18n.t('notSupportCoinType'))
-      return
-    }
 
-    let state = await this.btTransmitter.getState()
-    if (state === BtTransmitter.disconnected) {
-      ToastUtil.showLong(I18n.t('pleaseConnectDevice'))
-      return
-    }
-
-    //For iOS, only delay >300ms the dialog can be showed
-    setTimeout(() => {
-      this.setState({ newAccountWaitDialog: true })
-    }, 400)
-
-    try {
-      let account = await this.wallet.newAccount(coinType)
-      account.rename(this.newAccountName)
-      this.newAccountName = ''
-      this._refreshAccounts()
-    } catch (error) {
-      console.warn('newAccount Error', error)
-      this.setState({ newAccountWaitDialog: false })
-      ToastUtil.showErrorMsgShort(error)
-    }
-  }
-
-  /**
-   * only that the last account has transactions can new account
-   * @param {string} coinType
-   */
-  async _canNewAccount(coinType) {
-    let coinTypes = await this.wallet.availableNewAccountCoinTypes()
-    return coinTypes.includes(coinType)
-  }
 
   _gotoDetailPage(item) {
     this.props.setAccount(item)
@@ -516,22 +455,6 @@ class HomePage extends Component {
           </CardItem>
         ) : null}
         <List dataArray={_that.state.accounts} renderRow={_that._renderRow.bind(this)} />
-        <Dialog.Container visible={_that.state.newAccountDialogVisible}>
-          <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
-          <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>
-          <Dialog.Input onChangeText={text => (_that.newAccountName = text)} />
-          <Dialog.Button
-            label={I18n.t('cancel')}
-            onPress={() => _that.setState({ newAccountDialogVisible: false })}
-          />
-          <Dialog.Button
-            label={I18n.t('confirm')}
-            onPress={() => {
-              _that.setState({ newAccountDialogVisible: false })
-              _that._newAccount()
-            }}
-          />
-        </Dialog.Container>
         <Dialog.Container
           visible={this.state.updateVersionDialogVisible}
           style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
@@ -548,7 +471,6 @@ class HomePage extends Component {
             onPress={() => this._gotoBrowser()}
           />
         </Dialog.Container>
-        <ProgressDialog visible={_that.state.newAccountWaitDialog} message={I18n.t('addAccount')} />
       </Container>
     )
   }
