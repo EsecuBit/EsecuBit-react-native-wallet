@@ -5,7 +5,7 @@ import ToastUtil from '../../utils/ToastUtil'
 import { NavigationActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
-import {LEGAL_CURRENCY_UNIT_KEY} from '../../common/Constants'
+import {Unit} from '../../common/Constants'
 import {connect} from 'react-redux'
 
 const deviceW = Dimensions.get('window').width
@@ -52,7 +52,7 @@ class HandlerPage extends Component {
           if (D.test.jsWallet) {
             this.props.navigation.replace('Splash')
           }else{
-            this.props.navigation.replace('PairList', { hasBackBtc: false })
+            this.props.navigation.replace('PairList', { hasBackBtn: false })
           }
           console.warn('offlineModeNotAllowed')
           return
@@ -84,7 +84,7 @@ class HandlerPage extends Component {
       this.props.setCryptoCurrencyUnit(it, unit)
     })
     //legal currency
-    let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(LEGAL_CURRENCY_UNIT_KEY)
+    let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(Unit.legalCurrency)
     this.props.setLegalCurrencyUnit(legalCurrencyUnit)
   }
 }
@@ -92,6 +92,7 @@ class HandlerPage extends Component {
 const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
+  eosUnit: state.SettingsReducer.eosUnit,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
 })
 

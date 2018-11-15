@@ -3,7 +3,7 @@ export default {
   primaryKey: 'coinType',
   properties: {
     coinType: { type: 'string', indexed: true },
-    unit: 'string', // the coinType's unit
+    unit: 'string', // the coinType's Unit
     exchange: 'string' // json string
   }
 }

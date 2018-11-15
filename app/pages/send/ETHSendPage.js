@@ -144,7 +144,7 @@ class ETHSendPage extends React.Component {
     let feeValues = Object.values(fees)
     for (let i = 0; i < feeLevel; i++) {
       const json = {}
-      // eth fee unit convert to gWei
+      // eth fee Unit convert to gWei
       let feeValue =
         this.esWallet.convertValue(
           coinType,

@@ -94,7 +94,7 @@ export default {
   invalidAddress:'Illegal address',
   noAddressCheckSum:'ETH address has no check format',
   invalidAddressChecksum:'Address verification error (not used)',
-  valueIsDecimal:'The smallest unit of the transaction cannot be a decimal',
+  valueIsDecimal:'The smallest Unit of the transaction cannot be a decimal',
   notImplemented:'Function not implemented',
   unknown:'Unknown error',
   coinNotSupported:'This currency is not supported',

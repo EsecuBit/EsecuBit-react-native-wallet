@@ -1,11 +1,8 @@
 import ActionType from './ActionType'
+import CoinUtil from '../utils/CoinUtil'
 
 export function setCryptoCurrencyUnit(coinType, unit) {
-  //slice coinType string, only if coinType is testnet type
-  //eg: btc_testnet3 -> btc
-  if (coinType && coinType.indexOf('_') != -1) {
-    coinType = coinType.slice(0, coinType.indexOf('_'))
-  }
+  coinType = CoinUtil.getRealCoinType(coinType)
   let actionType = ''
   switch (coinType) {
     case 'btc':
@@ -13,6 +10,9 @@ export function setCryptoCurrencyUnit(coinType, unit) {
       break
     case 'eth':
       actionType = ActionType.SET_ETH_UNIT
+      break
+    case 'eos':
+      actionType = ActionType.SET_EOS_UNIT
       break
     default:
       actionType = ''

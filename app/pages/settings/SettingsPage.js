@@ -17,11 +17,8 @@ import I18n from "../../lang/i18n";
 import { EsWallet, D } from "esecubit-wallet-sdk";
 import { version } from "../../../package.json";
 import {
-  LEGAL_CURRENCY_UNIT_KEY,
-  ETH_UNIT_KEY,
-  BTC_UNIT_KEY,
-  RESULT_OK,
-  MOCK_URL
+  Unit,
+  Api
 } from "../../common/Constants";
 import PreferenceUtil from "../../utils/PreferenceUtil";
 import BtTransmitter from "../../device/BtTransmitter";
@@ -96,13 +93,13 @@ class SettingsPage extends Component {
 
   _updateCurrencyPreference(key, value, index) {
     switch (key) {
-      case LEGAL_CURRENCY_UNIT_KEY:
+      case Unit.legalCurrency:
         this.props.setLegalCurrencyUnit(value);
         break;
-      case BTC_UNIT_KEY:
+      case Unit.btc:
         this.props.setCryptoCurrencyUnit("btc", value);
         break;
-      case ETH_UNIT_KEY:
+      case Unit.eth:
         this.props.setCryptoCurrencyUnit("eth", value);
         break;
       default:
@@ -126,7 +123,7 @@ class SettingsPage extends Component {
         if (info === undefined) {
           ToastUtil.showShort(I18n.t("connectDeviceToGetCOSVersion"));
         }
-        if (info.errorCode === RESULT_OK) {
+        if (info.errorCode === Api.success) {
           if (info.data !== null) {
             this.setState({
               updateDesc: info.data.description,
@@ -150,7 +147,7 @@ class SettingsPage extends Component {
 
   _gotoBrowser() {
     if (this.info.data !== null) {
-      Linking.openURL(MOCK_URL + this.info.data.downloadUrl);
+      Linking.openURL(Api.baseUrl + this.info.data.downloadUrl);
     }
     this.setState({ updateVersionDialogVisible: false });
   }
@@ -302,7 +299,7 @@ class SettingsPage extends Component {
           onOk={result => {
             let label = result.selectedItem.label;
             let index = result.selectedItem.value;
-            this._updateCurrencyPreference(LEGAL_CURRENCY_UNIT_KEY, label, index);
+            this._updateCurrencyPreference(Unit.legalCurrency, label, index);
             this.setState({
               legalCurrencyDialogVisible: false,
               legalCurrencyLabel: label,
@@ -325,7 +322,7 @@ class SettingsPage extends Component {
           onOk={result => {
             let label = result.selectedItem.label;
             let index = result.selectedItem.value;
-            this._updateCurrencyPreference(BTC_UNIT_KEY, label, index);
+            this._updateCurrencyPreference(Unit.btc, label, index);
             this.setState({
               btcDialogVisible: false,
               btcLabel: label,
@@ -348,7 +345,7 @@ class SettingsPage extends Component {
           onOk={result => {
             let label = result.selectedItem.label;
             let index = result.selectedItem.value;
-            this._updateCurrencyPreference(ETH_UNIT_KEY, label, index);
+            this._updateCurrencyPreference(Unit.eth, label, index);
             this.setState({
               ethDialogVisible: false,
               ethLabel: label,

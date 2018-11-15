@@ -1,21 +1,19 @@
 import RealmDB from '../db/RealmDB'
 import {
-  LEGAL_CURRENCY_UNIT_KEY,
-  ETH_UNIT_KEY,
-  BTC_UNIT_KEY,
-  DEFAULT_DEVICE
+  Unit
 } from '../common/Constants'
 import { D } from 'esecubit-wallet-sdk'
+import CoinUtil from "./CoinUtil";
 
 const realmDB = new RealmDB('default')
 class PreferenceUtil {
   static async getCurrencyUnit(key) {
     let defaultValue = ''
-    if (key === ETH_UNIT_KEY) {
+    if (key === Unit.eth) {
       defaultValue = D.unit.eth.ETH
-    } else if (key === BTC_UNIT_KEY) {
+    } else if (key === Unit.btc) {
       defaultValue = D.unit.btc.BTC
-    } else if (key === LEGAL_CURRENCY_UNIT_KEY) {
+    } else if (key === Unit.legalCurrency) {
       defaultValue = D.unit.legal.USD
     }
     let result = await realmDB.getPreference(key).catch(err => {
@@ -42,28 +40,23 @@ class PreferenceUtil {
   }
 
   static async getCryptoCurrencyUnit(coinType) {
-    let key = D.isBtc(coinType) ? BTC_UNIT_KEY : ETH_UNIT_KEY
-    return this.getCurrencyUnit(key)
-  }
-
-  static async updateCryptoCurrencyUnit(coinType, key, value, index) {
-    key = D.isBtc(coinType) ? BTC_UNIT_KEY : ETH_UNIT_KEY
-    return this.updateCurrencyUnit(key, value, index)
+    let key = CoinUtil.getRealCoinType(coinType)
+    return this.getCurrencyUnit(Unit[key])
   }
 
   static async setDefaultDevice(obj) {
     obj = JSON.stringify(obj)
     realmDB
-      .saveOrUpdatePreference(DEFAULT_DEVICE, obj)
+      .saveOrUpdatePreference("sn", obj)
       .catch(err => console.warn('setDefaultDevice', err))
   }
 
   static async getDefaultDevice() {
     let obj = await realmDB
-      .getPreference(DEFAULT_DEVICE)
+      .getPreference("sn")
       .catch(err => console.warn('getDefaultDevice', err))
     console.log('?????', obj)
-    if (obj !== undefined) {
+    if (obj) {
       return JSON.parse(obj.value)
     }
     return obj

@@ -1,9 +1,10 @@
 import ActionType from '../actions/ActionType'
 
 const initialState = {
-  btcUnit: '',
-  ethUnit: '',
-  legalCurrencyUnit: ''
+  btcUnit: 'BTC',
+  ethUnit: 'ETH',
+  eosUnit: 'EOS',
+  legalCurrencyUnit: 'USD'
 }
 
 export default function settingsReducer(state = initialState, action) {
@@ -22,6 +23,11 @@ export default function settingsReducer(state = initialState, action) {
       return {
         ...state,
         legalCurrencyUnit: action.unit
+      }
+    case ActionType.SET_EOS_UNIT:
+      return {
+        ...state,
+        eosUnit: action.unit
       }
     default:
       return state
