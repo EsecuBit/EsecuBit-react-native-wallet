@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 import {
   NetInfo,
   View,
@@ -8,8 +8,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Linking
-} from "react-native";
-import { isIphoneX, CommonStyle, Dimen, Color } from "../../common/Styles";
+} from 'react-native'
+import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
   Container,
   Icon,
@@ -21,151 +21,146 @@ import {
   Subtitle,
   List,
   Text
-} from "native-base";
-import Dialog from "react-native-dialog";
-import I18n from "../../lang/i18n";
-import { EsWallet, D } from "esecubit-wallet-sdk";
-import { Api } from "../../common/Constants";
-import BigInteger from "bigi";
-import ToastUtil from "../../utils/ToastUtil";
-import BtTransmitter from "../../device/BtTransmitter";
-import StringUtil from "../../utils/StringUtil";
-import AppUtil from "../../utils/AppUtil";
-import { setAccount } from "../../actions/AccountAction";
-import { connect } from "react-redux";
+} from 'native-base'
+import Dialog from 'react-native-dialog'
+import I18n from '../../lang/i18n'
+import { EsWallet, D } from 'esecubit-wallet-sdk'
+import { Api } from '../../common/Constants'
+import BigInteger from 'bigi'
+import ToastUtil from '../../utils/ToastUtil'
+import BtTransmitter from '../../device/BtTransmitter'
+import StringUtil from '../../utils/StringUtil'
+import AppUtil from '../../utils/AppUtil'
+import { setAccount } from '../../actions/AccountAction'
+import { connect } from 'react-redux'
+import CoinCard from '../../components/CoinCard'
+import CoinUtil from '../../utils/CoinUtil'
 
-const platform = Platform.OS;
+const platform = Platform.OS
 
 class HomePage extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     //offlineMode
-    this.offlineMode = this.props.navigation.state.params.offlineMode;
-
-    //account
-    this.btcAccounts = [];
-    this.ethAccounts = [];
+    this.offlineMode = this.props.navigation.state.params.offlineMode
     //coinType
-    this.supportCoinType = D.supportedCoinTypes();
-    this.btcCoinType = this.supportCoinType[0];
-    this.ethCoinType = this.supportCoinType[1];
-
-    this.btTransmitter = new BtTransmitter();
-    this.wallet = new EsWallet();
+    this.supportCoinType = D.supportedCoinTypes()
+    this.btTransmitter = new BtTransmitter()
+    this.wallet = new EsWallet()
 
     this.state = {
       accounts: [],
       //total balance
-      totalLegalCurrencyBalance: "0.00",
+      totalLegalCurrencyBalance: '0.00',
       //state
       networkConnected: true,
       deviceConnected: !this.offlineMode,
       showDeviceConnectCard: true,
       syncIndicatorVisible: false,
       updateVersionDialogVisible: false
-    };
-    this.deviceW = Dimensions.get("window").width;
+    }
+    this.deviceW = Dimensions.get('window').width
   }
 
   componentWillMount() {
-    let _that = this;
+    let _that = this
     NetInfo.isConnected.fetch().done(isConnected => {
-      if (platform !== "ios") {
-        _that.setState({ networkConnected: isConnected });
+      if (platform !== 'ios') {
+        _that.setState({ networkConnected: isConnected })
       }
-    });
-    if (platform !== "ios") {
-      NetInfo.addEventListener("networkChange", this._handleConnectivityChange.bind(this));
+    })
+    if (platform !== 'ios') {
+      NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
     }
   }
 
   componentWillUnmount() {
-    NetInfo.removeEventListener("networkChange", this._handleConnectivityChange.bind(this));
+    NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
   }
 
   _handleConnectivityChange(status) {
-    if (platform === "ios") {
-      let ns = status.toUpperCase();
-      if (ns === "WIFI" || ns === "CELL") {
-        this.setState({ networkConnected: true });
+    if (platform === 'ios') {
+      let ns = status.toUpperCase()
+      if (ns === 'WIFI' || ns === 'CELL') {
+        this.setState({ networkConnected: true })
       } else {
-        this.setState({ networkConnected: false });
+        this.setState({ networkConnected: false })
       }
     } else {
-      this.setState({ networkConnected: status });
+      this.setState({ networkConnected: status })
     }
   }
 
   componentDidMount() {
-    this._initListener();
+    this._initListener()
     // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
-    this.props.navigation.addListener("willFocus", () => {
-      if (platform === "ios") {
-        NetInfo.addEventListener("networkChange", this._handleConnectivityChange.bind(this));
+    this.props.navigation.addListener('willFocus', () => {
+      if (platform === 'ios') {
+        NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
       }
-      this._updateUI();
-    });
+      this._updateUI()
+    })
     //delay to check app version
     setTimeout(() => {
-      this._checkVersion();
-    }, 3000);
+      this._checkVersion()
+    }, 3000)
   }
 
   _checkVersion() {
     AppUtil.checkUpdate()
       .then(info => {
-        console.log("checkVersion", info);
-        this.info = info;
-        if (info && info.errorCode === api.success) {
+        console.log('checkVersion', info)
+        this.info = info
+        if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
             this.setState({
               updateDesc: info.data.description,
               updateVersionDialogVisible: true
-            });
+            })
           }
         }
       })
       .catch(e => {
-        console.log("checkVersion error", e);
-        ToastUtil.showShort(e);
-      });
+        console.log('checkVersion error', e)
+        ToastUtil.showShort(e)
+      })
   }
 
   _checkForceUpdate() {
-    this.setState({ updateVersionDialogVisible: false });
+    this.setState({ updateVersionDialogVisible: false })
     if (this.info !== undefined && this.info.data.isForceUpdate) {
-      AppUtil.exitApp();
+      AppUtil.exitApp()
     }
   }
 
   _gotoBrowser() {
     if (this.info.data !== null) {
-      Linking.openURL(Api.baseUrl + this.info.data.downloadUrl);
+      Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
-    this.setState({ updateVersionDialogVisible: false });
+    this.setState({ updateVersionDialogVisible: false })
   }
 
   _initListener() {
     //device status
     this.btTransmitter.listenStatus((error, status) => {
       if (status === BtTransmitter.disconnected) {
-        this.setState({ deviceConnected: false, showDeviceConnectCard: true });
+        this.setState({ deviceConnected: false, showDeviceConnectCard: true })
       }
       if (status === BtTransmitter.connected) {
-        this.setState({ deviceConnected: true, showDeviceConnectCard: false });
+        this.setState({ deviceConnected: true, showDeviceConnectCard: false })
       }
-    });
+    })
   }
 
   async _updateUI() {
-    await this._refreshAccounts();
-    this._getTotalLegalCurrencyBalance(this.props.legalCurrencyUnit);
+    await this._refreshAccounts()
+    this._getTotalLegalCurrencyBalance()
   }
 
   _refreshAccounts() {
-    this.setState({ newAccountWaitDialog: false });
-    this.setState({ accounts: [] });
-    this._getAccounts();
+    this.setState({ newAccountWaitDialog: false })
+    this.setState({ accounts: [] })
+    this._getAccounts()
   }
 
   /**
@@ -174,148 +169,82 @@ class HomePage extends Component {
    */
   async _getAccounts() {
     try {
-      let accounts = await this.wallet.getAccounts();
-      console.log(accounts);
+      this.accounts = await this.wallet.getAccounts()
+      console.log(accounts)
       if (Array.isArray(accounts) && accounts.length === 0) {
-        accounts = this.accountsCache;
-        console.log("sdsdsd000", accounts, this.accountsCache);
+        accounts = this.accountsCache
+        console.log('sdsdsd000', accounts, this.accountsCache)
       } else if (Array.isArray(this.accountsCache) && this.accountsCache.length === 0) {
-        this.accountsCache = accounts;
-        console.log("asdadasd", this.accountsCache, accounts);
+        this.accountsCache = accounts
+        console.log('asdadasd', this.accountsCache, accounts)
       }
-      this.setState({ accounts: accounts });
-      let btcAccounts = this._getCoinAccounts(this.btcCoinType, accounts);
-      let ethAccounts = this._getCoinAccounts(this.ethCoinType, accounts);
-      this.btcAccounts = btcAccounts;
-      this.ethAccounts = ethAccounts;
+      this.setState({ accounts: accounts })
     } catch (error) {
-      console.warn("getAccounts", error);
-      ToastUtil.showErrorMsgShort(error);
+      console.warn('getAccounts', error)
+      ToastUtil.showErrorMsgShort(error)
     }
   }
 
-  _getTotalLegalCurrencyBalance(legalCurrencyUnit) {
-    let ethBalance = new BigInteger("0");
-    let btcBalance = new BigInteger("0");
+  _getTotalLegalCurrencyBalance() {
+    let totalLegalCurrencyBalance = ''
+    this.account.map(account => {
+      let fromUnit = CoinUtil.getMinimumUnit(account.coinType)
+      let legalCurrencyBalance = this.wallet.convertValue(
+        account.coinType,
+        account.balance,
+        fromUnit,
+        this.props.legalCurrencyUnit
+      )
+      totalLegalCurrencyBalance += parseFloat(legalCurrencyBalance)
+    })
 
-    this.btcAccounts.map(item => {
-      btcBalance = btcBalance.add(new BigInteger(item.balance));
-    });
-    this.ethAccounts.map(item => {
-      ethBalance = ethBalance.add(new BigInteger(item.balance));
-    });
-    btcBalance = this.wallet.convertValue(
-      this.btcCoinType,
-      btcBalance.toString(10),
-      D.unit.btc.satoshi,
-      legalCurrencyUnit
-    );
-    ethBalance = this.wallet.convertValue(
-      this.ethCoinType,
-      ethBalance.toString(10),
-      D.unit.eth.Wei,
-      legalCurrencyUnit
-    );
-    let totalLegalCurrencyBalance = parseFloat(btcBalance) + parseFloat(ethBalance);
     //format balance
     totalLegalCurrencyBalance = StringUtil.formatLegalCurrency(
       Number(totalLegalCurrencyBalance).toFixed(2)
-    );
+    )
     this.setState({
-      totalLegalCurrencyBalance: totalLegalCurrencyBalance.toString()
-    });
-  }
-
-  _gotoDetailPage(item) {
-    this.props.setAccount(item);
-    this.props.navigation.navigate("Detail");
+      totalLegalCurrencyBalance: totalLegalCurrencyBalance
+    })
   }
 
   _renderRow(item) {
-    let fromUnit = D.isBtc(item.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei;
-    let toUnit = D.isBtc(item.coinType) ? this.props.btcUnit : this.props.ethUnit;
-    let cryptoCurrencyBalance = this.wallet.convertValue(
-      item.coinType,
-      item.balance,
-      fromUnit,
-      toUnit
-    );
-    let legalCurrencyBalance = this.wallet.convertValue(
-      item.coinType,
-      item.balance,
-      fromUnit,
-      this.props.legalCurrencyUnit
-    );
-    legalCurrencyBalance = Number(legalCurrencyBalance)
-      .toFixed(2)
-      .toString();
-    return (
-      <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(item)}>
-        <Left style={{ flexDirection: "row" }}>
-          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>{item.label}</Title>
-        </Left>
-        <View>
-          <Subtitle
-            style={{
-              fontSize: 15,
-              color: Color.PRIMARY_TEXT,
-              textAlign: "right"
-            }}
-          >
-            {StringUtil.formatCryptoCurrency(cryptoCurrencyBalance) + " " + toUnit}
-          </Subtitle>
-          <Subtitle
-            style={{
-              fontSize: 13,
-              color: Color.LIGHT_PARIMARY,
-              textAlign: "right"
-            }}
-          >
-            {StringUtil.formatLegalCurrency(Number(legalCurrencyBalance).toFixed(2)) +
-              " " +
-              this.props.legalCurrencyUnit}
-          </Subtitle>
-        </View>
-      </CardItem>
-    );
+    return <CoinCard data={item} />
   }
 
   render() {
-    let _that = this;
-    let height = platform === "ios" ? 64 : 56;
+    let _that = this
+    let height = platform === 'ios' ? 64 : 56
     if (isIphoneX) {
-      height = 88;
+      height = 88
     }
     return (
       <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
         <View style={{ height: 205 }}>
-          <Image style={{ height: 205 }} source={require("../../imgs/bg_home.png")}>
+          <Image style={{ height: 205 }} source={require('../../imgs/bg_home.png')}>
             <View style={{ height: height }}>
               <View
                 style={{
                   flex: 1,
-                  backgroundColor: "transparent",
-                  flexDirection: "row"
+                  backgroundColor: 'transparent',
+                  flexDirection: 'row'
                 }}
-                translucent={false}
-              >
+                translucent={false}>
                 <StatusBar
-                  barStyle={platform === "ios" ? "light-content" : "default"}
+                  barStyle={platform === 'ios' ? 'light-content' : 'default'}
                   backgroundColor="#1D1D1D"
                   hidden={false}
                 />
                 <View
                   style={{
-                    justifyContent: "center",
+                    justifyContent: 'center',
                     width: 48,
                     height: height,
                     marginLeft: Dimen.MARGIN_HORIZONTAL,
                     marginTop: isIphoneX ? 20 : 0
-                  }}
-                >
-                  <Button transparent onPress={() => _that.props.navigation.navigate("Settings")}>
+                  }}>
+                  <Button transparent onPress={() => _that.props.navigation.navigate('Settings')}>
                     <Image
-                      source={require("../../imgs/ic_menu.png")}
+                      source={require('../../imgs/ic_menu.png')}
                       style={{ width: 20, height: 20 }}
                     />
                   </Button>
@@ -323,92 +252,84 @@ class HomePage extends Component {
                 <View
                   style={{
                     width: this.deviceW - 48 - 48 - 16,
-                    justifyContent: "center",
-                    alignItems: "center"
+                    justifyContent: 'center',
+                    alignItems: 'center'
                   }}
                 />
                 <View
                   style={{
-                    justifyContent: "center",
+                    justifyContent: 'center',
                     width: 48,
                     height: height,
                     marginTop: isIphoneX ? 20 : 0
-                  }}
-                >
+                  }}>
                   <TouchableOpacity
                     style={{
-                      justifyContent: "center",
+                      justifyContent: 'center',
                       width: 48,
                       height: height,
                       marginLeft: Dimen.MARGIN_HORIZONTAL
                     }}
                     onPress={() =>
-                      _that.props.navigation.navigate("NewAccount", {
+                      _that.props.navigation.navigate('NewAccount', {
                         btcAccounts: this.btcAccounts,
                         ethAccounts: this.ethAccounts
                       })
-                    }
-                  >
-                    <Image source={require("../../imgs/ic_add.png")} />
+                    }>
+                    <Image source={require('../../imgs/ic_add.png')} />
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
             <View
               style={{
-                flexDirection: "column",
-                backgroundColor: "transparent"
-              }}
-            >
+                flexDirection: 'column',
+                backgroundColor: 'transparent'
+              }}>
               <View
                 style={{
                   width: this.deviceW,
-                  flexDirection: "row",
-                  justifyContent: "center"
-                }}
-              >
+                  flexDirection: 'row',
+                  justifyContent: 'center'
+                }}>
                 <Text
                   style={{
                     color: Color.ACCENT,
                     marginTop: Dimen.MARGIN_VERTICAL
-                  }}
-                >
-                  {"— " + I18n.t("totalValue") + "  —"}
+                  }}>
+                  {'— ' + I18n.t('totalValue') + '  —'}
                 </Text>
               </View>
               <View
                 style={{
                   width: this.deviceW,
-                  flexDirection: "row",
-                  justifyContent: "center"
-                }}
-              >
+                  flexDirection: 'row',
+                  justifyContent: 'center'
+                }}>
                 <Text
                   style={{
                     color: Color.TEXT_ICONS,
                     fontSize: 27,
                     marginTop: Dimen.SPACE,
-                    textAlign: "center"
-                  }}
-                >
+                    textAlign: 'center'
+                  }}>
                   {_that.state.totalLegalCurrencyBalance}
                 </Text>
                 <Text
                   style={{
                     color: Color.ACCENT,
-                    alignSelf: "auto",
+                    alignSelf: 'auto',
                     fontSize: 13,
                     marginTop: Dimen.SPACE,
                     marginLeft: Dimen.SPACE
-                  }}
-                >
+                  }}>
                   {_that.props.legalCurrencyUnit}
                 </Text>
               </View>
             </View>
           </Image>
         </View>
-        {_that.state.networkConnected ? null : ToastUtil.showShort(I18n.t("networkNotAvailable"))}
+        {_that.state.networkConnected ? null : ToastUtil.showShort(I18n.t('networkNotAvailable'))}
         {!_that.state.deviceConnected && _that.state.showDeviceConnectCard ? (
           <CardItem
             button
@@ -416,15 +337,14 @@ class HomePage extends Component {
               {
                 marginTop: Dimen.SPACE,
                 marginBottom: Dimen.MARGIN_VERTICAL,
-                flexDirection: "column"
+                flexDirection: 'column'
               },
               CommonStyle.cardStyle
-            ]}
-          >
-            <View style={{ flexDirection: "column" }}>
-              <Text style={CommonStyle.secondaryText}>{I18n.t("pleaseConnectDeviceToSync")}</Text>
+            ]}>
+            <View style={{ flexDirection: 'column' }}>
+              <Text style={CommonStyle.secondaryText}>{I18n.t('pleaseConnectDeviceToSync')}</Text>
             </View>
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: 'row' }}>
               <Left>
                 <Button
                   transparent
@@ -433,21 +353,19 @@ class HomePage extends Component {
                       showDeviceConnectCard: false,
                       offlineMode: true
                     })
-                  }
-                >
-                  <Text style={{ color: Color.ACCENT }}>{I18n.t("cancel")}</Text>
+                  }>
+                  <Text style={{ color: Color.ACCENT }}>{I18n.t('cancel')}</Text>
                 </Button>
               </Left>
               <Right>
                 <Button
                   transparent
                   onPress={() =>
-                    _that.props.navigation.navigate("PairList", {
+                    _that.props.navigation.navigate('PairList', {
                       hasBackBtn: true
                     })
-                  }
-                >
-                  <Text style={{ color: Color.ACCENT }}>{I18n.t("confirm")}</Text>
+                  }>
+                  <Text style={{ color: Color.ACCENT }}>{I18n.t('confirm')}</Text>
                 </Button>
               </Right>
             </View>
@@ -456,38 +374,38 @@ class HomePage extends Component {
         <List dataArray={_that.state.accounts} renderRow={_that._renderRow.bind(this)} />
         <Dialog.Container
           visible={this.state.updateVersionDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}
-        >
-          <Dialog.Title>{I18n.t("versionUpdate")}</Dialog.Title>
+          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
+          <Dialog.Title>{I18n.t('versionUpdate')}</Dialog.Title>
           <Dialog.Description>{this.state.updateDesc}</Dialog.Description>
           <Dialog.Button
             style={{ color: Color.ACCENT }}
-            label={I18n.t("cancel")}
+            label={I18n.t('cancel')}
             onPress={this._checkForceUpdate.bind(this)}
           />
           <Dialog.Button
             style={{ color: Color.ACCENT }}
-            label={I18n.t("confirm")}
+            label={I18n.t('confirm')}
             onPress={() => this._gotoBrowser()}
           />
         </Dialog.Container>
       </Container>
-    );
+    )
   }
 }
 
 const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
+  eosUnit: state.SettingsReducer.eosUnit,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
-});
+})
 
 const mapDispatchToProps = {
   setAccount
-};
+}
 
 const Home = connect(
   mapStateToProps,
   mapDispatchToProps
-)(HomePage);
-export default Home;
+)(HomePage)
+export default Home

@@ -1,21 +1,21 @@
 import ActionType from './ActionType'
 import CoinUtil from '../utils/CoinUtil'
+import { Coin } from '../common/Constants'
 
 export function setCryptoCurrencyUnit(coinType, unit) {
   coinType = CoinUtil.getRealCoinType(coinType)
   let actionType = ''
   switch (coinType) {
-    case 'btc':
+    case Coin.btc:
       actionType = ActionType.SET_BTC_UNIT
       break
-    case 'eth':
+    case Coin.eth:
       actionType = ActionType.SET_ETH_UNIT
       break
-    case 'eos':
+    case Coin.eos:
       actionType = ActionType.SET_EOS_UNIT
       break
     default:
-      actionType = ''
       break
   }
   return {

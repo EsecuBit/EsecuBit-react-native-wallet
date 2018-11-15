@@ -9,3 +9,10 @@ export const Api = {
   success: 0,
   baseUrl: 'http://39.106.201.178/app-update-server/'
 }
+
+export const Coin = {
+  btc: 'btc',
+  eth: 'eth',
+  eos: 'eos',
+  legal: 'legal'
+}

@@ -5,8 +5,9 @@ import ToastUtil from '../../utils/ToastUtil'
 import { NavigationActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
-import {Unit} from '../../common/Constants'
+import {Unit, Coin} from '../../common/Constants'
 import {connect} from 'react-redux'
+import CoinUtil from "../../utils/CoinUtil";
 
 const deviceW = Dimensions.get('window').width
 class HandlerPage extends Component {
@@ -79,12 +80,13 @@ class HandlerPage extends Component {
 
   async _getCurrencyPreference() {
     let coinTypes = D.supportedCoinTypes()
-    coinTypes.map(async it => {
+    await coinTypes.map(async it => {
+      it = CoinUtil.getRealCoinType(it)
       let unit = await PreferenceUtil.getCryptoCurrencyUnit(it)
       this.props.setCryptoCurrencyUnit(it, unit)
     })
     //legal currency
-    let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(Unit.legalCurrency)
+    let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(Coin.legal)
     this.props.setLegalCurrencyUnit(legalCurrencyUnit)
   }
 }
