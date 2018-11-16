@@ -29,6 +29,7 @@ class HandlerPage extends Component {
 
   componentDidMount() {
     this._getCurrencyPreference()
+    this.esWallet.setTestSeed("95a0c91336b247cc0a8ad13b16461a61eae869b11d80182517ea1faf6c3aeb10df96fb0b2400b02c6b7f6dd8156b1eb79fe2b05b56dff17ef6922a68315c1f75");
     this._enterOfflineMode()
   }
 
@@ -80,11 +81,14 @@ class HandlerPage extends Component {
 
   async _getCurrencyPreference() {
     let coinTypes = D.supportedCoinTypes()
-    await coinTypes.map(async it => {
+    coinTypes.map(async it => {
       it = CoinUtil.getRealCoinType(it)
       let unit = await PreferenceUtil.getCryptoCurrencyUnit(it)
       this.props.setCryptoCurrencyUnit(it, unit)
+      console.log('crypto', this.props.setCryptoCurrencyUnit);
+      
     })
+    console.log('legal', this.props.setLegalCurrencyUnit)
     //legal currency
     let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(Coin.legal)
     this.props.setLegalCurrencyUnit(legalCurrencyUnit)

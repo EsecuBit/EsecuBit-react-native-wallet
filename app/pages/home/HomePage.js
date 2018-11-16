@@ -154,11 +154,10 @@ class HomePage extends Component {
 
   async _updateUI() {
     await this._refreshAccounts()
-    this._getTotalLegalCurrencyBalance()
+    await this._getTotalLegalCurrencyBalance()
   }
 
   _refreshAccounts() {
-    this.setState({ newAccountWaitDialog: false })
     this.setState({ accounts: [] })
     this._getAccounts()
   }
@@ -169,7 +168,7 @@ class HomePage extends Component {
    */
   async _getAccounts() {
     try {
-      this.accounts = await this.wallet.getAccounts()
+      let accounts = await this.wallet.getAccounts()
       console.log(accounts)
       if (Array.isArray(accounts) && accounts.length === 0) {
         accounts = this.accountsCache
@@ -178,7 +177,7 @@ class HomePage extends Component {
         this.accountsCache = accounts
         console.log('asdadasd', this.accountsCache, accounts)
       }
-      this.setState({ accounts: accounts })
+      await this.setState({ accounts: accounts })
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -187,7 +186,7 @@ class HomePage extends Component {
 
   _getTotalLegalCurrencyBalance() {
     let totalLegalCurrencyBalance = ''
-    this.account.map(account => {
+    this.state.accounts.map(account => {
       let fromUnit = CoinUtil.getMinimumUnit(account.coinType)
       let legalCurrencyBalance = this.wallet.convertValue(
         account.coinType,

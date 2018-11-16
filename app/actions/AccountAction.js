@@ -6,3 +6,10 @@ export function setAccount(account) {
     account: account
   }
 }
+
+export function setAccountCryptoCurrencyUnit(unit) {
+  return {
+    type: ActionType.SET_ACCOUNT_CRYPTO_CURRENCY_UNIT,
+    unit: unit
+  }
+}

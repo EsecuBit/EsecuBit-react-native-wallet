@@ -21,6 +21,8 @@ import StringUtil from '../../utils/StringUtil'
 import AccountOperateBottomBar from '../../components/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/AccountDetailHeader'
 import { connect } from 'react-redux'
+import CoinUtil from '../../utils/CoinUtil'
+import { Coin } from '../../common/Constants'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
@@ -42,7 +44,6 @@ class AccountDetailPage extends React.Component {
       dMemo: '',
       renameDialogVisible: false
     }
-    this.cryptoCurrencyUnit = D.isBtc(this.account.coinType) ? props.btcUnit : props.ethUnit
   }
 
   componentDidMount() {
@@ -52,31 +53,34 @@ class AccountDetailPage extends React.Component {
       console.log('listen TxInfo')
       _that._getTxInfos()
     })
-    // _that._initListener()
   }
-
-  // _initListener() {
-  //   DeviceEventEmitter.addListener('balance', () => {
-  //     this.accountHeader.updateBalance(this.account.balance)
-  //   })
-  // }
 
   async _gotoSendPage() {
     let deviceState = await this.transmitter.getState()
-    if (deviceState === BtTransmitter.disconnected) {
+    //soft wallet no need to connect hardware
+    if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
       return
     }
-    if (D.isBtc(this.account.coinType)) {
-      this.props.navigation.navigate('BTCSend')
-    } else if (D.isEth(this.account.coinType)) {
-      this.props.navigation.navigate('ETHSend')
+    let coinType = CoinUtil.getRealCoinType(this.account.coinType)
+    switch (coinType) {
+      case Coin.btc:
+        this.props.navigation.navigate('BTCSend')
+        break
+      case Coin.eth:
+        this.props.navigation.navigate('ETHSend')
+        break
+      case Coin.eos:
+        this.props.navigation.navigate('EOSSend')
+        break
+      default:
+        throw D.error.coinNotSupported
     }
   }
 
   async _gotoAddressDetailPage() {
     let deviceState = await this.transmitter.getState()
-    if (deviceState === BtTransmitter.disconnected) {
+    if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
       return
     }

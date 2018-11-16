@@ -11,27 +11,27 @@ import {
   CardItem,
   Text,
   Content
-} from "native-base";
-import { SinglePickerMaterialDialog } from "react-native-material-dialog";
-import I18n from "../../lang/i18n";
-import { EsWallet, D } from "esecubit-wallet-sdk";
-import { version } from "../../../package.json";
+} from "native-base"
+import { SinglePickerMaterialDialog } from "react-native-material-dialog"
+import I18n from "../../lang/i18n"
+import { EsWallet, D } from "esecubit-wallet-sdk"
+import { version } from "../../../package.json"
 import {
   Unit,
   Api
-} from "../../common/Constants";
-import PreferenceUtil from "../../utils/PreferenceUtil";
-import BtTransmitter from "../../device/BtTransmitter";
-import Dialog from "react-native-dialog";
-import ToastUtil from "../../utils/ToastUtil";
-import { Color, Dimen, CommonStyle } from "../../common/Styles";
-import AppUtil from "../../utils/AppUtil";
-import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/SettingsAction";
-import { connect } from "react-redux";
-import CoinUtil from "../../utils/CoinUtil";
+} from "../../common/Constants"
+import PreferenceUtil from "../../utils/PreferenceUtil"
+import BtTransmitter from "../../device/BtTransmitter"
+import Dialog from "react-native-dialog"
+import ToastUtil from "../../utils/ToastUtil"
+import { Color, Dimen, CommonStyle } from "../../common/Styles"
+import AppUtil from "../../utils/AppUtil"
+import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/SettingsAction"
+import { connect } from "react-redux"
+import CoinUtil from "../../utils/CoinUtil"
 
-const btcUnit = ["BTC", "mBTC"];
-const ethUnit = ["ETH", "GWei"];
+const btcUnit = ["BTC", "mBTC"]
+const ethUnit = ["ETH", "GWei"]
 const platform = Platform.OS;
 
 class SettingsPage extends Component {
@@ -65,6 +65,7 @@ class SettingsPage extends Component {
   componentDidMount() {
     this._listenDeviceStatus();
   }
+  
 
   _listenDeviceStatus() {
     this.transmitter.getState().then(state => {
