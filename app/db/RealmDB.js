@@ -123,6 +123,17 @@ class RealmDB extends IDatabase {
     })
   }
 
+  updateAddressInfos(addressInfos) {
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    return Realm.open(this._config).then(realm => {
+      realm.write(() => {
+        addressInfos.forEach(addressInfo => {
+          realm.create('AddressInfo', addressInfo, true)
+        })
+      })
+    })
+  }
+
   getAddressInfos(filter = {}) {
     let filterQuery = RealmDB.makeQuery(filter)
     return Realm.open(this._config)
