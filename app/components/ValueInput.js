@@ -37,6 +37,10 @@ export default class ValueInput extends PureComponent {
     return this.state.sendValueStatus
   }
 
+  updateValue(value) {
+    this.setState({sendValue: value})
+  }
+
   render() {
     const { placeholder, onItemClick } = this.props
     return (

@@ -7,14 +7,16 @@ import ValueInput from '../../components/ValueInput'
 import AccountNameInput from '../../components/AccountNameInput'
 import MemoInput from '../../components/MemoInput'
 import SendToolbar from '../../components/SendToolbar'
+import { connect } from 'react-redux'
+import ToastUtil from '../../utils/ToastUtil';
 
-export default class EOSSendPage extends Component {
-  constructor() {
-    super()
+class EOSSendPage extends Component {
+  constructor(props) {
+    super(props)
     this.state = {
       accountName: '',
       sendValue: '',
-      balance: '',
+      balance: props.account.balance,
       memo: '',
       disableFooterBtn: true
     }
@@ -31,7 +33,10 @@ export default class EOSSendPage extends Component {
   }
 
   _handleSendValueItemClick(value) {
-    //TODO: handle value percentage click
+    console.log('send value', value);
+    let sendValue = Number(this.props.account.balance * value).toLocaleString('en')
+    console.log('send value1', sendValue);
+    this.valueInput.updateValue(sendValue)
   }
 
   async _checkFormData() {
@@ -39,11 +44,55 @@ export default class EOSSendPage extends Component {
     await this.setState({ disableFooterBtn: !result })
   }
 
-  _buildEOSMaxAmountForm() {}
+  _buildEOSMaxAmountForm() {
+    return {
+      sendAll: true,
+      token: 'EOS',
+      type: 'tokenTransfer',
+      comment: this.state.memo,
+      outputs: [{
+        account: this.state.accountName.trim(),
+        value: this.state.sendValue
+      }
+      ]
+    }
 
-  _buildEOSSendForm() {}
+  }
 
-  _send() {}
+  _buildEOSSendForm() {
+    return {
+      token: 'EOS',
+      type: 'tokenTransfer',
+      comment: this.state.memo,
+      outputs: [{
+        account: this.state.accountName.trim(),
+        value: this.state.sendValue
+      }
+      ]
+    }
+  }
+
+  _send() {
+    let form = this._buildEOSSendForm()
+    this.props.account
+      .prepareTx(form)
+      .then(result => {
+        console.log('EOS build result', result)
+        return this.props.account.buildTx(result)
+      })
+      .then(result => {
+        console.log('EOS send result', result)
+        return this.props.account.sendTx(result)
+      })
+      .then(() => {
+        console.log('EOS send successful')
+        ToastUtil.showShort(I18n.t('success'))
+      })
+      .catch(err => {
+        console.warn('EOS send error', err)
+        ToastUtil.showErrorMsgShort(err)
+      })
+  }
 
   render() {
     return (
@@ -52,7 +101,7 @@ export default class EOSSendPage extends Component {
         <Content>
           <View style={{ marginTop: Dimen.SPACE, marginBottom: Dimen.SPACE }}>
             <Text style={styles.balanceText}>
-              {'Balance' + ': ' + this.state.balance + ' ' + this.cryptoCurrencyUnit}
+              {'Balance' + ': ' + this.state.balance + ' ' + 'EOS'}
             </Text>
           </View>
           <Card>
@@ -93,3 +142,11 @@ const styles = StyleSheet.create({
     padding: 3
   }
 })
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account,
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
+
+})
+
+export default connect(mapStateToProps)(EOSSendPage)

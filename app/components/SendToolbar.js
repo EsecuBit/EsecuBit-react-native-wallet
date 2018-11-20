@@ -10,10 +10,11 @@ import {
   Image
 } from 'react-native'
 import { Color, CommonStyle, Dimen } from '../common/Styles'
+import { withNavigation }from 'react-navigation'
 
 const platform = Platform.OS
 
-export default class SendToolbar extends PureComponent {
+class SendToolbar extends PureComponent {
   constructor() {
     super()
     this.deviceW = Dimensions.get('window').width
@@ -65,3 +66,4 @@ export default class SendToolbar extends PureComponent {
     )
   }
 }
+export default withNavigation(SendToolbar)
