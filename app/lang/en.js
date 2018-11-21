@@ -145,6 +145,8 @@ export default {
   permissionManage: 'Permission Manage',
   permissionManageTip: 'Note: \n  - Owner Key: Has all permissions for the current EOS account. \n  \
   - Active Key: By default, all transactions except the Owner Key can be changed. \n \
-  - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.'
+  - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.',
+  stake: 'Stake',
+  unstake: 'UnStake'
 
 }

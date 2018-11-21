@@ -146,5 +146,7 @@ export default {
   permissionManage: '权限管理',
   permissionManageTip: '注意:\n  - Owner Key: 拥有当前EOS账号的所有权限。\n\
   - Active Key: 默认情况下，可以完成除更改Owner Key以外的所有交易。\n\
-  - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key'
+  - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key',
+  stake: '抵押',
+  unstake: '赎回'
 }
