@@ -73,7 +73,7 @@ class RealmDB extends IDatabase {
     return Realm.open(this._config)
       .then(realm => {
         let accounts = realm.objects('Account').filtered(filterQuery).slice()
-        return wrapper.account.unwrap(accounts)
+        return wrapper.account.unwraps(accounts)
       })
   }
 

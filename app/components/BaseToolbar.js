@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 import { Button, Header, Icon, Left, Right } from 'native-base'
-import I18n from '../lang/i18n'
 import { Dimensions, StatusBar, Text, View, Platform } from 'react-native'
 import { Color, CommonStyle, Dimen } from '../common/Styles'
 import PropTypes from 'prop-types'
+import { withNavigation }from 'react-navigation'
 
 const platform = Platform.OS
 
-export default class BaseToolbar extends PureComponent {
+class BaseToolbar extends PureComponent {
   constructor() {
     super()
     this.deviceW = Dimensions.get('window').width
@@ -62,4 +62,4 @@ BaseToolbar.prototypes = {
 BaseToolbar.defaultProps = {
   title: ''
 }
-
+export default withNavigation(BaseToolbar)

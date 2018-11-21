@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 
-
 const platform = Platform.OS
 const deviceW = Dimensions.get('window').width
 class AccountDetailHeader extends PureComponent {
@@ -21,8 +20,9 @@ class AccountDetailHeader extends PureComponent {
     this.state = {
       accountName: this.account.label,
       cryptoCurrencyBalance: '0',
-      legalCurrencyBalance: '0',
+      legalCurrencyBalance: '0'
     }
+    this._hideMenu.bind(this)
   }
 
   componentDidMount() {
@@ -35,28 +35,39 @@ class AccountDetailHeader extends PureComponent {
     if (D.isBtc(this.account.coinType)) {
       fromUnit = D.unit.btc.satoshi
       toUnit = this.props.btcUnit
-    }else {
+    } else {
       fromUnit = D.unit.eth.Wei
       toUnit = this.props.ethUnit
     }
-    let cryptoCurrencyBalance =  this.wallet.convertValue(this.account.coinType, balance, fromUnit, toUnit)
-    let legalCurrencyBalance =  this.wallet.convertValue(this.account.coinType, balance, fromUnit, this.props.legalCurrencyUnit)
-    this.setState({legalCurrencyBalance: legalCurrencyBalance, cryptoCurrencyBalance: cryptoCurrencyBalance})
+    let cryptoCurrencyBalance = this.wallet.convertValue(
+      this.account.coinType,
+      balance,
+      fromUnit,
+      toUnit
+    )
+    let legalCurrencyBalance = this.wallet.convertValue(
+      this.account.coinType,
+      balance,
+      fromUnit,
+      this.props.legalCurrencyUnit
+    )
+    this.setState({
+      legalCurrencyBalance: legalCurrencyBalance,
+      cryptoCurrencyBalance: cryptoCurrencyBalance
+    })
   }
 
-
-  _hideMenu() {
+  _hideMenu(type) {
     this.moreMenu.hide()
-    this.props.onHideMenu()
+    this.props.onHideMenu(type)
   }
-
 
   updateAccountName(name) {
     //EOS not support rename account
     if (this.account.coinType === 'eos') {
       return
     }
-    this.setState({accountName: name})
+    this.setState({ accountName: name })
   }
 
   render() {
@@ -115,9 +126,21 @@ class AccountDetailHeader extends PureComponent {
                       <Icon name="ios-more" style={{ color: Color.TEXT_ICONS }} />
                     </Button>
                   }>
-                  <MenuItem onPress={this._hideMenu.bind(this)}>
-                    {I18n.t('renameAccount')}
-                  </MenuItem>
+                  {D.isEos(this.account.coinType) ? (
+                    <MenuItem onPress={() => this._hideMenu('perimssionManage')}>
+                      {I18n.t('permissionManage')}
+                    </MenuItem>
+                  ) : null}
+                  {D.isEos(this.account.coinType) ? null : (
+                    <MenuItem onPress={() => this._hideMenu('renameAccount')}>
+                      {I18n.t('renameAccount')}
+                    </MenuItem>
+                  )}
+                  {D.isEos(this.account.coinType) ? (
+                    <MenuItem onPress={() => this._hideMenu('accountAssets')}>
+                      {I18n.t('accountAssets')}
+                    </MenuItem>
+                  ) : null}
                 </Menu>
               </View>
             </View>

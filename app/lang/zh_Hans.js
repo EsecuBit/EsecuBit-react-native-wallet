@@ -143,5 +143,8 @@ export default {
   connectDeviceToGetCOSVersion: '请先连接设备获取COS版本信息',
   accountName: '帐户名',
   accountAssets: '帐户资产',
-  permissionManage: '权限管理'
+  permissionManage: '权限管理',
+  permissionManageTip: '注意:\n  - Owner Key: 拥有当前EOS账号的所有权限。\n\
+  - Active Key: 默认情况下，可以完成除更改Owner Key以外的所有交易。\n\
+  - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key'
 }

@@ -142,6 +142,9 @@ export default {
   connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
   accountName: 'Account Name',
   accountAssets: 'Account Assets',
-  permissionManage: 'Permission Manage'
+  permissionManage: 'Permission Manage',
+  permissionManageTip: 'Note: \n  - Owner Key: Has all permissions for the current EOS account. \n  \
+  - Active Key: By default, all transactions except the Owner Key can be changed. \n \
+  - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.'
 
 }

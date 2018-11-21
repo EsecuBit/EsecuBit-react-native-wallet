@@ -4,14 +4,16 @@ import { View, Container, Textarea, Icon } from 'native-base'
 import BaseToolbar from '../../components/BaseToolbar'
 import { Color, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
+import I18n from '../../lang/i18n'
+import { connect } from 'react-redux'
 
-export default class EOSKeyDetailPage extends Component {
+class EOSKeyDetailPage extends Component {
 
   constructor() {
     super()
     this.state = {
-      ownerKey: 'testOwnerKey',
-      activeKey: 'testActiveKey'
+      ownerKey: '',
+      activeKey: ''
     }
   }
 
@@ -22,6 +24,18 @@ export default class EOSKeyDetailPage extends Component {
     } catch (error) {
       ToastUtil.showShort('Copy Failed')
     }
+  }
+
+  componentDidMount() {
+    this.getPermission()
+  }
+
+  async getPermission() {
+    let keyDetail = await this.props.account.getPermissions()
+    console.log('keyDetail', keyDetail);
+    let activeKey = keyDetail.active.keys[0].publicKey
+    let ownerKey = keyDetail.owner.keys[0].publicKey
+    this.setState({activeKey: activeKey, ownerKey: ownerKey})
   }
   
   render() {
@@ -43,12 +57,16 @@ export default class EOSKeyDetailPage extends Component {
             </View>
           </View>
           <Textarea style={{fontSize: Dimen.PRIMARY_TEXT}} rowSpan={3} bordered disabled value={this.state.activeKey}  />
-          <Text style={styles.tips}>{'Tips: \n' + 'testtesttest'}</Text>
+          <Text style={styles.tips}>{I18n.t('permissionManageTip')}</Text>
         </View>
       </Container>
     )
   }
 }
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account
+})
 
 const styles = StyleSheet.create({
   keyTitle: {
@@ -62,3 +80,5 @@ const styles = StyleSheet.create({
     fontSize: Dimen.SECONDARY_TEXT,
   }
 })
+
+export default connect(mapStateToProps)(EOSKeyDetailPage)

@@ -474,9 +474,24 @@ class AccountDetailPage extends React.Component {
         break
     }
   }
-
-  _handleMenuItemClick() {
-     this.setState({ renameDialogVisible: true })
+  /**
+   * Handle Menu Item Click
+   * @param type: [accountAssets, permissionManage, renameAccount]
+   */
+  _handleMenuItemClick(type) {
+    switch (type) {
+      case 'accountAssets':
+        this.props.navigation.navigate('EOSAssets')
+        break
+      case 'permissionManage':
+        this.props.navigation.navigate('EOSKeyDetail')
+        break
+      case 'renameAccount':
+        this.setState({renameDialogVisible: true})
+        break
+      default:
+        break
+    }
   }
 
   render() {
@@ -484,7 +499,7 @@ class AccountDetailPage extends React.Component {
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
           ref={ref => (this.accountHeader = ref)}
-          onHideMenu={() => this._handleMenuItemClick.bind(this)}
+          onHideMenu={type => this._handleMenuItemClick(type)}
           navigation={this.props.navigation}
         />
         <Dialog.Container visible={this.state.renameDialogVisible}>
