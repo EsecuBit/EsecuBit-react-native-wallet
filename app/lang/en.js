@@ -93,7 +93,7 @@ export default {
   balanceNotEnough:'Insufficient balance',
   invalidAddress:'Illegal address',
   noAddressCheckSum:'ETH address has no check format',
-  invalidAddressChecksum:'Address verification error (not used)',
+  invalidAddressChecksum:'Address verification error',
   valueIsDecimal:'The smallest Unit of the transaction cannot be a decimal',
   notImplemented:'Function not implemented',
   unknown:'Unknown error',

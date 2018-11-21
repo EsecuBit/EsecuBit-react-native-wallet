@@ -6,6 +6,7 @@ import { Color, Dimen } from '../../common/Styles'
 import AssetsProgressBar from '../../components/AssetsProgresBar'
 import { connect } from 'react-redux'
 import I18n from '../../lang/i18n'
+import { withNavigation } from 'react-navigation'
 
 class EOSResourcesDetailPage extends Component {
 
@@ -40,7 +41,7 @@ class EOSResourcesDetailPage extends Component {
                   <Text style={styles.cardItemTitle}>{I18n.t('balance')}</Text>
                   <Text style={styles.cardItemBody}>{this.props.account.balance}</Text>
                   <Text style={styles.cardItemHint}>EOS</Text>
-                  <TouchableHighlight style={styles.cardItemButton} onPress={() => this.props.navigation.navigate('EOSBandWidthManage')}>
+                  <TouchableHighlight style={styles.cardItemButton} onPress={() => this.props.navigation.navigate('EOSBandWidthManage',{type: 'stake'})}>
                     <Text style={styles.cardItemButtonText}>{I18n.t('stake')}</Text>
                   </TouchableHighlight>
                 </Body>
@@ -52,7 +53,7 @@ class EOSResourcesDetailPage extends Component {
                   <Text style={styles.cardItemTitle}>{I18n.t('stake')}</Text>
                   <Text style={styles.cardItemBody}>{this.state.totalStaked}</Text>
                   <Text style={styles.cardItemHint}>EOS</Text>
-                  <TouchableHighlight style={styles.cardItemButton} onPress={() => this.props.navigation.navigate('EOSBandWidthManage')}>
+                  <TouchableHighlight style={styles.cardItemButton} onPress={() => this.props.navigation.navigate('EOSBandWidthManage', {type: 'unstake'})}>
                     <Text style={styles.cardItemButtonText}>{I18n.t('unstake')}</Text>
                   </TouchableHighlight>
                 </Body>
@@ -121,4 +122,6 @@ const mapStateToProps = state => ({
   account: state.AccountReducer.account
 })
 
-export default connect(mapStateToProps)(EOSResourcesDetailPage) 
+export default withNavigation(connect(mapStateToProps)(EOSResourcesDetailPage)
+
+)

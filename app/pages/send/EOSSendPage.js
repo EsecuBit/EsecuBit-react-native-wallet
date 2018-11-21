@@ -8,7 +8,8 @@ import AccountNameInput from '../../components/AccountNameInput'
 import MemoInput from '../../components/MemoInput'
 import SendToolbar from '../../components/SendToolbar'
 import { connect } from 'react-redux'
-import ToastUtil from '../../utils/ToastUtil';
+import ToastUtil from '../../utils/ToastUtil'
+import I18n from '../../lang/i18n'
 
 class EOSSendPage extends Component {
   constructor(props) {
@@ -33,10 +34,10 @@ class EOSSendPage extends Component {
   }
 
   _handleSendValueItemClick(value) {
-    console.log('send value', value);
     let sendValue = Number(this.props.account.balance * value).toLocaleString('en')
-    console.log('send value1', sendValue);
+    this.setState({sendValue: sendValue})
     this.valueInput.updateValue(sendValue)
+    this._checkFormData()
   }
 
   async _checkFormData() {

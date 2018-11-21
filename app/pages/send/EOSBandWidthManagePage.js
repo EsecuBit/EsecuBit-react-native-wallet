@@ -17,10 +17,14 @@ import FooterButton from '../../components/FooterButton'
 import { Color } from '../../common/Styles'
 import PercentageBar from '../../components/PercentageBar'
 import StringUtil from '../../utils/StringUtil'
+import { connect } from 'react-redux'
+import { withNavigation }from 'react-navigation'
+import ToastUtil from "../../utils/ToastUtil"
+import I18n from '../../lang/i18n'
 
-export default class EOSBandWidthManagePage extends Component {
-  constructor() {
-    super()
+class EOSBandWidthManagePage extends Component {
+  constructor(props) {
+    super(props)
     this.state = {
       disableFooterBtn: true,
       // true is invalid input
@@ -33,8 +37,8 @@ export default class EOSBandWidthManagePage extends Component {
       cpuValue: '',
       netValue: ''
     }
-    // stake or unstake
-    // this.type = this.props.navigation.state.params.type
+    const { params } = props.navigation.state
+    this.type = params.type
   }
 
   async _handleCpuInput(text) {
@@ -56,6 +60,36 @@ export default class EOSBandWidthManagePage extends Component {
     this.setState({ disableFooterBtn: !result })
   }
 
+  _stake() {
+    let formData = this._buildStakeFormData()
+    console.log('stake formData', formData)
+    this.props.account.prepareDelegate(formData)
+      .then(result => {
+        console.log('stake build result', result)
+        return this.props.account.buildTx(result)
+      })
+      .then(result => {
+        console.log('stake send result', result)
+        return this.props.account.sendTx(result)
+      })
+      .then(() => {
+        console.log('stake successful')
+        ToastUtil.showShort(I18n.t('success'))
+      })
+      .catch(err => {
+        console.log('stake error ', err)
+        ToastUtil.showErrorMsgShort(err)
+      })
+  }
+
+  _buildStakeFormData() {
+    return {
+      delegate: this.type === 'stake',
+      network: this.state.netValue,
+      cpu: this.state.cpuValue
+    }
+  }
+
   render() {
     return (
       <Container>
@@ -64,7 +98,7 @@ export default class EOSBandWidthManagePage extends Component {
           <Card padder>
             <CardItem style={{ flexDirection: 'column', alignItems: 'flex-start' }} padder>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                <Text style={styles.title}>CPU: 0.1 EOS</Text>
+                <Text style={styles.title}>{'CPU: '+ this.props.account.resources.stake.total.cpu}</Text>
               </View>
               <Item stackedLabel>
                 <Label>CPU</Label>
@@ -84,7 +118,6 @@ export default class EOSBandWidthManagePage extends Component {
                   ) : null}
                 </InputGroup>
               </Item>
-              <PercentageBar type="normal" data={[0.1, 0.3, 0.5, 0.7, 1]} onItemClick={() => {}} />
             </CardItem>
             <CardItem style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
               <View
@@ -92,7 +125,7 @@ export default class EOSBandWidthManagePage extends Component {
                   flexDirection: 'row',
                   flexWrap: 'wrap'
                 }}>
-                <Text style={styles.title}>Network: 0.1 EOS</Text>
+                <Text style={styles.title}>{'Network: '+ this.props.account.resources.stake.total.net}</Text>
               </View>
               <Item stackedLabel last>
                 <Label>Network</Label>
@@ -112,11 +145,10 @@ export default class EOSBandWidthManagePage extends Component {
                   ) : null}
                 </InputGroup>
               </Item>
-              <PercentageBar type="normal" data={[0.1, 0.3, 0.5, 0.7, 1]} onItemClick={() => {}} />
             </CardItem>
           </Card>
         </Content>
-        <FooterButton title="Stake" disabled={this.state.disableFooterBtn} />
+        <FooterButton title={this.type} disabled={this.state.disableFooterBtn} onPress={() => this._stake()}/>
       </Container>
     )
   }
@@ -130,3 +162,8 @@ const styles = StyleSheet.create({
     borderRadius: 10
   }
 })
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account
+})
+export default withNavigation(connect(mapStateToProps)(EOSBandWidthManagePage))

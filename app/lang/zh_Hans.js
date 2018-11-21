@@ -93,7 +93,7 @@ export default {
   balanceNotEnough:'余额不足',
   invalidAddress:'非法地址',
   noAddressCheckSum:'ETH地址没有校验格式',
-  invalidAddressChecksum:'地址校验错误（没有用到）',
+  invalidAddressChecksum:'地址校验错误',
   valueIsDecimal:'交易的最小单位不能是小数',
   notImplemented:'功能未实现',
   unknown:'未知错误',
