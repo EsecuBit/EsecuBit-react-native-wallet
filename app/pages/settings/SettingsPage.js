@@ -261,6 +261,12 @@ class SettingsPage extends Component {
               <View style={CommonStyle.divider} />
             )}
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+              <Text style={customStyle.headerText}>EOS</Text>
+            </CardItem>
+            <CardItem bordered button onPress={() => this.props.navigation.navigate('EOSKeyDetail')}>
+              <Text>{I18n.t("permissionManage")}</Text>
+            </CardItem>
+            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={customStyle.headerText}>{I18n.t("about")}</Text>
             </CardItem>
             <CardItem bordered button onPress={() => this._checkVersion()}>

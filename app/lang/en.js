@@ -141,6 +141,7 @@ export default {
   versionUpdate: 'Version Update',
   connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
   accountName: 'Account Name',
-  accountAssets: 'Account Assets'
+  accountAssets: 'Account Assets',
+  permissionManage: 'Permission Manage'
 
 }

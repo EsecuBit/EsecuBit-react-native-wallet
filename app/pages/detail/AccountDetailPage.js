@@ -475,12 +475,16 @@ class AccountDetailPage extends React.Component {
     }
   }
 
+  _handleMenuItemClick() {
+     this.setState({ renameDialogVisible: true })
+  }
+
   render() {
     return (
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
           ref={ref => (this.accountHeader = ref)}
-          onHideMenu={() => this.setState({ renameDialogVisible: true })}
+          onHideMenu={() => this._handleMenuItemClick.bind(this)}
           navigation={this.props.navigation}
         />
         <Dialog.Container visible={this.state.renameDialogVisible}>
