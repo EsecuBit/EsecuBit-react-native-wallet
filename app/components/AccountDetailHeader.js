@@ -141,6 +141,11 @@ class AccountDetailHeader extends PureComponent {
                       {I18n.t('accountAssets')}
                     </MenuItem>
                   ) : null}
+                  {D.isEos(this.account.coinType) ? (
+                    <MenuItem onPress={() => this._hideMenu('vote')}>
+                      {I18n.t('vote')}
+                    </MenuItem>
+                  ) : null}
                 </Menu>
               </View>
             </View>

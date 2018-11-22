@@ -14,6 +14,7 @@ import EOSResourcesDetailPage from '../pages/detail/EOSResourcesDetailPage'
 import EOSKeyDetailPage from '../pages/detail/EOSKeyDetailPage'
 import EOSBandWidthManagePage from '../pages/send/EOSBandWidthManagePage'
 import EOSNetworkSettingPage from '../pages/settings/EOSNetworkSettingPage'
+import EOSVotePage from "../pages/detail/EOSVotePage"
 
 export default {
   Handler: {
@@ -63,5 +64,8 @@ export default {
   },
   EOSNetworkSetting: {
     screen: EOSNetworkSettingPage
+  },
+  EOSVote: {
+    screen: EOSVotePage
   }
 }

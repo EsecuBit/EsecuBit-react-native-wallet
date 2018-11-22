@@ -148,5 +148,6 @@ export default {
   - Active Key: 默认情况下，可以完成除更改Owner Key以外的所有交易。\n\
   - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key',
   stake: '抵押',
-  unstake: '赎回'
+  unstake: '赎回',
+  vote: '投票'
 }

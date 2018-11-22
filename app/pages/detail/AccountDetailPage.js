@@ -489,6 +489,9 @@ class AccountDetailPage extends React.Component {
       case 'renameAccount':
         this.setState({renameDialogVisible: true})
         break
+      case 'vote':
+        this.props.navigation.navigate('EOSVote')
+        break
       default:
         break
     }
