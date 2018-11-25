@@ -153,12 +153,12 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
     }
 
     @ReactMethod
-    public void sendApdu(final String hexApdu, final boolean isEnc, final Promise promise) {
+    public void sendApdu(final String hexApdu, final Promise promise) {
         mWorkExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String response = sendApduSync(hexApdu, isEnc);
+                    String response = sendApduSync(hexApdu);
                     promise.resolve(response);
                 } catch (EsException e) {
                     e.printStackTrace();
@@ -190,7 +190,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
         }
     }
 
-    private String sendApduSync(String hexApdu, boolean isEnc) throws EsException {
+    private String sendApduSync(String hexApdu) throws EsException {
         EsDevice esDevice = getEsDevice();
         byte[] apdu = ByteUtil.hexStringToBytes(hexApdu);
         int[] responseLength = {1024};
@@ -208,37 +208,8 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
         }
         byte[] responseNew = new byte[responseLength[0]];
         System.arraycopy(response, 0, responseNew, 0, responseLength[0]);
-        if (responseNew[0] == 0x61) {
-            int nextGetApduLength = ByteUtil.byteToInt(responseNew[1]);
-            return ByteUtil.bytesToHex(resendApdu(nextGetApduLength));
-        }
         return ByteUtil.bytesToHex(responseNew);
     }
-
-    private byte[] resendApdu(int nextGetApduLength) throws EsException {
-        EsDevice esDevice = getEsDevice();
-        byte[] apdu = ByteUtil.hexStringToBytes("00C0000000");
-        byte[] response = new byte[0];
-        while (true) {
-            apdu[0x04] = (byte) nextGetApduLength;
-            int[] resendResponseLength = {1024};
-            byte[] resendResponse = new byte[resendResponseLength[0]];
-            int errCode = esDevice.sendApdu(apdu, apdu.length, resendResponse, resendResponseLength);
-
-            if (errCode != 0) {
-                throw new EsException(errCode);
-
-            } else if (resendResponse[0] == 0x61 && resendResponse.length == 2) {
-                nextGetApduLength = ByteUtil.byteToInt(resendResponse[1]);
-                ByteUtil.concat(response, resendResponse, nextGetApduLength);
-
-            } else  {
-                return ByteUtil.concat(response, resendResponse, nextGetApduLength);
-            }
-        }
-
-    }
-
 
     private EsDevice getEsDevice() {
         try {
