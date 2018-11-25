@@ -149,5 +149,8 @@ export default {
   - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key',
   stake: '抵押',
   unstake: '赎回',
-  vote: '投票'
+  vote: '投票',
+  ramTransaction: '售买内存',
+  buy: '购买',
+  sell: '出售',
 }

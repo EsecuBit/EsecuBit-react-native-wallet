@@ -149,5 +149,8 @@ export default {
   stake: 'Stake',
   unstake: 'UnStake',
   vote: 'Vote',
+  ramTransaction: 'Buy/Sell RAM',
+  buy: 'Buy',
+  sell: 'Sell',
 
 }

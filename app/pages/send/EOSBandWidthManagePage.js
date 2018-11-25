@@ -15,7 +15,6 @@ import {
 import BaseToolbar from '../../components/BaseToolbar'
 import FooterButton from '../../components/FooterButton'
 import { Color } from '../../common/Styles'
-import PercentageBar from '../../components/PercentageBar'
 import StringUtil from '../../utils/StringUtil'
 import { connect } from 'react-redux'
 import { withNavigation }from 'react-navigation'

@@ -122,6 +122,4 @@ const mapStateToProps = state => ({
   account: state.AccountReducer.account
 })
 
-export default withNavigation(connect(mapStateToProps)(EOSResourcesDetailPage)
-
-)
+export default withNavigation(connect(mapStateToProps)(EOSResourcesDetailPage))
