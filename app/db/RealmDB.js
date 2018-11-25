@@ -152,9 +152,9 @@ class RealmDB extends IDatabase {
 
   newTx(account, addressInfos, txInfo, utxos = []) {
     account = wrapper.account.wrap(account)
-    addressInfos = wrapper.addressInfo.wrap(addressInfos)
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
     txInfo = wrapper.txInfo.wrap(txInfo)
-    utxos = wrapper.utxo.wrap(utxos)
+    utxos = wrapper.utxo.wraps(utxos)
 
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)
@@ -166,10 +166,10 @@ class RealmDB extends IDatabase {
 
   removeTx (account, addressInfos, txInfo, updateUtxos = [], removeUtxos = []) {
     account = wrapper.account.wrap(account)
-    addressInfos = wrapper.addressInfo.wrap(addressInfos)
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
     txInfo = wrapper.txInfo.wrap(txInfo)
-    updateUtxos = wrapper.utxo.wrap(updateUtxos)
-    removeUtxos = wrapper.utxo.wrap(removeUtxos)
+    updateUtxos = wrapper.utxo.wraps(updateUtxos)
+    removeUtxos = wrapper.utxo.wraps(removeUtxos)
 
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)
