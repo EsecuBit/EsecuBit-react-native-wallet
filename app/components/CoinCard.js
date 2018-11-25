@@ -9,6 +9,7 @@ import CoinUtil from '../utils/CoinUtil'
 import { setAccount } from '../actions/AccountAction'
 import { connect } from 'react-redux'
 import { withNavigation } from 'react-navigation'
+import CustomIcon from './CustomIcon';
 
 class CoinCard extends PureComponent {
   constructor() {
@@ -44,6 +45,7 @@ class CoinCard extends PureComponent {
     return (
       <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(data)}>
         <Left style={{ flexDirection: 'row' }}>
+          <CustomIcon coinType={this.props.data.coinType} />
           <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>{data.label}</Title>
         </Left>
         <View>
@@ -72,7 +74,7 @@ class CoinCard extends PureComponent {
 }
 
 CoinCard.propTypes = {
-  data: PropTypes.string.isRequired
+  data: PropTypes.object.isRequired
 }
 
 const mapStateToProps = state => ({
