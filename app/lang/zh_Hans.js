@@ -93,7 +93,7 @@ export default {
   balanceNotEnough:'余额不足',
   invalidAddress:'非法地址',
   noAddressCheckSum:'ETH地址没有校验格式',
-  invalidAddressChecksum:'地址校验错误（没有用到）',
+  invalidAddressChecksum:'地址校验错误',
   valueIsDecimal:'交易的最小单位不能是小数',
   notImplemented:'功能未实现',
   unknown:'未知错误',
@@ -140,5 +140,17 @@ export default {
   confirming: '确认中',
   checkVersion: '检查更新',
   versionUpdate: '版本更新',
-  connectDeviceToGetCOSVersion: '请先连接设备获取COS版本信息'
+  connectDeviceToGetCOSVersion: '请先连接设备获取COS版本信息',
+  accountName: '帐户名',
+  accountAssets: '帐户资产',
+  permissionManage: '权限管理',
+  permissionManageTip: '注意:\n  - Owner Key: 拥有当前EOS账号的所有权限。\n\
+  - Active Key: 默认情况下，可以完成除更改Owner Key以外的所有交易。\n\
+  - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key',
+  stake: '抵押',
+  unstake: '赎回',
+  vote: '投票',
+  ramTransaction: '售买内存',
+  buy: '购买',
+  sell: '出售',
 }

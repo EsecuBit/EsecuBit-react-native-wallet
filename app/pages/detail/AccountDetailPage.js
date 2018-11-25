@@ -6,34 +6,23 @@ import {
   Dimensions,
   Platform,
   TextInput,
-  DeviceEventEmitter,
-  ActionSheetIOS,
-  Image,
-  StatusBar
+  DeviceEventEmitter
 } from 'react-native'
 import I18n from '../../lang/i18n'
-import {
-  Button,
-  Container,
-  Icon,
-  List,
-  ListItem,
-  Content,
-  CardItem,
-  Text
-} from 'native-base'
+import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
 import PopupDialog from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
-import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
-import EsAccountHelper from '../../EsAccountHelper'
+import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import CoinUtil from '../../utils/CoinUtil'
 import ToastUtil from '../../utils/ToastUtil'
-import Menu, { MenuItem } from 'react-native-material-menu'
 import Dialog from 'react-native-dialog'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AccountOperateBottomBar from '../../components/AccountOperateBottomBar'
+import AccountDetailHeader from '../../components/AccountDetailHeader'
+import { connect } from 'react-redux'
+import CoinUtil from '../../utils/CoinUtil'
+import { Coin } from '../../common/Constants'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
@@ -41,115 +30,57 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 434
 const ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT = 520
 
-export default class AccountDetailPage extends React.Component {
+class AccountDetailPage extends React.Component {
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
-    this.account = EsAccountHelper.getInstance().getAccount()
-    const { params } = props.navigation.state
-    this.coinType = params.coinType
-    this.minimumCryptoCurrencyUnit = D.isBtc(this.coinType)
-      ? D.unit.btc.satoshi
-      : D.unit.eth.Wei
-    this.cryptoCurrencyUnit = D.isBtc(this.coinType)
-      ? params.btcUnit
-      : params.ethUnit
-    this.legalCurrencyUnit = params.legalCurrencyUnit
-    this.navigateParam = {
-      coinType: this.coinType,
-      cryptoCurrencyUnit: this.cryptoCurrencyUnit,
-      legalCurrencyUnit: this.legalCurrencyUnit
-    }
+    this.account = props.account
     //transmitter
     this.transmitter = new BtTransmitter()
-
     this.state = {
       data: [],
       refreshing: false,
-      accountBalance: '',
       isShowBottomBar: true,
       dMemo: '',
-      renameDialogVisible: false,
-      accountName: this.account.label,
-      legalCurrencyBalance: ''
+      renameDialogVisible: false
     }
   }
 
   componentDidMount() {
     let _that = this
-    CoinUtil.getInstance()
-      .minimumCryptoCurrencyToDefautCurrency(
-        _that.account.coinType,
-        _that.account.balance
-      )
-      .then(value => {
-        _that.setState({ accountBalance: value })
-        _that._getLegalCurrencyBalance()
-      })
-    //get tx list
     _that._getTxInfos()
-    let minimumUnit = D.isBtc(this.coinType)
-      ? D.unit.btc.satoshi
-      : D.unit.eth.Wei
-    //listenTxInfo
-    _that.wallet.listenTxInfo(async () => {
-      console.log('listenTxInfo _getTxInfos')
-      await _that._getTxInfos()
-      let balance = _that.wallet.convertValue(
-        _that.coinType,
-        _that.account.balance,
-        minimumUnit,
-        _that.cryptoCurrencyUnit
-      )
-      _that.setState({ accountBalance: balance })
-      _that._getLegalCurrencyBalance()
-    })
-    this._initListener()
-    this._getLegalCurrencyBalance()
-  }
-
-  _getLegalCurrencyBalance() {
-    let legalCurrencyBalance = this.wallet.convertValue(
-      this.coinType,
-      this.account.balance,
-      this.minimumCryptoCurrencyUnit,
-      this.legalCurrencyUnit
-    )
-    legalCurrencyBalance = Number(legalCurrencyBalance)
-      .toFixed(2)
-      .toString()
-    this.setState({ legalCurrencyBalance: legalCurrencyBalance })
-  }
-
-  _initListener() {
-    DeviceEventEmitter.addListener('balance', () => {
-      let value = this.wallet.convertValue(
-        this.coinType,
-        this.account.balance,
-        this.minimumCryptoCurrencyUnit,
-        this.cryptoCurrencyUnit
-      )
-      this.setState({ accountBalance: value })
-      this._getLegalCurrencyBalance()
+    _that.wallet.listenTxInfo(() => {
+      console.log('listen TxInfo')
+      _that._getTxInfos()
     })
   }
 
   async _gotoSendPage() {
     let deviceState = await this.transmitter.getState()
-    if (deviceState === BtTransmitter.disconnected) {
+    //soft wallet no need to connect hardware
+    if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
       return
     }
-    if (D.isBtc(this.coinType)) {
-      this.props.navigation.navigate('BTCSend', this.navigateParam)
-    } else {
-      this.props.navigation.navigate('ETHSend', this.navigateParam)
+    let coinType = CoinUtil.getRealCoinType(this.account.coinType)
+    switch (coinType) {
+      case Coin.btc:
+        this.props.navigation.navigate('BTCSend')
+        break
+      case Coin.eth:
+        this.props.navigation.navigate('ETHSend')
+        break
+      case Coin.eos:
+        this.props.navigation.navigate('EOSSend')
+        break
+      default:
+        throw D.error.coinNotSupported
     }
   }
 
   async _gotoAddressDetailPage() {
     let deviceState = await this.transmitter.getState()
-    if (deviceState === BtTransmitter.disconnected) {
+    if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
       return
     }
@@ -266,10 +197,7 @@ export default class AccountDetailPage extends React.Component {
                 marginTop: 15,
                 marginLeft: 10
               }}>
-              <Text
-                style={styles.leftText}
-                numberOfLines={2}
-                ellipsizeMode="tail">
+              <Text style={styles.leftText} numberOfLines={2} ellipsizeMode="tail">
                 {title}
               </Text>
             </View>
@@ -303,8 +231,7 @@ export default class AccountDetailPage extends React.Component {
                 marginBottom: 15,
                 marginRight: 10
               }}>
-              <Text
-                style={{ fontSize: Dimen.SECONDARY_TEXT, color: confirmColor }}>
+              <Text style={{ fontSize: Dimen.SECONDARY_TEXT, color: confirmColor }}>
                 {confirmStr}
               </Text>
             </View>
@@ -319,21 +246,21 @@ export default class AccountDetailPage extends React.Component {
     let value = StringUtil.removeNegativeSymbol(rowData.value)
     if (rowData.direction === D.tx.direction.in) {
       price = this.wallet.convertValue(
-        this.coinType,
+        this.account.coinType,
         value,
         D.unit.btc.satoshi,
         this.cryptoCurrencyUnit
       )
     } else {
       price = this.wallet.convertValue(
-        this.coinType,
+        this.account.coinType,
         value,
         D.unit.btc.satoshi,
         this.cryptoCurrencyUnit
       )
       if (isToSelf) {
         price = this.wallet.convertValue(
-          this.coinType,
+          this.account.coinType,
           rowData.fee,
           D.unit.btc.satoshi,
           this.cryptoCurrencyUnit
@@ -348,25 +275,23 @@ export default class AccountDetailPage extends React.Component {
     let value = StringUtil.removeNegativeSymbol(rowData.value)
     if (rowData.direction === D.tx.direction.in) {
       price = this.wallet.convertValue(
-        this.coinType,
+        this.account.coinType,
         rowData.value,
         D.unit.eth.Wei,
         this.cryptoCurrencyUnit
       )
     } else {
       if (!isToSelf) {
-        price = new BigInteger(rowData.fee)
-          .add(new BigInteger(value))
-          .toString(10)
+        price = new BigInteger(rowData.fee).add(new BigInteger(value)).toString(10)
         price = this.wallet.convertValue(
-          this.coinType,
+          this.account.coinType,
           price,
           D.unit.eth.Wei,
           this.cryptoCurrencyUnit
         )
       } else {
         price = this.wallet.convertValue(
-          this.coinType,
+          this.account.coinType,
           rowData.fee,
           D.unit.eth.Wei,
           this.cryptoCurrencyUnit
@@ -409,14 +334,14 @@ export default class AccountDetailPage extends React.Component {
           value = value.slice(1, value.length)
         }
         price = this.wallet.convertValue(
-          this.coinType,
+          this.account.coinType,
           value,
           D.unit.btc.satoshi,
           this.cryptoCurrencyUnit
         )
         if (isToSelf) {
           price = this.wallet.convertValue(
-            this.coinType,
+            this.account.coinType,
             rowData.fee,
             D.unit.btc.satoshi,
             this.cryptoCurrencyUnit
@@ -433,18 +358,16 @@ export default class AccountDetailPage extends React.Component {
           if (value.startsWith('-')) {
             value = value.slice(1, value.length)
           }
-          price = new BigInteger(rowData.fee)
-            .add(new BigInteger(value))
-            .toString(10)
+          price = new BigInteger(rowData.fee).add(new BigInteger(value)).toString(10)
           price = this.wallet.convertValue(
-            this.coinType,
+            this.account.coinType,
             price,
             D.unit.eth.Wei,
             this.cryptoCurrencyUnit
           )
         } else {
           price = this.wallet.convertValue(
-            this.coinType,
+            this.account.coinType,
             rowData.fee,
             D.unit.eth.Wei,
             this.cryptoCurrencyUnit
@@ -502,38 +425,16 @@ export default class AccountDetailPage extends React.Component {
   }
 
   _getTxInfos() {
-    EsAccountHelper.getInstance()
-      .getAccount()
+    this.account
       .getTxInfos()
       .then(txInfos => this.setState({ data: txInfos.txInfos }))
       .catch(error => ToastUtil.showErrorMsgLong(error))
   }
 
-  _showRenameAccountDialog() {
-    this.moreMenu.hide()
-    this.setState({ renameDialogVisible: true })
-  }
-
-  _showRenameAccountDialogIOS() {
-    let _that = this
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: [I18n.t('renameAccount'), I18n.t('cancel')],
-        cancelButtonIndex: 1,
-        destructiveButtonIndex: 0
-      },
-      function(index) {
-        if (index === 0) {
-          _that.setState({ renameDialogVisible: true })
-        }
-      }
-    )
-  }
-
   _renameAccount() {
     this.account
       .rename(this.renameAccountname)
-      .then(() => this.setState({ accountName: this.renameAccountname }))
+      .then(() => this.accountHeader.updateAccountName(this.renameAccountname))
       .then(() => {
         console.log('rename emiter')
         DeviceEventEmitter.emit('rename')
@@ -561,139 +462,49 @@ export default class AccountDetailPage extends React.Component {
 
   _gotoResendPage() {
     this.transactionDetailDialog.dismiss()
-    let param = this.navigateParam
-    param['txInfo'] = this.rowData
-    if (D.isBtc(this.coinType)) {
-      this.props.navigation.navigate('BTCSend', param)
-    } else {
-      this.props.navigation.navigate('ETHSend', param)
+    let param = { txInfo: this.rowData }
+    switch (true) {
+      case D.isBtc(this.account.coinType):
+        this.props.navigation.navigate('BTCSend', param)
+        break
+      case D.isEth(this.account.coinType):
+        this.props.navigation.navigate('ETHSend', param)
+        break
+      default:
+        break
+    }
+  }
+  /**
+   * Handle Menu Item Click
+   * @param type: [accountAssets, permissionManage, renameAccount]
+   */
+  _handleMenuItemClick(type) {
+    switch (type) {
+      case 'accountAssets':
+        this.props.navigation.navigate('EOSAssets')
+        break
+      case 'permissionManage':
+        this.props.navigation.navigate('EOSKeyDetail')
+        break
+      case 'renameAccount':
+        this.setState({renameDialogVisible: true})
+        break
+      case 'vote':
+        this.props.navigation.navigate('EOSVote')
+        break
+      default:
+        break
     }
   }
 
   render() {
-    // const params  = this.props.navigation.state.params
-    let height = platform === 'ios' ? 64 : 56
-    if (isIphoneX) {
-      height = 88
-    }
     return (
-      <Container
-        style={[
-          CommonStyle.layoutBottom,
-          { backgroundColor: Color.CONTAINER_BG }
-        ]}>
-        <View style={{ height: 205 }}>
-          <Image
-            style={{ height: 205 }}
-            source={require('../../imgs/bg_detail.png')}>
-            <View style={{ height: height }}>
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  flexDirection: 'row'
-                }}
-                translucent={false}>
-                <StatusBar
-                  barStyle={platform === 'ios' ? 'light-content' : 'default'}
-                  backgroundColor={Color.DARK_PRIMARY}
-                  hidden={false}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  <Button
-                    transparent
-                    onPress={() => {
-                      this.props.navigation.pop()
-                    }}>
-                    <Icon
-                      name="ios-arrow-back"
-                      style={{ color: Color.TEXT_ICONS }}
-                    />
-                  </Button>
-                </View>
-                <View
-                  style={{
-                    width: deviceW - 48 - 48 + 16,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  {platform === 'ios' ? (
-                    <Button
-                      transparent
-                      onPress={() => {
-                        this._showRenameAccountDialogIOS()
-                      }}>
-                      <Image
-                        source={require('../../imgs/ic_more.png')}
-                        style={{ width: 20 }}
-                      />
-                    </Button>
-                  ) : (
-                    <Menu
-                      ref={refs => (this.moreMenu = refs)}
-                      button={
-                        <Button
-                          transparent
-                          onPress={() => this.moreMenu.show()}>
-                          <Image source={require('../../imgs/ic_more.png')} />
-                        </Button>
-                      }>
-                      <MenuItem
-                        onPress={this._showRenameAccountDialog.bind(this)}>
-                        {I18n.t('renameAccount')}
-                      </MenuItem>
-                    </Menu>
-                  )}
-                </View>
-              </View>
-            </View>
-            <View style={{ flexDirection: 'column' }}>
-              <Text
-                style={styles.accountNameText}
-                numberOfLines={1}
-                ellipsizeMode="middle">
-                {this.account.label}
-              </Text>
-              <View
-                style={{
-                  width: this.deviceW,
-                  flexDirection: 'row',
-                  backgroundColor: 'transparent'
-                }}>
-                <Text style={styles.accountBalanceText}>
-                  {this.state.accountBalance}
-                </Text>
-                <Text style={styles.cryptoCurrencyUnitText}>
-                  {this.cryptoCurrencyUnit}
-                </Text>
-              </View>
-              <Text
-                style={styles.legalCurrencyBalanceText}
-                numberOfLines={1}
-                ellipsizeMode="middle">
-                {StringUtil.formatLegalCurrency(
-                  Number(this.state.legalCurrencyBalance).toFixed(2)
-                ) +
-                  ' ' +
-                  this.legalCurrencyUnit}
-              </Text>
-            </View>
-          </Image>
-        </View>
+      <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
+        <AccountDetailHeader
+          ref={ref => (this.accountHeader = ref)}
+          onHideMenu={type => this._handleMenuItemClick(type)}
+          navigation={this.props.navigation}
+        />
         <Dialog.Container visible={this.state.renameDialogVisible}>
           <Dialog.Title>{I18n.t('renameAccount')}</Dialog.Title>
           <Dialog.Description>{I18n.t('renameAccountHint')}</Dialog.Description>
@@ -755,7 +566,7 @@ export default class AccountDetailPage extends React.Component {
           }}
           width={0.9}
           height={
-            D.isBtc(this.coinType)
+            D.isBtc(this.account.coinType)
               ? BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT
               : ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT
           }
@@ -793,23 +604,17 @@ export default class AccountDetailPage extends React.Component {
                   alignItems: 'center'
                 }}>
                 <View>
-                  <Text style={{ fontSize: 22, color: this.dAmountColor }}>
-                    {this.dAmount}
-                  </Text>
+                  <Text style={{ fontSize: 22, color: this.dAmountColor }}>{this.dAmount}</Text>
                 </View>
               </View>
               <View style={[styles.detailLine, { marginTop: 15 }]} />
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>
-                  {this.dConfirmStr}
-                </Text>
+                <Text style={styles.detailCellLeftText}>{this.dConfirmStr}</Text>
                 <Text style={styles.detailCellRightText}>{this.dDate}</Text>
               </View>
               <View style={styles.detailLine} />
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>
-                  {I18n.t('through')}
-                </Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('through')}</Text>
                 <Text
                   style={[
                     styles.detailCellRightText,
@@ -842,25 +647,17 @@ export default class AccountDetailPage extends React.Component {
               <View style={styles.detailLine} />
 
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>
-                  {I18n.t('totalCost')}
-                </Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('totalCost')}</Text>
                 <Text style={styles.detailCellRightText}>{this.dTotal}</Text>
               </View>
               <View style={styles.detailLine} />
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>
-                  {I18n.t('confirmNum')}
-                </Text>
-                <Text style={styles.detailCellRightText}>
-                  {this.dConfirmNum}
-                </Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('confirmNum')}</Text>
+                <Text style={styles.detailCellRightText}>{this.dConfirmNum}</Text>
               </View>
               <View style={styles.detailLine} />
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>
-                  {I18n.t('tradingID')}
-                </Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('tradingID')}</Text>
                 <Text
                   style={[
                     styles.detailCellRightText,
@@ -872,7 +669,7 @@ export default class AccountDetailPage extends React.Component {
                 </Text>
               </View>
               <View style={styles.detailLine} />
-              {D.isBtc(this.coinType) ? null : (
+              {D.isBtc(this.account.coinType) ? null : (
                 <View
                   style={{
                     width: deviceW * 0.9,
@@ -894,26 +691,16 @@ export default class AccountDetailPage extends React.Component {
                   </View>
                 </View>
               )}
-              {D.isBtc(this.coinType) ? null : (
-                <View style={styles.detailLine} />
-              )}
+              {D.isBtc(this.account.coinType) ? null : <View style={styles.detailLine} />}
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>
-                  {I18n.t('canResend')}
-                </Text>
-                <Text style={styles.detailCellRightText}>
-                  {this.resendableText}
-                </Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('canResend')}</Text>
+                <Text style={styles.detailCellRightText}>{this.resendableText}</Text>
               </View>
             </View>
             {this.canResend ? (
               <View style={styles.resendBtnWrapper}>
-                <Button
-                  style={styles.resendButton}
-                  onPress={this._gotoResendPage.bind(this)}>
-                  <Text style={{ textAlign: 'center' }}>
-                    {I18n.t('resend')}
-                  </Text>
+                <Button style={styles.resendButton} onPress={this._gotoResendPage.bind(this)}>
+                  <Text style={{ textAlign: 'center' }}>{I18n.t('resend')}</Text>
                 </Button>
               </View>
             ) : null}
@@ -934,34 +721,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Dimen.MARGIN_HORIZONTAL,
     flex: 0,
     flexDirection: 'row'
-  },
-  accountNameText: {
-    marginTop: 30,
-    paddingHorizontal: Dimen.MARGIN_HORIZONTAL,
-    color: Color.ACCENT,
-    backgroundColor: 'transparent',
-    fontSize: Dimen.PRIMARY_TEXT
-  },
-  accountBalanceText: {
-    color: Color.TEXT_ICONS,
-    fontSize: 27,
-    marginTop: 5,
-    marginLeft: Dimen.MARGIN_HORIZONTAL,
-    backgroundColor: 'transparent'
-  },
-  cryptoCurrencyUnitText: {
-    color: Color.ACCENT,
-    alignSelf: 'auto',
-    fontSize: 13,
-    marginTop: 5,
-    marginLeft: Dimen.SPACE
-  },
-  legalCurrencyBalanceText: {
-    marginTop: 5,
-    paddingHorizontal: Dimen.MARGIN_HORIZONTAL,
-    color: Color.ACCENT,
-    backgroundColor: 'transparent',
-    fontSize: Dimen.SECONDARY_TEXT
   },
   listView: {
     flex: 1
@@ -1051,3 +810,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   }
 })
+
+const mapStateToProps = state => ({
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
+  btcUnit: state.SettingsReducer.btcUnit,
+  ethUnit: state.SettingsReducer.ethUnit,
+  account: state.AccountReducer.account
+})
+
+const AccountDetail = connect(mapStateToProps)(AccountDetailPage)
+export default AccountDetail

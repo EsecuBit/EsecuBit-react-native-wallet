@@ -93,8 +93,8 @@ export default {
   balanceNotEnough:'Insufficient balance',
   invalidAddress:'Illegal address',
   noAddressCheckSum:'ETH address has no check format',
-  invalidAddressChecksum:'Address verification error (not used)',
-  valueIsDecimal:'The smallest unit of the transaction cannot be a decimal',
+  invalidAddressChecksum:'Address verification error',
+  valueIsDecimal:'The smallest Unit of the transaction cannot be a decimal',
   notImplemented:'Function not implemented',
   unknown:'Unknown error',
   coinNotSupported:'This currency is not supported',
@@ -139,6 +139,18 @@ export default {
   confirming: 'Confirming',
   checkVersion: 'Check For Updates',
   versionUpdate: 'Version Update',
-  connectDeviceToGetCOSVersion: 'Please connect device to get cos version'
+  connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
+  accountName: 'Account Name',
+  accountAssets: 'Account Assets',
+  permissionManage: 'Permission Manage',
+  permissionManageTip: 'Note: \n  - Owner Key: Has all permissions for the current EOS account. \n  \
+  - Active Key: By default, all transactions except the Owner Key can be changed. \n \
+  - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.',
+  stake: 'Stake',
+  unstake: 'UnStake',
+  vote: 'Vote',
+  ramTransaction: 'Buy/Sell RAM',
+  buy: 'Buy',
+  sell: 'Sell',
 
 }

@@ -8,6 +8,11 @@ export default {
     index: 'int',
     balance: 'string',
     externalPublicKeyIndex: 'int',
-    changePublicKeyIndex: 'int'
+    changePublicKeyIndex: 'int',
+
+    // EOS
+    queryOffset: 'int?',
+    tokens: 'string?', // json
+    resources: 'string?' // json
   }
 }

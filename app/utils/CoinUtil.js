@@ -1,79 +1,64 @@
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import PreferenceUtil from '../utils/PreferenceUtil'
-import { LEGAL_CURRENCY_UNIT_KEY } from '../common/Constants'
+import { Coin } from '../common/Constants'
+import { D } from 'esecubit-wallet-sdk'
 
-var CoinUtil = (function() {
-  var instance
-  function CoinUtil() {
-    let wallet = new EsWallet()
-
-    return {
-      //minimum crypto currency unit to legal currency unit displayed
-      minimumCryptoCurrencyToLegalCurrency: async function(coinType, value) {
-        let fromUnit = D.isBtc(coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-        let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(
-          LEGAL_CURRENCY_UNIT_KEY
-        )
-        return Number(
-          wallet.convertValue(coinType, value, fromUnit, legalCurrencyUnit)
-        ).toFixed(2)
-      },
-      minimumCryptoCurrencyToDefautCurrency: async function(coinType, value) {
-        let fromUnit = D.isBtc(coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-        let toUnit = await PreferenceUtil.getCryptoCurrencyUnit(coinType)
-        return wallet.convertValue(coinType, value, fromUnit, toUnit)
-      },
-      //crypto currency unit displayed to legal currency unit displayed
-      defaultCryptoCurrencyToLegalCurrency: async function(coinType, value) {
-        let fromUnit = await PreferenceUtil.getCryptoCurrencyUnit(coinType)
-        let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(
-          LEGAL_CURRENCY_UNIT_KEY
-        )
-        return Number(
-          wallet.convertValue(coinType, value, fromUnit, legalCurrencyUnit)
-        ).toFixed(2)
-      },
-      //legal currency unit displayed to crypto currency unit displayed
-      defaultLegalCurrencyToCryptoCurrency: async function(coinType, value) {
-        let toUnit = await PreferenceUtil.getCryptoCurrencyUnit(coinType)
-        let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(
-          LEGAL_CURRENCY_UNIT_KEY
-        )
-        return wallet.convertValue(coinType, value, legalCurrencyUnit, toUnit)
-      },
-      //legal currency unit displayed to minimum cryto currency unit
-      defaultLegalCurrencyToMinimumCryptoCurrency: async function(
-        coinType,
-        value
-      ) {
-        let toUnit = D.isBtc(coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-        let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(
-          LEGAL_CURRENCY_UNIT_KEY
-        )
-        return wallet.convertValue(coinType, value, legalCurrencyUnit, toUnit)
-      },
-      //crypto currency unit displayed to minimum cryto currency unit
-      defaultCryptoCurrencyToMinimumCryptoCurrency: async function(
-        coinType,
-        value
-      ) {
-        let fromUnit = await PreferenceUtil.getCryptoCurrencyUnit(coinType)
-        let toUnit = D.isBtc(coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-        return wallet.convertValue(coinType, value, fromUnit, toUnit)
-      },
-      getExchangeRate: async function(coinType, value) {
-        return this.defaultCryptoCurrencyToLegalCurrency(coinType, value)
+export default class CoinUtil {
+  static contains(coinTypes, coinType) {
+    let isContains = false;
+    coinTypes.map(item => {
+      if (item.includes(coinType)) {
+        isContains = true;
       }
+    });
+    return isContains;
+  }
+
+  static getRealCoinType(coinType) {
+    //slice coinType string, only if coinType is testnet type
+    //eg: btc_testnet3 -> btc
+    if (coinType && coinType.indexOf("_") != -1) {
+      coinType = coinType.slice(0, coinType.indexOf("_"));
+    }
+    return coinType
+  }
+
+  /**
+   *
+   * @param coinType
+   * @returns {string}
+   */
+  static getMinimumUnit(coinType) {
+    coinType = this.getRealCoinType(coinType)
+    switch (coinType) {
+      case Coin.btc:
+        return D.unit.btc.satoshi
+      case Coin.eth:
+        return D.unit.eth.Wei
+      case Coin.eos:
+        return D.unit.eos.EOS
+      default:
+        throw D.error.coinNotSupported
     }
   }
 
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new CoinUtil()
-      }
-      return instance
+  /**
+   * Get default unit of user settings
+   * To use this method, you should add CoinUtil.getDefaultUnit.bind(this) in your React.Component constructor
+   * @param coinType
+   */
+  static getDefaultUnit(coinType) {
+    coinType = CoinUtil.getRealCoinType(coinType)
+    let _that = this
+    switch (coinType) {
+      case Coin.btc:
+        return D.unit.btc.BTC
+      case Coin.eth:
+        return D.unit.eth.ETH
+      case Coin.eos:
+        return D.unit.eos.EOS
+      case Coin.legal:
+        return D.unit.legal.USD
+      default:
+        throw D.error.coinNotSupported
     }
   }
-})()
-export default CoinUtil
+}

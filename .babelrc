@@ -8,7 +8,7 @@
         "vm": "vm-browserify",
         "stream": "stream-browserify"
       }
-    }]
+    }],"transform-decorators-legacy"
   ],
   "env": {
     "TODO": "only for jest, check necessary",

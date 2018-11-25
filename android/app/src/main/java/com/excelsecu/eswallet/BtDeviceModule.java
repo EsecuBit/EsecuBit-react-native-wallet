@@ -170,7 +170,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
 
     @ReactMethod
     public void getState(Promise promise) {
-        EsDevice esDevice = getEsDevice();
+        EsDevice esDevice = mEsWallet.getDevice();
         if (esDevice == null) {
             promise.resolve(STATUS_DISCONNECTED);
             return;
@@ -191,7 +191,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
     }
 
     private String sendApduSync(String hexApdu, boolean isEnc) throws EsException {
-        EsDevice esDevice = getEsDevice();
+        EsDevice esDevice = mEsWallet.getDevice();
         byte[] apdu = ByteUtil.hexStringToBytes(hexApdu);
         int[] responseLength = {1024};
         byte[] response = new byte[responseLength[0]];
@@ -216,7 +216,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
     }
 
     private byte[] resendApdu(int nextGetApduLength) throws EsException {
-        EsDevice esDevice = getEsDevice();
+        EsDevice esDevice = mEsWallet.getDevice();
         byte[] apdu = ByteUtil.hexStringToBytes("00C0000000");
         byte[] response = new byte[0];
         while (true) {
@@ -240,16 +240,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
     }
 
 
-    private EsDevice getEsDevice() {
-        try {
-            Field field = mEsWallet.getClass().getDeclaredField("mDevice");
-            field.setAccessible(true);
-            return (EsDevice) field.get(mEsWallet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     private void sendConnectStatus(int error, int status, String pairCode) {
         WritableMap params = Arguments.createMap();

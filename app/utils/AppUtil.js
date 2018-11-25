@@ -5,7 +5,7 @@ import I18n from '../lang/i18n'
 import ToastUtil from './ToastUtil'
 import StringUtil from './StringUtil'
 import { D } from 'esecubit-wallet-sdk'
-import { MOCK_URL } from '../common/Constants'
+import { Api } from '../common/Constants'
 
 const BackIOS = NativeModules.BackIOS
 export default class AppUtil {
@@ -15,7 +15,7 @@ export default class AppUtil {
     try {
       let walletInfo = await wallet.getWalletInfo()
       let cosVersion = walletInfo.cos_version
-      let respsonse = await fetch(MOCK_URL + 'getNewApp', {
+      let respsonse = await fetch(Api.baseUrl + 'getNewApp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
