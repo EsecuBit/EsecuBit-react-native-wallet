@@ -15,7 +15,7 @@ class PreferenceUtil {
       return result.label
     }
     //never set before
-    PreferenceUtil.updateCurrencyUnit(key, defaultUnit, 0)
+    await PreferenceUtil.updateCurrencyUnit(key, defaultUnit, 0)
     return defaultUnit
   }
 
@@ -27,7 +27,7 @@ class PreferenceUtil {
         return D.unit.eth.ETH
       case Coin.eos:
         return D.unit.eos.EOS
-      case Coin.legalCurrency:
+      case Coin.legal:
         return D.unit.legal.USD
       default:
         throw D.error.coinNotSupported

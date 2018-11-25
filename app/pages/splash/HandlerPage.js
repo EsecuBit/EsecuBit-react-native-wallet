@@ -1,15 +1,15 @@
-import React, { Component } from 'react'
-import { View, Image, Dimensions } from 'react-native'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import ToastUtil from '../../utils/ToastUtil'
-import { NavigationActions } from 'react-navigation'
-import PreferenceUtil from '../../utils/PreferenceUtil'
-import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
-import {Unit, Coin} from '../../common/Constants'
-import {connect} from 'react-redux'
-import CoinUtil from "../../utils/CoinUtil";
+import React, { Component } from "react"
+import { View, Image, Dimensions } from "react-native"
+import { EsWallet, D } from "esecubit-wallet-sdk"
+import ToastUtil from "../../utils/ToastUtil"
+import { NavigationActions } from "react-navigation"
+import PreferenceUtil from "../../utils/PreferenceUtil"
+import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/SettingsAction"
+import { Unit, Coin } from "../../common/Constants"
+import { connect } from "react-redux"
+import CoinUtil from "../../utils/CoinUtil"
 
-const deviceW = Dimensions.get('window').width
+const deviceW = Dimensions.get("window").width
 class HandlerPage extends Component {
   constructor(props) {
     super(props)
@@ -20,16 +20,18 @@ class HandlerPage extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Image
-          source={require('../../imgs/ic_background.png')}
+          source={require("../../imgs/ic_background.png")}
           style={{ flex: 1, width: deviceW, height: deviceW }}
         />
       </View>
     )
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._getCurrencyPreference()
-    this.esWallet.setTestSeed("95a0c91336b247cc0a8ad13b16461a61eae869b11d80182517ea1faf6c3aeb10df96fb0b2400b02c6b7f6dd8156b1eb79fe2b05b56dff17ef6922a68315c1f75");
+    this.esWallet.setTestSeed(
+      "90b41b9c4720b3f522a9e0d783c70fcabc43d5529f2d7d8ecc798da2c436259f052d697718e3297f1512c71e51b3d762099653d20d019cad931576f5d1c00775"
+    )
     this._enterOfflineMode()
   }
 
@@ -41,40 +43,40 @@ class HandlerPage extends Component {
           index: 0,
           actions: [
             NavigationActions.navigate({
-              routeName: 'Home',
+              routeName: "Home",
               params: { offlineMode: true }
             })
           ]
         })
         this.props.navigation.dispatch(resetAction)
-        console.log('can enter offline mode')
+        console.log("can enter offline mode")
       })
       .catch(e => {
         if (e === D.error.offlineModeNotAllowed) {
           if (D.test.jsWallet) {
-            this.props.navigation.replace('Splash')
-          }else{
-            this.props.navigation.replace('PairList', { hasBackBtn: false })
+            this.props.navigation.replace("Splash")
+          } else {
+            this.props.navigation.replace("PairList", { hasBackBtn: false })
           }
-          console.warn('offlineModeNotAllowed')
+          console.warn("offlineModeNotAllowed")
           return
         }
         if (e === D.error.offlineModeUnnecessary) {
-          console.warn('offlineModeUnnecessary')
-          this.props.navigation.replace('Home', { offlineMode: true })
+          console.warn("offlineModeUnnecessary")
+          this.props.navigation.replace("Home", { offlineMode: true })
           return
         }
         if (e === D.error.networkProviderError) {
-          console.warn('networkProviderError')
-          this.props.navigation.replace('Home', { offlineMode: true })
+          console.warn("networkProviderError")
+          this.props.navigation.replace("Home", { offlineMode: true })
           return
         }
         if (e === D.error.networkUnavailable) {
-          console.warn('networkUnavailable')
-          this.props.navigation.replace('Home', { offlineMode: true })
+          console.warn("networkUnavailable")
+          this.props.navigation.replace("Home", { offlineMode: true })
           return
         }
-        console.warn('other error, stop', e)
+        console.warn("other error, stop", e)
         ToastUtil.showErrorMsgShort(e)
       })
   }
@@ -85,10 +87,7 @@ class HandlerPage extends Component {
       it = CoinUtil.getRealCoinType(it)
       let unit = await PreferenceUtil.getCryptoCurrencyUnit(it)
       this.props.setCryptoCurrencyUnit(it, unit)
-      console.log('crypto', this.props.setCryptoCurrencyUnit);
-      
     })
-    console.log('legal', this.props.setLegalCurrencyUnit)
     //legal currency
     let legalCurrencyUnit = await PreferenceUtil.getCurrencyUnit(Coin.legal)
     this.props.setLegalCurrencyUnit(legalCurrencyUnit)
@@ -107,9 +106,8 @@ const mapDispatchToProps = {
   setLegalCurrencyUnit
 }
 
-const Handler = connect(mapStateToProps, mapDispatchToProps)(HandlerPage)
+const Handler = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HandlerPage)
 export default Handler
-
-
-
-
