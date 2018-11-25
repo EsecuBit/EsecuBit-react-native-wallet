@@ -120,7 +120,7 @@ class AccountDetailPage extends React.Component {
     let confirmStr = ''
     let confirmColor = Color.ACCENT
 
-    rowData.showAddresses.forEach(function(item, index) {
+    rowData.showAddresses.forEach((item, index) => {
       let addr = ''
       if (item === 'self' || item === 'Self' || item === 'SELF') {
         addr = item
@@ -538,7 +538,7 @@ class AccountDetailPage extends React.Component {
               '( ' +
               I18n.t('value') +
               ': ' +
-              this.cryptoCurrencyUnit +
+              this.props.accountCurrentUnit +
               ' )'}
           </Text>
         </View>
@@ -815,7 +815,8 @@ const mapStateToProps = state => ({
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
-  account: state.AccountReducer.account
+  account: state.AccountReducer.account,
+  accountCurrentUnit: state.AccountReducer.unit
 })
 
 const AccountDetail = connect(mapStateToProps)(AccountDetailPage)
