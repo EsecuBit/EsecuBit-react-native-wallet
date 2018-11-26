@@ -328,7 +328,7 @@ class BTCSendPage extends React.Component {
       console.log('asd', this.lockSend, !this._checkFormData())
       return
     }
-    this.setState({transactionConfirmDesc: I18n.t('send') + this.state.sendValue +' ' + this.props.btcUnit + I18n.t('to1') + this.state.address})
+    this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.btcUnit + " "+ I18n.t('to1') +" "+ this.state.address})
     this.setState({transactionConfirmDialogVisible: true})
 
   }

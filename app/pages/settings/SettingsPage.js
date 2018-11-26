@@ -191,7 +191,7 @@ class SettingsPage extends Component {
                 this.isConnected
                   ? ToastUtil.showShort(I18n.t("hasConnected"))
                   : _that.props.navigation.navigate("PairList", {
-                      hasBackBtn: true
+                      hasBackBtn: false
                     })
               }}
             >

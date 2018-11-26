@@ -168,16 +168,16 @@ class HomePage extends Component {
    */
   async _getAccounts() {
     try {
-      let accounts = await this.wallet.getAccounts()
-      console.log(accounts)
-      if (Array.isArray(accounts) && accounts.length === 0) {
-        accounts = this.accountsCache
-        console.log('sdsdsd000', accounts, this.accountsCache)
+      this.accounts = await this.wallet.getAccounts()
+      console.log(this.accounts )
+      if (Array.isArray(this.accounts ) && this.accounts .length === 0) {
+        this.accounts  = this.accountsCache
+        console.log('sdsdsd000', this.accounts , this.accountsCache)
       } else if (Array.isArray(this.accountsCache) && this.accountsCache.length === 0) {
-        this.accountsCache = accounts
-        console.log('asdadasd', this.accountsCache, accounts)
+        this.accountsCache = this.accounts 
+        console.log('asdadasd', this.accountsCache, this.accounts )
       }
-      await this.setState({ accounts: accounts })
+      await this.setState({ accounts: this.accounts  })
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -186,7 +186,7 @@ class HomePage extends Component {
 
   _getTotalLegalCurrencyBalance() {
     let totalLegalCurrencyBalance = '0'
-    this.state.accounts.forEach(account => {
+    this.accounts.forEach(account => {
       let fromUnit = CoinUtil.getMinimumUnit(account.coinType)
       let legalCurrencyBalance = this.wallet.convertValue(
         account.coinType,
@@ -270,10 +270,7 @@ class HomePage extends Component {
                       marginLeft: Dimen.MARGIN_HORIZONTAL
                     }}
                     onPress={() =>
-                      _that.props.navigation.navigate('NewAccount', {
-                        btcAccounts: this.btcAccounts,
-                        ethAccounts: this.ethAccounts
-                      })
+                      _that.props.navigation.navigate('NewAccount')
                     }>
                     <Image source={require('../../imgs/ic_add.png')} />
                   </TouchableOpacity>
@@ -361,7 +358,7 @@ class HomePage extends Component {
                   transparent
                   onPress={() =>
                     _that.props.navigation.navigate('PairList', {
-                      hasBackBtn: true
+                      hasBackBtn: false
                     })
                   }>
                   <Text style={{ color: Color.ACCENT }}>{I18n.t('confirm')}</Text>

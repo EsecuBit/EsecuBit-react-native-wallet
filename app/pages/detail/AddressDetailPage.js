@@ -64,7 +64,7 @@ class AddressDetailPage extends PureComponent {
           this.popupDialog = popupDialog
         }}
         width={0.8}
-        height={D.isBtc(this.coinType) ? 455 : 415}
+        height={D.isBtc(this.coinType) ? 460 : 420}
         containerStyle={{ backgroundColor: '#E0E0E0' }}
         onDismissed={() => this.props.navigation.pop()}>
         <View style={styles.qrCodeWrapper}>

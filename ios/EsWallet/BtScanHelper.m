@@ -107,16 +107,14 @@
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI
 {
   NSLog(@"central = %@, peripheral = %@, advertisementData = %@, RSSI = %@", central, peripheral, advertisementData, RSSI);
-  if ([ESSerialNumber isESKeyWithAdvertisementData:advertisementData]) {
-    NSString *name = [ESSerialNumber deviceNameWithAdvertisementData:advertisementData forPeripheral:peripheral];
-    if (name) {
-      if ([self.keyNames containsObject:name]) {
-        return;
-      }
-      [self.delegate didDescoverPeripheral:name peripheral:peripheral];
-      [self.keyNames addObject:name];
-      [self.peripherals addObject:peripheral];
+  NSString *name = [ESSerialNumber deviceNameWithAdvertisementData:advertisementData forPeripheral:peripheral];
+  if (name) {
+    if ([self.keyNames containsObject:name]) {
+      return;
     }
+    [self.delegate didDescoverPeripheral:name peripheral:peripheral];
+    [self.keyNames addObject:name];
+    [self.peripherals addObject:peripheral];
   }
 }
 @end

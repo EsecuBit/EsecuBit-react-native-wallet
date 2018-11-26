@@ -5,9 +5,7 @@ import {
   RefreshControl,
   Dimensions,
   Platform,
-  TextInput,
-  DeviceEventEmitter
-} from 'react-native'
+  TextInput} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
 import PopupDialog from 'react-native-popup-dialog'
@@ -44,8 +42,8 @@ class AccountDetailPage extends React.Component {
       dMemo: '',
       renameDialogVisible: false
     }
-    console.log('unit', props.accountCurrentUnit);
-    
+    console.log('unit', props.accountCurrentUnit)
+
     this.cryptoCurrencyUnit = props.accountCurrentUnit
   }
 
@@ -94,9 +92,9 @@ class AccountDetailPage extends React.Component {
     this.setState({ refreshing: true })
     this.account
       .sync()
-      .then(async () => {
+      .then(() => {
         console.log('sync _getTxInfos')
-        await this._getTxInfos()
+        this._getTxInfos()
         this.setState({ refreshing: false })
       })
       .catch(error => {
@@ -123,7 +121,6 @@ class AccountDetailPage extends React.Component {
     let confirmStr = ''
     let confirmColor = Color.ACCENT
 
-   
     rowData.showAddresses.forEach((item, index) => {
       let addr = ''
       if (item === 'self' || item === 'Self' || item === 'SELF') {
@@ -432,7 +429,7 @@ class AccountDetailPage extends React.Component {
     this.account
       .getTxInfos()
       .then(txInfos => {
-        console.log('txInfo', txInfos);
+        console.log('txInfo', txInfos)
         this.setState({ data: txInfos.txInfos })
       })
       .catch(error => {
@@ -442,9 +439,12 @@ class AccountDetailPage extends React.Component {
   }
 
   _renameAccount() {
+    let _that = this
     this.account
       .rename(this.renameAccountname)
-      .then(() => this.props.account.label = this.renameAccountname)
+      .then(() => {
+        _that.props.account.label = this.renameAccountname
+      })
       .catch(error => {
         console.log('rename', error)
         ToastUtil.showErrorMsgShort(error)
@@ -496,7 +496,7 @@ class AccountDetailPage extends React.Component {
         this.props.navigation.navigate('EOSKeyDetail')
         break
       case 'renameAccount':
-        this.setState({renameDialogVisible: true})
+        this.setState({ renameDialogVisible: true })
         break
       case 'vote':
         this.props.navigation.navigate('EOSVote')
@@ -510,7 +510,7 @@ class AccountDetailPage extends React.Component {
     return (
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
-          ref={ref => this.accountHeader = ref}
+          ref={ref => (this.accountHeader = ref)}
           onHideMenu={type => this._handleMenuItemClick(type)}
           navigation={this.props.navigation}
         />

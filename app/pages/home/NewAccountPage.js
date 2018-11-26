@@ -21,23 +21,19 @@ export default class NewAccountPage extends Component {
     }
     //coinType
     this.supportCoinType = D.supportedCoinTypes()
-    this.newAccountType = this.btcCoinType
+    this.newAccountType = ''
     this.btTransmitter = new BtTransmitter()
     this.wallet = new EsWallet()
     this.newAccountName = ''
     this._newAccount.bind(this)
 
-    //account，just for iOS
-    const { params } = props.navigation.state
-    this.btcAccounts = params.btcAccounts
-    this.ethAccounts = params.ethAccounts
   }
 
   /**
    * only support new BTC account and ETH account
    */
   async _newAccount() {
-    let coinType = D.isBtc(this.newAccountType) ? this.btcCoinType : this.ethCoinType
+    let coinType = this.newAccountType
     if (this.newAccountName === null) {
       ToastUtil.showLong(I18n.t('emptyAccountNameError'))
       return
@@ -53,32 +49,11 @@ export default class NewAccountPage extends Component {
       return
     }
 
-    //iOS添加账号等待框延迟显示，防止跟newAccountDialog渲染冲突而不显示，经测试，延迟时间至少300毫秒才有效
-    //just for iOS
-    if (platform === 'ios') {
-      let account = []
-      let isNeedDialog = true
-
-      if (coinType === this.btcCoinType) {
-        account = this.btcAccounts
-      } else {
-        account = this.ethAccounts
-      }
-
-      account.map(item => {
-        if (item.txInfos.length === 0) {
-          isNeedDialog = false
-        }
-      })
-
-      if (isNeedDialog) {
-        setTimeout(() => {
-          console.log('setTimeout1=====')
-          this.setState({ newAccountWaitDialog: true })
-        }, 400)
-      }
-    }
-
+    setTimeout(() => {
+      console.log('setTimeout1=====')
+      this.setState({ newAccountWaitDialog: true })
+    }, 400)
+      
     try {
       if (platform !== 'ios') {
         await this.setState({ newAccountWaitDialog: true })
@@ -108,10 +83,13 @@ export default class NewAccountPage extends Component {
 
   _renderBTCAddAccount() {
     let _that = this
+    let coinType = ''
     let isSupportBTC = false
-    this.supportCoinType.forEach(it => {
+    this.supportCoinType.map(it => {
+      console.log('new account it', it);
       if (it.startsWith('btc')) {
         isSupportBTC = true
+        coinType = it
       }
     })
     return isSupportBTC ? (
@@ -119,8 +97,10 @@ export default class NewAccountPage extends Component {
         button
         style={CommonStyle.cardStyle}
         onPress={() => {
-          _that.setState({ newAccountDialogVisible: true })
-          this.newAccountType = this.btcCoinType
+          console.log('new btc account');
+          
+          this.setState({ newAccountDialogVisible: true })
+          this.newAccountType = coinType
         }}>
         <Left style={{ flexDirection: 'row' }}>
           <Icon
@@ -133,7 +113,8 @@ export default class NewAccountPage extends Component {
         <Right>
           <TouchableOpacity
             onPress={() => {
-              _that.setState({ newAccountDialogVisible: true })
+              console.log('new eth account');
+              this.setState({ newAccountDialogVisible: true })
               this.newAccountType = this.btcCoinType
             }}>
             <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
@@ -145,10 +126,12 @@ export default class NewAccountPage extends Component {
 
   _renderETHAddAccount() {
     let _that = this
+    let coinType = ''
     let isSupportETH = false
-    this.supportCoinType.forEach(it => {
-      if (it.startsWith('btc')) {
+    this.supportCoinType.map(it => {
+      if (it.startsWith('eth')) {
         isSupportETH = true
+        coinType= it
       }
     })
     return isSupportETH ? (
@@ -157,7 +140,7 @@ export default class NewAccountPage extends Component {
         style={CommonStyle.cardStyle}
         onPress={() => {
           _that.setState({ newAccountDialogVisible: true })
-          this.newAccountType = this.ethCoinType
+          this.newAccountType = coinType
         }}>
         <Left style={{ flexDirection: 'row' }}>
           <Icon

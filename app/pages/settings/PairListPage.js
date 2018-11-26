@@ -50,7 +50,7 @@ export default class PairListPage extends React.Component {
     })
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
-      if (error === D.error.succeed && status === 1111) {
+      if (error === D.error.succeed && status === D.status.authenticate) {
         this.setState({authenticateDialogVisible: true, pairCode: pairCode})
       }
       if(error === D.error.succeed && status === D.status.syncing) {

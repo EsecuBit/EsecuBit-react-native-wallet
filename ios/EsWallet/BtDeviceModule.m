@@ -110,7 +110,7 @@ RCT_EXPORT_METHOD(sendApdu:(NSString *)apdu
 {
   dispatch_async(dispatch_get_global_queue(0, 0), ^{
     NSData *apduData = [NSData fromHex:apdu];
-    NSData *response = [self.wallet sendAPDUWithData:apduData secure:false];
+    NSData *response = [self.wallet sendAPDUWithData:apduData];
     UInt32 error = [self.wallet getLastNativeErrorCode];
     if (error != 0) {
       // TODO UPDATE newest react0native version, reject has only one argument
