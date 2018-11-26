@@ -8,6 +8,7 @@ import I18n from '../lang/i18n'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
+import CoinUtil from '../utils/CoinUtil';
 
 const platform = Platform.OS
 const deviceW = Dimensions.get('window').width
@@ -64,9 +65,11 @@ class AccountDetailHeader extends PureComponent {
 
   updateAccountName(name) {
     //EOS not support rename account
-    if (this.account.coinType === 'eos') {
+    let coinType = CoinUtil.getRealCoinType(this.account.coinType)
+    if (coinType === 'eos') {
       return
     }
+    this.props.account.label = name
     this.setState({ accountName: name })
   }
 

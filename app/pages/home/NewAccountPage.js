@@ -1,22 +1,6 @@
 import React, { Component } from 'react'
-import {
-  StatusBar,
-  View,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  Platform
-} from 'react-native'
-import {
-  Button,
-  Container,
-  Header,
-  Left,
-  Icon,
-  CardItem,
-  Title,
-  Right
-} from 'native-base'
+import { StatusBar, View, Text, Dimensions, TouchableOpacity, Platform } from 'react-native'
+import { Button, Container, Header, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
@@ -36,9 +20,7 @@ export default class NewAccountPage extends Component {
       newAccountWaitDialog: false
     }
     //coinType
-    ;(this.supportCoinType = D.supportedCoinTypes()),
-    (this.btcCoinType = this.supportCoinType[0])
-    this.ethCoinType = this.supportCoinType[1]
+    this.supportCoinType = D.supportedCoinTypes()
     this.newAccountType = this.btcCoinType
     this.btTransmitter = new BtTransmitter()
     this.wallet = new EsWallet()
@@ -55,9 +37,7 @@ export default class NewAccountPage extends Component {
    * only support new BTC account and ETH account
    */
   async _newAccount() {
-    let coinType = D.isBtc(this.newAccountType)
-      ? this.btcCoinType
-      : this.ethCoinType
+    let coinType = D.isBtc(this.newAccountType) ? this.btcCoinType : this.ethCoinType
     if (this.newAccountName === null) {
       ToastUtil.showLong(I18n.t('emptyAccountNameError'))
       return
@@ -126,6 +106,80 @@ export default class NewAccountPage extends Component {
     return coinTypes.includes(coinType)
   }
 
+  _renderBTCAddAccount() {
+    let _that = this
+    let isSupportBTC = false
+    this.supportCoinType.forEach(it => {
+      if (it.startsWith('btc')) {
+        isSupportBTC = true
+      }
+    })
+    return isSupportBTC ? (
+      <CardItem
+        button
+        style={CommonStyle.cardStyle}
+        onPress={() => {
+          _that.setState({ newAccountDialogVisible: true })
+          this.newAccountType = this.btcCoinType
+        }}>
+        <Left style={{ flexDirection: 'row' }}>
+          <Icon
+            name="bitcoin"
+            type="FontAwesome"
+            style={{ width: 28, height: 28, color: Color.BITCOIN }}
+          />
+          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>BTC</Title>
+        </Left>
+        <Right>
+          <TouchableOpacity
+            onPress={() => {
+              _that.setState({ newAccountDialogVisible: true })
+              this.newAccountType = this.btcCoinType
+            }}>
+            <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
+          </TouchableOpacity>
+        </Right>
+      </CardItem>
+    ) : null
+  }
+
+  _renderETHAddAccount() {
+    let _that = this
+    let isSupportETH = false
+    this.supportCoinType.forEach(it => {
+      if (it.startsWith('btc')) {
+        isSupportETH = true
+      }
+    })
+    return isSupportETH ? (
+      <CardItem
+        button
+        style={CommonStyle.cardStyle}
+        onPress={() => {
+          _that.setState({ newAccountDialogVisible: true })
+          this.newAccountType = this.ethCoinType
+        }}>
+        <Left style={{ flexDirection: 'row' }}>
+          <Icon
+            name="ethereum"
+            type="MaterialCommunityIcons"
+            style={{ width: 28, height: 28, color: Color.ETH }}
+          />
+          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>ETH</Title>
+        </Left>
+        <Right>
+          <TouchableOpacity
+            onPress={() => {
+              _that.setState({ newAccountDialogVisible: true })
+              this.newAccountType = this.ethCoinType
+            }}>
+            <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
+          </TouchableOpacity>
+        </Right>
+      </CardItem>
+    ) : null
+  }
+
   render() {
     let _that = this
     return (
@@ -140,12 +194,7 @@ export default class NewAccountPage extends Component {
               <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
             </Button>
           </Left>
-          <View
-            style={
-              platform === 'ios'
-                ? CommonStyle.toolbarIOS
-                : CommonStyle.toolbarAndroid
-            }>
+          <View style={platform === 'ios' ? CommonStyle.toolbarIOS : CommonStyle.toolbarAndroid}>
             <Text
               style={{
                 color: Color.ACCENT,
@@ -157,66 +206,8 @@ export default class NewAccountPage extends Component {
           </View>
           <Right />
         </Header>
-        <CardItem
-          button
-          style={CommonStyle.cardStyle}
-          onPress={() => {
-            _that.setState({ newAccountDialogVisible: true })
-            this.newAccountType = this.btcCoinType
-          }}>
-          <Left style={{ flexDirection: 'row' }}>
-            <Icon
-              name="bitcoin"
-              type="FontAwesome"
-              style={{ width: 28, height: 28, color: Color.BITCOIN }}
-            />
-            <Title
-              style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>
-              BTC
-            </Title>
-          </Left>
-          <Right>
-            <TouchableOpacity
-              onPress={() => {
-                _that.setState({ newAccountDialogVisible: true })
-                this.newAccountType = this.btcCoinType
-              }}>
-              <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>
-                {I18n.t('add')}
-              </Text>
-            </TouchableOpacity>
-          </Right>
-        </CardItem>
-        {/* <CardItem
-          button
-          style={CommonStyle.cardStyle}
-          onPress={() => {
-            _that.setState({ newAccountDialogVisible: true })
-            this.newAccountType = this.ethCoinType
-          }}>
-          <Left style={{ flexDirection: 'row' }}>
-            <Icon
-              name="ethereum"
-              type="MaterialCommunityIcons"
-              style={{ width: 28, height: 28, color: Color.ETH }}
-            />
-            <Title
-              style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>
-              ETH
-            </Title>
-          </Left>
-          <Right>
-            <TouchableOpacity
-              onPress={() => {
-                _that.setState({ newAccountDialogVisible: true })
-                this.newAccountType = this.ethCoinType
-              }}>
-              <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>
-                {I18n.t('add')}
-              </Text>
-            </TouchableOpacity>
-          </Right>
-        </CardItem> */}
+        {this._renderBTCAddAccount()}
+        {this._renderETHAddAccount()}
         <Dialog.Container visible={_that.state.newAccountDialogVisible}>
           <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
           <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>

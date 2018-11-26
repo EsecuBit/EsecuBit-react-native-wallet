@@ -48,6 +48,20 @@ export default class PairListPage extends React.Component {
       await _that.setState({ deviceList: [] })
       _that._findDefaultDevice()
     })
+    this.wallet.listenStatus(async (error, status, pairCode) => {
+      console.log('wallet code', error, status, pairCode)
+      if (error === D.error.succeed && status === 1111) {
+        this.setState({authenticateDialogVisible: true, pairCode: pairCode})
+      }
+      if(error === D.error.succeed && status === D.status.syncing) {
+        this.setState({authenticateDialogVisible: false})
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({ routeName: 'Splash' })]
+        })
+        this.props.navigation.dispatch(resetAction)    
+      }
+    })
    
   }
 
@@ -85,20 +99,6 @@ export default class PairListPage extends React.Component {
     this.setState({ connectDialogVisible: false })
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-    await this.wallet._init(pairCode => {
-      console.log('show pairCode', pairCode);
-      if (pairCode) {
-        this.setState({ connectDialogVisible: false })
-        this.setState({ pairCode: pairCode, authenticateDialogVisible: true })
-      }else {
-        this.setState({ authenticateDialogVisible: false })
-      }
-    })
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [NavigationActions.navigate({ routeName: 'Splash' })]
-    })
-    this.props.navigation.dispatch(resetAction)
   }
 
   _findDefaultDevice() {
@@ -216,7 +216,7 @@ export default class PairListPage extends React.Component {
               }}>
               <Image
                 source={require('../../imgs/bluetooth_bg.png')}
-                style={{ width: 100, height: 100 }}
+                style={{ width: 80, height: 80 }}
               />
             </View>
             <View

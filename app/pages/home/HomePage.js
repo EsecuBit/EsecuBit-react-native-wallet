@@ -185,8 +185,8 @@ class HomePage extends Component {
   }
 
   _getTotalLegalCurrencyBalance() {
-    let totalLegalCurrencyBalance = ''
-    this.state.accounts.map(account => {
+    let totalLegalCurrencyBalance = '0'
+    this.state.accounts.forEach(account => {
       let fromUnit = CoinUtil.getMinimumUnit(account.coinType)
       let legalCurrencyBalance = this.wallet.convertValue(
         account.coinType,
@@ -194,7 +194,7 @@ class HomePage extends Component {
         fromUnit,
         this.props.legalCurrencyUnit
       )
-      totalLegalCurrencyBalance += parseFloat(legalCurrencyBalance)
+      totalLegalCurrencyBalance = parseFloat(legalCurrencyBalance) + parseFloat(totalLegalCurrencyBalance)
     })
 
     //format balance

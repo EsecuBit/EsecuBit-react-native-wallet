@@ -444,12 +444,11 @@ class AccountDetailPage extends React.Component {
   _renameAccount() {
     this.account
       .rename(this.renameAccountname)
-      .then(() => this.accountHeader.updateAccountName(this.renameAccountname))
-      .then(() => {
-        console.log('rename emiter')
-        DeviceEventEmitter.emit('rename')
+      .then(() => this.props.account.label = this.renameAccountname)
+      .catch(error => {
+        console.log('rename', error)
+        ToastUtil.showErrorMsgShort(error)
       })
-      .catch(error => ToastUtil.showErrorMsgLong(error))
   }
 
   _handleTransactionDetailDismiss() {
@@ -511,7 +510,7 @@ class AccountDetailPage extends React.Component {
     return (
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
-          ref={ref => (this.accountHeader = ref)}
+          ref={ref => this.accountHeader = ref}
           onHideMenu={type => this._handleMenuItemClick(type)}
           navigation={this.props.navigation}
         />
