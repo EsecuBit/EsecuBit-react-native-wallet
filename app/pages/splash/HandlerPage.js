@@ -8,6 +8,7 @@ import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/Setti
 import { Unit, Coin } from "../../common/Constants"
 import { connect } from "react-redux"
 import CoinUtil from "../../utils/CoinUtil"
+import I18n from "../../lang/i18n"
 
 const deviceW = Dimensions.get("window").width
 class HandlerPage extends Component {
@@ -27,12 +28,18 @@ class HandlerPage extends Component {
     )
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this._getCurrencyPreference()
     this.esWallet.setTestSeed(
       "90b41b9c4720b3f522a9e0d783c70fcabc43d5529f2d7d8ecc798da2c436259f052d697718e3297f1512c71e51b3d762099653d20d019cad931576f5d1c00775"
     )
     this._enterOfflineMode()
+    this._getLanguagePreference()
+  }
+
+  async _getLanguagePreference() {
+    let language = await PreferenceUtil.getLanguagePreference()
+    I18n.locale = language
   }
 
   _enterOfflineMode() {

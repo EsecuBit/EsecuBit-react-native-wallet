@@ -35,6 +35,7 @@ export default {
   // invalidAddress: '非法地址',
   from: '从',
   to: '发送至',
+  to1: '到',
   value: '金额',
   transactionRecord: '交易记录',
   orderByTime: '按时间顺序排序',
@@ -153,4 +154,7 @@ export default {
   ramTransaction: '售买内存',
   buy: '购买',
   sell: '出售',
+  language: '语言',
+  transactionConfirm: '交易确认',
+  pairDeviceTip: '点击下面的序列号连接设备'
 }

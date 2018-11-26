@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { StyleSheet, View, StatusBar, Dimensions, Platform, Linking } from "react-native";
+import React, { Component } from "react"
+import { StyleSheet, View, StatusBar, Dimensions, Platform, Linking } from "react-native"
 import {
   Container,
   Header,
@@ -16,10 +16,7 @@ import { SinglePickerMaterialDialog } from "react-native-material-dialog"
 import I18n from "../../lang/i18n"
 import { EsWallet, D } from "esecubit-wallet-sdk"
 import { version } from "../../../package.json"
-import {
-  Unit,
-  Api
-} from "../../common/Constants"
+import { Unit, Api } from "../../common/Constants"
 import PreferenceUtil from "../../utils/PreferenceUtil"
 import BtTransmitter from "../../device/BtTransmitter"
 import Dialog from "react-native-dialog"
@@ -32,11 +29,11 @@ import CoinUtil from "../../utils/CoinUtil"
 
 const btcUnit = ["BTC", "mBTC"]
 const ethUnit = ["ETH", "GWei"]
-const platform = Platform.OS;
+const platform = Platform.OS
 
 class SettingsPage extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       //version
       appVersion: version,
@@ -53,108 +50,110 @@ class SettingsPage extends Component {
       ethDialogVisible: false,
       disConnectDialogVisible: false,
       updateVersionDialogVisible: false,
-      updateDesc: ""
-    };
-    this.coinTypes = D.supportedCoinTypes();
-    this.wallet = new EsWallet();
-    this.transmitter = new BtTransmitter();
-    this.isConnected = false;
-    this.deviceW = Dimensions.get("window").width;
+      updateDesc: "",
+      changeLanguageIndex: 0,
+      changeLanguageLabel: "English",
+      changeLanguageDialogVisible: false
+    }
+    this.coinTypes = D.supportedCoinTypes()
+    this.wallet = new EsWallet()
+    this.transmitter = new BtTransmitter()
+    this.isConnected = false
+    this.deviceW = Dimensions.get("window").width
   }
 
   componentDidMount() {
-    this._listenDeviceStatus();
+    this._listenDeviceStatus()
   }
-  
 
   _listenDeviceStatus() {
     this.transmitter.getState().then(state => {
-      console.log("state", state);
+      console.log("state", state)
       if (state === BtTransmitter.connected) {
-        this.isConnected = true;
-        this._getWalletInfo();
+        this.isConnected = true
+        this._getWalletInfo()
       } else if (state === BtTransmitter.disconnected) {
-        this.isConnected = false;
-        this.setState({ cosVersion: "unknown" });
+        this.isConnected = false
+        this.setState({ cosVersion: "unknown" })
       }
-    });
+    })
   }
 
   _getWalletInfo() {
     this.wallet
       .getWalletInfo()
       .then(value => {
-        this.setState({ cosVersion: value.cos_version });
+        this.setState({ cosVersion: value.cos_version })
       })
       .catch(error => {
-        console.warn("getWalletInfo Error", error);
-        this.setState({ cosVersion: "unknown" });
-      });
+        console.warn("getWalletInfo Error", error)
+        this.setState({ cosVersion: "unknown" })
+      })
   }
 
   _updateCurrencyPreference(key, value, index) {
     switch (key) {
       case Unit.legalCurrency:
-        this.props.setLegalCurrencyUnit(value);
-        break;
+        this.props.setLegalCurrencyUnit(value)
+        break
       case Unit.btc:
-        this.props.setCryptoCurrencyUnit("btc", value);
-        break;
+        this.props.setCryptoCurrencyUnit("btc", value)
+        break
       case Unit.eth:
-        this.props.setCryptoCurrencyUnit("eth", value);
-        break;
+        this.props.setCryptoCurrencyUnit("eth", value)
+        break
       default:
-        break;
+        break
     }
-    PreferenceUtil.updateCurrencyUnit(key, value, index);
+    PreferenceUtil.updateCurrencyUnit(key, value, index)
   }
 
   async _disConnect() {
-    console.log("disConnected");
-    await this.setState({ disConnectDialogVisible: false });
-    this.transmitter.disconnect();
-    this.props.navigation.pop();
+    console.log("disConnected")
+    await this.setState({ disConnectDialogVisible: false })
+    this.transmitter.disconnect()
+    this.props.navigation.pop()
   }
 
   _checkVersion() {
     AppUtil.checkUpdate()
       .then(info => {
-        console.log("checkVersion", info);
-        this.info = info;
+        console.log("checkVersion", info)
+        this.info = info
         if (info === undefined) {
-          ToastUtil.showShort(I18n.t("connectDeviceToGetCOSVersion"));
+          ToastUtil.showShort(I18n.t("connectDeviceToGetCOSVersion"))
         }
         if (info.errorCode === Api.success) {
           if (info.data !== null) {
             this.setState({
               updateDesc: info.data.description,
               updateVersionDialogVisible: true
-            });
+            })
           }
         }
       })
       .catch(e => {
-        console.log("checkVersion error", e);
-        ToastUtil.showShort(e);
-      });
+        console.log("checkVersion error", e)
+        ToastUtil.showShort(e)
+      })
   }
 
   _checkForceUpdate() {
-    this.setState({ updateVersionDialogVisible: false });
+    this.setState({ updateVersionDialogVisible: false })
     if (this.info !== undefined && this.info.data.isForceUpdate) {
-      AppUtil.exitApp();
+      AppUtil.exitApp()
     }
   }
 
   _gotoBrowser() {
     if (this.info.data !== null) {
-      Linking.openURL(Api.baseUrl + this.info.data.downloadUrl);
+      Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
-    this.setState({ updateVersionDialogVisible: false });
+    this.setState({ updateVersionDialogVisible: false })
   }
 
   render() {
-    let _that = this;
+    let _that = this
     return (
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <Header style={{ backgroundColor: "#1D1D1D" }}>
@@ -193,7 +192,7 @@ class SettingsPage extends Component {
                   ? ToastUtil.showShort(I18n.t("hasConnected"))
                   : _that.props.navigation.navigate("PairList", {
                       hasBackBtn: true
-                    });
+                    })
               }}
             >
               <Text>{I18n.t("connectDevice")}</Text>
@@ -261,6 +260,16 @@ class SettingsPage extends Component {
               <View style={CommonStyle.divider} />
             )}
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+              <Text style={customStyle.headerText}>App</Text>
+            </CardItem>
+            <CardItem
+              bordered
+              button
+              onPress={() => this.setState({ changeLanguageDialogVisible: true })}
+            >
+              <Text>{I18n.t("language")}</Text>
+            </CardItem>
+            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={customStyle.headerText}>{I18n.t("about")}</Text>
             </CardItem>
             <CardItem bordered button onPress={() => this._checkVersion()}>
@@ -298,14 +307,14 @@ class SettingsPage extends Component {
           }}
           onCancel={() => this.setState({ legalCurrencyDialogVisible: false })}
           onOk={result => {
-            let label = result.selectedItem.label;
-            let index = result.selectedItem.value;
-            this._updateCurrencyPreference(Unit.legalCurrency, label, index);
+            let label = result.selectedItem.label
+            let index = result.selectedItem.value
+            this._updateCurrencyPreference(Unit.legalCurrency, label, index)
             this.setState({
               legalCurrencyDialogVisible: false,
               legalCurrencyLabel: label,
               legalCurrencyIndex: index
-            });
+            })
           }}
         />
         <SinglePickerMaterialDialog
@@ -321,14 +330,14 @@ class SettingsPage extends Component {
           }}
           onCancel={() => this.setState({ btcDialogVisible: false })}
           onOk={result => {
-            let label = result.selectedItem.label;
-            let index = result.selectedItem.value;
-            this._updateCurrencyPreference(Unit.btc, label, index);
+            let label = result.selectedItem.label
+            let index = result.selectedItem.value
+            this._updateCurrencyPreference(Unit.btc, label, index)
             this.setState({
               btcDialogVisible: false,
               btcLabel: label,
               btcIndex: index
-            });
+            })
           }}
         />
         <SinglePickerMaterialDialog
@@ -344,14 +353,46 @@ class SettingsPage extends Component {
           }}
           onCancel={() => this.setState({ ethDialogVisible: false })}
           onOk={result => {
-            let label = result.selectedItem.label;
-            let index = result.selectedItem.value;
-            this._updateCurrencyPreference(Unit.eth, label, index);
+            let label = result.selectedItem.label
+            let index = result.selectedItem.value
+            this._updateCurrencyPreference(Unit.eth, label, index)
             this.setState({
               ethDialogVisible: false,
               ethLabel: label,
               ethIndex: index
-            });
+            })
+          }}
+        />
+
+        <SinglePickerMaterialDialog
+          title={I18n.t("language")}
+          items={["English", "简体中文"].map((row, index) => ({
+            value: index,
+            label: row
+          }))}
+          colorAccent={Color.ACCENT}
+          okLabel={I18n.t("confirm")}
+          cancelLabel={I18n.t("cancel")}
+          selectedItem={{
+            value: this.state.changeLanguageIndex,
+            label: this.state.changeLanguageLabel
+          }}
+          visible={this.state.changeLanguageDialogVisible}
+          onCancel={() => this.setState({ changeLanguageDialogVisible: false })}
+          onOk={result => {
+            let index = result.selectedItem.value
+            switch (index) {
+              case 0:
+                I18n.locale = "en"
+                PreferenceUtil.updateLanguagePrefrence('en')
+                break
+              case 1:
+                I18n.locale = "zh-Hans"
+                PreferenceUtil.updateLanguagePrefrence('zh-Hans')
+                break
+            }
+            this.setState({ changeLanguageDialogVisible: false })
+            this.forceUpdate()
           }}
         />
 
@@ -390,7 +431,7 @@ class SettingsPage extends Component {
           />
         </Dialog.Container>
       </Container>
-    );
+    )
   }
 }
 
@@ -399,21 +440,21 @@ const customStyle = StyleSheet.create({
     color: Color.SECONDARY_TEXT,
     fontSize: Dimen.SECONDARY_TEXT
   }
-});
+})
 
 const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
-});
+})
 
 const mapDispatchToProps = {
   setCryptoCurrencyUnit,
   setLegalCurrencyUnit
-};
+}
 
 const Settings = connect(
   mapStateToProps,
   mapDispatchToProps
-)(SettingsPage);
-export default Settings;
+)(SettingsPage)
+export default Settings

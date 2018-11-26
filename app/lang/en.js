@@ -35,6 +35,7 @@ export default {
   // invalidAddress: 'invalid address',
   from: 'From',
   to: 'to',
+  to1: 'to',
   value: 'Value',
   transactionRecord: 'Transaction Records',
   orderByTime: 'Order By Time',
@@ -152,5 +153,8 @@ export default {
   ramTransaction: 'Buy/Sell RAM',
   buy: 'Buy',
   sell: 'Sell',
+  language: 'Language',
+  transactionConfirm: 'Transaction Confirm',
+  pairDeviceTip: 'Click the following SN to connect device'
 
 }

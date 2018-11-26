@@ -2,6 +2,7 @@ import RealmDB from '../db/RealmDB'
 import {Coin, Unit} from '../common/Constants'
 import { D } from 'esecubit-wallet-sdk'
 import CoinUtil from './CoinUtil'
+import { log } from 'util';
 
 const realmDB = new RealmDB('default')
 class PreferenceUtil {
@@ -32,6 +33,25 @@ class PreferenceUtil {
       default:
         throw D.error.coinNotSupported
     }
+  }
+
+  static async getLanguagePreference() {
+    let defaultLanguage = 'en'
+    let result = await realmDB.getPreference('language').catch(err => {
+      console.warn('getLanguagePreference', err)
+    })
+  
+    if (result) {
+      return result.value
+    }
+    await PreferenceUtil.updateLanguagePrefrence(defaultLanguage)
+    return defaultLanguage
+  }
+
+  static async updateLanguagePrefrence(value) {
+    await realmDB.saveOrUpdatePreference('language', value).catch(error => {
+      console.warn('updateLanguagePrefrence', error)
+    })
   }
 
   static async updateCurrencyUnit(key, label, index) {
