@@ -55,20 +55,12 @@ class EsBtDevice {
     return this._device.sendApdu(apdu)
       .then(response => {
         response = Buffer.from(response, 'hex')
-        if (!response || response.length < 2) {
-          console.warn('invalid response without sw1sw2')
-          throw D.error.deviceProtocol
-        }
-
-        let indexSw1Sw2 = response.length - 2
-        let sw1sw2 = (response[indexSw1Sw2] << 8) + response[indexSw1Sw2 + 1]
-        let responseData = response.slice(0, indexSw1Sw2)
-        console.debug('transmitter got response', sw1sw2.toString(16), responseData.toString('hex'))
-        return {result: sw1sw2, response: responseData}
+        console.debug('transmitter got response', response.toString('hex'))
+        return {result: 0x9000, response: response}
       }).catch((e) => {
         console.warn('sendApdu got error', e)
-        let error = parseInt(e.code, 16)
-        throw error
+        let sw1sw2 = parseInt(e.code, 16)
+        return {result: sw1sw2, response: Buffer.alloc(0)}
       })
   }
 }

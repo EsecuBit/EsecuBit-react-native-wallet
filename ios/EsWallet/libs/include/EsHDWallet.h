@@ -54,7 +54,7 @@ typedef void(^EsResultCallBack)(NSNumber *errorCode,NSString *result);
  @param sec 是否加密
  @return response
  */
-- (NSData *)sendAPDUWithData:(NSData *)data secure:(BOOL)sec;
+- (NSData *)sendAPDUWithData:(NSData *)data;
 
 /**
  错误码

@@ -68,6 +68,4 @@ typedef NS_ENUM(unichar, ESCertificateCategory) {
 +(BOOL)isValidSerialNumber:(NSString *)sn;
 
 + (NSString*)deviceNameWithAdvertisementData:(NSDictionary*)advertisementData forPeripheral:(CBPeripheral*)p;
-
-+(BOOL)isESKeyWithAdvertisementData:(NSDictionary *)advertisementData;
 @end
