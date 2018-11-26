@@ -105,7 +105,7 @@ class RealmDB extends IDatabase {
         let total = allTxs.length
         let startIndex = filter.startIndex || 0
         let endIndex = filter.endIndex || total
-        let txInfos = wrapper.txInfo.unwrap(allTxs.slice(startIndex, endIndex))
+        let txInfos = wrapper.txInfo.unwraps(allTxs.slice(startIndex, endIndex))
         return { total, txInfos }
       })
   }

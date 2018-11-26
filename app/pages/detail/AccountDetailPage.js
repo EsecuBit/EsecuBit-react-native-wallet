@@ -44,6 +44,9 @@ class AccountDetailPage extends React.Component {
       dMemo: '',
       renameDialogVisible: false
     }
+    console.log('unit', props.accountCurrentUnit);
+    
+    this.cryptoCurrencyUnit = props.accountCurrentUnit
   }
 
   componentDidMount() {
@@ -99,7 +102,7 @@ class AccountDetailPage extends React.Component {
       .catch(error => {
         console.warn('_onRefresh', error)
         this.setState({ refreshing: false })
-        ToastUtil.showErrorMsgLong(error)
+        ToastUtil.showErrorMsgShort(error)
       })
   }
 
@@ -120,6 +123,7 @@ class AccountDetailPage extends React.Component {
     let confirmStr = ''
     let confirmColor = Color.ACCENT
 
+   
     rowData.showAddresses.forEach((item, index) => {
       let addr = ''
       if (item === 'self' || item === 'Self' || item === 'SELF') {
@@ -427,8 +431,14 @@ class AccountDetailPage extends React.Component {
   _getTxInfos() {
     this.account
       .getTxInfos()
-      .then(txInfos => this.setState({ data: txInfos.txInfos }))
-      .catch(error => ToastUtil.showErrorMsgLong(error))
+      .then(txInfos => {
+        console.log('txInfo', txInfos);
+        this.setState({ data: txInfos.txInfos })
+      })
+      .catch(error => {
+        console.log('txInfo error', error)
+        ToastUtil.showErrorMsgLong(error)
+      })
   }
 
   _renameAccount() {
@@ -816,7 +826,7 @@ const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
   account: state.AccountReducer.account,
-  accountCurrentUnit: state.AccountReducer.unit
+  accountCurrentUnit: state.AccountReducer.accountCurrentUnit
 })
 
 const AccountDetail = connect(mapStateToProps)(AccountDetailPage)

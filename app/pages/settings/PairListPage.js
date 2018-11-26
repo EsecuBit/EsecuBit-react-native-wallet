@@ -48,11 +48,12 @@ export default class PairListPage extends React.Component {
       await _that.setState({ deviceList: [] })
       _that._findDefaultDevice()
     })
+   
   }
 
   _listenTransmitter() {
     let _that = this
-    _that.transmitter.listenStatus(async (error, status, pairCode) => {
+    _that.transmitter.listenStatus(async (error, status) => {
       console.log('connect status', error, status)
       if (error !== D.error.succeed) {
         ToastUtil.showLong('connectFailed')
@@ -61,16 +62,6 @@ export default class PairListPage extends React.Component {
       }
       if (status === BtTransmitter.connecting) {
         _that.setState({ connectDialogVisible: true })
-        return
-      }
-      if (status === BtTransmitter.authenticating && pairCode !== '') {
-        console.log('authenticating', pairCode)
-        _that.setState({ connectDialogVisible: false })
-        _that.setState({ pairCode: pairCode, authenticateDialogVisible: true })
-        return
-      }
-      if (status === BtTransmitter.authenticated) {
-        _that.setState({ authenticateDialogVisible: false })
         return
       }
       if (status === BtTransmitter.disconnected) {
@@ -82,19 +73,32 @@ export default class PairListPage extends React.Component {
         return
       }
       if (status === BtTransmitter.connected) {
-        console.log('device connected')
-        _that.transmitter.stopScan()
-        _that.setState({ connectDialogVisible: false })
-        console.log('connected device info', this.connectDeviceInfo)
-        PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [NavigationActions.navigate({ routeName: 'Splash' })]
-        })
-        _that.props.navigation.dispatch(resetAction)
+        _that._gotoSyncPage()
         return
       }
     })
+  }
+
+  async _gotoSyncPage() {
+    console.log('device connected')
+    this.transmitter.stopScan()
+    this.setState({ connectDialogVisible: false })
+    console.log('connected device info', this.connectDeviceInfo)
+    await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
+    await this.wallet._init(pairCode => {
+      console.log('show pairCode', pairCode);
+      if (pairCode) {
+        this.setState({ connectDialogVisible: false })
+        this.setState({ pairCode: pairCode, authenticateDialogVisible: true })
+      }else {
+        this.setState({ authenticateDialogVisible: false })
+      }
+    })
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: 'Splash' })]
+    })
+    this.props.navigation.dispatch(resetAction)
   }
 
   _findDefaultDevice() {
@@ -169,11 +173,11 @@ export default class PairListPage extends React.Component {
     }
     return (
       <Container style={CommonStyle.layoutBottom}>
-        <View style={{ height: bgHeight }}>
+        <View style={{ height: bgHeight, justifyContent: 'center', alignItems: 'center' }}>
           <Image
             source={require('../../imgs/bg_home.png')}
             resizeMode={'stretch'}
-            style={{ height: bgHeight }}>
+            style={{ height: bgHeight, alignContent: 'center', alignItems: 'center'}}>
             <View style={{ height: height }}>
               <View
                 style={{
@@ -208,7 +212,6 @@ export default class PairListPage extends React.Component {
             </View>
             <View
               style={{
-                marginLeft: deviceW * 0.37,
                 marginTop: Dimen.MARGIN_VERTICAL
               }}>
               <Image
@@ -218,16 +221,28 @@ export default class PairListPage extends React.Component {
             </View>
             <View
               style={{
-                marginLeft: I18n.locale === 'zh-Hans-CN' ? deviceW * 0.37 : deviceW * 0.14
+                
               }}>
               <Text
                 style={{
+                  textAlignVertical: 'center',
+                  textAlign: 'center',
                   color: Color.TEXT_ICONS,
                   fontSize: 25,
                   marginTop: 30,
                   backgroundColor: 'transparent'
                 }}>
                 {I18n.t('pairDevice')}
+              </Text>
+              <Text
+                style={{
+                  textAlignVertical: 'center',
+                  textAlign: 'center',
+                  color: Color.TEXT_ICONS,
+                  marginTop: Dimen.SPACE,
+                  backgroundColor: 'transparent'
+                }}>
+                {I18n.t('pairDeviceTip')}
               </Text>
             </View>
           </Image>

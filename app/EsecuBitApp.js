@@ -15,7 +15,7 @@ export default class EsecuBitApp extends React.Component {
     // test net
     D.test.coin = true
     // enable hardware wallet, default software wallet
-    D.test.jsWallet = true
+    D.test.jsWallet = false
     Provider.DB = RealmDB
     Provider.Transmitters.push(BtTransmitter)
     this.wallet = new EsWallet()

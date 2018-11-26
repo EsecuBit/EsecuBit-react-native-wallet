@@ -105,13 +105,12 @@ RCT_EXPORT_METHOD(disconnect)
 }
 
 RCT_EXPORT_METHOD(sendApdu:(NSString *)apdu
-                  isEnc:(BOOL) isEnc
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
   dispatch_async(dispatch_get_global_queue(0, 0), ^{
     NSData *apduData = [NSData fromHex:apdu];
-    NSData *response = [self.wallet sendAPDUWithData:apduData secure:isEnc];
+    NSData *response = [self.wallet sendAPDUWithData:apduData secure:false];
     UInt32 error = [self.wallet getLastNativeErrorCode];
     if (error != 0) {
       // TODO UPDATE newest react0native version, reject has only one argument

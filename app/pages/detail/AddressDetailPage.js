@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   addressText: {
     marginHorizontal: Dimen.MARGIN_HORIZONTAL,
     marginTop: Dimen.SPACE,
-    height: 45
+    height: 50,
   },
   remindText: {
     marginHorizontal: Dimen.MARGIN_HORIZONTAL,

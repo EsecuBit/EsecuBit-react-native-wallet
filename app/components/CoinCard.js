@@ -40,10 +40,22 @@ class CoinCard extends PureComponent {
     }
   }
 
+  _getAccountCurrencyUnit(coinType) {
+    coinType = CoinUtil.getRealCoinType(coinType)
+    switch (coinType) {
+      case Coin.btc:
+        return this.props.btcUnit
+      case Coin.eth:
+        return this.props.ethUnit
+      case Coin.eos:
+        return this.props.eosUnit
+    }
+  }
+
   render() {
     const { data } = this.props
     let fromUnit = CoinUtil.getMinimumUnit(data.coinType)
-    let toUnit = CoinUtil.getDefaultUnit(data.coinType)
+    let toUnit = this._getAccountCurrencyUnit(data.coinType)
     let cryptoCurrencyBalance = this.wallet.convertValue(
       data.coinType,
       data.balance,
