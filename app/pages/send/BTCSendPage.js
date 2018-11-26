@@ -45,7 +45,9 @@ class BTCSendPage extends React.Component {
       sendDialogVisible: false,
       remarks: '',
       transactionFee: '0',
-      deviceLimitDialogVisible: false
+      deviceLimitDialogVisible: false,
+      transactionConfirmDialogVisible: false,
+      transactionConfirmDesc: '',
     }
   }
 
@@ -321,11 +323,17 @@ class BTCSendPage extends React.Component {
     }
   }
 
-  _send() {
+  _confirmTransaction() {
     if (this.lockSend || !this._checkFormData()) {
       console.log('asd', this.lockSend, !this._checkFormData())
       return
     }
+    this.setState({transactionConfirmDesc: I18n.t('send') + this.state.sendValue +' ' + this.props.btcUnit + I18n.t('to1') + this.state.address})
+    this.setState({transactionConfirmDialogVisible: true})
+
+  }
+
+  _send() {
 
     let value = this.state.sendValue ? this.state.sendValue.trim() : '0'
     let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
@@ -606,7 +614,27 @@ class BTCSendPage extends React.Component {
             onPress={() => this.setState({ deviceLimitDialogVisible: false })}
           />
         </Dialog.Container>
-        <FooterButton onPress={this._send.bind(this)} title="Send" />
+        <Dialog.Container
+          visible={this.state.transactionConfirmDialogVisible}
+          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}
+        >
+          <Dialog.Title>{I18n.t("transactionConfirm")}</Dialog.Title>
+          <Dialog.Description>{this.state.transactionConfirmDesc}</Dialog.Description>
+          <Dialog.Button
+            style={{ color: Color.ACCENT }}
+            label={I18n.t("cancel")}
+            onPress={() => this.setState({transactionConfirmDialogVisible: false})}
+          />
+          <Dialog.Button
+            style={{ color: Color.ACCENT }}
+            label={I18n.t("confirm")}
+            onPress={() => {
+              this._send()
+              this.setState({transactionConfirmDialogVisible: false})
+            }}
+          />
+        </Dialog.Container>
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title="Send" />
       </Container>
     )
   }
