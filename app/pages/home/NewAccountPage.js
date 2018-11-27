@@ -8,10 +8,10 @@ import BtTransmitter from '../../device/BtTransmitter'
 import Dialog from 'react-native-dialog'
 import ProgressDialog from 'react-native-simple-dialogs/src/ProgressDialog'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-
+import BaseComponent from '../../components/BaseComponent'
 const platform = Platform.OS
 
-export default class NewAccountPage extends Component {
+export default class NewAccountPage extends BaseComponent {
   constructor(props) {
     super(props)
     this.deviceW = Dimensions.get('window').width

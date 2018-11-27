@@ -19,11 +19,12 @@ import ToastUtil from '../../utils/ToastUtil'
 import { ProgressDialog } from 'react-native-simple-dialogs'
 import { NavigationActions } from 'react-navigation'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
+import BaseComponent from '../../components/BaseComponent'
 const deviceW = Dimensions.get('window').width
 const deviceH = Dimensions.get('window').height
 const platform = Platform.OS
 
-export default class PairListPage extends React.Component {
+export default class PairListPage extends BaseComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -51,9 +52,11 @@ export default class PairListPage extends React.Component {
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
       if (error === D.error.succeed && status === D.status.authenticate) {
+        console.log('wallet authenticating');
         this.setState({authenticateDialogVisible: true, pairCode: pairCode})
       }
-      if(error === D.error.succeed && status === D.status.syncing) {
+      if(error === D.error.succeed && status === D.status.authenticated) {
+        console.log('wallet authenticated');
         this.setState({authenticateDialogVisible: false})
         const resetAction = NavigationActions.reset({
           index: 0,

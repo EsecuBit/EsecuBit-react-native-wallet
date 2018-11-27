@@ -5,9 +5,9 @@ import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color } from '../../common/Styles'
-
+import BaseComponent from '../../components/BaseComponent'
 const platform = Platform.OS
-export default class ScanQrCodePage extends Component {
+export default class ScanQrCodePage extends BaseComponent {
   constructor(props) {
     super(props)
     this.hadReceiveResult = false

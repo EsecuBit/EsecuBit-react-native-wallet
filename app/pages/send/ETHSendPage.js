@@ -27,10 +27,10 @@ import StringUtil from '../../utils/StringUtil'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
 import Dialog from 'react-native-dialog'
-
+import BaseComponent from '../../components/BaseComponent'
 const platform = Platform.OS
 
-class ETHSendPage extends React.Component {
+class ETHSendPage extends BaseComponent {
   constructor(props) {
     super(props)
     this.account = props.account

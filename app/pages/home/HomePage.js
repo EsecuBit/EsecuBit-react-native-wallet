@@ -35,10 +35,10 @@ import { setAccount } from '../../actions/AccountAction'
 import { connect } from 'react-redux'
 import CoinCard from '../../components/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
-
+import BaseComponent from '../../components/BaseComponent'
 const platform = Platform.OS
 
-class HomePage extends Component {
+class HomePage extends BaseComponent {
   constructor(props) {
     super(props)
     //offlineMode
@@ -97,9 +97,11 @@ class HomePage extends Component {
     this.props.navigation.addListener('willFocus', () => {
       if (platform === 'ios') {
         NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
+        
       }
       this._updateUI()
     })
+    
     //delay to check app version
     setTimeout(() => {
       this._checkVersion()
@@ -157,9 +159,9 @@ class HomePage extends Component {
     await this._getTotalLegalCurrencyBalance()
   }
 
-  _refreshAccounts() {
-    this.setState({ accounts: [] })
-    this._getAccounts()
+  async _refreshAccounts() {
+    await this.setState({ accounts: [] })
+    await this._getAccounts()
   }
 
   /**
@@ -168,16 +170,16 @@ class HomePage extends Component {
    */
   async _getAccounts() {
     try {
-      this.accounts = await this.wallet.getAccounts()
-      console.log(this.accounts )
-      if (Array.isArray(this.accounts ) && this.accounts .length === 0) {
-        this.accounts  = this.accountsCache
-        console.log('sdsdsd000', this.accounts , this.accountsCache)
+      let accounts = await this.wallet.getAccounts()
+      console.log('_getAccounts', accounts)
+      if (Array.isArray(accounts) && accounts.length === 0) {
+        accounts  = this.accountsCache
+        console.log('_getAccounts 1', accounts, this.accountsCache)
       } else if (Array.isArray(this.accountsCache) && this.accountsCache.length === 0) {
-        this.accountsCache = this.accounts 
-        console.log('asdadasd', this.accountsCache, this.accounts )
+        this.accountsCache = accounts 
+        console.log('_getAccounts cache', this.accountsCache, accounts )
       }
-      await this.setState({ accounts: this.accounts  })
+      await this.setState({ accounts: accounts })
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -186,7 +188,8 @@ class HomePage extends Component {
 
   _getTotalLegalCurrencyBalance() {
     let totalLegalCurrencyBalance = '0'
-    this.accounts.forEach(account => {
+    if(!this.state.accounts) return
+    this.state.accounts.forEach(account => {
       let fromUnit = CoinUtil.getMinimumUnit(account.coinType)
       let legalCurrencyBalance = this.wallet.convertValue(
         account.coinType,

@@ -26,12 +26,12 @@ import AppUtil from "../../utils/AppUtil"
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/SettingsAction"
 import { connect } from "react-redux"
 import CoinUtil from "../../utils/CoinUtil"
-
+import BaseComponent from '../../components/BaseComponent'
 const btcUnit = ["BTC", "mBTC"]
 const ethUnit = ["ETH", "GWei"]
 const platform = Platform.OS
 
-class SettingsPage extends Component {
+class SettingsPage extends BaseComponent {
   constructor(props) {
     super(props)
     this.state = {

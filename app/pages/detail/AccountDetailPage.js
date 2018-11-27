@@ -21,6 +21,7 @@ import AccountDetailHeader from '../../components/AccountDetailHeader'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import { Coin } from '../../common/Constants'
+import BaseComponent from '../../components/BaseComponent'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
@@ -28,7 +29,7 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 434
 const ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT = 520
 
-class AccountDetailPage extends React.Component {
+class AccountDetailPage extends BaseComponent {
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()

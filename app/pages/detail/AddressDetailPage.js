@@ -13,8 +13,8 @@ import I18n from '../../lang/i18n'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import { connect } from 'react-redux'
-
-class AddressDetailPage extends PureComponent {
+import BaseComponent from '../../components/BaseComponent'
+class AddressDetailPage extends BaseComponent {
   constructor(props) {
     super()
     this.state = {
@@ -64,7 +64,7 @@ class AddressDetailPage extends PureComponent {
           this.popupDialog = popupDialog
         }}
         width={0.8}
-        height={D.isBtc(this.coinType) ? 460 : 420}
+        height={D.isBtc(this.coinType) ? 465 : 425}
         containerStyle={{ backgroundColor: '#E0E0E0' }}
         onDismissed={() => this.props.navigation.pop()}>
         <View style={styles.qrCodeWrapper}>
