@@ -207,8 +207,10 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
             throw new EsException(error);
         }
 
-        int sw1sw2 = ((response[responseLength[0] - 1] & 0xff) << 8) +
-            (response[responseLength[0] - 2] & 0xff);
+        int sw1sw2 =  ((response[responseLength[0] - 2] & 0xff) << 8) + (response[responseLength[0] - 1] & 0xff);
+        if (sw1sw2 != 0x9000) {
+          throw new EsException(sw1sw2);
+        }
         byte[] responseNew = new byte[responseLength[0] - 2];
         System.arraycopy(response, 0, responseNew, 0, responseLength[0] - 2);
         return ByteUtil.bytesToHex(responseNew);

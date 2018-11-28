@@ -3,19 +3,19 @@ import { D } from 'esecubit-wallet-sdk'
 const wrappers = {
   wraps (array) {
     if (!Array.isArray(array)) {
-      console.warn('try to unwrap a non-array object', array)
+      // console.warn('try to unwrap a non-array object', array)
       throw D.error.invalidParams
     }
-    console.warn('wrappers wraps');
+    // console.warn('wrappers wraps');
     return array.map(obj => this.wrap(obj))
   },
 
   unwraps (array) {
     if (!Array.isArray(array)) {
-      console.warn('try to unwrap a non-array object', array)
+      // console.warn('try to unwrap a non-array object', array)
       throw D.error.invalidParams
     }
-    console.warn('wrappers unwraps');
+    // console.warn('wrappers unwraps');
     return array.map(obj => this.unwrap(obj))
   }
 }
@@ -23,19 +23,19 @@ const wrappers = {
 const account = {
   wrap (account) {
     account = D.copy(account)
-    console.warn('wrap1', account);
+    // console.warn('wrap1', account);
     if (account.tokens) account.tokens = JSON.stringify(account.tokens)
     if (account.resources) account.resources = JSON.stringify(account.resources)
-    console.warn('wrap2', account);
+    // console.warn('wrap2', account);
     return account
   },
 
   unwrap (account) {
     account = D.copy(account)
-    console.warn('account unwrap1', account.tokens, JSON.parse(account.tokens));
+    // console.warn('account unwrap1', account.tokens, JSON.parse(account.tokens));
     if (account.tokens) account.tokens = JSON.parse(account.tokens)
     if (account.resources) account.resources = JSON.parse(account.resources)
-    console.warn('account unwrap2', account);
+    // console.warn('account unwrap2', account);
     return account
   }
 }
