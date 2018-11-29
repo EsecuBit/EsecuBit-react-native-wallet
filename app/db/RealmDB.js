@@ -98,10 +98,11 @@ class RealmDB extends IDatabase {
   }
 
   getTxInfos(filter = {}) {
+    console.log('ab');
     let filterQuery = RealmDB.makeQuery(filter)
     return Realm.open(this._config)
       .then(realm => {
-        let txInfos = realm.objects('TxInfo').filtered(filterQuery)
+        let txInfos = realm.objects('TxInfo').filtered(filterQuery).slice()
         return wrapper.txInfo.unwraps(txInfos)
       })
   }

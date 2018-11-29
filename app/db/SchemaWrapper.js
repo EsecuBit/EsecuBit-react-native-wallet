@@ -3,7 +3,7 @@ import { D } from 'esecubit-wallet-sdk'
 const wrappers = {
   wraps (array) {
     if (!Array.isArray(array)) {
-      // console.warn('try to unwrap a non-array object', array)
+      console.warn('try to unwrap a non-array object', array)
       throw D.error.invalidParams
     }
     // console.warn('wrappers wraps');
@@ -12,7 +12,7 @@ const wrappers = {
 
   unwraps (array) {
     if (!Array.isArray(array)) {
-      // console.warn('try to unwrap a non-array object', array)
+      console.warn('try to unwrap a non-array object', array)
       throw D.error.invalidParams
     }
     // console.warn('wrappers unwraps');
