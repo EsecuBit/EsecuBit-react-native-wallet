@@ -51,11 +51,11 @@ export default class PairListPage extends BaseComponent {
     })
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
-      if (error === D.error.succeed && status === D.status.authenticate) {
+      if (error === D.error.succeed && status === D.status.auth) {
         console.log('wallet authenticating');
         this.setState({authenticateDialogVisible: true, pairCode: pairCode})
       }
-      if(error === D.error.succeed && status === D.status.authenticated) {
+      if(error === D.error.succeed && status === D.status.authFinish) {
         console.log('wallet authenticated');
         this.setState({authenticateDialogVisible: false})
         const resetAction = NavigationActions.reset({

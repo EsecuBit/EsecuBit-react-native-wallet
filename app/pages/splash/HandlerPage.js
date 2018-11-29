@@ -68,19 +68,16 @@ class HandlerPage extends Component {
           console.warn("offlineModeNotAllowed")
           return
         }
-        if (e === D.error.offlineModeUnnecessary) {
+        if (e === D.error.offlineModeUnnecessary || 
+          e === D.error.networkProviderError || 
+          e === D.error.networkUnavailable || 
+          e === D.error.invalidParams || 
+          e === D.error.unknown)  {
           console.warn("offlineModeUnnecessary")
           this.props.navigation.replace("Home", { offlineMode: true })
-          return
-        }
-        if (e === D.error.networkProviderError) {
-          console.warn("networkProviderError")
-          this.props.navigation.replace("Home", { offlineMode: true })
-          return
-        }
-        if (e === D.error.networkUnavailable) {
-          console.warn("networkUnavailable")
-          this.props.navigation.replace("Home", { offlineMode: true })
+          if(e === D.error.unknown) {
+            ToastUtil.showErrorMsgShort(e)
+          }
           return
         }
         console.warn("other error, stop", e)
