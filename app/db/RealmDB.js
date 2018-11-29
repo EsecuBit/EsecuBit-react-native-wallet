@@ -101,12 +101,8 @@ class RealmDB extends IDatabase {
     let filterQuery = RealmDB.makeQuery(filter)
     return Realm.open(this._config)
       .then(realm => {
-        let allTxs = realm.objects('TxInfo').filtered(filterQuery).sorted('time', true)
-        let total = allTxs.length
-        let startIndex = filter.startIndex || 0
-        let endIndex = filter.endIndex || total
-        let txInfos = wrapper.txInfo.unwraps(allTxs.slice(startIndex, endIndex))
-        return { total, txInfos }
+        let txInfos = realm.objects('TxInfo').filtered(filterQuery)
+        return wrapper.txInfo.unwraps(txInfos)
       })
   }
 
