@@ -26,7 +26,6 @@ export default class NewAccountPage extends BaseComponent {
     this.wallet = new EsWallet()
     this.newAccountName = ''
     this._newAccount.bind(this)
-
   }
 
   /**
@@ -49,11 +48,34 @@ export default class NewAccountPage extends BaseComponent {
       return
     }
 
-    setTimeout(() => {
-      console.log('setTimeout1=====')
-      this.setState({ newAccountWaitDialog: true })
-    }, 400)
-      
+    //just for iOS
+    if (platform === 'ios') {
+      let accounts = []
+      let isNeedDialog = true
+
+      //all account
+      accounts = await this.wallet.getAccounts()
+      //accounts of selected coinType
+      let coinAccount = []
+      accounts.map(it => {
+        if (coinType.indexOf(it.coinType) != -1) {
+          coinAccount.push(it)
+        }
+      })
+      coinAccount.map(item => {
+        if (item.txInfos.length === 0) {
+          isNeedDialog = false
+        }
+      })
+
+      if (isNeedDialog) {
+        setTimeout(() => {
+          console.log('setTimeout1=====')
+          this.setState({ newAccountWaitDialog: true })
+        }, 400)
+      }
+    }
+
     try {
       if (platform !== 'ios') {
         await this.setState({ newAccountWaitDialog: true })
@@ -86,7 +108,7 @@ export default class NewAccountPage extends BaseComponent {
     let coinType = ''
     let isSupportBTC = false
     this.supportCoinType.map(it => {
-      console.log('new account it', it);
+      console.log('new account it', it)
       if (it.startsWith('btc')) {
         isSupportBTC = true
         coinType = it
@@ -97,8 +119,8 @@ export default class NewAccountPage extends BaseComponent {
         button
         style={CommonStyle.cardStyle}
         onPress={() => {
-          console.log('new btc account');
-          
+          console.log('new btc account')
+
           this.setState({ newAccountDialogVisible: true })
           this.newAccountType = coinType
         }}>
@@ -113,9 +135,9 @@ export default class NewAccountPage extends BaseComponent {
         <Right>
           <TouchableOpacity
             onPress={() => {
-              console.log('new eth account');
+              console.log('new eth account')
               this.setState({ newAccountDialogVisible: true })
-              this.newAccountType = this.btcCoinType
+              this.newAccountType = coinType
             }}>
             <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
           </TouchableOpacity>
@@ -131,7 +153,7 @@ export default class NewAccountPage extends BaseComponent {
     this.supportCoinType.map(it => {
       if (it.startsWith('eth')) {
         isSupportETH = true
-        coinType= it
+        coinType = it
       }
     })
     return isSupportETH ? (
@@ -154,7 +176,7 @@ export default class NewAccountPage extends BaseComponent {
           <TouchableOpacity
             onPress={() => {
               _that.setState({ newAccountDialogVisible: true })
-              this.newAccountType = this.ethCoinType
+              this.newAccountType = coinType
             }}>
             <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
           </TouchableOpacity>
