@@ -217,6 +217,7 @@ export default class NewAccountPage extends BaseComponent {
           <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
           <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>
           <Dialog.Input
+            maxLength={7}
             selectionColor={Color.ACCENT}
             underlineColorAndroid="#EBBD36"
             onChangeText={text => (_that.newAccountName = text)}

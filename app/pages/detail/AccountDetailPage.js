@@ -497,13 +497,25 @@ class AccountDetailPage extends BaseComponent {
         this.props.navigation.navigate('EOSKeyDetail')
         break
       case 'renameAccount':
-        this.setState({ renameDialogVisible: true })
+        this._showRenameDialog()
         break
       case 'vote':
         this.props.navigation.navigate('EOSVote')
         break
       default:
         break
+    }
+  }
+
+  _showRenameDialog() {
+    let _that = this
+    if(platform === 'ios') {
+      // iOS render is too fast
+      setTimeout(() => {
+        _that.setState({renameDialogVisible: true})
+      }, 400)
+    }else {
+      _that.setState({renameDialogVisible: true})
     }
   }
 
@@ -519,6 +531,7 @@ class AccountDetailPage extends BaseComponent {
           <Dialog.Title>{I18n.t('renameAccount')}</Dialog.Title>
           <Dialog.Description>{I18n.t('renameAccountHint')}</Dialog.Description>
           <Dialog.Input
+            maxLength={7}
             selectionColor={Color.ACCENT}
             underlineColorAndroid={Color.ACCENT}
             onChangeText={text => (this.renameAccountname = text)}
