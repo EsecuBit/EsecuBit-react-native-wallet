@@ -1,22 +1,8 @@
 import React from 'react'
-import {
-  View,
-  Platform,
-  DeviceEventEmitter,
-  TouchableOpacity
-} from 'react-native'
+import { View, Platform, DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Dropdown } from 'react-native-material-dropdown'
-import {
-  Container,
-  Content,
-  Icon,
-  Text,
-  Card,
-  CardItem,
-  Item,
-  Input
-} from 'native-base'
+import { Container, Content, Icon, Text, Card, CardItem, Item, Input } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import { MaterialDialog } from 'react-native-material-dialog'
@@ -64,13 +50,13 @@ class ETHSendPage extends BaseComponent {
       remarks: '',
       transactionFee: '0',
       transactionConfirmDialogVisible: false,
-      transactionConfirmDesc: '',
+      transactionConfirmDesc: ''
     }
     this._buildETHSendForm.bind(this)
   }
 
   _fillResendData() {
-    const { params }= this.props.navigation.state
+    const { params } = this.props.navigation.state
     if (params) {
       this.txInfo = params.txInfo
     }
@@ -149,12 +135,8 @@ class ETHSendPage extends BaseComponent {
       const json = {}
       // eth fee Unit convert to gWei
       let feeValue =
-        this.esWallet.convertValue(
-          coinType,
-          feeValues[i],
-          D.unit.eth.Wei,
-          D.unit.eth.GWei
-        ) + D.unit.eth.GWei
+        this.esWallet.convertValue(coinType, feeValues[i], D.unit.eth.Wei, D.unit.eth.GWei) +
+        D.unit.eth.GWei
       json.value = I18n.t(feeKeys[i]) + '( ' + feeValue + ' / byte )'
       this.state.feesTip.push(json)
     }
@@ -208,10 +190,7 @@ class ETHSendPage extends BaseComponent {
    */
   _maxAmount() {
     console.log('maxAmount Fee before', this.state.selectedFee)
-    if (
-      this.state.selectedFee === '' &&
-      this.state.currentFeeType === 'standard'
-    ) {
+    if (this.state.selectedFee === '' && this.state.currentFeeType === 'standard') {
       this.setState({ selectedFee: this.state.fees[0] })
     }
     let fee = this.state.selectedFee ? this.state.selectedFee.toString() : '0'
@@ -243,9 +222,7 @@ class ETHSendPage extends BaseComponent {
       .prepareTx(formData)
       .then(result => {
         console.log('_maxAmount result', result)
-        let fromUnit = D.isBtc(this.coinType)
-          ? D.unit.btc.satoshi
-          : D.unit.eth.Wei
+        let fromUnit = D.isBtc(this.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
         let value = this.esWallet.convertValue(
           this.coinType,
           result.output.value,
@@ -291,10 +268,7 @@ class ETHSendPage extends BaseComponent {
     }
     value = this._toMinimumUnit(value)
 
-    if (
-      this.state.selectedFee === '' &&
-      this.state.currentFeeType === 'standard'
-    ) {
+    if (this.state.selectedFee === '' && this.state.currentFeeType === 'standard') {
       this.setState({ selectedFee: this.state.fees[0] })
     }
     let fee = this.state.selectedFee ? this.state.selectedFee + '' : '0'
@@ -316,9 +290,7 @@ class ETHSendPage extends BaseComponent {
       .prepareTx(formData)
       .then(value => {
         console.log('_calculateTotalCost result', value)
-        let fromUnit = D.isBtc(this.coinType)
-          ? D.unit.btc.satoshi
-          : D.unit.eth.Wei
+        let fromUnit = D.isBtc(this.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
         let legalCurrencyResult = this.esWallet.convertValue(
           this.coinType,
           value.total,
@@ -337,9 +309,7 @@ class ETHSendPage extends BaseComponent {
           fromUnit,
           this.cryptoCurrencyUnit
         )
-        legalCurrencyResult = StringUtil.formatLegalCurrency(
-          Number(legalCurrencyResult).toFixed(2)
-        )
+        legalCurrencyResult = StringUtil.formatLegalCurrency(Number(legalCurrencyResult).toFixed(2))
         this.setState({
           totalCostLegalCurrency: legalCurrencyResult,
           totalCostCryptoCurrency: cryptoCurrencyResult,
@@ -365,12 +335,7 @@ class ETHSendPage extends BaseComponent {
   }
 
   gWeiToWei(value) {
-    return this.esWallet.convertValue(
-      this.coinType,
-      value,
-      D.unit.eth.GWei,
-      D.unit.eth.Wei
-    )
+    return this.esWallet.convertValue(this.coinType, value, D.unit.eth.GWei, D.unit.eth.Wei)
   }
 
   _checkValue(value) {
@@ -394,17 +359,24 @@ class ETHSendPage extends BaseComponent {
       console.log('asd', this.lockSend, !this._checkFormData())
       return
     }
-    this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.ethUnit + " "+ I18n.t('to1') +" "+ this.state.address})
-    this.setState({transactionConfirmDialogVisible: true})
-
+    this.setState({
+      transactionConfirmDesc:
+        I18n.t('send') +
+        ' ' +
+        this.state.sendValue +
+        ' ' +
+        this.props.ethUnit +
+        ' ' +
+        I18n.t('to1') +
+        ' ' +
+        this.state.address
+    })
+    this.setState({ transactionConfirmDialogVisible: true })
   }
 
   _send() {
-
     let value = this.state.sendValue ? this.state.sendValue.trim() : '0'
-    let fee = this.state.selectedFee
-      ? this.state.selectedFee.toString().trim()
-      : '0'
+    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
     let gasLimit = this.state.gasLimit ? this.state.gasLimit.trim() : '0'
     let data = this.state.ethData ? this.state.ethData.trim() : ''
     value = this._toMinimumUnit(value)
@@ -412,7 +384,14 @@ class ETHSendPage extends BaseComponent {
       fee = this.gWeiToWei(fee)
     }
     let formData = this._buildETHSendForm(fee, value, gasLimit, data)
-    this.setState({ sendDialogVisible: true })
+    // iOS render is too fast
+    if (platform === 'ios') {
+      setTimeout(() => {
+        this.setState({ sendDialogVisible: true })
+      }, 400)
+    } else {
+      this.setState({ sendDialogVisible: true })
+    }
     this.lockSend = true
     console.log('_send formData', formData)
     this.account
@@ -469,12 +448,7 @@ class ETHSendPage extends BaseComponent {
 
   _toMinimumUnit(value) {
     let toUnit = D.isBtc(this.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-    return this.esWallet.convertValue(
-      this.coinType,
-      value,
-      this.cryptoCurrencyUnit,
-      toUnit
-    )
+    return this.esWallet.convertValue(this.coinType, value, this.cryptoCurrencyUnit, toUnit)
   }
 
   render() {
@@ -491,21 +465,13 @@ class ETHSendPage extends BaseComponent {
                 numberOfLines: 3,
                 marginHorizontal: Dimen.SPACE
               }}>
-              {I18n.t('balance') +
-                ': ' +
-                this.state.balance +
-                ' ' +
-                this.cryptoCurrencyUnit}
+              {I18n.t('balance') + ': ' + this.state.balance + ' ' + this.cryptoCurrencyUnit}
             </Text>
           </View>
           <Card style={{ marginLeft: 0, marginRight: 0 }}>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('address')}
                 </Text>
                 <Input
@@ -527,11 +493,7 @@ class ETHSendPage extends BaseComponent {
             </CardItem>
             <CardItem>
               <Item inlineLabel>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('value')}
                 </Text>
                 <Input
@@ -548,13 +510,9 @@ class ETHSendPage extends BaseComponent {
                   value={this.state.sendValue.toString()}
                   returnKeyType="done"
                   onChangeText={text =>
-                    this._calculateSendValue(text).catch(err =>
-                      console.log(err)
-                    )
+                    this._calculateSendValue(text).catch(err => console.log(err))
                   }
-                  keyboardType={
-                    platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'
-                  }
+                  keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
                   blurOnSubmit={true}
                 />
                 <TouchableOpacity
@@ -576,11 +534,7 @@ class ETHSendPage extends BaseComponent {
             </CardItem>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   GasPrice
                 </Text>
                 {this.state.currentFeeType === 'standard' ? (
@@ -591,10 +545,7 @@ class ETHSendPage extends BaseComponent {
                     itemTextStyle={{ textAlign: 'center', flex: 0 }}
                     fontSize={14}
                     onChangeText={(value, index) =>
-                      this._calculateETHFee(
-                        this.state.fees[index],
-                        this.state.gasLimit
-                      )
+                      this._calculateETHFee(this.state.fees[index], this.state.gasLimit)
                     }
                   />
                 ) : (
@@ -603,12 +554,8 @@ class ETHSendPage extends BaseComponent {
                     value={this.state.selectedFee}
                     ref={refs => (this.feeInput = refs)}
                     placeholder="GWei per byte"
-                    onChangeText={text =>
-                      this._calculateETHFee(text, this.state.gasLimit)
-                    }
-                    keyboardType={
-                      platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'
-                    }
+                    onChangeText={text => this._calculateETHFee(text, this.state.gasLimit)}
+                    keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
                     blurOnSubmit={true}
                     returnKeyType="done"
                   />
@@ -623,23 +570,15 @@ class ETHSendPage extends BaseComponent {
             </CardItem>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   GasLimit
                 </Text>
                 <Input
                   selectionColor={Color.ACCENT}
                   ref={refs => (this.gasLimitInput = refs)}
                   placeholder={I18n.t('gasLimitTip')}
-                  onChangeText={text =>
-                    this._calculateETHFee(this.state.selectedFee, text)
-                  }
-                  keyboardType={
-                    platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'
-                  }
+                  onChangeText={text => this._calculateETHFee(this.state.selectedFee, text)}
+                  keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
                   blurOnSubmit={true}
                   value={this.state.gasLimit}
                   returnKeyType="done"
@@ -648,13 +587,7 @@ class ETHSendPage extends BaseComponent {
             </CardItem>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
-                  Data
-                </Text>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>Data</Text>
                 <Input
                   selectionColor={Color.ACCENT}
                   multiline={true}
@@ -674,11 +607,7 @@ class ETHSendPage extends BaseComponent {
             </CardItem>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('remarks')}
                 </Text>
                 <Input
@@ -699,38 +628,24 @@ class ETHSendPage extends BaseComponent {
               </Item>
             </CardItem>
             <CardItem>
-              <Text
-                style={[
-                  CommonStyle.secondaryText,
-                  { marginRight: Dimen.SPACE }
-                ]}>
+              <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                 {I18n.t('transactionFee')}
               </Text>
               <View style={{ flex: 1, marginLeft: 32 }}>
-                <View
-                  style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <Text>{this.state.transactionFee + ' '}</Text>
-                  <Text style={{ textAlignVertical: 'center' }}>
-                    {this.cryptoCurrencyUnit}
-                  </Text>
+                  <Text style={{ textAlignVertical: 'center' }}>{this.cryptoCurrencyUnit}</Text>
                 </View>
               </View>
             </CardItem>
             <CardItem>
-              <Text
-                style={[
-                  CommonStyle.secondaryText,
-                  { marginRight: Dimen.SPACE }
-                ]}>
+              <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                 {I18n.t('totalCost')}
               </Text>
               <View style={{ flex: 1, marginLeft: 32 }}>
-                <View
-                  style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <Text>{this.state.totalCostCryptoCurrency + ' '}</Text>
-                  <Text style={{ textAlignVertical: 'center' }}>
-                    {this.cryptoCurrencyUnit}
-                  </Text>
+                  <Text style={{ textAlignVertical: 'center' }}>{this.cryptoCurrencyUnit}</Text>
                 </View>
                 <View
                   style={{
@@ -761,32 +676,29 @@ class ETHSendPage extends BaseComponent {
             title={I18n.t('transacting')}
             visible={this.state.sendDialogVisible}
             onCancel={() => {}}>
-            <Text style={{ color: Color.PRIMARY_TEXT }}>
-              {I18n.t('pleaseInputPassword')}
-            </Text>
+            <Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text>
           </MaterialDialog>
         </Content>
         <Dialog.Container
           visible={this.state.transactionConfirmDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}
-        >
-          <Dialog.Title>{I18n.t("transactionConfirm")}</Dialog.Title>
+          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
+          <Dialog.Title>{I18n.t('transactionConfirm')}</Dialog.Title>
           <Dialog.Description>{this.state.transactionConfirmDesc}</Dialog.Description>
           <Dialog.Button
             style={{ color: Color.ACCENT }}
-            label={I18n.t("cancel")}
-            onPress={() => this.setState({transactionConfirmDialogVisible: false})}
+            label={I18n.t('cancel')}
+            onPress={() => this.setState({ transactionConfirmDialogVisible: false })}
           />
           <Dialog.Button
             style={{ color: Color.ACCENT }}
-            label={I18n.t("confirm")}
+            label={I18n.t('confirm')}
             onPress={() => {
               this._send()
-              this.setState({transactionConfirmDialogVisible: false})
+              this.setState({ transactionConfirmDialogVisible: false })
             }}
           />
         </Dialog.Container>
-        <FooterButton onPress={this._confirmTransaction.bind(this)} title='Send'/>
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title="Send" />
       </Container>
     )
   }

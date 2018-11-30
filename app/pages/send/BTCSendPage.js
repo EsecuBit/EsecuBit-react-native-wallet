@@ -307,7 +307,7 @@ class BTCSendPage extends BaseComponent {
       })
       .catch(error => {
         console.warn('_calculateTotalCost error', error)
-        ToastUtil.showErrorMsg(error)
+        ToastUtil.showErrorMsgShort(error)
       })
   }
 
@@ -334,12 +334,20 @@ class BTCSendPage extends BaseComponent {
   }
 
   _send() {
-
     let value = this.state.sendValue ? this.state.sendValue.trim() : '0'
     let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
     value = this._toMinimumUnit(value)
     let formData = this._buildBTCSendForm(fee, value)
-    this.setState({ sendDialogVisible: true })
+
+    // iOS render is too fast
+    if(platform === 'ios') {
+      setTimeout(() => {
+        this.setState({ sendDialogVisible: true })
+      }, 400)
+    }else{
+      this.setState({ sendDialogVisible: true })
+    }
+
     this.lockSend = true
     console.log('_send formData', formData)
     this.account
