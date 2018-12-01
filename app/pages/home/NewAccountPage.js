@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StatusBar, View, Text, Dimensions, TouchableOpacity, Platform } from 'react-native'
+import {StatusBar, View, Text, Dimensions, TouchableOpacity, Platform, BackHandler} from 'react-native'
 import { Button, Container, Header, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
@@ -9,6 +9,7 @@ import Dialog from 'react-native-dialog'
 import ProgressDialog from 'react-native-simple-dialogs/src/ProgressDialog'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
 const platform = Platform.OS
 
 export default class NewAccountPage extends BaseComponent {
@@ -27,6 +28,19 @@ export default class NewAccountPage extends BaseComponent {
     this.newAccountName = ''
     this._newAccount.bind(this)
   }
+
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
 
   /**
    * only support new BTC account and ETH account

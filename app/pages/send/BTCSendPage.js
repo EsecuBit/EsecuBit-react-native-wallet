@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Platform, DeviceEventEmitter, TouchableOpacity } from 'react-native'
+import {View, Platform, DeviceEventEmitter, TouchableOpacity, BackHandler} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Dropdown } from 'react-native-material-dropdown'
 import { Container, Content, Icon, Text, Card, CardItem, Item, Input } from 'native-base'
@@ -13,6 +13,7 @@ import StringUtil from '../../utils/StringUtil'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
 import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
 const platform = Platform.OS
 
 class BTCSendPage extends BaseComponent {
@@ -79,7 +80,17 @@ class BTCSendPage extends BaseComponent {
     }
   }
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
+
   componentDidMount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
     this._initListener()
     this._getSuggestedFee().catch(err => {
       console.warn('getSuggestedFee error', err)

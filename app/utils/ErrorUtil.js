@@ -21,6 +21,7 @@ const errorMap = {
   109: 'pinError',
   110: 'operationTimeout',
   111: 'deviceNotInit',
+  114: 'deviceNotConnected',
   201: 'databaseOpenFailed',
   202: 'databaseExecFailed',
   301: 'lastAccountNoTransaction',

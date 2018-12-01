@@ -2,7 +2,6 @@ import { version, versionCode } from '../../package.json'
 import { EsWallet } from 'esecubit-wallet-sdk'
 import { Platform, BackAndroid, NativeModules } from 'react-native'
 import I18n from '../lang/i18n'
-import ToastUtil from './ToastUtil'
 import StringUtil from './StringUtil'
 import { D } from 'esecubit-wallet-sdk'
 import { Api } from '../common/Constants'
@@ -32,8 +31,8 @@ export default class AppUtil {
       return respsonse
     } catch (e) {
       console.log('checkUpdate error', e)
-      if (e !== D.error.deviceProtocol) {
-        // ToastUtil.showShort(e)
+      if(D.error.deviceNotConnected === e) {
+        throw e
       }
     }
   }

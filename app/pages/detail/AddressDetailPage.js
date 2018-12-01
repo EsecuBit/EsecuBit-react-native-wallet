@@ -3,7 +3,8 @@ import {
   View,
   StyleSheet,
   TouchableWithoutFeedback,
-  Clipboard
+  Clipboard,
+  BackHandler
 } from 'react-native'
 import { Text, CheckBox, Left, Body, Right } from 'native-base'
 import PopupDialog from 'react-native-popup-dialog'
@@ -14,6 +15,7 @@ import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import { connect } from 'react-redux'
 import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
 class AddressDetailPage extends BaseComponent {
   constructor(props) {
     super()
@@ -29,7 +31,17 @@ class AddressDetailPage extends BaseComponent {
   componentDidMount() {
     this.popupDialog.show()
     this._getAddress(this.state.storeAddress)
+    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
 
   async _handleStoreAddress() {
     await this.setState({ storeAddress: !this.state.storeAddress })

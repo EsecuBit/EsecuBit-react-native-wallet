@@ -97,7 +97,7 @@ export default {
   invalidAddressChecksum:'地址校验错误',
   valueIsDecimal:'交易的最小单位不能是小数',
   notImplemented:'功能未实现',
-  unknown:'未知错误',
+  unknown:'发生了未知错误',
   coinNotSupported:'不支持该币种',
   syncError: '网络无法连接，同步失败，请尝试连接网络后再同步',
   showAddressTip: '温馨提示： 请核对下面的地址与设备上的地址是否匹配',
@@ -156,5 +156,7 @@ export default {
   sell: '出售',
   language: '语言',
   transactionConfirm: '交易确认',
-  pairDeviceTip: '点击下面的序列号连接设备'
+  pairDeviceTip: '点击下面的序列号连接设备',
+  deviceNotConnected: '请先连接设备获取COS版本信息',
+  pleaseWait: '请稍等...'
 }

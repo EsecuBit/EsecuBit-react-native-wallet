@@ -7,7 +7,7 @@ import {
   Image,
   StatusBar,
   Dimensions,
-  Platform
+  Platform, BackHandler
 } from 'react-native'
 import { Container, List, ListItem, Button, Icon } from 'native-base'
 import I18n from '../../lang/i18n'
@@ -33,7 +33,8 @@ export default class PairListPage extends BaseComponent {
       connectDialogVisible: false,
       authenticateDialogVisible: false,
       refreshing: false,
-      scanText: ''
+      scanText: '',
+      waitingDialogVisible: false
     }
     this.transmitter = new BtTransmitter()
     this.wallet = new EsWallet()
@@ -41,7 +42,17 @@ export default class PairListPage extends BaseComponent {
     this.hasBackBtn = this.props.navigation.state.params.hasBackBtn
   }
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
+
   componentDidMount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
     let _that = this
     // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers 
     this.props.navigation.addListener('willFocus', async () => {
@@ -51,9 +62,13 @@ export default class PairListPage extends BaseComponent {
     })
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
-      if (error === D.error.succeed && status === D.status.auth) {
+      if (error === D.error.succeed && status === D.status.auth && pairCode) {
         console.log('wallet authenticating');
-        this.setState({authenticateDialogVisible: true, pairCode: pairCode})
+        if(pairCode) {
+          console.log('has receive pairCode');
+          this.setState({waitingDialogVisible: false})
+          this.setState({authenticateDialogVisible: true, pairCode: pairCode})
+        }
       }
       if(error === D.error.succeed && status === D.status.authFinish) {
         console.log('wallet authenticated');
@@ -87,11 +102,11 @@ export default class PairListPage extends BaseComponent {
           connectDialogVisible: false
         })
         ToastUtil.showLong(I18n.t('disconnect'))
+        this._onRefresh()
         return
       }
-      if (status === BtTransmitter.connected) {
+      if(status === BtTransmitter.connected) {
         _that._gotoSyncPage()
-        return
       }
     })
   }
@@ -102,6 +117,7 @@ export default class PairListPage extends BaseComponent {
     this.setState({ connectDialogVisible: false })
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
+    this.setState({waitingDialogVisible: true})
   }
 
   _findDefaultDevice() {
@@ -273,9 +289,15 @@ export default class PairListPage extends BaseComponent {
           message={I18n.t('connecting')}
         />
         <Dialog.Container visible={this.state.authenticateDialogVisible}>
-          <Dialog.Title>{I18n.t('pairCode')}</Dialog.Title>
+          <Dialog.Title>{I18n.t('pairCode') }</Dialog.Title>
           <Dialog.Description>{this.state.pairCode}</Dialog.Description>
+          <Dialog.Description>{I18n.t('pleaseWait')}</Dialog.Description>
         </Dialog.Container>
+        <ProgressDialog
+          activityIndicatorColor={Color.ACCENT}
+          visible={this.state.waitingDialogVisible}
+          message={I18n.t('pleaseWait')}
+        />
       </Container>
     )
   }

@@ -11,7 +11,7 @@ export default {
   cryptoCurrency: 'Crypto Currency',
   btc: 'BTC',
   eth: 'ETH',
-  pairDevice: 'List Of Available  Device',
+  pairDevice: 'SCANNING...',
   device: 'Device',
   about: 'About',
   privacyPolicy: 'Privacy Policy',
@@ -155,6 +155,8 @@ export default {
   sell: 'Sell',
   language: 'Language',
   transactionConfirm: 'Transaction Confirm',
-  pairDeviceTip: 'Click the following SN to connect device'
+  pairDeviceTip: 'Connect Your Device',
+  deviceNotConnected: 'Please connect device to get cos version',
+  pleaseWait: 'Please Wait...'
 
 }

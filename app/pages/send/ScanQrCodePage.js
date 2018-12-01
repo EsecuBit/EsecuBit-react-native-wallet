@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { DeviceEventEmitter, Dimensions, Platform, View } from 'react-native'
+import {BackHandler, DeviceEventEmitter, Dimensions, Platform, View} from 'react-native'
 import { Container } from 'native-base'
 import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
@@ -7,6 +7,7 @@ import I18n from '../../lang/i18n'
 import { Color } from '../../common/Styles'
 import BaseComponent from '../../components/BaseComponent'
 const platform = Platform.OS
+import {NavigationActions} from 'react-navigation'
 export default class ScanQrCodePage extends BaseComponent {
   constructor(props) {
     super(props)
@@ -14,6 +15,20 @@ export default class ScanQrCodePage extends BaseComponent {
     this.isIPhone = platform === 'ios'
     this.deviceW = Dimensions.get('window').width
   }
+
+  componentDidMount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
+
   _qrCodeReceived(e) {
     if (!this.hadReceiveResult) {
       let _that = this

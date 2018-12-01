@@ -7,7 +7,7 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
-  Linking
+  Linking, BackHandler
 } from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
@@ -36,6 +36,7 @@ import { connect } from 'react-redux'
 import CoinCard from '../../components/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
 const platform = Platform.OS
 
 class HomePage extends BaseComponent {
@@ -60,6 +61,7 @@ class HomePage extends BaseComponent {
       updateVersionDialogVisible: false
     }
     this.deviceW = Dimensions.get('window').width
+   
   }
 
   componentWillMount() {
@@ -76,7 +78,14 @@ class HomePage extends BaseComponent {
 
   componentWillUnmount() {
     NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
   }
+
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
 
   _handleConnectivityChange(status) {
     if (platform === 'ios') {
@@ -106,6 +115,8 @@ class HomePage extends BaseComponent {
     setTimeout(() => {
       this._checkVersion()
     }, 3000)
+
+    BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
   }
 
   _checkVersion() {
@@ -124,7 +135,9 @@ class HomePage extends BaseComponent {
       })
       .catch(e => {
         console.log('checkVersion error', e)
-        ToastUtil.showErrorMsgShort(e)
+        if(D.error.deviceNotConnected !== e) {
+          ToastUtil.showErrorMsgShort(e)
+        }
       })
   }
 
@@ -171,14 +184,7 @@ class HomePage extends BaseComponent {
   async _getAccounts() {
     try {
       let accounts = await this.wallet.getAccounts()
-      console.log('_getAccounts', accounts)
-      if (Array.isArray(accounts) && accounts.length === 0) {
-        accounts  = this.accountsCache
-        console.log('_getAccounts 1', accounts, this.accountsCache)
-      } else if (Array.isArray(this.accountsCache) && this.accountsCache.length === 0) {
-        this.accountsCache = accounts 
-        console.log('_getAccounts cache', this.accountsCache, accounts )
-      }
+      console.log('accounts', accounts);
       await this.setState({ accounts: accounts })
     } catch (error) {
       console.warn('getAccounts', error)

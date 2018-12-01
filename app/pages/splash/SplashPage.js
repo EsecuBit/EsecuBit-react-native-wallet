@@ -24,10 +24,10 @@ export default class SplashPage extends Component {
     let _that = this
     this.wallet.listenStatus(async (error, status) => {
       console.log('wallet status', error, status)
-      if (error === D.error.networkUnavailable) {
-        console.log('networkUnavailable', error, status)
+      if (error === D.error.networkUnavailable || error === D.error.networkProviderError) {
+        console.log('networkUnavailable or networkProviderError error ', error, status)
         _that.setState({ syncDialogVisible: false })
-        ToastUtil.showLong(I18n.t('syncError'))
+        ToastUtil.showErrorMsgLong(error)
         _that.props.navigation.navigate('Home', { offlineMode: false })
       }
       if (error === D.error.deviceNotInit) {

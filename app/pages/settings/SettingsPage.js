@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { StyleSheet, View, StatusBar, Dimensions, Platform, Linking } from "react-native"
+import {StyleSheet, View, StatusBar, Dimensions, Platform, Linking, BackHandler} from "react-native"
 import {
   Container,
   Header,
@@ -27,6 +27,7 @@ import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/Setti
 import { connect } from "react-redux"
 import CoinUtil from "../../utils/CoinUtil"
 import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
 const btcUnit = ["BTC", "mBTC"]
 const ethUnit = ["ETH", "GWei"]
 const platform = Platform.OS
@@ -61,9 +62,18 @@ class SettingsPage extends BaseComponent {
     this.isConnected = false
     this.deviceW = Dimensions.get("window").width
   }
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
 
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
+  
   componentDidMount() {
     this._listenDeviceStatus()
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
   }
 
   _listenDeviceStatus() {
@@ -118,12 +128,8 @@ class SettingsPage extends BaseComponent {
   _checkVersion() {
     AppUtil.checkUpdate()
       .then(info => {
-        console.log("checkVersion", info)
         this.info = info
-        if (info === undefined) {
-          ToastUtil.showShort(I18n.t("connectDeviceToGetCOSVersion"))
-        }
-        if (info.errorCode === Api.success) {
+        if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
             this.setState({
               updateDesc: info.data.description,
@@ -133,8 +139,8 @@ class SettingsPage extends BaseComponent {
         }
       })
       .catch(e => {
-        console.log("checkVersion error", e)
-        ToastUtil.showShort(e)
+        console.log("setting checkVersion error", e)
+        ToastUtil.showErrorMsgShort(e)
       })
   }
 

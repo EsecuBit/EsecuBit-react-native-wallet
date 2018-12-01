@@ -5,9 +5,12 @@ import {
   RefreshControl,
   Dimensions,
   Platform,
-  TextInput} from 'react-native'
+  TextInput,
+  BackHandler
+} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
+import { NavigationActions } from 'react-navigation'
 import PopupDialog from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
@@ -55,7 +58,17 @@ class AccountDetailPage extends BaseComponent {
       console.log('listen TxInfo')
       _that._getTxInfos()
     })
+    BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
 
   async _gotoSendPage() {
     let deviceState = await this.transmitter.getState()
