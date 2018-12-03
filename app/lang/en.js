@@ -63,8 +63,8 @@ export default {
   normal: 'normal',
   economic: 'economic',
   //other
-  cancel: 'Cancel',
-  confirm: 'Confirm',
+  cancel: 'CANCEL',
+  confirm: 'CONFIRM',
   pairCode: 'Pair Code',
   connectFailed: 'Connect failed',
   //errormsg
@@ -114,7 +114,7 @@ export default {
   renameAccountHint: 'Please input new account name',
   isNotHexString: 'Data is not hex string',
   disconnectTip: 'After disconnecting, some features will not be available. Continue?',
-  pleaseConnectDeviceToSync: 'Please reconnect device to sync data',
+  pleaseConnectDeviceToSync: 'Please reconnect device to sync data after network connnected',
   emptyValueError: 'Value cannot be empty',
   emptyGasPriceError: 'GasPrice cannot be empty',
   getAddressError: 'Get address failed',

@@ -653,7 +653,7 @@ class BTCSendPage extends BaseComponent {
             }}
           />
         </Dialog.Container>
-        <FooterButton onPress={this._confirmTransaction.bind(this)} title="Send" />
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')} />
       </Container>
     )
   }

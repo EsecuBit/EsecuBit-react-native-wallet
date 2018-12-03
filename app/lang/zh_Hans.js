@@ -114,7 +114,7 @@ export default {
   renameAccountHint: '请输入新的账户名',
   isNotHexString: 'Data不符合格式',
   disconnectTip: '断开连接后，将无法使用部分功能，是否继续?',
-  pleaseConnectDeviceToSync: '请重新连接设备进行同步数据',
+  pleaseConnectDeviceToSync: '请连接网络后重新连接设备进行同步数据',
   emptyValueError: '金额不能为空',
   emptyGasPriceError: 'GasPrice不能为空',
   emptyGasLimitError: '',
