@@ -1,4 +1,4 @@
-import { version, versionCode } from '../../package.json'
+import { version, versionCode, cosVersion } from '../../package.json'
 import { EsWallet } from 'esecubit-wallet-sdk'
 import { Platform, BackAndroid, NativeModules } from 'react-native'
 import I18n from '../lang/i18n'
@@ -13,7 +13,7 @@ export default class AppUtil {
     let lang = I18n.locale === 'zh-Hans-CN' ? 'zh_CN' : 'en_US'
     try {
       let walletInfo = await wallet.getWalletInfo()
-      let cosVersion = walletInfo.cos_version
+      let cosVersion = cosVersion
       let respsonse = await fetch(Api.baseUrl + 'getNewApp', {
         method: 'POST',
         headers: {

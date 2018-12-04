@@ -16,7 +16,7 @@ import { SinglePickerMaterialDialog } from "react-native-material-dialog"
 import I18n from "../../lang/i18n"
 import { EsWallet, D } from "esecubit-wallet-sdk"
 import { version } from "../../../package.json"
-import { Unit, Api } from "../../common/Constants"
+import { Unit, Api, Coin } from "../../common/Constants"
 import PreferenceUtil from "../../utils/PreferenceUtil"
 import BtTransmitter from "../../device/BtTransmitter"
 import Dialog from "react-native-dialog"
@@ -27,7 +27,7 @@ import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from "../../actions/Setti
 import { connect } from "react-redux"
 import CoinUtil from "../../utils/CoinUtil"
 import BaseComponent from '../../components/BaseComponent'
-import {NavigationActions} from 'react-navigation'
+import { cosVersion} from '../../../package.json'
 const btcUnit = ["BTC", "mBTC"]
 const ethUnit = ["ETH", "GWei"]
 const platform = Platform.OS
@@ -38,7 +38,7 @@ class SettingsPage extends BaseComponent {
     this.state = {
       //version
       appVersion: version,
-      cosVersion: "1.0.0",
+      cosVersion: "1.0",
       //dialog
       legalCurrencyLabel: props.legalCurrencyUnit,
       legalCurrencyIndex: 0,
@@ -93,7 +93,7 @@ class SettingsPage extends BaseComponent {
     this.wallet
       .getWalletInfo()
       .then(value => {
-        this.setState({ cosVersion: value.cos_version })
+        this.setState({ cosVersion: cosVersion })
       })
       .catch(error => {
         console.warn("getWalletInfo Error", error)
@@ -103,13 +103,13 @@ class SettingsPage extends BaseComponent {
 
   _updateCurrencyPreference(key, value, index) {
     switch (key) {
-      case Unit.legalCurrency:
+      case Coin.legal:
         this.props.setLegalCurrencyUnit(value)
         break
-      case Unit.btc:
+      case Coin.btc:
         this.props.setCryptoCurrencyUnit("btc", value)
         break
-      case Unit.eth:
+      case Coin.eth:
         this.props.setCryptoCurrencyUnit("eth", value)
         break
       default:
@@ -322,7 +322,7 @@ class SettingsPage extends BaseComponent {
           onOk={result => {
             let label = result.selectedItem.label
             let index = result.selectedItem.value
-            this._updateCurrencyPreference(Unit.legalCurrency, label, index)
+            this._updateCurrencyPreference(Coin.legal, label, index)
             this.setState({
               legalCurrencyDialogVisible: false,
               legalCurrencyLabel: label,
@@ -345,7 +345,7 @@ class SettingsPage extends BaseComponent {
           onOk={result => {
             let label = result.selectedItem.label
             let index = result.selectedItem.value
-            this._updateCurrencyPreference(Unit.btc, label, index)
+            this._updateCurrencyPreference(Coin.btc, label, index)
             this.setState({
               btcDialogVisible: false,
               btcLabel: label,
@@ -368,7 +368,7 @@ class SettingsPage extends BaseComponent {
           onOk={result => {
             let label = result.selectedItem.label
             let index = result.selectedItem.value
-            this._updateCurrencyPreference(Unit.eth, label, index)
+            this._updateCurrencyPreference(Coin.eth, label, index)
             this.setState({
               ethDialogVisible: false,
               ethLabel: label,
