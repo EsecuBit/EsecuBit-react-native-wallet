@@ -5,8 +5,8 @@ import android.support.annotation.Nullable;
 import com.excelsecu.eshdwallet.EsHDWallet;
 import com.excelsecu.eshdwallet.IEsDeviceState;
 import com.excelsecu.eshdwallet.IEsHDWallet;
-import com.excelsecu.transmit.EsDevice;
 import com.excelsecu.transmit.EsException;
+import com.excelsecu.transmit.device.EsDevice;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -17,11 +17,9 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -132,7 +130,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
         mWorkExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                mEsWallet.connect(finalInfo.device.getName(), new IEsHDWallet.OnResponseListener<Boolean>() {
+                mEsWallet.connect(finalInfo.device, finalInfo.scanRecord, new IEsHDWallet.OnResponseListener<Boolean>() {
                     @Override
                     public void response(int error, Boolean isConnected) {
                         int status = isConnected ? STATUS_CONNECTED : STATUS_DISCONNECTED;
