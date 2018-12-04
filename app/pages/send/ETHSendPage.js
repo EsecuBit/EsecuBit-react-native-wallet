@@ -717,6 +717,7 @@ class ETHSendPage extends BaseComponent {
 
 const mapStateToProps = state => ({
   account: state.AccountReducer.account,
-  ethUnit: state.SettingsReducer.ethUnit
+  ethUnit: state.SettingsReducer.ethUnit,
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
 })
 export default connect(mapStateToProps)(ETHSendPage)

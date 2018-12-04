@@ -604,7 +604,7 @@ class BTCSendPage extends BaseComponent {
                       fontSize: Dimen.SECONDARY_TEXT,
                       textAlignVertical: 'center'
                     }}>
-                    {this.legalCurrencyUnit}
+                    {this.props.legalCurrencyUnit}
                   </Text>
                 </View>
               </View>
@@ -661,7 +661,8 @@ class BTCSendPage extends BaseComponent {
 
 const mapStateToProps = state => ({
   account: state.AccountReducer.account,
-  btcUnit: state.SettingsReducer.btcUnit
+  btcUnit: state.SettingsReducer.btcUnit,
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
 })
 
 const BTCSend = connect(mapStateToProps)(BTCSendPage)
