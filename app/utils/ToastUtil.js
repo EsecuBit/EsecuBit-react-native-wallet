@@ -1,8 +1,8 @@
 import { Toast } from 'native-base'
 import ErrorUtil from './ErrorUtil'
 
-const TOAST_SHORT_DURATION = 1000
-const TOAST_LONG_DURATION = 3000
+const TOAST_SHORT_DURATION = 2000
+const TOAST_LONG_DURATION = 4000
 
 class ToastUtil {
   static showLong(msg) {

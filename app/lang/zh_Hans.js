@@ -158,5 +158,6 @@ export default {
   transactionConfirm: '交易确认',
   pairDeviceTip: '点击下面的序列号连接设备',
   deviceNotConnected: '请先连接设备获取COS版本信息',
-  pleaseWait: '请稍等...'
+  pleaseWait: '请稍等...',
+  noNewApp: '当前已是最新版本'
 }

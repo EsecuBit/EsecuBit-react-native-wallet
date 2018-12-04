@@ -157,6 +157,7 @@ export default {
   transactionConfirm: 'Transaction Confirm',
   pairDeviceTip: 'Connect Your Device',
   deviceNotConnected: 'Please connect device to get cos version',
-  pleaseWait: 'Please Wait...'
+  pleaseWait: 'Please Wait...',
+  noNewApp: 'This is the latest version'
 
 }

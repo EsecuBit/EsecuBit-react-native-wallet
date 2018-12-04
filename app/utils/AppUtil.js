@@ -27,6 +27,14 @@ export default class AppUtil {
           lang: lang
         })
       })
+      console.log('update form', StringUtil.jsonToFormData({
+        platform: Platform.OS,
+        versionName: version,
+        versionCode: versionCode,
+        hardwareVersionCode: cosVersion,
+        lang: lang
+      }));
+      
       respsonse = await respsonse.json()
       return respsonse
     } catch (e) {

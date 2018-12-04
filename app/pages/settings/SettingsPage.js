@@ -128,7 +128,11 @@ class SettingsPage extends BaseComponent {
   _checkVersion() {
     AppUtil.checkUpdate()
       .then(info => {
+        console.log('update info', info);
         this.info = info
+        if(!info) {
+          ToastUtil.showErrorMsgShort(D.error.networkUnavailable)
+        }
         if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
             this.setState({
@@ -136,6 +140,9 @@ class SettingsPage extends BaseComponent {
               updateVersionDialogVisible: true
             })
           }
+        }
+        if(info && info.errorCode === Api.noNewApp) {
+          ToastUtil.showShort(I18n.t('noNewApp'))
         }
       })
       .catch(e => {
