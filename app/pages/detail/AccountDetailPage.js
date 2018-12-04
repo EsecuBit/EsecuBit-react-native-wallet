@@ -458,6 +458,7 @@ class AccountDetailPage extends BaseComponent {
       .rename(this.renameAccountname)
       .then(() => {
         _that.props.account.label = this.renameAccountname
+        // _that.accountHeader.updateAccountName(this.renameAccountname)
       })
       .catch(error => {
         console.log('rename', error)
@@ -536,7 +537,7 @@ class AccountDetailPage extends BaseComponent {
     return (
       <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
-          ref={ref => (this.accountHeader = ref)}
+          ref={refs => this.accountHeader = refs}
           onHideMenu={type => this._handleMenuItemClick(type)}
           navigation={this.props.navigation}
         />

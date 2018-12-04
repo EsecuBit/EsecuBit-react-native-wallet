@@ -27,7 +27,10 @@ class AccountDetailHeader extends PureComponent {
   }
 
   componentDidMount() {
-    this._getBalance(this.account.balance)
+    this.props.navigation.addListener('willFocus', () => {
+      this._getBalance(this.props.account.balance)
+      this.updateAccountName(this.props.account.label)
+    })
   }
 
   _getBalance(balance) {
@@ -72,6 +75,7 @@ class AccountDetailHeader extends PureComponent {
     this.props.account.label = name
     this.setState({ accountName: name })
   }
+
 
   render() {
     let height = platform === 'ios' ? 64 : 56
