@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {StatusBar, View, Text, Dimensions, TouchableOpacity, Platform, BackHandler} from 'react-native'
+import {StatusBar, View, Text, Dimensions, TouchableOpacity, Platform, BackHandler, InteractionManager} from 'react-native'
 import { Button, Container, Header, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
@@ -92,7 +92,7 @@ export default class NewAccountPage extends BaseComponent {
 
     try {
       if (platform !== 'ios') {
-        await this.setState({ newAccountWaitDialog: true })
+        this.setState({ newAccountWaitDialog: true })
       }
       let account = await this.wallet.newAccount(coinType)
       await account.rename(this.newAccountName)
@@ -103,8 +103,10 @@ export default class NewAccountPage extends BaseComponent {
       this.props.navigation.pop()
     } catch (error) {
       console.warn('newAccount Error', error)
-      this.setState({ newAccountWaitDialog: false })
-      ToastUtil.showErrorMsgShort(error)
+      InteractionManager.runAfterInteractions(() => {
+        this.setState({ newAccountWaitDialog: false })
+      })
+      ToastUtil.showErrorMsgLong(error)
     }
   }
 
@@ -122,7 +124,6 @@ export default class NewAccountPage extends BaseComponent {
     let coinType = ''
     let isSupportBTC = false
     this.supportCoinType.map(it => {
-      console.log('new account it', it)
       if (it.startsWith('btc')) {
         isSupportBTC = true
         coinType = it
