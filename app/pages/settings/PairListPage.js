@@ -52,13 +52,15 @@ export default class PairListPage extends BaseComponent {
   };
 
   componentDidMount() {
+    console.log('xr width', deviceW)
+    console.log('xr height', deviceH)
     BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
     let _that = this
     // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers 
     this.props.navigation.addListener('willFocus', async () => {
       _that._listenTransmitter()
       await _that.setState({ deviceList: [] })
-      _that._findDefaultDevice()
+      _that._findDefaultDevice(true)
     })
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
@@ -71,8 +73,6 @@ export default class PairListPage extends BaseComponent {
         }
       }
       if(error === D.error.succeed && status === D.status.authFinish) {
-        console.log('wallet authenticated');
-        this.setState({authenticateDialogVisible: false})
         const resetAction = NavigationActions.reset({
           index: 0,
           actions: [NavigationActions.navigate({ routeName: 'Splash' })]
@@ -99,10 +99,11 @@ export default class PairListPage extends BaseComponent {
       if (status === BtTransmitter.disconnected) {
         _that.setState({
           authenticateDialogVisible: false,
-          connectDialogVisible: false
+          connectDialogVisible: false,
+          waitingDialogVisible: false
         })
         ToastUtil.showLong(I18n.t('disconnect'))
-        this._onRefresh()
+        this._onRefresh(false)
         return
       }
       if(status === BtTransmitter.connected) {
@@ -120,15 +121,15 @@ export default class PairListPage extends BaseComponent {
     this.setState({waitingDialogVisible: true})
   }
 
-  _findDefaultDevice() {
+  _findDefaultDevice(autoConnect) {
     PreferenceUtil.getDefaultDevice()
       .then(value => {
-        this._findDevice(value)
+        this._findDevice(value, autoConnect)
       })
       .catch(err => console.log(err))
   }
 
-  _findDevice(deviceInfo) {
+  _findDevice(deviceInfo, autoConnect) {
     let devices = new Set()
     let _that = this
     _that.transmitter.startScan((error, info) => {
@@ -139,7 +140,7 @@ export default class PairListPage extends BaseComponent {
         deviceList: Array.from(devices)
       })
       //found default device, connect directly
-      if (deviceInfo != null && info.sn === deviceInfo.sn) {
+      if (deviceInfo != null && info.sn === deviceInfo.sn && autoConnect) {
         this._connectDevice(deviceInfo)
       }
     })
@@ -172,13 +173,13 @@ export default class PairListPage extends BaseComponent {
     this.setState({ connectDialogVisible: true })
   }
 
-  _onRefresh() {
+  _onRefresh(autoConnect) {
     this.transmitter.stopScan()
     this.setState({
       refreshing: true,
       deviceList: []
     })
-    this._findDefaultDevice()
+    this._findDefaultDevice(autoConnect)
     this.setState({
       refreshing: false
     })
@@ -273,7 +274,7 @@ export default class PairListPage extends BaseComponent {
             refreshControl={
               <RefreshControl
                 refreshing={this.state.refreshing}
-                onRefresh={() => this._onRefresh()}
+                onRefresh={() => this._onRefresh(true)}
               />
             }
             renderRow={item => (
