@@ -56,7 +56,7 @@ const DIMEN_PADDING = 5
 const DIMEN_MARGIN_HORIZONTAL = 16
 const DIMEN_MARGIN_VERTICAL = 16
 const DIMEN_CORNER = 10
-const DIMEN_CARD_HEIGHT = 86
+const DIMEN_CARD_HEIGHT = 96
 const DIMEN_TOOLBAR_ANDROID = 56
 const DIMEN_TOOLBAR_IOS = 64
 const DIMEN_IPHONEX_SAFEAREA_PADDING = 34
@@ -109,7 +109,7 @@ export const CommonStyle = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginTop: DIMEN_SPACE,
-    marginBottom: DIMEN_SPACE
+    marginBottom: DIMEN_SPACE,
   },
   toolbarIOS: {
     justifyContent: 'center',

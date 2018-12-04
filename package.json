@@ -1,7 +1,8 @@
 {
   "name": "EsecuBit",
-  "version": "0.2.3",
-  "versionCode": 4,
+  "version": "0.2.8",
+  "versionCode": 9,
+  "cosVersion": "1.0",
   "author": "EsecuBit",
   "private": true,
   "description": "EsecuBit Wallet App",
