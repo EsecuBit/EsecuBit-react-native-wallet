@@ -7,7 +7,8 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
-  Linking, BackHandler
+  Linking,
+  BackHandler
 } from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
@@ -36,7 +37,7 @@ import { connect } from 'react-redux'
 import CoinCard from '../../components/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import BaseComponent from '../../components/BaseComponent'
-import {NavigationActions} from 'react-navigation'
+import { NavigationActions } from 'react-navigation'
 const platform = Platform.OS
 
 class HomePage extends BaseComponent {
@@ -61,7 +62,6 @@ class HomePage extends BaseComponent {
       updateVersionDialogVisible: false
     }
     this.deviceW = Dimensions.get('window').width
-   
   }
 
   componentWillMount() {
@@ -69,6 +69,11 @@ class HomePage extends BaseComponent {
     NetInfo.isConnected.fetch().done(isConnected => {
       if (platform !== 'ios') {
         _that.setState({ networkConnected: isConnected })
+        this.wallet.getAccounts().then(accounts => {
+          if (accounts.length === 0) {
+            this.btTransmitter.disconnect()
+          }
+        })
       }
     })
     if (platform !== 'ios') {
@@ -78,25 +83,22 @@ class HomePage extends BaseComponent {
 
   componentWillUnmount() {
     NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
   }
 
-
-  onBackPress = () => {
-    this.props.navigation.pop()
-    return true;
-  };
+  
 
   _handleConnectivityChange(status) {
-    if (platform === 'ios') {
-      let ns = status.toUpperCase()
-      if (ns === 'WIFI' || ns === 'CELL') {
-        this.setState({ networkConnected: true })
-      } else {
-        this.setState({ networkConnected: false })
-      }
+    let ns = status.toUpperCase()
+    if (ns === 'WIFI' || ns === 'CELL') {
+      console.log('networkChange', ns)
+      this.setState({ networkConnected: true })
+      this.wallet.getAccounts().then(accounts => {
+        if (accounts.length === 0) {
+          this.btTransmitter.disconnect()
+        }
+      })
     } else {
-      this.setState({ networkConnected: status })
+      this.setState({ networkConnected: false })
     }
   }
 
@@ -106,17 +108,16 @@ class HomePage extends BaseComponent {
     this.props.navigation.addListener('willFocus', () => {
       if (platform === 'ios') {
         NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
-        
       }
       this._updateUI()
     })
-    
+
+    this._updateUI()
     //delay to check app version
     setTimeout(() => {
       this._checkVersion()
     }, 3000)
 
-    BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
   }
 
   _checkVersion() {
@@ -135,7 +136,7 @@ class HomePage extends BaseComponent {
       })
       .catch(e => {
         console.log('checkVersion error', e)
-        if(D.error.deviceNotConnected !== e) {
+        if (D.error.deviceNotConnected !== e) {
           ToastUtil.showErrorMsgShort(e)
         }
       })
@@ -184,7 +185,7 @@ class HomePage extends BaseComponent {
   async _getAccounts() {
     try {
       let accounts = await this.wallet.getAccounts()
-      console.log('accounts', accounts);
+      console.log('accounts', accounts)
       await this.setState({ accounts: accounts })
     } catch (error) {
       console.warn('getAccounts', error)
@@ -194,7 +195,7 @@ class HomePage extends BaseComponent {
 
   _getTotalLegalCurrencyBalance() {
     let totalLegalCurrencyBalance = '0'
-    if(!this.state.accounts) return
+    if (!this.state.accounts) return
     this.state.accounts.forEach(account => {
       let fromUnit = CoinUtil.getMinimumUnit(account.coinType)
       let legalCurrencyBalance = this.wallet.convertValue(
@@ -203,7 +204,8 @@ class HomePage extends BaseComponent {
         fromUnit,
         this.props.legalCurrencyUnit
       )
-      totalLegalCurrencyBalance = parseFloat(legalCurrencyBalance) + parseFloat(totalLegalCurrencyBalance)
+      totalLegalCurrencyBalance =
+        parseFloat(legalCurrencyBalance) + parseFloat(totalLegalCurrencyBalance)
     })
 
     //format balance
@@ -278,9 +280,7 @@ class HomePage extends BaseComponent {
                       height: height,
                       marginLeft: Dimen.MARGIN_HORIZONTAL
                     }}
-                    onPress={() =>
-                      _that.props.navigation.navigate('NewAccount')
-                    }>
+                    onPress={() => _that.props.navigation.navigate('NewAccount')}>
                     <Image source={require('../../imgs/ic_add.png')} />
                   </TouchableOpacity>
                 </View>
@@ -347,9 +347,9 @@ class HomePage extends BaseComponent {
               CommonStyle.cardStyle
             ]}>
             <View style={{ flexDirection: 'column' }}>
-              <Text style={CommonStyle.secondaryText}>{I18n.t('pleaseConnectDeviceToSync')}</Text>
+              <Text style={[CommonStyle.secondaryText]}>{I18n.t('pleaseConnectDeviceToSync')}</Text>
             </View>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', marginBottom: Dimen.SPACE }}>
               <Left>
                 <Button
                   transparent
