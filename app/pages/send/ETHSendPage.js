@@ -464,7 +464,7 @@ class ETHSendPage extends BaseComponent {
 
   render() {
     return (
-      <Container>
+      <Container style={CommonStyle.layoutBottom}>
         <SendToolbar coinType="ETH" navigation={this.props.navigation} />
         <Content padder>
           <View style={{ marginVertical: Dimen.SPACE }}>

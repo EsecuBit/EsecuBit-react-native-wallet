@@ -130,9 +130,6 @@ class SettingsPage extends BaseComponent {
       .then(info => {
         console.log('update info', info);
         this.info = info
-        if(!info) {
-          ToastUtil.showErrorMsgShort(D.error.networkUnavailable)
-        }
         if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
             this.setState({

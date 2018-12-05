@@ -7,7 +7,8 @@ import {
   Image,
   StatusBar,
   Dimensions,
-  Platform, BackHandler
+  Platform, BackHandler,
+  InteractionManager
 } from 'react-native'
 import { Container, List, ListItem, Button, Icon } from 'native-base'
 import I18n from '../../lang/i18n'
@@ -52,7 +53,7 @@ export default class PairListPage extends BaseComponent {
   };
 
   componentDidMount() {
-    console.log('xr width', deviceW)
+    console.log('xr width', deviceW, isIphoneX)
     console.log('xr height', deviceH)
     BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
     let _that = this
@@ -73,11 +74,13 @@ export default class PairListPage extends BaseComponent {
         }
       }
       if(error === D.error.succeed && status === D.status.authFinish) {
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [NavigationActions.navigate({ routeName: 'Splash' })]
+        InteractionManager.runAfterInteractions(() => {
+          const resetAction = NavigationActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: 'Splash' })]
+          })
+          this.props.navigation.dispatch(resetAction)  
         })
-        this.props.navigation.dispatch(resetAction)    
       }
     })
    

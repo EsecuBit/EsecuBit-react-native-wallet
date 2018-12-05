@@ -12,8 +12,7 @@ export default class AppUtil {
     let wallet = new EsWallet()
     let lang = I18n.locale === 'zh-Hans-CN' ? 'zh_CN' : 'en_US'
     try {
-      let walletInfo = await wallet.getWalletInfo()
-      let cosVersion = cosVersion
+      await wallet.getWalletInfo()
       let respsonse = await fetch(Api.baseUrl + 'getNewApp', {
         method: 'POST',
         headers: {
@@ -39,8 +38,10 @@ export default class AppUtil {
       return respsonse
     } catch (e) {
       console.log('checkUpdate error', e)
-      if(D.error.deviceNotConnected === e) {
-        throw e
+      if(D.error.deviceProtocol === e || D.error.deviceNotConnected === e) {
+        throw D.error.deviceNotConnected
+      }else {
+        throw D.error.networkUnavailable
       }
     }
   }

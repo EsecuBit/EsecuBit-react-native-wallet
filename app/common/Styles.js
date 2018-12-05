@@ -76,7 +76,7 @@ const deviceHeight = Dimensions.get('window').height
 const deviceWidth = Dimensions.get('window').width
 const platform = Platform.OS
 export const isIphoneX =
-  platform === 'ios' && (deviceHeight === 812 || deviceWidth === 812)
+  platform === 'ios' && (deviceHeight === 812 || deviceWidth === 812 || deviceHeight === 896 || deviceWidth === 896)
 
 export const CommonStyle = StyleSheet.create({
   privateText: {
