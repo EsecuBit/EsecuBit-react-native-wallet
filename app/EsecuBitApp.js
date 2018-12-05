@@ -8,6 +8,7 @@ import { Provider as StoreProvider } from 'react-redux'
 import store from './store'
 import AppNavigation from './AppNavigation'
 import { Root } from 'native-base'
+import CryptoNative from './device/CryptoNative'
 
 export default class EsecuBitApp extends React.Component {
   constructor(props) {
@@ -18,6 +19,7 @@ export default class EsecuBitApp extends React.Component {
     D.test.jsWallet = false
     Provider.DB = RealmDB
     Provider.Transmitters.push(BtTransmitter)
+    Provider.Crypto = CryptoNative
     this.wallet = new EsWallet()
     //黄色Warnings框开关
     console.disableYellowBox = true

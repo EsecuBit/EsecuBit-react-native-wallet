@@ -4,6 +4,7 @@ import android.app.Application;
 
 
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
+import com.excelsecu.eswallet.crypto.CryptoReactPackage;
 import com.facebook.react.ReactApplication;
 import io.realm.react.RealmReactPackage;
 import com.facebook.react.ReactNativeHost;
@@ -30,12 +31,13 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.asList(
-          new MainReactPackage(),
-            new RealmReactPackage(),
-            new RNCameraPackage(),
-            new VectorIconsPackage(),
-            new RNI18nPackage(),
-          new BtDeviceReactPackage()
+              new MainReactPackage(),
+              new RealmReactPackage(),
+              new RNCameraPackage(),
+              new VectorIconsPackage(),
+              new RNI18nPackage(),
+              new BtDeviceReactPackage(),
+              new CryptoReactPackage()
       );
     }
   };

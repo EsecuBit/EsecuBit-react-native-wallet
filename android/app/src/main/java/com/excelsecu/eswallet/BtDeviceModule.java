@@ -7,6 +7,7 @@ import com.excelsecu.eshdwallet.IEsDeviceState;
 import com.excelsecu.eshdwallet.IEsHDWallet;
 import com.excelsecu.transmit.EsException;
 import com.excelsecu.transmit.device.EsDevice;
+import com.excelsecu.transmit.util.LogUtil;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -200,7 +201,10 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
             throw new EsException(28667);
         }
 
+        LogUtil.d("sendApdu apdu " + hexApdu);
         int error = esDevice.sendApdu(apdu, apdu.length, response, responseLength);
+        LogUtil.d("sendApdu response error " + error + ", response " + ByteUtil.bytesToHex(response, responseLength[0]));
+
         if (error != 0) {
             throw new EsException(error);
         }
