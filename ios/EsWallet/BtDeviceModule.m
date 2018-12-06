@@ -9,6 +9,7 @@
 #import "BtScanHelper.h"
 #import "EsHDWallet.h"
 #import "NSData+Hex.h"
+#import "DDRSAWrapper.h"
 
 
 #define STATUS_DISCONNECTED @0

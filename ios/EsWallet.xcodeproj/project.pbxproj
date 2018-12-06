@@ -52,6 +52,8 @@
 		69654938C1BF480AA088DF47 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E6E778E670AD4A6F9DAB8B8D /* Feather.ttf */; };
 		7260E7C569D744E1B06938E8 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41BB6FD1070940BE9F77CC8F /* Foundation.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		87737D2C21B7F0D80088013B /* DDRSAWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 87737D0A21B7F0D80088013B /* DDRSAWrapper.m */; };
+		87737D2F21B7F44D0088013B /* CryptoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 87737D2E21B7F44D0088013B /* CryptoModule.m */; };
 		899C1DF371ED4289938A517C /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6B88FEE5FF5498F81D3ABB6 /* libRNCamera.a */; };
 		920C5FC27C20421CBFBD42E6 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */; };
 		936D0EE97B9A462EA33B3116 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */; };
@@ -367,6 +369,10 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		85702D7DFAB04E5989D5D108 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		86602FE62B5743DE8612AC6E /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		87737D0A21B7F0D80088013B /* DDRSAWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDRSAWrapper.m; path = EsWallet/DDRSAWrapper.m; sourceTree = "<group>"; };
+		87737D2B21B7F0D80088013B /* DDRSAWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDRSAWrapper.h; path = EsWallet/DDRSAWrapper.h; sourceTree = "<group>"; };
+		87737D2D21B7F44D0088013B /* CryptoModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CryptoModule.h; path = EsWallet/CryptoModule.h; sourceTree = "<group>"; };
+		87737D2E21B7F44D0088013B /* CryptoModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CryptoModule.m; path = EsWallet/CryptoModule.m; sourceTree = "<group>"; };
 		8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		8D7F0B08CE9744D1AA8DDBF7 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -537,10 +543,14 @@
 				2169E75B210AEE7C0039D751 /* ESSerialNumber.h */,
 				2137A568210B148900477DCD /* BtScanHelper.h */,
 				2137A569210B148900477DCD /* BtScanHelper.m */,
+				87737D2B21B7F0D80088013B /* DDRSAWrapper.h */,
+				87737D0A21B7F0D80088013B /* DDRSAWrapper.m */,
 				210FCB0E210D9B8E00F6981B /* NSData+Hex.h */,
 				210FCB0F210D9B8E00F6981B /* NSData+Hex.m */,
 				210FCBB42110078C00F6981B /* Localizable.strings */,
 				9BA72AEE216DA047007E215C /* BackIOS.m */,
+				87737D2D21B7F44D0088013B /* CryptoModule.h */,
+				87737D2E21B7F44D0088013B /* CryptoModule.m */,
 			);
 			name = EsWallet;
 			sourceTree = "<group>";
@@ -1219,7 +1229,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -1227,7 +1237,7 @@
 			name = "Bundle React Native code and images";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/packager/react-native-xcode.sh\n";
 		};
@@ -1260,10 +1270,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				87737D2F21B7F44D0088013B /* CryptoModule.m in Sources */,
 				2137A56A210B148900477DCD /* BtScanHelper.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				210FCB10210D9B8E00F6981B /* NSData+Hex.m in Sources */,
+				87737D2C21B7F0D80088013B /* DDRSAWrapper.m in Sources */,
 				9BA72AEF216DA047007E215C /* BackIOS.m in Sources */,
 				2169E718210ACDEF0039D751 /* BtDeviceModule.m in Sources */,
 			);

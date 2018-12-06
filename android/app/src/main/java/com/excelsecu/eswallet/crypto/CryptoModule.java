@@ -82,9 +82,9 @@ public class CryptoModule extends ReactContextBaseJavaModule {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             byte[] b = cipher.doFinal(message);
-            if (b.length != 128) {
-                byte[] padding = new byte[128];
-                System.arraycopy(b, 0, padding, 128 - b.length, b.length);
+            if (b.length < message.length) {
+                byte[] padding = new byte[message.length];
+                System.arraycopy(b, 0, padding, message.length - b.length, b.length);
                 b = padding;
             }
 
