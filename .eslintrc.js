@@ -3,9 +3,10 @@ module.exports = {
         "eslint:recommended",
         "plugin:react/recommended"
     ],
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaFeatures": {
-            "jsx": true
+            "jsx": true,
         },
         "ecmaVersion": 2017,
         "sourceType": "module",
@@ -27,7 +28,7 @@ module.exports = {
         // a function will be skipped.
     },
     "rules": {
-      "indent": [2, 2],
+      "indent": ["error", 2, { "SwitchCase": 1 }],
       "no-console": 0,
       "no-unused-vars": 2,
       "no-alert": 1,
@@ -45,7 +46,9 @@ module.exports = {
     
     },
     "env": {
-      "amd": true
+      "amd": true,
+      "browser": true,
+      "node": true
     },
     "globals": {
         "global": true,

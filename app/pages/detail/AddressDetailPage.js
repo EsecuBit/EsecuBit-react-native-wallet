@@ -3,7 +3,8 @@ import {
   View,
   StyleSheet,
   TouchableWithoutFeedback,
-  Clipboard
+  Clipboard,
+  BackHandler
 } from 'react-native'
 import { Text, CheckBox, Left, Body, Right } from 'native-base'
 import PopupDialog from 'react-native-popup-dialog'
@@ -12,25 +13,35 @@ import QrCode from 'react-native-qrcode'
 import I18n from '../../lang/i18n'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
-import EsAccountHelper from '../../EsAccountHelper'
-import { TOAST_SHORT_DURATION } from '../../common/Constants'
-
-export default class AddressDetailPage extends PureComponent {
-  constructor() {
+import { connect } from 'react-redux'
+import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
+class AddressDetailPage extends BaseComponent {
+  constructor(props) {
     super()
     this.state = {
       address: '',
       storeAddress: false
     }
     this.eswallet = new EsWallet()
-    this.account = EsAccountHelper.getInstance().getAccount()
+    this.account = props.account
     this.coinType = this.account.coinType
   }
 
   componentDidMount() {
     this.popupDialog.show()
     this._getAddress(this.state.storeAddress)
+    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
 
   async _handleStoreAddress() {
     await this.setState({ storeAddress: !this.state.storeAddress })
@@ -52,7 +63,7 @@ export default class AddressDetailPage extends PureComponent {
   _setClipboardContent(addr) {
     try {
       Clipboard.setString(addr)
-      ToastUtil.show(I18n.t('copySuccess', TOAST_SHORT_DURATION))
+      ToastUtil.showShort(I18n.t('copySuccess'))
     } catch (error) {
       ToastUtil.showLong(I18n.t('copyFailed'))
     }
@@ -65,7 +76,7 @@ export default class AddressDetailPage extends PureComponent {
           this.popupDialog = popupDialog
         }}
         width={0.8}
-        height={D.isBtc(this.coinType) ? 455 : 415}
+        height={D.isBtc(this.coinType) ? 465 : 425}
         containerStyle={{ backgroundColor: '#E0E0E0' }}
         onDismissed={() => this.props.navigation.pop()}>
         <View style={styles.qrCodeWrapper}>
@@ -132,8 +143,7 @@ const styles = StyleSheet.create({
   addressText: {
     marginHorizontal: Dimen.MARGIN_HORIZONTAL,
     marginTop: Dimen.SPACE,
-    // marginBottom: DIMEN_SPACE,
-    height: 45
+    height: 50,
   },
   remindText: {
     marginHorizontal: Dimen.MARGIN_HORIZONTAL,
@@ -145,3 +155,10 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   }
 })
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account
+})
+
+const AddressDetail = connect(mapStateToProps)(AddressDetailPage)
+export default  AddressDetail

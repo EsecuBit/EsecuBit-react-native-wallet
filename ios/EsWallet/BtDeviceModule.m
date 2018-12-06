@@ -9,13 +9,12 @@
 #import "BtScanHelper.h"
 #import "EsHDWallet.h"
 #import "NSData+Hex.h"
+#import "DDRSAWrapper.h"
 
 
 #define STATUS_DISCONNECTED @0
 #define STATUS_CONNECTING @5
 #define STATUS_CONNECTED @10
-#define STATUS_AUTHENTICATING @11
-#define STATUS_AUTHENTICATED @12
 
 @interface BtDeviceModule ()<ScanDelegate,EsHDWalletDelegate>
 
@@ -47,8 +46,6 @@ RCT_EXPORT_MODULE(BtDevice);
            @"disconnected": STATUS_DISCONNECTED,
            @"connecting": STATUS_CONNECTING,
            @"connected": STATUS_CONNECTED,
-           @"authenticating":STATUS_AUTHENTICATING,
-           @"authenticated":STATUS_AUTHENTICATED,
            };
 }
 
@@ -85,6 +82,7 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)info)
   EsHDWallet *weakWallet = self.wallet;
   dispatch_async(dispatch_get_global_queue(0, 0), ^{
     EsErrorCode errorCode = [weakWallet connectWithSerialNumber:sn];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
       if (errorCode == ESErrorNoError) {
         self.state = STATUS_CONNECTED;
@@ -105,13 +103,12 @@ RCT_EXPORT_METHOD(disconnect)
 }
 
 RCT_EXPORT_METHOD(sendApdu:(NSString *)apdu
-                  isEnc:(BOOL) isEnc
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
   dispatch_async(dispatch_get_global_queue(0, 0), ^{
     NSData *apduData = [NSData fromHex:apdu];
-    NSData *response = [self.wallet sendAPDUWithData:apduData secure:isEnc];
+    NSData *response = [self.wallet sendAPDUWithData:apduData];
     UInt32 error = [self.wallet getLastNativeErrorCode];
     if (error != 0) {
       // TODO UPDATE newest react0native version, reject has only one argument
@@ -133,31 +130,16 @@ RCT_EXPORT_METHOD(sendApdu:(NSString *)apdu
 
 - (void)didChangeEsBLEState:(EsBLEState)bleState pairingCode:(NSString *)pairingCode
 {
-//  NSLog(@"bleState == %ld, pairingCode == %@",(long)bleState,pairingCode);
+  NSLog(@"bleState == %ld, pairingCode == %@",(long)bleState,pairingCode);
   switch (bleState) {
+    case ESBLEStateConnected: {
+      self.state = STATUS_CONNECTED;
+      [self sendConnectStatusWithError:0 status:STATUS_CONNECTED pairCode: @""];
+    }
     case ESBLEStateDisconnected:
     {
       self.state = STATUS_DISCONNECTED;
       [self sendConnectStatusWithError:0 status:STATUS_DISCONNECTED pairCode:@""];
-    }
-      break;
-    case ESBLEStateWillAuthenticate:
-    {
-      self.state = STATUS_AUTHENTICATING;
-      if (pairingCode)
-      {
-        [self sendConnectStatusWithError:0 status:STATUS_AUTHENTICATING pairCode:pairingCode];
-      }
-      else
-      {
-        [self sendConnectStatusWithError:0 status:STATUS_AUTHENTICATING pairCode:@""];
-      }
-    }
-      break;
-    case ESBLEStateDidAuthenticate:
-    {
-      self.state = STATUS_AUTHENTICATED;
-      [self sendConnectStatusWithError:0 status:STATUS_AUTHENTICATED pairCode:@""];
     }
       break;
     default:

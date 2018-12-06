@@ -9,11 +9,12 @@ import {
   Platform,
   Image
 } from 'react-native'
-import { Color, CommonStyle, Dimen } from '../common/Styles'
+import { Color, CommonStyle, Dimen, isIphoneX } from '../common/Styles'
+import { withNavigation }from 'react-navigation'
 
 const platform = Platform.OS
 
-export default class SendToolbar extends PureComponent {
+class SendToolbar extends PureComponent {
   constructor() {
     super()
     this.deviceW = Dimensions.get('window').width
@@ -21,10 +22,14 @@ export default class SendToolbar extends PureComponent {
 
   render() {
     let _that = this
+    let height = platform === 'ios' ? 64 : 56
+    if (isIphoneX) {
+      height = 88
+    }
     return (
       <View>
         <Header
-          style={{ backgroundColor: Color.DARK_PRIMARY }}
+          style={{ backgroundColor: Color.DARK_PRIMARY, height: height, alignContent: 'center', alignItems: 'center' }}
           translucent={false}>
           <StatusBar
             barStyle={platform === 'ios' ? 'light-content' : 'default'}
@@ -44,6 +49,8 @@ export default class SendToolbar extends PureComponent {
             }>
             <Text
               style={{
+                textAlignVertical: 'center',
+                textAlign: 'center',
                 color: Color.ACCENT,
                 fontSize: Dimen.PRIMARY_TEXT,
                 marginBottom: platform === 'ios' ? 15 : 0
@@ -65,3 +72,4 @@ export default class SendToolbar extends PureComponent {
     )
   }
 }
+export default withNavigation(SendToolbar)

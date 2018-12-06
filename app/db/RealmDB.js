@@ -9,6 +9,7 @@ import TxInfoSchema from './TxInfoSchema'
 import UtxoSchema from './UtxoSchema'
 import SettingsSchema from './SettingsSchema'
 import PreferenceSchema from './PreferenceSchema'
+import wrapper from './SchemaWrapper'
 
 class RealmDB extends IDatabase {
   constructor(walletId) {
@@ -19,7 +20,7 @@ class RealmDB extends IDatabase {
     RealmDB.prototype.Instances = RealmDB.prototype.Instances || {}
     this._walletId = walletId
     this._config = {
-      schemaVersion: 7,
+      schemaVersion: 8,
       schema: [AccountSchema, AddressInfoSchema,
         ExchangeSchema, FeeSchema,
         TxInfoSchema, UtxoSchema,
@@ -45,6 +46,7 @@ class RealmDB extends IDatabase {
   }
 
   newAccount(account) {
+    account = wrapper.account.wrap(account)
     return Realm.open(this._config)
       .then(realm => realm.write(() => realm.create('Account', account)))
       .catch(e => {
@@ -54,6 +56,7 @@ class RealmDB extends IDatabase {
   }
 
   deleteAccount(account, addressInfos) {
+    account = wrapper.account.wrap(account)
     return Realm.open(this._config).then(realm => realm.write(() => {
       account = realm.objects('Account').filtered(`accountId = "${account.accountId}"`)
       realm.delete(account)
@@ -68,25 +71,22 @@ class RealmDB extends IDatabase {
   getAccounts(filter = {}) {
     let filterQuery = RealmDB.makeQuery(filter)
     return Realm.open(this._config)
-      .then(realm => D.copy(realm.objects('Account').filtered(filterQuery).slice()))
+      .then(realm => {
+        let accounts = realm.objects('Account').filtered(filterQuery).slice()
+        return wrapper.account.unwraps(accounts)
+      })
   }
 
-  renameAccount(account) {
-    let filterQuery = RealmDB.makeQuery(account)
+  updateAccount(account) {
+    account = wrapper.account.wrap(account)
     return Realm.open(this._config).then(realm => realm.write(() => {
-      let oldAccount = realm.objects('Account').filtered(filterQuery)[0]
-      oldAccount.label = account.label
+      realm.create('Account', account, true)
     }))
   }
 
   saveOrUpdateTxComment(txInfo) {
     let filterQuery = RealmDB.makeQuery(txInfo)
-    txInfo = D.copy(txInfo)
-    // multi primary key
-    txInfo.txId_accountId = txInfo.txId + '_' + txInfo.accountId
-    txInfo.inputs = JSON.stringify(txInfo.inputs)
-    txInfo.outputs = JSON.stringify(txInfo.outputs)
-    txInfo.showAddresses = JSON.stringify(txInfo.showAddresses)
+    txInfo = wrapper.txInfo.wrap(txInfo)
 
     return Realm.open(this._config).then(realm =>
       realm.write(() => {
@@ -98,30 +98,34 @@ class RealmDB extends IDatabase {
   }
 
   getTxInfos(filter = {}) {
+    console.log('ab');
     let filterQuery = RealmDB.makeQuery(filter)
     return Realm.open(this._config)
       .then(realm => {
-        let allTxs = realm.objects('TxInfo').filtered(filterQuery).sorted('time', true)
-        let total = allTxs.length
-        let startIndex = filter.startIndex || 0
-        let endIndex = filter.endIndex || total
-        let txInfos = D.copy(allTxs.slice(startIndex, endIndex))
-        txInfos.forEach(txInfo => {
-          txInfo.inputs = JSON.parse(txInfo.inputs)
-          txInfo.outputs = JSON.parse(txInfo.outputs)
-          txInfo.showAddresses = JSON.parse(txInfo.showAddresses)
-        })
-        return { total, txInfos }
+        let txInfos = realm.objects('TxInfo').filtered(filterQuery).slice()
+        return wrapper.txInfo.unwraps(txInfos)
       })
   }
 
   newAddressInfos(account, addressInfos) {
+    account = wrapper.account.wrap(account)
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
     return Realm.open(this._config).then(realm => {
       realm.write(() => {
         realm.create('Account', account, true)
-        D.copy(addressInfos).forEach(addressInfo => {
-          addressInfo.txs = JSON.stringify(addressInfo.txs)
+        addressInfos.forEach(addressInfo => {
           realm.create('AddressInfo', addressInfo)
+        })
+      })
+    })
+  }
+
+  updateAddressInfos(addressInfos) {
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    return Realm.open(this._config).then(realm => {
+      realm.write(() => {
+        addressInfos.forEach(addressInfo => {
+          realm.create('AddressInfo', addressInfo, true)
         })
       })
     })
@@ -144,20 +148,10 @@ class RealmDB extends IDatabase {
   }
 
   newTx(account, addressInfos, txInfo, utxos = []) {
-    txInfo = D.copy(txInfo)
-    // multi primary key
-    txInfo.txId_accountId = txInfo.txId + '_' + txInfo.accountId
-    txInfo.inputs = JSON.stringify(txInfo.inputs)
-    txInfo.outputs = JSON.stringify(txInfo.outputs)
-    txInfo.showAddresses = JSON.stringify(txInfo.showAddresses)
-
-    addressInfos = D.copy(addressInfos)
-    for (let addressInfo of addressInfos) {
-      addressInfo.txs = JSON.stringify(addressInfos.txs)
-    }
-
-    utxos = D.copy(utxos)
-    utxos.forEach(utxo => utxo.txId_index = utxo.txId + '_' + utxo.index)
+    account = wrapper.account.wrap(account)
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    txInfo = wrapper.txInfo.wrap(txInfo)
+    utxos = wrapper.utxo.wraps(utxos)
 
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)
@@ -168,23 +162,11 @@ class RealmDB extends IDatabase {
   }
 
   removeTx (account, addressInfos, txInfo, updateUtxos = [], removeUtxos = []) {
-    txInfo = D.copy(txInfo)
-    // multi primary key
-    txInfo.txId_accountId = txInfo.txId + '_' + txInfo.accountId
-    txInfo.inputs = JSON.stringify(txInfo.inputs)
-    txInfo.outputs = JSON.stringify(txInfo.outputs)
-    txInfo.showAddresses = JSON.stringify(txInfo.showAddresses)
-
-    addressInfos = D.copy(addressInfos)
-    for (let addressInfo of addressInfos) {
-      addressInfo.txs = JSON.stringify(addressInfos.txs)
-    }
-
-    updateUtxos = D.copy(updateUtxos)
-    updateUtxos.forEach(utxo => utxo.txId_index = utxo.txId + '_' + utxo.index)
-
-    removeUtxos = D.copy(removeUtxos)
-    removeUtxos.forEach(utxo => utxo.txId_index = utxo.txId + '_' + utxo.index)
+    account = wrapper.account.wrap(account)
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    txInfo = wrapper.txInfo.wrap(txInfo)
+    updateUtxos = wrapper.utxo.wraps(updateUtxos)
+    removeUtxos = wrapper.utxo.wraps(removeUtxos)
 
     return Realm.open(this._config).then(realm => realm.write(() => {
       realm.create('Account', account, true)
@@ -204,16 +186,13 @@ class RealmDB extends IDatabase {
     let filterQuery = RealmDB.makeQuery({ coinType })
     return Realm.open(this._config).then(realm => {
       let fee = realm.objects('Fee').filtered(filterQuery)[0]
-      if (!fee) return
-      fee = D.copy(fee) // avoid modify the property which realm will do
-      fee.fee = JSON.parse(fee.fee)
-      return fee
+      if (!fee) return null
+      return wrapper.fee.unwrap(fee)
     })
   }
 
   saveOrUpdateFee(fee) {
-    fee = D.copy(fee)
-    fee.fee = JSON.stringify(fee.fee)
+    fee = wrapper.fee.wrap(fee)
     return Realm.open(this._config).then(realm => realm.write(() => { realm.create('Fee', fee, true) }))
   }
 
@@ -221,16 +200,13 @@ class RealmDB extends IDatabase {
     let filterQuery = RealmDB.makeQuery({ coinType })
     return Realm.open(this._config).then(realm => {
       let exchange = realm.objects('Exchange').filtered(filterQuery)[0]
-      if (!exchange) return
-      exchange = D.copy(exchange) // avoid modify the property which realm will do
-      exchange.exchange = JSON.parse(exchange.exchange)
-      return exchange
+      if (!exchange) return null
+      return wrapper.exchange.unwrap(exchange)
     })
   }
 
   saveOrUpdateExchange(exchange) {
-    exchange = D.copy(exchange)
-    exchange.exchange = JSON.stringify(exchange.exchange)
+    exchange = wrapper.exchange.wrap(exchange)
     return Realm.open(this._config).then(realm => realm.write(() => { realm.create('Exchange', exchange, true) }))
   }
 

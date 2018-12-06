@@ -11,7 +11,7 @@ export default {
   cryptoCurrency: 'Crypto Currency',
   btc: 'BTC',
   eth: 'ETH',
-  pairDevice: 'List Of Available  Device',
+  pairDevice: 'SCANNING...',
   device: 'Device',
   about: 'About',
   privacyPolicy: 'Privacy Policy',
@@ -35,6 +35,7 @@ export default {
   // invalidAddress: 'invalid address',
   from: 'From',
   to: 'to',
+  to1: 'to',
   value: 'Value',
   transactionRecord: 'Transaction Records',
   orderByTime: 'Order By Time',
@@ -62,8 +63,8 @@ export default {
   normal: 'normal',
   economic: 'economic',
   //other
-  cancel: 'Cancel',
-  confirm: 'Confirm',
+  cancel: 'CANCEL',
+  confirm: 'CONFIRM',
   pairCode: 'Pair Code',
   connectFailed: 'Connect failed',
   //errormsg
@@ -93,8 +94,8 @@ export default {
   balanceNotEnough:'Insufficient balance',
   invalidAddress:'Illegal address',
   noAddressCheckSum:'ETH address has no check format',
-  invalidAddressChecksum:'Address verification error (not used)',
-  valueIsDecimal:'The smallest unit of the transaction cannot be a decimal',
+  invalidAddressChecksum:'Address verification error',
+  valueIsDecimal:'The smallest Unit of the transaction cannot be a decimal',
   notImplemented:'Function not implemented',
   unknown:'Unknown error',
   coinNotSupported:'This currency is not supported',
@@ -113,7 +114,7 @@ export default {
   renameAccountHint: 'Please input new account name',
   isNotHexString: 'Data is not hex string',
   disconnectTip: 'After disconnecting, some features will not be available. Continue?',
-  pleaseConnectDeviceToSync: 'Please reconnect device to sync data',
+  pleaseConnectDeviceToSync: 'Please reconnect device to sync data after network connnected',
   emptyValueError: 'Value cannot be empty',
   emptyGasPriceError: 'GasPrice cannot be empty',
   getAddressError: 'Get address failed',
@@ -139,6 +140,24 @@ export default {
   confirming: 'Confirming',
   checkVersion: 'Check For Updates',
   versionUpdate: 'Version Update',
-  connectDeviceToGetCOSVersion: 'Please connect device to get cos version'
+  connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
+  accountName: 'Account Name',
+  accountAssets: 'Account Assets',
+  permissionManage: 'Permission Manage',
+  permissionManageTip: 'Note: \n  - Owner Key: Has all permissions for the current EOS account. \n  \
+  - Active Key: By default, all transactions except the Owner Key can be changed. \n \
+  - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.',
+  stake: 'Stake',
+  unstake: 'UnStake',
+  vote: 'Vote',
+  ramTransaction: 'Buy/Sell RAM',
+  buy: 'Buy',
+  sell: 'Sell',
+  language: 'Language',
+  transactionConfirm: 'Transaction Confirm',
+  pairDeviceTip: 'Connect Your Device',
+  deviceNotConnected: 'Please connect device to get cos version',
+  pleaseWait: 'Please Wait...',
+  noNewApp: 'This is the latest version'
 
 }

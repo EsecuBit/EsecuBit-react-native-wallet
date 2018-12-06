@@ -64,6 +64,9 @@ import com.android.build.OutputFile
  *   extraPackagerArgs: []
  * ]
  */
+ project.ext.react = [
+   bundleInDebug: true,
+ ]
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
@@ -98,7 +101,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
-        versionName "0.1.9"
+        versionName "0.3.4"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -140,15 +143,13 @@ configurations.all {
 
 dependencies {
     compile project(':react-native-camera')
-    compile project(':realm')
     compile project(':react-native-vector-icons')
+    compile project(':realm')
     compile project(':react-native-i18n')
-    implementation project(':react-native-i18n')
-    implementation project(':realm')
-    implementation project(':react-native-vector-icons')
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.0'
-    implementation 'com.facebook.react:react-native:+'
+    compile project(':react-native-vector-icons')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:27.1.0'
+    compile 'com.facebook.react:react-native:+'
     // From node_modules
 }
 

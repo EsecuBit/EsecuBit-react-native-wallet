@@ -7,7 +7,8 @@ import {
   Image,
   StatusBar,
   Dimensions,
-  Platform
+  Platform,
+  BackHandler
 } from 'react-native'
 import { Container, List, ListItem, Button, Icon } from 'native-base'
 import I18n from '../../lang/i18n'
@@ -17,13 +18,14 @@ import PreferenceUtil from '../../utils/PreferenceUtil'
 import Dialog from 'react-native-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { ProgressDialog } from 'react-native-simple-dialogs'
-import { NavigationActions, StackActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
+import BaseComponent from '../../components/BaseComponent'
 const deviceW = Dimensions.get('window').width
 const deviceH = Dimensions.get('window').height
 const platform = Platform.OS
 
-export default class PairListPage extends React.Component {
+export default class PairListPage extends BaseComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -32,7 +34,8 @@ export default class PairListPage extends React.Component {
       connectDialogVisible: false,
       authenticateDialogVisible: false,
       refreshing: false,
-      scanText: ''
+      scanText: '',
+      waitingDialogVisible: false
     }
     this.transmitter = new BtTransmitter()
     this.wallet = new EsWallet()
@@ -40,18 +43,69 @@ export default class PairListPage extends React.Component {
     this.hasBackBtn = this.props.navigation.state.params.hasBackBtn
   }
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+    this.setState({
+      waitingDialogVisible: false,
+      authenticateDialogVisible: false,
+      connectDialogVisible: false
+    })
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true
+  }
+
   componentDidMount() {
+    console.log('xr width', deviceW, isIphoneX)
+    console.log('xr height', deviceH)
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     let _that = this
-    this.props.navigation.addListener('didFocus', async () => {
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
+    this.props.navigation.addListener('willFocus', async () => {
       _that._listenTransmitter()
       await _that.setState({ deviceList: [] })
-      _that._findDefaultDevice()
+      _that._findDefaultDevice(true)
+    })
+    this.wallet.listenStatus(async (error, status, pairCode) => {
+      console.log('wallet code', error, status, pairCode)
+      if (error != D.error.succeed) {
+        this.setState({
+          waitingDialogVisible: false,
+          authenticateDialogVisible: false,
+          connectDialogVisible: false
+        })
+      }else{
+        if (status === D.status.auth && pairCode) {
+          console.log('wallet authenticating')
+          if (pairCode) {
+            console.log('has receive pairCode')
+            this.setState({ waitingDialogVisible: false })
+            this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
+          }
+        }
+        if (status === D.status.syncing) {
+          this.setState({
+            waitingDialogVisible: false,
+            authenticateDialogVisible: false,
+            connectDialogVisible: false
+          })
+          let timeout = 0;
+          if (platform === 'ios') {
+            timeout = 400
+          }
+          setTimeout(() => {
+            this.props.navigation.navigate('Splash')
+          }, timeout)
+        }
+      }
     })
   }
 
   _listenTransmitter() {
     let _that = this
-    _that.transmitter.listenStatus(async (error, status, pairCode) => {
+    _that.transmitter.listenStatus(async (error, status) => {
       console.log('connect status', error, status)
       if (error !== D.error.succeed) {
         ToastUtil.showLong('connectFailed')
@@ -62,60 +116,55 @@ export default class PairListPage extends React.Component {
         _that.setState({ connectDialogVisible: true })
         return
       }
-      if (status === BtTransmitter.authenticating && pairCode !== '') {
-        console.log('authenticating', pairCode)
-        _that.setState({ connectDialogVisible: false })
-        _that.setState({ pairCode: pairCode, authenticateDialogVisible: true })
-        return
-      }
-      if (status === BtTransmitter.authenticated) {
-        _that.setState({ authenticateDialogVisible: false })
-        return
-      }
       if (status === BtTransmitter.disconnected) {
         _that.setState({
           authenticateDialogVisible: false,
-          connectDialogVisible: false
+          connectDialogVisible: false,
+          waitingDialogVisible: false
         })
         ToastUtil.showLong(I18n.t('disconnect'))
+        this._onRefresh(false)
         return
       }
       if (status === BtTransmitter.connected) {
-        console.log('device connected')
+        _that._gotoSyncPage()
         _that.transmitter.stopScan()
-        _that.setState({ connectDialogVisible: false })
-        console.log('connected device info', this.connectDeviceInfo)
-        PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-        const resetAction = StackActions.reset({
-          index: 0,
-          actions: [NavigationActions.navigate({ routeName: 'Splash' })]
-        })
-        _that.props.navigation.dispatch(resetAction)
-        return
       }
     })
   }
 
-  _findDefaultDevice() {
+  async _gotoSyncPage() {
+    console.log('device connected')
+    this.transmitter.stopScan()
+    this.setState({ connectDialogVisible: false })
+    console.log('connected device info', this.connectDeviceInfo)
+    await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
+    this.setState({ waitingDialogVisible: true })
+  }
+
+  _findDefaultDevice(autoConnect) {
     PreferenceUtil.getDefaultDevice()
       .then(value => {
-        this._findDevice(value)
+        this._findDevice(value, autoConnect)
       })
       .catch(err => console.log(err))
   }
 
-  _findDevice(deviceInfo) {
+  _findDevice(deviceInfo, autoConnect) {
     let devices = new Set()
     let _that = this
     _that.transmitter.startScan((error, info) => {
-      if (info.sn !== null) {
-        devices.add(info)
+      if (info.sn && info.sn.length === 12) {
+        // filter device sn
+        if(info.sn.startsWith('ES12') || info.sn.startsWith('2')) {
+          devices.add(info)
+        }
       }
       _that.setState({
         deviceList: Array.from(devices)
       })
-      //found default device, connect directly
-      if (deviceInfo != null && info.sn === deviceInfo.sn) {
+      // found default device, connect directly
+      if (deviceInfo != null && info.sn === deviceInfo.sn && autoConnect) {
         this._connectDevice(deviceInfo)
       }
     })
@@ -148,13 +197,13 @@ export default class PairListPage extends React.Component {
     this.setState({ connectDialogVisible: true })
   }
 
-  _onRefresh() {
+  _onRefresh(autoConnect) {
     this.transmitter.stopScan()
     this.setState({
       refreshing: true,
       deviceList: []
     })
-    this._findDefaultDevice()
+    this._findDefaultDevice(autoConnect)
     this.setState({
       refreshing: false
     })
@@ -167,12 +216,12 @@ export default class PairListPage extends React.Component {
       height = 88
     }
     return (
-      <Container style={CommonStyle.layoutBottom}>
-        <View style={{ height: bgHeight }}>
+      <Container style={CommonStyle.safeAreaBottom}>
+        <View style={{ height: bgHeight, justifyContent: 'center', alignItems: 'center' }}>
           <Image
             source={require('../../imgs/bg_home.png')}
             resizeMode={'stretch'}
-            style={{ height: bgHeight }}>
+            style={{ height: bgHeight, alignContent: 'center', alignItems: 'center' }}>
             <View style={{ height: height }}>
               <View
                 style={{
@@ -207,26 +256,34 @@ export default class PairListPage extends React.Component {
             </View>
             <View
               style={{
-                marginLeft: deviceW * 0.37,
                 marginTop: Dimen.MARGIN_VERTICAL
               }}>
               <Image
                 source={require('../../imgs/bluetooth_bg.png')}
-                style={{ width: 100, height: 100 }}
+                style={{ width: 80, height: 80 }}
               />
             </View>
-            <View
-              style={{
-                marginLeft: I18n.locale === 'zh-Hans-CN' ? deviceW * 0.37 : deviceW * 0.14
-              }}>
+            <View style={{}}>
               <Text
                 style={{
+                  textAlignVertical: 'center',
+                  textAlign: 'center',
                   color: Color.TEXT_ICONS,
                   fontSize: 25,
                   marginTop: 30,
                   backgroundColor: 'transparent'
                 }}>
                 {I18n.t('pairDevice')}
+              </Text>
+              <Text
+                style={{
+                  textAlignVertical: 'center',
+                  textAlign: 'center',
+                  color: Color.TEXT_ICONS,
+                  marginTop: Dimen.SPACE,
+                  backgroundColor: 'transparent'
+                }}>
+                {I18n.t('pairDeviceTip')}
               </Text>
             </View>
           </Image>
@@ -238,7 +295,7 @@ export default class PairListPage extends React.Component {
             refreshControl={
               <RefreshControl
                 refreshing={this.state.refreshing}
-                onRefresh={() => this._onRefresh()}
+                onRefresh={() => this._onRefresh(true)}
               />
             }
             renderRow={item => (
@@ -256,7 +313,13 @@ export default class PairListPage extends React.Component {
         <Dialog.Container visible={this.state.authenticateDialogVisible}>
           <Dialog.Title>{I18n.t('pairCode')}</Dialog.Title>
           <Dialog.Description>{this.state.pairCode}</Dialog.Description>
+          <Dialog.Description>{I18n.t('pleaseWait')}</Dialog.Description>
         </Dialog.Container>
+        <ProgressDialog
+          activityIndicatorColor={Color.ACCENT}
+          visible={this.state.waitingDialogVisible}
+          message={I18n.t('pleaseWait')}
+        />
       </Container>
     )
   }

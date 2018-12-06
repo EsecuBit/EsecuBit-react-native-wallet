@@ -1,33 +1,57 @@
 import RealmDB from '../db/RealmDB'
-import {
-  LEGAL_CURRENCY_UNIT_KEY,
-  ETH_UNIT_KEY,
-  BTC_UNIT_KEY,
-  DEFAULT_DEVICE
-} from '../common/Constants'
+import {Coin, Unit} from '../common/Constants'
 import { D } from 'esecubit-wallet-sdk'
+import CoinUtil from './CoinUtil'
+import { log } from 'util';
 
 const realmDB = new RealmDB('default')
 class PreferenceUtil {
   static async getCurrencyUnit(key) {
-    let defaultValue = ''
-    if (key === ETH_UNIT_KEY) {
-      defaultValue = D.unit.eth.ETH
-    } else if (key === BTC_UNIT_KEY) {
-      defaultValue = D.unit.btc.BTC
-    } else if (key === LEGAL_CURRENCY_UNIT_KEY) {
-      defaultValue = D.unit.legal.USD
-    }
+    let defaultUnit = PreferenceUtil.prototype._getDefaultUnit(key)
     let result = await realmDB.getPreference(key).catch(err => {
       console.warn('getCurrencyUnit', err)
     })
-    if (result !== undefined) {
+    if (result) {
       result = JSON.parse(result.value)
       return result.label
     }
     //never set before
-    this.updateCurrencyUnit(key, defaultValue, 0)
-    return defaultValue
+    await PreferenceUtil.updateCurrencyUnit(key, defaultUnit, 0)
+    return defaultUnit
+  }
+
+  _getDefaultUnit(coinType) {
+    switch (coinType) {
+      case Coin.btc:
+        return D.unit.btc.BTC
+      case Coin.eth:
+        return D.unit.eth.ETH
+      case Coin.eos:
+        return D.unit.eos.EOS
+      case Coin.legal:
+        return D.unit.legal.USD
+      default:
+        throw D.error.coinNotSupported
+    }
+  }
+
+  static async getLanguagePreference() {
+    let defaultLanguage = 'en'
+    let result = await realmDB.getPreference('language').catch(err => {
+      console.warn('getLanguagePreference', err)
+    })
+  
+    if (result) {
+      return result.value
+    }
+    await PreferenceUtil.updateLanguagePrefrence(defaultLanguage)
+    return defaultLanguage
+  }
+
+  static async updateLanguagePrefrence(value) {
+    await realmDB.saveOrUpdatePreference('language', value).catch(error => {
+      console.warn('updateLanguagePrefrence', error)
+    })
   }
 
   static async updateCurrencyUnit(key, label, index) {
@@ -42,28 +66,18 @@ class PreferenceUtil {
   }
 
   static async getCryptoCurrencyUnit(coinType) {
-    let key = D.isBtc(coinType) ? BTC_UNIT_KEY : ETH_UNIT_KEY
+    let key = CoinUtil.getRealCoinType(coinType)
     return this.getCurrencyUnit(key)
-  }
-
-  static async updateCryptoCurrencyUnit(coinType, key, value, index) {
-    key = D.isBtc(coinType) ? BTC_UNIT_KEY : ETH_UNIT_KEY
-    return this.updateCurrencyUnit(key, value, index)
   }
 
   static async setDefaultDevice(obj) {
     obj = JSON.stringify(obj)
-    realmDB
-      .saveOrUpdatePreference(DEFAULT_DEVICE, obj)
-      .catch(err => console.warn('setDefaultDevice', err))
+    realmDB.saveOrUpdatePreference('sn', obj).catch(err => console.warn('setDefaultDevice', err))
   }
 
   static async getDefaultDevice() {
-    let obj = await realmDB
-      .getPreference(DEFAULT_DEVICE)
-      .catch(err => console.warn('getDefaultDevice', err))
-    console.log('?????', obj)
-    if (obj !== undefined) {
+    let obj = await realmDB.getPreference('sn').catch(err => console.warn('getDefaultDevice', err))
+    if (obj) {
       return JSON.parse(obj.value)
     }
     return obj

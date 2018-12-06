@@ -4,6 +4,12 @@ global.navigator = global.navigator || {}
 global.window = global.window || {}
 global.chrome = global.chrome || undefined
 
+global.Uint8Array.prototype.fill = function(value) {
+  for (let i = 0; i < this.length; i++) {
+    this[i] = value;
+  }
+}
+
 // asyncToGenerator
 var babelHelpers = (global.babelHelpers = {})
 babelHelpers.typeof =

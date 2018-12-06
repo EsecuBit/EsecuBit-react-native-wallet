@@ -1,44 +1,30 @@
 import React from 'react'
-import {
-  View,
-  Platform,
-  DeviceEventEmitter,
-  TouchableOpacity
-} from 'react-native'
+import {View, Platform, DeviceEventEmitter, TouchableOpacity, BackHandler} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Dropdown } from 'react-native-material-dropdown'
-import {
-  Container,
-  Content,
-  Icon,
-  Text,
-  Card,
-  CardItem,
-  Item,
-  Input
-} from 'native-base'
+import { Container, Content, Icon, Text, Card, CardItem, Item, Input } from 'native-base'
 import { CommonStyle, Color, Dimen } from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
-import EsAccountHelper from '../../EsAccountHelper'
 import { MaterialDialog } from 'react-native-material-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import Dialog from 'react-native-dialog'
 import StringUtil from '../../utils/StringUtil'
-import SendButton from '../../components/SendButton'
-
+import FooterButton from '../../components/FooterButton'
+import { connect } from 'react-redux'
+import BaseComponent from '../../components/BaseComponent'
+import {NavigationActions} from 'react-navigation'
 const platform = Platform.OS
 
-export default class BTCSendPage extends React.Component {
+class BTCSendPage extends BaseComponent {
   constructor(props) {
     super(props)
-    this.account = EsAccountHelper.getInstance().getAccount()
+    this.account = props.account
     this.coinType = this.account.coinType
     this.esWallet = new EsWallet()
-    const { params } = props.navigation.state
-    this.legalCurrencyUnit = params.legalCurrencyUnit
-    this.cryptoCurrencyUnit = params.cryptoCurrencyUnit
-    this.txInfo = params.txInfo
+
+    this.legalCurrencyUnit = props.legalCurrencyUnit
+    this.cryptoCurrencyUnit = props.btcUnit
     this.minimumUnit = D.unit.btc.satoshi
     //prevent duplicate send
     this.lockSend = false
@@ -60,11 +46,17 @@ export default class BTCSendPage extends React.Component {
       sendDialogVisible: false,
       remarks: '',
       transactionFee: '0',
-      deviceLimitDialogVisible: false
+      deviceLimitDialogVisible: false,
+      transactionConfirmDialogVisible: false,
+      transactionConfirmDesc: '',
     }
   }
 
   _fillResendData() {
+    const { params }= this.props.navigation.state
+    if (params) {
+      this.txInfo = params.txInfo
+    }
     if (this.txInfo !== undefined) {
       let value =
         this.txInfo.outputs.find(output => !output.isMine) === undefined
@@ -88,7 +80,17 @@ export default class BTCSendPage extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  };
+
   componentDidMount() {
+    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
     this._initListener()
     this._getSuggestedFee().catch(err => {
       console.warn('getSuggestedFee error', err)
@@ -146,13 +148,7 @@ export default class BTCSendPage extends React.Component {
     for (let i = 0; i < feeLevel; i++) {
       const json = {}
       let feeValue = feeValues[i]
-      json.value =
-        I18n.t(feeKeys[i]) +
-        '( ' +
-        feeValue +
-        ' ' +
-        D.unit.btc.satoshi +
-        ' / byte )'
+      json.value = I18n.t(feeKeys[i]) + '( ' + feeValue + ' ' + D.unit.btc.satoshi + ' / byte )'
       this.state.feesTip.push(json)
     }
   }
@@ -214,15 +210,10 @@ export default class BTCSendPage extends React.Component {
    */
   _maxAmount() {
     console.log('maxAmount Fee before', this.state.selectedFee)
-    if (
-      this.state.selectedFee === '' &&
-      this.state.currentFeeType === 'standard'
-    ) {
+    if (this.state.selectedFee === '' && this.state.currentFeeType === 'standard') {
       this.setState({ selectedFee: this.state.fees[0] })
     }
-    let fee = this.state.selectedFee
-      ? this.state.selectedFee.toString().trim()
-      : '0'
+    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
     console.log('maxAmount Fee after', this.state.selectedFee)
     let formData = this._buildBTCMaxAmountForm(fee)
     console.log('_maxAmount formData', formData)
@@ -282,15 +273,10 @@ export default class BTCSendPage extends React.Component {
     }
     value = this._toMinimumUnit(value)
 
-    if (
-      this.state.selectedFee === '' &&
-      this.state.currentFeeType === 'standard'
-    ) {
+    if (this.state.selectedFee === '' && this.state.currentFeeType === 'standard') {
       this.setState({ selectedFee: this.state.fees[0] })
     }
-    let fee = this.state.selectedFee
-      ? this.state.selectedFee.toString().trim()
-      : '0'
+    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
     if (StringUtil.isInvalidValue(fee)) {
       if (this.feeInput != null) {
         this.feeInput._root.clear()
@@ -304,9 +290,7 @@ export default class BTCSendPage extends React.Component {
       .then(value => {
         console.log('_calculateTotalCost result', value)
         this._checkIfDeviceLimit(value)
-        let fromUnit = D.isBtc(this.coinType)
-          ? D.unit.btc.satoshi
-          : D.unit.eth.Wei
+        let fromUnit = D.isBtc(this.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
         let legalCurrencyResult = this.esWallet.convertValue(
           this.coinType,
           value.total,
@@ -325,9 +309,7 @@ export default class BTCSendPage extends React.Component {
           fromUnit,
           this.cryptoCurrencyUnit
         )
-        legalCurrencyResult = StringUtil.formatLegalCurrency(
-          Number(legalCurrencyResult).toFixed(2)
-        )
+        legalCurrencyResult = StringUtil.formatLegalCurrency(Number(legalCurrencyResult).toFixed(2))
         this.setState({
           totalCostLegalCurrency: legalCurrencyResult,
           totalCostCryptoCurrency: cryptoCurrencyResult,
@@ -336,7 +318,7 @@ export default class BTCSendPage extends React.Component {
       })
       .catch(error => {
         console.warn('_calculateTotalCost error', error)
-        ToastUtil.showErrorMsg(error)
+        ToastUtil.showErrorMsgShort(error)
       })
   }
 
@@ -352,19 +334,31 @@ export default class BTCSendPage extends React.Component {
     }
   }
 
-  _send() {
+  _confirmTransaction() {
     if (this.lockSend || !this._checkFormData()) {
       console.log('asd', this.lockSend, !this._checkFormData())
       return
     }
+    this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.btcUnit + " "+ I18n.t('to1') +" "+ this.state.address})
+    this.setState({transactionConfirmDialogVisible: true})
 
+  }
+
+  _send() {
     let value = this.state.sendValue ? this.state.sendValue.trim() : '0'
-    let fee = this.state.selectedFee
-      ? this.state.selectedFee.toString().trim()
-      : '0'
+    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
     value = this._toMinimumUnit(value)
     let formData = this._buildBTCSendForm(fee, value)
-    this.setState({ sendDialogVisible: true })
+
+    // iOS render is too fast
+    if(platform === 'ios') {
+      setTimeout(() => {
+        this.setState({ sendDialogVisible: true })
+      }, 400)
+    }else{
+      this.setState({ sendDialogVisible: true })
+    }
+
     this.lockSend = true
     console.log('_send formData', formData)
     this.account
@@ -436,7 +430,7 @@ export default class BTCSendPage extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Container style={CommonStyle.safeAreaBottom}>
         <SendToolbar coinType="BTC" navigation={this.props.navigation} />
         <Content padder>
           <View style={{ marginTop: Dimen.SPACE, marginBottom: Dimen.SPACE }}>
@@ -449,21 +443,13 @@ export default class BTCSendPage extends React.Component {
                 numberOfLines: 3,
                 marginRight: Dimen.SPACE
               }}>
-              {I18n.t('balance') +
-                ': ' +
-                this.state.balance +
-                ' ' +
-                this.cryptoCurrencyUnit}
+              {I18n.t('balance') + ': ' + this.state.balance + ' ' + this.cryptoCurrencyUnit}
             </Text>
           </View>
           <Card>
             <CardItem>
               <Item inlineLabel>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('address')}
                 </Text>
                 <Input
@@ -485,11 +471,7 @@ export default class BTCSendPage extends React.Component {
             </CardItem>
             <CardItem>
               <Item inlineLabel>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('value')}
                 </Text>
                 <Input
@@ -505,13 +487,9 @@ export default class BTCSendPage extends React.Component {
                   value={this.state.sendValue}
                   returnKeyType="done"
                   onChangeText={text => {
-                    this._calculateSendValue(text).catch(err =>
-                      console.log(err)
-                    )
+                    this._calculateSendValue(text).catch(err => console.log(err))
                   }}
-                  keyboardType={
-                    platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'
-                  }
+                  keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
                   blurOnSubmit={true}
                 />
                 <TouchableOpacity
@@ -529,11 +507,7 @@ export default class BTCSendPage extends React.Component {
             </CardItem>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('fee')}
                 </Text>
                 {this.state.currentFeeType === 'standard' ? (
@@ -558,9 +532,7 @@ export default class BTCSendPage extends React.Component {
                     ref={refs => (this.feeInput = refs)}
                     placeholder="satoshi per byte"
                     onChangeText={text => this._calculateBTCFee(text)}
-                    keyboardType={
-                      platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'
-                    }
+                    keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
                     blurOnSubmit={true}
                     returnKeyType="done"
                   />
@@ -574,11 +546,7 @@ export default class BTCSendPage extends React.Component {
             </CardItem>
             <CardItem>
               <Item>
-                <Text
-                  style={[
-                    CommonStyle.secondaryText,
-                    { marginRight: Dimen.SPACE }
-                  ]}>
+                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                   {I18n.t('remarks')}
                 </Text>
                 <Input
@@ -598,38 +566,24 @@ export default class BTCSendPage extends React.Component {
               </Item>
             </CardItem>
             <CardItem>
-              <Text
-                style={[
-                  CommonStyle.secondaryText,
-                  { marginRight: Dimen.SPACE }
-                ]}>
+              <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                 {I18n.t('transactionFee')}
               </Text>
               <View style={{ flex: 1, marginLeft: 32 }}>
-                <View
-                  style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <Text>{this.state.transactionFee + ' '}</Text>
-                  <Text style={{ textAlignVertical: 'center' }}>
-                    {this.cryptoCurrencyUnit}
-                  </Text>
+                  <Text style={{ textAlignVertical: 'center' }}>{this.cryptoCurrencyUnit}</Text>
                 </View>
               </View>
             </CardItem>
             <CardItem>
-              <Text
-                style={[
-                  CommonStyle.secondaryText,
-                  { marginRight: Dimen.SPACE }
-                ]}>
+              <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
                 {I18n.t('totalCost')}
               </Text>
               <View style={{ flex: 1, marginLeft: 32 }}>
-                <View
-                  style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <Text>{this.state.totalCostCryptoCurrency + ' '}</Text>
-                  <Text style={{ textAlignVertical: 'center' }}>
-                    {this.cryptoCurrencyUnit}
-                  </Text>
+                  <Text style={{ textAlignVertical: 'center' }}>{this.cryptoCurrencyUnit}</Text>
                 </View>
                 <View
                   style={{
@@ -650,7 +604,7 @@ export default class BTCSendPage extends React.Component {
                       fontSize: Dimen.SECONDARY_TEXT,
                       textAlignVertical: 'center'
                     }}>
-                    {this.legalCurrencyUnit}
+                    {this.props.legalCurrencyUnit}
                   </Text>
                 </View>
               </View>
@@ -661,9 +615,7 @@ export default class BTCSendPage extends React.Component {
           title={I18n.t('transacting')}
           visible={this.state.sendDialogVisible}
           onCancel={() => {}}>
-          <Text style={{ color: Color.PRIMARY_TEXT }}>
-            {I18n.t('pleaseInputPassword')}
-          </Text>
+          <Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text>
         </MaterialDialog>
         <Dialog.Container
           visible={this.state.deviceLimitDialogVisible}
@@ -681,8 +633,37 @@ export default class BTCSendPage extends React.Component {
             onPress={() => this.setState({ deviceLimitDialogVisible: false })}
           />
         </Dialog.Container>
-        <SendButton onPress={this._send.bind(this)} />
+        <Dialog.Container
+          visible={this.state.transactionConfirmDialogVisible}
+          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}
+        >
+          <Dialog.Title>{I18n.t("transactionConfirm")}</Dialog.Title>
+          <Dialog.Description>{this.state.transactionConfirmDesc}</Dialog.Description>
+          <Dialog.Button
+            style={{ color: Color.ACCENT }}
+            label={I18n.t("cancel")}
+            onPress={() => this.setState({transactionConfirmDialogVisible: false})}
+          />
+          <Dialog.Button
+            style={{ color: Color.ACCENT }}
+            label={I18n.t("confirm")}
+            onPress={() => {
+              this._send()
+              this.setState({transactionConfirmDialogVisible: false})
+            }}
+          />
+        </Dialog.Container>
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')} />
       </Container>
     )
   }
 }
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account,
+  btcUnit: state.SettingsReducer.btcUnit,
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
+})
+
+const BTCSend = connect(mapStateToProps)(BTCSendPage)
+export default BTCSend

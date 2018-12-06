@@ -18,6 +18,10 @@ const COLOR_CONTAINER = '#F7F7F7'
 const COLOR_LIST_BG = '#F5F5F5'
 const COLOR_CONTAINER_BG = '#EFEFEF'
 const COLOR_MASK = '#0000004D'
+const COLOR_SUCCESS = '#5cb85c'
+const COLOR_WARNING = '#f0ad4e'
+const COLOR_DANGER = '#d9534f'
+const COLOR_DISABLE_BG = '#CFCFCF'
 
 export const Color = {
   PRIMARY: COLOR_PRIMARY,
@@ -38,7 +42,11 @@ export const Color = {
   CONTAINER: COLOR_CONTAINER,
   LIST_BG: COLOR_LIST_BG,
   CONTAINER_BG: COLOR_CONTAINER_BG,
-  MASK: COLOR_MASK
+  MASK: COLOR_MASK,
+  SUCCESS: COLOR_SUCCESS,
+  WARNING: COLOR_WARNING,
+  DANGER: COLOR_DANGER,
+  DISABLE_BG: COLOR_DISABLE_BG
 }
 
 const DIMEN_SECONDAT_TEXT = 14
@@ -48,7 +56,7 @@ const DIMEN_PADDING = 5
 const DIMEN_MARGIN_HORIZONTAL = 16
 const DIMEN_MARGIN_VERTICAL = 16
 const DIMEN_CORNER = 10
-const DIMEN_CARD_HEIGHT = 86
+const DIMEN_CARD_HEIGHT = 96
 const DIMEN_TOOLBAR_ANDROID = 56
 const DIMEN_TOOLBAR_IOS = 64
 const DIMEN_IPHONEX_SAFEAREA_PADDING = 34
@@ -68,7 +76,7 @@ const deviceHeight = Dimensions.get('window').height
 const deviceWidth = Dimensions.get('window').width
 const platform = Platform.OS
 export const isIphoneX =
-  platform === 'ios' && (deviceHeight === 812 || deviceWidth === 812)
+  platform === 'ios' && (deviceHeight === 812 || deviceWidth === 812 || deviceHeight === 896 || deviceWidth === 896)
 
 export const CommonStyle = StyleSheet.create({
   privateText: {
@@ -87,7 +95,7 @@ export const CommonStyle = StyleSheet.create({
     height: 1,
     backgroundColor: COLOR_DIVIDER
   },
-  layoutBottom: {
+  safeAreaBottom: {
     paddingBottom: isIphoneX ? DIMEN_IPHONEX_SAFEAREA_PADDING : 0
   },
   cardStyle: {
@@ -101,11 +109,15 @@ export const CommonStyle = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginTop: DIMEN_SPACE,
-    marginBottom: DIMEN_SPACE
+    marginBottom: DIMEN_SPACE,
   },
   toolbarIOS: {
+    flex: 3,
     justifyContent: 'center',
-    height: DIMEN_TOOLBAR_IOS
+    height: DIMEN_TOOLBAR_IOS,
+    alignItems: 'center',
+    alignContent: 'center',
+    marginTop: isIphoneX ? Dimen.MARGIN_VERTICAL : 0,
   },
   toolbarAndroid: {
     justifyContent: 'center',

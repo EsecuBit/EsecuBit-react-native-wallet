@@ -50,20 +50,18 @@ class EsBtDevice {
     this._statusListener = callback
   }
 
-  sendApdu(apdu) {
+  sendAndReceive(apdu) {
     if (typeof apdu !== 'string') apdu = apdu.toString('hex')
-    return this._device.sendApdu(apdu, false)
-      .then(response => Buffer.from(response, 'hex'))
-      .catch((e) => {
+    return this._device.sendApdu(apdu)
+      .then(response => {
+        response = Buffer.from(response, 'hex')
+        console.debug('transmitter got response', response.toString('hex'))
+        return {result: 0x9000, response: response}
+      }).catch((e) => {
         console.warn('sendApdu got error', e)
         let sw1sw2 = parseInt(e.code, 16)
-        EsBtDevice._checkSw1Sw2(sw1sw2)
+        return {result: sw1sw2, response: Buffer.alloc(0)}
       })
-  }
-
-  static _checkSw1Sw2 (sw1sw2) {
-    let errorCode = D.error.checkSw1Sw2(sw1sw2)
-    if (errorCode !== D.error.succeed) throw errorCode
   }
 }
 EsBtDevice.connected = BtDevice.connected

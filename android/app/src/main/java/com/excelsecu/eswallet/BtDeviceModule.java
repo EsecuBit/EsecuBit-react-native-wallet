@@ -5,8 +5,9 @@ import android.support.annotation.Nullable;
 import com.excelsecu.eshdwallet.EsHDWallet;
 import com.excelsecu.eshdwallet.IEsDeviceState;
 import com.excelsecu.eshdwallet.IEsHDWallet;
-import com.excelsecu.transmit.EsDevice;
 import com.excelsecu.transmit.EsException;
+import com.excelsecu.transmit.device.EsDevice;
+import com.excelsecu.transmit.util.LogUtil;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -17,11 +18,9 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -132,7 +131,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
         mWorkExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                mEsWallet.connect(finalInfo.device.getName(), new IEsHDWallet.OnResponseListener<Boolean>() {
+                mEsWallet.connect(finalInfo.device, finalInfo.scanRecord, new IEsHDWallet.OnResponseListener<Boolean>() {
                     @Override
                     public void response(int error, Boolean isConnected) {
                         int status = isConnected ? STATUS_CONNECTED : STATUS_DISCONNECTED;
@@ -153,12 +152,12 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
     }
 
     @ReactMethod
-    public void sendApdu(final String hexApdu, final boolean isEnc, final Promise promise) {
+    public void sendApdu(final String hexApdu, final Promise promise) {
         mWorkExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String response = sendApduSync(hexApdu, isEnc);
+                    String response = sendApduSync(hexApdu);
                     promise.resolve(response);
                 } catch (EsException e) {
                     e.printStackTrace();
@@ -170,7 +169,7 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
 
     @ReactMethod
     public void getState(Promise promise) {
-        EsDevice esDevice = getEsDevice();
+        EsDevice esDevice = mEsWallet.getDevice();
         if (esDevice == null) {
             promise.resolve(STATUS_DISCONNECTED);
             return;
@@ -190,8 +189,8 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
         }
     }
 
-    private String sendApduSync(String hexApdu, boolean isEnc) throws EsException {
-        EsDevice esDevice = getEsDevice();
+    private String sendApduSync(String hexApdu) throws EsException {
+        EsDevice esDevice = mEsWallet.getDevice();
         byte[] apdu = ByteUtil.hexStringToBytes(hexApdu);
         int[] responseLength = {1024};
         byte[] response = new byte[responseLength[0]];
@@ -202,54 +201,23 @@ public class BtDeviceModule extends ReactContextBaseJavaModule implements IEsDev
             throw new EsException(28667);
         }
 
+        LogUtil.d("sendApdu apdu " + hexApdu);
         int error = esDevice.sendApdu(apdu, apdu.length, response, responseLength);
+        LogUtil.d("sendApdu response error " + error + ", response " + ByteUtil.bytesToHex(response, responseLength[0]));
+
         if (error != 0) {
             throw new EsException(error);
         }
-        byte[] responseNew = new byte[responseLength[0]];
-        System.arraycopy(response, 0, responseNew, 0, responseLength[0]);
-        if (responseNew[0] == 0x61) {
-            int nextGetApduLength = ByteUtil.byteToInt(responseNew[1]);
-            return ByteUtil.bytesToHex(resendApdu(nextGetApduLength));
+
+        int sw1sw2 =  ((response[responseLength[0] - 2] & 0xff) << 8) + (response[responseLength[0] - 1] & 0xff);
+        if (sw1sw2 != 0x9000) {
+          throw new EsException(sw1sw2);
         }
+        byte[] responseNew = new byte[responseLength[0] - 2];
+        System.arraycopy(response, 0, responseNew, 0, responseLength[0] - 2);
         return ByteUtil.bytesToHex(responseNew);
     }
 
-    private byte[] resendApdu(int nextGetApduLength) throws EsException {
-        EsDevice esDevice = getEsDevice();
-        byte[] apdu = ByteUtil.hexStringToBytes("00C0000000");
-        byte[] response = new byte[0];
-        while (true) {
-            apdu[0x04] = (byte) nextGetApduLength;
-            int[] resendResponseLength = {1024};
-            byte[] resendResponse = new byte[resendResponseLength[0]];
-            int errCode = esDevice.sendApdu(apdu, apdu.length, resendResponse, resendResponseLength);
-
-            if (errCode != 0) {
-                throw new EsException(errCode);
-
-            } else if (resendResponse[0] == 0x61 && resendResponse.length == 2) {
-                nextGetApduLength = ByteUtil.byteToInt(resendResponse[1]);
-                ByteUtil.concat(response, resendResponse, nextGetApduLength);
-
-            } else  {
-                return ByteUtil.concat(response, resendResponse, nextGetApduLength);
-            }
-        }
-
-    }
-
-
-    private EsDevice getEsDevice() {
-        try {
-            Field field = mEsWallet.getClass().getDeclaredField("mDevice");
-            field.setAccessible(true);
-            return (EsDevice) field.get(mEsWallet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private void sendConnectStatus(int error, int status, String pairCode) {
         WritableMap params = Arguments.createMap();
