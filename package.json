@@ -1,7 +1,7 @@
 {
   "name": "EsecuBit",
-  "version": "0.2.9",
-  "versionCode": 10,
+  "version": "0.3.4",
+  "versionCode": 15,
   "cosVersion": "1.0",
   "author": "EsecuBit",
   "private": true,
