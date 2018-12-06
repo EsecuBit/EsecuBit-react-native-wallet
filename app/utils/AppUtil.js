@@ -1,16 +1,18 @@
 import { version, versionCode, cosVersion } from '../../package.json'
 import { EsWallet } from 'esecubit-wallet-sdk'
 import { Platform, BackAndroid, NativeModules } from 'react-native'
-import I18n from '../lang/i18n'
+
 import StringUtil from './StringUtil'
 import { D } from 'esecubit-wallet-sdk'
 import { Api } from '../common/Constants'
+import PreferenceUtil from './PreferenceUtil.js';
 
 const BackIOS = NativeModules.BackIOS
 export default class AppUtil {
   static async checkUpdate() {
     let wallet = new EsWallet()
-    let lang = I18n.locale === 'zh-Hans-CN' ? 'zh_CN' : 'en_US'
+    let lang = await PreferenceUtil.getLanguagePreference()
+    lang = lang === 'zh-Hans' ? 'zh_CN' : 'en_US'
     try {
       await wallet.getWalletInfo()
       let respsonse = await fetch(Api.baseUrl + 'getNewApp', {

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Button, Header, Icon, Left, Right } from 'native-base'
 import { Dimensions, StatusBar, Text, View, Platform } from 'react-native'
-import { Color, CommonStyle, Dimen } from '../common/Styles'
+import { Color, CommonStyle, Dimen, isIphoneX } from '../common/Styles'
 import PropTypes from 'prop-types'
 import { withNavigation }from 'react-navigation'
 
@@ -15,10 +15,14 @@ class BaseToolbar extends PureComponent {
 
   render() {
     const { title } = this.props
+    let height = platform === 'ios' ? 64 : 56
+    if (isIphoneX) {
+      height = 88
+    }
     return (
       <View>
         <Header
-          style={{ backgroundColor: Color.DARK_PRIMARY }}
+          style={{ backgroundColor: Color.DARK_PRIMARY, height: height, alignContent: 'center', alignItems: 'center' }}
           translucent={false}
         >
           <StatusBar
@@ -32,17 +36,19 @@ class BaseToolbar extends PureComponent {
             </Button>
           </Left>
           <View
-            style={
+            style={[
               platform === 'ios'
                 ? CommonStyle.toolbarIOS
-                : CommonStyle.toolbarAndroid
+                : CommonStyle.toolbarAndroid]
             }
           >
             <Text
               style={{
+                textAlignVertical:'center',
+                textAlign: 'center',
                 color: Color.ACCENT,
                 fontSize: Dimen.PRIMARY_TEXT,
-                marginBottom: platform === 'ios' ? 15 : 0
+                marginBottom: platform === 'ios' ? 15 : 0    
               }}
             >
               {title}

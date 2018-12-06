@@ -535,7 +535,7 @@ class AccountDetailPage extends BaseComponent {
 
   render() {
     return (
-      <Container style={[CommonStyle.layoutBottom, { backgroundColor: Color.CONTAINER_BG }]}>
+      <Container style={[CommonStyle.safeAreaBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
           ref={refs => this.accountHeader = refs}
           onHideMenu={type => this._handleMenuItemClick(type)}

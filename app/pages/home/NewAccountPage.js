@@ -47,7 +47,7 @@ export default class NewAccountPage extends BaseComponent {
    */
   async _newAccount() {
     let coinType = this.newAccountType
-    if (this.newAccountName === null) {
+    if (!this.newAccountName) {
       ToastUtil.showLong(I18n.t('emptyAccountNameError'))
       return
     }

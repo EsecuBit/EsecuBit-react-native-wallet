@@ -7,8 +7,8 @@ import {
   Image,
   StatusBar,
   Dimensions,
-  Platform, BackHandler,
-  InteractionManager
+  Platform,
+  BackHandler
 } from 'react-native'
 import { Container, List, ListItem, Button, Icon } from 'native-base'
 import I18n from '../../lang/i18n'
@@ -44,20 +44,25 @@ export default class PairListPage extends BaseComponent {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+    this.setState({
+      waitingDialogVisible: false,
+      authenticateDialogVisible: false,
+      connectDialogVisible: false
+    })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
-    return true;
-  };
+    return true
+  }
 
   componentDidMount() {
     console.log('xr width', deviceW, isIphoneX)
     console.log('xr height', deviceH)
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     let _that = this
-    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers 
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
     this.props.navigation.addListener('willFocus', async () => {
       _that._listenTransmitter()
       await _that.setState({ deviceList: [] })
@@ -65,25 +70,37 @@ export default class PairListPage extends BaseComponent {
     })
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
-      if (error === D.error.succeed && status === D.status.auth && pairCode) {
-        console.log('wallet authenticating');
-        if(pairCode) {
-          console.log('has receive pairCode');
-          this.setState({waitingDialogVisible: false})
-          this.setState({authenticateDialogVisible: true, pairCode: pairCode})
+      if (error != D.error.succeed) {
+        this.setState({
+          waitingDialogVisible: false,
+          authenticateDialogVisible: false,
+          connectDialogVisible: false
+        })
+      }else{
+        if (status === D.status.auth && pairCode) {
+          console.log('wallet authenticating')
+          if (pairCode) {
+            console.log('has receive pairCode')
+            this.setState({ waitingDialogVisible: false })
+            this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
+          }
+        }
+        if (status === D.status.syncing) {
+          this.setState({
+            waitingDialogVisible: false,
+            authenticateDialogVisible: false,
+            connectDialogVisible: false
+          })
+          let timeout = 0;
+          if (platform === 'ios') {
+            timeout = 400
+          }
+          setTimeout(() => {
+            this.props.navigation.navigate('Splash')
+          }, timeout)
         }
       }
-      if(error === D.error.succeed && status === D.status.authFinish) {
-        InteractionManager.runAfterInteractions(() => {
-          const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [NavigationActions.navigate({ routeName: 'Splash' })]
-          })
-          this.props.navigation.dispatch(resetAction)  
-        })
-      }
     })
-   
   }
 
   _listenTransmitter() {
@@ -109,8 +126,9 @@ export default class PairListPage extends BaseComponent {
         this._onRefresh(false)
         return
       }
-      if(status === BtTransmitter.connected) {
+      if (status === BtTransmitter.connected) {
         _that._gotoSyncPage()
+        _that.transmitter.stopScan()
       }
     })
   }
@@ -121,7 +139,7 @@ export default class PairListPage extends BaseComponent {
     this.setState({ connectDialogVisible: false })
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-    this.setState({waitingDialogVisible: true})
+    this.setState({ waitingDialogVisible: true })
   }
 
   _findDefaultDevice(autoConnect) {
@@ -136,13 +154,16 @@ export default class PairListPage extends BaseComponent {
     let devices = new Set()
     let _that = this
     _that.transmitter.startScan((error, info) => {
-      if (info.sn !== null) {
-        devices.add(info)
+      if (info.sn && info.sn.length === 12) {
+        // filter device sn
+        if(info.sn.startsWith('ES12') || info.sn.startsWith('2')) {
+          devices.add(info)
+        }
       }
       _that.setState({
         deviceList: Array.from(devices)
       })
-      //found default device, connect directly
+      // found default device, connect directly
       if (deviceInfo != null && info.sn === deviceInfo.sn && autoConnect) {
         this._connectDevice(deviceInfo)
       }
@@ -195,12 +216,12 @@ export default class PairListPage extends BaseComponent {
       height = 88
     }
     return (
-      <Container style={CommonStyle.layoutBottom}>
+      <Container style={CommonStyle.safeAreaBottom}>
         <View style={{ height: bgHeight, justifyContent: 'center', alignItems: 'center' }}>
           <Image
             source={require('../../imgs/bg_home.png')}
             resizeMode={'stretch'}
-            style={{ height: bgHeight, alignContent: 'center', alignItems: 'center'}}>
+            style={{ height: bgHeight, alignContent: 'center', alignItems: 'center' }}>
             <View style={{ height: height }}>
               <View
                 style={{
@@ -242,10 +263,7 @@ export default class PairListPage extends BaseComponent {
                 style={{ width: 80, height: 80 }}
               />
             </View>
-            <View
-              style={{
-                
-              }}>
+            <View style={{}}>
               <Text
                 style={{
                   textAlignVertical: 'center',
@@ -293,7 +311,7 @@ export default class PairListPage extends BaseComponent {
           message={I18n.t('connecting')}
         />
         <Dialog.Container visible={this.state.authenticateDialogVisible}>
-          <Dialog.Title>{I18n.t('pairCode') }</Dialog.Title>
+          <Dialog.Title>{I18n.t('pairCode')}</Dialog.Title>
           <Dialog.Description>{this.state.pairCode}</Dialog.Description>
           <Dialog.Description>{I18n.t('pleaseWait')}</Dialog.Description>
         </Dialog.Container>

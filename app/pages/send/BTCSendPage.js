@@ -430,7 +430,7 @@ class BTCSendPage extends BaseComponent {
 
   render() {
     return (
-      <Container style={CommonStyle.layoutBottom}>
+      <Container style={CommonStyle.safeAreaBottom}>
         <SendToolbar coinType="BTC" navigation={this.props.navigation} />
         <Content padder>
           <View style={{ marginTop: Dimen.SPACE, marginBottom: Dimen.SPACE }}>

@@ -95,7 +95,7 @@ export const CommonStyle = StyleSheet.create({
     height: 1,
     backgroundColor: COLOR_DIVIDER
   },
-  layoutBottom: {
+  safeAreaBottom: {
     paddingBottom: isIphoneX ? DIMEN_IPHONEX_SAFEAREA_PADDING : 0
   },
   cardStyle: {
@@ -112,8 +112,12 @@ export const CommonStyle = StyleSheet.create({
     marginBottom: DIMEN_SPACE,
   },
   toolbarIOS: {
+    flex: 3,
     justifyContent: 'center',
-    height: DIMEN_TOOLBAR_IOS
+    height: DIMEN_TOOLBAR_IOS,
+    alignItems: 'center',
+    alignContent: 'center',
+    marginTop: isIphoneX ? Dimen.MARGIN_VERTICAL : 0,
   },
   toolbarAndroid: {
     justifyContent: 'center',
