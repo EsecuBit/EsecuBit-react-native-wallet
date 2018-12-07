@@ -128,7 +128,7 @@ export default {
   transactionFee: '交易费用',
   newAccountSuccess: '新建账户成功',
   copyRemind:'长按二维码复制地址',
-  pleaseInputPassword: '请在设备上输入密码',
+  pleaseInputPassword: '请在设备上输入密码并核对交易信息',
   tips: '提示',
   deviceLimitTips: '因为设备限制，签名时交易报文不能超过2k（约45个utxo）。目前最大可发送金额为: ',
   canResend: '是否可重发',

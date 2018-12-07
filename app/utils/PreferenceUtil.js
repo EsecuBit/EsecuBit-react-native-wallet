@@ -1,23 +1,23 @@
 import RealmDB from '../db/RealmDB'
-import {Coin, Unit} from '../common/Constants'
+import { Coin } from '../common/Constants'
 import { D } from 'esecubit-wallet-sdk'
 import CoinUtil from './CoinUtil'
-import { log } from 'util';
 
 const realmDB = new RealmDB('default')
 class PreferenceUtil {
   static async getCurrencyUnit(key) {
     let defaultUnit = PreferenceUtil.prototype._getDefaultUnit(key)
-    let result = await realmDB.getPreference(key).catch(err => {
-      console.warn('getCurrencyUnit', err)
-    })
+    let result = await realmDB.getPreference(key)
     if (result) {
       result = JSON.parse(result.value)
-      return result.label
+      return result
     }
-    //never set before
+    // never set before
     await PreferenceUtil.updateCurrencyUnit(key, defaultUnit, 0)
-    return defaultUnit
+    return {
+      label: defaultUnit,
+      index: 0
+    }
   }
 
   _getDefaultUnit(coinType) {
@@ -36,47 +36,42 @@ class PreferenceUtil {
   }
 
   static async getLanguagePreference() {
-    let defaultLanguage = 'en'
-    let result = await realmDB.getPreference('language').catch(err => {
-      console.warn('getLanguagePreference', err)
-    })
-  
-    if (result) {
-      return result.value
+    let languagePref = await realmDB.getPreference('language')
+    console.log('languagePref', languagePref);
+    
+    if(languagePref) {
+      return JSON.parse(languagePref.value)
     }
-    await PreferenceUtil.updateLanguagePrefrence(defaultLanguage)
-    return defaultLanguage
   }
 
-  static async updateLanguagePrefrence(value) {
-    await realmDB.saveOrUpdatePreference('language', value).catch(error => {
-      console.warn('updateLanguagePrefrence', error)
-    })
-  }
-
-  static async updateCurrencyUnit(key, label, index) {
-    let obj = {
+  static async updateLanguagePrefrence(label, index) {
+    let value = {
       label: label,
       index: index
     }
-    let value = JSON.stringify(obj)
-    await realmDB.saveOrUpdatePreference(key, value).catch(error => {
-      console.warn('updateCurrencyPreference', error)
-    })
+    realmDB.saveOrUpdatePreference('language', JSON.stringify(value))
+  }
+
+  static async updateCurrencyUnit(key, label, index) {
+    let value = {
+      label: label,
+      index: index
+    }
+    realmDB.saveOrUpdatePreference(key, JSON.stringify(value))
   }
 
   static async getCryptoCurrencyUnit(coinType) {
     let key = CoinUtil.getRealCoinType(coinType)
-    return this.getCurrencyUnit(key)
+    return await this.getCurrencyUnit(key)
   }
 
   static async setDefaultDevice(obj) {
     obj = JSON.stringify(obj)
-    realmDB.saveOrUpdatePreference('sn', obj).catch(err => console.warn('setDefaultDevice', err))
+    realmDB.saveOrUpdatePreference('sn', obj)
   }
 
   static async getDefaultDevice() {
-    let obj = await realmDB.getPreference('sn').catch(err => console.warn('getDefaultDevice', err))
+    let obj = await realmDB.getPreference('sn')
     if (obj) {
       return JSON.parse(obj.value)
     }

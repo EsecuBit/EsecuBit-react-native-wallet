@@ -146,6 +146,7 @@ export default class PairListPage extends BaseComponent {
     PreferenceUtil.getDefaultDevice()
       .then(value => {
         this._findDevice(value, autoConnect)
+        this.setState({refreshing: false})
       })
       .catch(err => console.log(err))
   }
@@ -161,7 +162,7 @@ export default class PairListPage extends BaseComponent {
         }
       }
       _that.setState({
-        deviceList: Array.from(devices)
+        deviceList: Array.from(devices),
       })
       // found default device, connect directly
       if (deviceInfo != null && info.sn === deviceInfo.sn && autoConnect) {
@@ -204,9 +205,7 @@ export default class PairListPage extends BaseComponent {
       deviceList: []
     })
     this._findDefaultDevice(autoConnect)
-    this.setState({
-      refreshing: false
-    })
+    
   }
 
   render() {

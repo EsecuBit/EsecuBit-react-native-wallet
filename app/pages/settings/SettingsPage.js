@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import {
   StyleSheet,
   View,
-  StatusBar,
   Dimensions,
   Platform,
   Linking,
@@ -82,7 +81,30 @@ class SettingsPage extends BaseComponent {
 
   componentDidMount() {
     this._listenDeviceStatus()
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+    this.props.navigation.addListener("willFocus", () => {
+      this._getPreference()
+    })
+    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+  }
+
+  async _getPreference() {
+    let languagePref = await PreferenceUtil.getLanguagePreference()
+    if (languagePref) {
+      this.setState({changeLanguageIndex: languagePref.index, changeLanguageLabel: languagePref.label})
+    }
+    let btcPref = await PreferenceUtil.getCryptoCurrencyUnit(Coin.btc)
+    if (btcPref) {
+      this.setState({btcIndex: btcPref.index, btcLabel: btcPref.label})
+    }
+    let ethPref = await PreferenceUtil.getCryptoCurrencyUnit(Coin.eth)
+    if (ethPref) {
+      this.setState({ethIndex: ethPref.index, ethLabel: ethPref.label})
+    }
+    let legalPref = await PreferenceUtil.getCurrencyUnit(Coin.legal)
+    console.log('legalPref', legalPref)
+    if (legalPref) {
+      this.setState({legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index})
+    }
   }
 
   _listenDeviceStatus() {
@@ -159,13 +181,13 @@ class SettingsPage extends BaseComponent {
 
   _checkForceUpdate() {
     this.setState({ updateVersionDialogVisible: false })
-    if (this.info !== undefined && this.info.data.isForceUpdate) {
+    if (this.info && this.info.data.isForceUpdate) {
       AppUtil.exitApp()
     }
   }
 
   _gotoBrowser() {
-    if (this.info.data !== null) {
+    if (this.info.data) {
       Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
     this.setState({ updateVersionDialogVisible: false })
@@ -377,11 +399,13 @@ class SettingsPage extends BaseComponent {
             switch (index) {
               case 0:
                 I18n.locale = 'en'
-                PreferenceUtil.updateLanguagePrefrence('en')
+                PreferenceUtil.updateLanguagePrefrence('en', 0)
+                this.setState({ changeLanguageIndex: 0, changeLanguageLabel: 'en' })
                 break
               case 1:
                 I18n.locale = 'zh-Hans'
-                PreferenceUtil.updateLanguagePrefrence('zh-Hans')
+                PreferenceUtil.updateLanguagePrefrence('zh-Hans', 1)
+                this.setState({ changeLanguageIndex: 1, changeLanguageLabel: 'zh-Hans' })
                 break
             }
             this.setState({ changeLanguageDialogVisible: false })

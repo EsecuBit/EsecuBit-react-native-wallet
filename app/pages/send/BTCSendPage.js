@@ -310,6 +310,7 @@ class BTCSendPage extends BaseComponent {
           this.cryptoCurrencyUnit
         )
         legalCurrencyResult = StringUtil.formatLegalCurrency(Number(legalCurrencyResult).toFixed(2))
+        this.canSend = true
         this.setState({
           totalCostLegalCurrency: legalCurrencyResult,
           totalCostCryptoCurrency: cryptoCurrencyResult,
@@ -318,6 +319,7 @@ class BTCSendPage extends BaseComponent {
       })
       .catch(error => {
         console.warn('_calculateTotalCost error', error)
+        this.canSend = false
         ToastUtil.showErrorMsgShort(error)
       })
   }
@@ -339,8 +341,10 @@ class BTCSendPage extends BaseComponent {
       console.log('asd', this.lockSend, !this._checkFormData())
       return
     }
-    this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.btcUnit + " "+ I18n.t('to1') +" "+ this.state.address})
-    this.setState({transactionConfirmDialogVisible: true})
+    if (this.canSend) {
+      this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.btcUnit + " "+ I18n.t('to1') +" "+ this.state.address})
+      this.setState({transactionConfirmDialogVisible: true})
+    }
 
   }
 

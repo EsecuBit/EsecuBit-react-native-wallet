@@ -12,7 +12,11 @@ export default class AppUtil {
   static async checkUpdate() {
     let wallet = new EsWallet()
     let lang = await PreferenceUtil.getLanguagePreference()
-    lang = lang === 'zh-Hans' ? 'zh_CN' : 'en_US'
+    if (lang) {
+      lang = lang.label === 'zh-Hans' ? 'zh_CN' : 'en_US'
+    }else {
+      lang = 'en_US'
+    }
     try {
       await wallet.getWalletInfo()
       let respsonse = await fetch(Api.baseUrl + 'getNewApp', {
