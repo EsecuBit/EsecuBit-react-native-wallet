@@ -383,7 +383,7 @@ class BTCSendPage extends BaseComponent {
       })
       .catch(error => {
         ToastUtil.showErrorMsgLong(error)
-        this.setState({ sendDialogVisible: false })
+        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false})
         this.lockSend = false
       })
   }

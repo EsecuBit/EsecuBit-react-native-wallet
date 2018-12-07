@@ -10,6 +10,7 @@ import ProgressDialog from 'react-native-simple-dialogs/src/ProgressDialog'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import BaseComponent from '../../components/BaseComponent'
 import {NavigationActions} from 'react-navigation'
+import BaseToolbar from '../../components/BaseToolbar'
 const platform = Platform.OS
 
 export default class NewAccountPage extends BaseComponent {
@@ -204,28 +205,7 @@ export default class NewAccountPage extends BaseComponent {
     let _that = this
     return (
       <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
-        <Header style={{ backgroundColor: '#1D1D1D' }}>
-          <StatusBar
-            barStyle={platform === 'ios' ? 'light-content' : 'default'}
-            backgroundColor="#1D1D1D"
-          />
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.pop()}>
-              <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
-            </Button>
-          </Left>
-          <View style={platform === 'ios' ? CommonStyle.toolbarIOS : CommonStyle.toolbarAndroid}>
-            <Text
-              style={{
-                color: Color.ACCENT,
-                fontSize: Dimen.PRIMARY_TEXT,
-                marginBottom: platform === 'ios' ? 15 : 0
-              }}>
-              {I18n.t('newAccount')}
-            </Text>
-          </View>
-          <Right />
-        </Header>
+        <BaseToolbar title={I18n.t('newAccount')} />
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
         <Dialog.Container visible={_that.state.newAccountDialogVisible}>
