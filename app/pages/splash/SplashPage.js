@@ -33,16 +33,16 @@ export default class SplashPage extends Component {
     let _that = this
     if(platform === 'ios') {
       if (ns === 'none' || ns === 'unknown') {
-        _that.setState({ syncDialogVisible: false })
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-          ]
-        })
         setTimeout(() => {
+          _that.setState({ syncDialogVisible: false })
+          const resetAction = NavigationActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
+            ]
+          })
           this.props.navigation.dispatch(resetAction)
-        }, 400)
+        }, 2000)
       }
     }
   }
