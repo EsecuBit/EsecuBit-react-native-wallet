@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import {
   View,
   StyleSheet,
@@ -10,7 +10,6 @@ import {
 } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
-import { NavigationActions } from 'react-navigation'
 import PopupDialog from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
@@ -24,7 +23,6 @@ import AccountDetailHeader from '../../components/AccountDetailHeader'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import { Coin } from '../../common/Constants'
-import BaseComponent from '../../components/BaseComponent'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
@@ -32,7 +30,7 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 434
 const ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT = 520
 
-class AccountDetailPage extends BaseComponent {
+class AccountDetailPage extends Component {
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
@@ -52,23 +50,32 @@ class AccountDetailPage extends BaseComponent {
   }
 
   componentDidMount() {
-    let _that = this
-    _that._getTxInfos()
-    _that.wallet.listenTxInfo(() => {
+    this._onFocus()
+    this._onBlur()
+    this._getTxInfos()
+    this.wallet.listenTxInfo(() => {
       console.log('listen TxInfo')
-      _that._getTxInfos()
+      this._getTxInfos()
     })
-    BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+      this.wallet.listenTxInfo(() => {})
+    })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
     return true;
-  };
+  }
 
   async _gotoSendPage() {
     let deviceState = await this.transmitter.getState()

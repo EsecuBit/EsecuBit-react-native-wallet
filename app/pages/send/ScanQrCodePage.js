@@ -5,10 +5,8 @@ import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color } from '../../common/Styles'
-import BaseComponent from '../../components/BaseComponent'
 const platform = Platform.OS
-import {NavigationActions} from 'react-navigation'
-export default class ScanQrCodePage extends BaseComponent {
+export default class ScanQrCodePage extends Component {
   constructor(props) {
     super(props)
     this.hadReceiveResult = false
@@ -17,11 +15,20 @@ export default class ScanQrCodePage extends BaseComponent {
   }
 
   componentDidMount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    this._onFocus()
+    this._onBlur()
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
   }
 
   onBackPress = () => {

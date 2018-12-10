@@ -14,9 +14,7 @@ import I18n from '../../lang/i18n'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import { connect } from 'react-redux'
-import BaseComponent from '../../components/BaseComponent'
-import {NavigationActions} from 'react-navigation'
-class AddressDetailPage extends BaseComponent {
+class AddressDetailPage extends PureComponent {
   constructor(props) {
     super()
     this.state = {
@@ -30,12 +28,22 @@ class AddressDetailPage extends BaseComponent {
 
   componentDidMount() {
     this.popupDialog.show()
+    this._onFocus()
+    this._onBlur()
     this._getAddress(this.state.storeAddress)
-    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
   }
 
   onBackPress = () => {

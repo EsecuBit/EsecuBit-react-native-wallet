@@ -7,19 +7,15 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
-  Linking,
-  BackHandler
+  Linking, BackHandler
 } from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
   Container,
-  Icon,
-  Title,
   Button,
   CardItem,
   Right,
   Left,
-  Subtitle,
   List,
   Text
 } from 'native-base'
@@ -27,7 +23,6 @@ import Dialog from 'react-native-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import { Api } from '../../common/Constants'
-import BigInteger from 'bigi'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
@@ -36,11 +31,10 @@ import { setAccount } from '../../actions/AccountAction'
 import { connect } from 'react-redux'
 import CoinCard from '../../components/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
-import BaseComponent from '../../components/BaseComponent'
-import { NavigationActions } from 'react-navigation'
+
 const platform = Platform.OS
 
-class HomePage extends BaseComponent {
+class HomePage extends Component {
   constructor(props) {
     super(props)
     //offlineMode
@@ -64,28 +58,26 @@ class HomePage extends BaseComponent {
     this.deviceW = Dimensions.get('window').width
   }
 
-  componentWillMount() {
-    let _that = this
-    NetInfo.isConnected.fetch().done(isConnected => {
-      if (platform !== 'ios') {
-        _that.setState({ networkConnected: isConnected })
-        this.wallet.getAccounts().then(accounts => {
-          if (accounts.length === 0) {
-            this.btTransmitter.disconnect()
-          }
-        })
-      }
-    })
-    if (platform !== 'ios') {
+
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      this._updateUI()
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
       NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
-    }
+    })
   }
 
-  componentWillUnmount() {
-    NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+      NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+    })
   }
 
-  
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  }
 
   _handleConnectivityChange(status) {
     let ns = status.toUpperCase()
@@ -103,15 +95,9 @@ class HomePage extends BaseComponent {
   }
 
   componentDidMount() {
+    this._onFocus()
+    this._onBlur()
     this._initListener()
-    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
-    this.props.navigation.addListener('willFocus', () => {
-      if (platform === 'ios') {
-        NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
-      }
-      this._updateUI()
-    })
-
     this._updateUI()
     //delay to check app version
     setTimeout(() => {

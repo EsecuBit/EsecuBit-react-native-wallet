@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import {
   View,
   StyleSheet,
@@ -18,14 +18,11 @@ import PreferenceUtil from '../../utils/PreferenceUtil'
 import Dialog from 'react-native-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { ProgressDialog } from 'react-native-simple-dialogs'
-import { NavigationActions } from 'react-navigation'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
-import BaseComponent from '../../components/BaseComponent'
-const deviceW = Dimensions.get('window').width
 const deviceH = Dimensions.get('window').height
 const platform = Platform.OS
 
-export default class PairListPage extends BaseComponent {
+export default class PairListPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -41,36 +38,15 @@ export default class PairListPage extends BaseComponent {
     this.wallet = new EsWallet()
     this.connectDeviceInfo = {}
     this.hasBackBtn = this.props.navigation.state.params.hasBackBtn
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-    this.setState({
-      waitingDialogVisible: false,
-      authenticateDialogVisible: false,
-      connectDialogVisible: false
-    })
-  }
-
-  onBackPress = () => {
-    this.props.navigation.pop()
-    return true
+    this._renderRowView.bind(this)
   }
 
   componentDidMount() {
-    console.log('xr width', deviceW, isIphoneX)
-    console.log('xr height', deviceH)
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-    let _that = this
-    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
-    this.props.navigation.addListener('willFocus', async () => {
-      _that._listenTransmitter()
-      await _that.setState({ deviceList: [] })
-      _that._findDefaultDevice(true)
-    })
+    this._onFocus()
+    this._onBlur()
     this.wallet.listenStatus(async (error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
-      if (error != D.error.succeed) {
+      if (error !== D.error.succeed) {
         this.setState({
           waitingDialogVisible: false,
           authenticateDialogVisible: false,
@@ -80,7 +56,7 @@ export default class PairListPage extends BaseComponent {
         if (status === D.status.auth && pairCode) {
           console.log('wallet authenticating')
           if (pairCode) {
-            console.log('has receive pairCode')
+            console.log('has receive pairCode', pairCode)
             this.setState({ waitingDialogVisible: false })
             this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
           }
@@ -101,6 +77,32 @@ export default class PairListPage extends BaseComponent {
         }
       }
     })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+      this.setState({
+        waitingDialogVisible: false,
+        authenticateDialogVisible: false,
+        connectDialogVisible: false
+      })
+    })
+  }
+
+  _onFocus() {
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
+    this.props.navigation.addListener('willFocus', async () => {
+      this._listenTransmitter()
+      await this.setState({ deviceList: [] })
+      this._findDefaultDevice(true)
+      BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+    })
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true
   }
 
   _listenTransmitter() {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import {StatusBar, View, Text, Dimensions, TouchableOpacity, Platform, BackHandler, InteractionManager} from 'react-native'
-import { Button, Container, Header, Left, Icon, CardItem, Title, Right } from 'native-base'
+import { Text, Dimensions, TouchableOpacity, Platform, BackHandler, InteractionManager} from 'react-native'
+import { Container, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
@@ -8,12 +8,10 @@ import BtTransmitter from '../../device/BtTransmitter'
 import Dialog from 'react-native-dialog'
 import ProgressDialog from 'react-native-simple-dialogs/src/ProgressDialog'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import BaseComponent from '../../components/BaseComponent'
-import {NavigationActions} from 'react-navigation'
 import BaseToolbar from '../../components/BaseToolbar'
 const platform = Platform.OS
 
-export default class NewAccountPage extends BaseComponent {
+export default class NewAccountPage extends Component {
   constructor(props) {
     super(props)
     this.deviceW = Dimensions.get('window').width
@@ -31,17 +29,26 @@ export default class NewAccountPage extends BaseComponent {
   }
 
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+    this._onFocus()
+    this._onBlur()
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
     return true;
-  };
+  }
 
   /**
    * only support new BTC account and ETH account
@@ -63,17 +70,15 @@ export default class NewAccountPage extends BaseComponent {
       return
     }
 
-    //just for iOS
     if (platform === 'ios') {
       let accounts = []
       let isNeedDialog = true
-
       //all account
       accounts = await this.wallet.getAccounts()
       //accounts of selected coinType
       let coinAccount = []
       accounts.map(it => {
-        if (coinType.indexOf(it.coinType) != -1) {
+        if (coinType.indexOf(it.coinType) !== -1) {
           coinAccount.push(it)
         }
       })
@@ -85,16 +90,14 @@ export default class NewAccountPage extends BaseComponent {
 
       if (isNeedDialog) {
         setTimeout(() => {
-          console.log('setTimeout1=====')
           this.setState({ newAccountWaitDialog: true })
         }, 400)
       }
+    }else {
+      this.setState({ newAccountWaitDialog: true })
     }
 
     try {
-      if (platform !== 'ios') {
-        this.setState({ newAccountWaitDialog: true })
-      }
       let account = await this.wallet.newAccount(coinType)
       await account.rename(this.newAccountName)
       this.newAccountName = ''
@@ -104,6 +107,8 @@ export default class NewAccountPage extends BaseComponent {
       this.props.navigation.pop()
     } catch (error) {
       console.warn('newAccount Error', error)
+      // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
+      // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
       InteractionManager.runAfterInteractions(() => {
         this.setState({ newAccountWaitDialog: false })
       })
@@ -121,7 +126,6 @@ export default class NewAccountPage extends BaseComponent {
   }
 
   _renderBTCAddAccount() {
-    let _that = this
     let coinType = ''
     let isSupportBTC = false
     this.supportCoinType.map(it => {

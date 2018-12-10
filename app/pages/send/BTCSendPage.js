@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import {View, Platform, DeviceEventEmitter, TouchableOpacity, BackHandler} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Dropdown } from 'react-native-material-dropdown'
@@ -12,11 +12,9 @@ import Dialog from 'react-native-dialog'
 import StringUtil from '../../utils/StringUtil'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
-import BaseComponent from '../../components/BaseComponent'
-import {NavigationActions} from 'react-navigation'
 const platform = Platform.OS
 
-class BTCSendPage extends BaseComponent {
+class BTCSendPage extends Component {
   constructor(props) {
     super(props)
     this.account = props.account
@@ -80,22 +78,27 @@ class BTCSendPage extends BaseComponent {
     }
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
     return true;
-  };
+  }
 
   componentDidMount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    this._onFocus()
+    this._onBlur()
     this._initListener()
-    this._getSuggestedFee().catch(err => {
-      console.warn('getSuggestedFee error', err)
-      ToastUtil.showErrorMsgLong(err)
-    })
     let balance = this.esWallet.convertValue(
       this.coinType,
       this.account.balance,
@@ -104,6 +107,10 @@ class BTCSendPage extends BaseComponent {
     )
     this.setState({ balance: balance })
     this._fillResendData()
+    this._getSuggestedFee().catch(err => {
+      console.warn('getSuggestedFee error', err)
+      ToastUtil.showErrorMsgLong(err)
+    })
   }
 
   _initListener() {
@@ -113,9 +120,7 @@ class BTCSendPage extends BaseComponent {
     this.esWallet.listenTxInfo(async () => {
       let data = await this.account.getTxInfos()
       let txInfo = data.txInfos[0]
-
-      if (this.state.remarks !== undefined && this.state.remarks !== '') {
-        console.log('111111', this.state.remarks)
+      if (this.state.remarks) {
         txInfo.comment = this.state.remarks
         this.account
           .updateTxComment(txInfo)

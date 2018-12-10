@@ -19,29 +19,34 @@ export default class SplashPage extends Component {
     this.btTransmitter = new BtTransmitter()
   }
 
-  componentWillMount() {
-    this._listenWalletStatus()
-    NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
+    })
   }
 
-  componentWillUnmount() {
-    this.setState({ syncDialogVisible: false })
-    NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      this.setState({ syncDialogVisible: false })
+      NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+      this.wallet.listenStatus(() => {} )
+    })
   }
+
+  componentDidMount() {
+    this._listenWalletStatus()
+    this._onFocus()
+    this._onBlur()
+  }
+
+
 
   _handleConnectivityChange(ns) {
     let _that = this
     if(platform === 'ios') {
       if (ns === 'none' || ns === 'unknown') {
         setTimeout(() => {
-          _that.setState({ syncDialogVisible: false })
-          const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-            ]
-          })
-          this.props.navigation.dispatch(resetAction)
+          _that._gotoHomePage(true)
         }, 2000)
       }
     }
@@ -63,48 +68,33 @@ export default class SplashPage extends Component {
           _that.props.navigation.pop()
         } else {
           setTimeout(() => {
-            _that.setState({ syncDialogVisible: false })
             ToastUtil.showErrorMsgLong(error)
-            const resetAction = NavigationActions.reset({
-              index: 0,
-              actions: [
-                NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-              ]
-            })
-            this.props.navigation.dispatch(resetAction)
+            _that._gotoHomePage(false)
           }, 1000)
         }
       } else {
         if (status === D.status.syncFinish) {
-          _that.setState({ syncDialogVisible: false })
-          const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-            ]
-          })
-          this.props.navigation.dispatch(resetAction)
-          // _that.props.navigation.replace('Home', { offlineMode: false})
+          _that._gotoHomePage(false)
         }
         if (status === D.status.deviceChange) {
           console.log('device change')
         }
         if (status === D.status.plugOut) {
-          _that.setState({ syncDialogVisible: false })
-          const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: true } })
-            ],
-            params: {
-              offlineMode: true
-            }
-          })
-          this.props.navigation.dispatch(resetAction)
-          // _that.props.navigation.replace('Home', { offlineMode: true})
+          _that._gotoHomePage(true)
         }
       }
     })
+  }
+
+  _gotoHomePage(offlineMode) {
+    this.setState({ syncDialogVisible: false })
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: offlineMode } })
+      ]
+    })
+    this.props.navigation.dispatch(resetAction)
   }
 
   render() {

@@ -3,15 +3,11 @@ import {
   StyleSheet,
   View,
   Dimensions,
-  Platform,
   Linking,
   BackHandler
 } from 'react-native'
 import {
   Container,
-  Header,
-  Left,
-  Button,
   Icon,
   Right,
   Card,
@@ -23,7 +19,7 @@ import { SinglePickerMaterialDialog } from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import { version } from '../../../package.json'
-import { Unit, Api, Coin } from '../../common/Constants'
+import { Api, Coin } from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import Dialog from 'react-native-dialog'
@@ -33,14 +29,12 @@ import AppUtil from '../../utils/AppUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
-import BaseComponent from '../../components/BaseComponent'
 import { cosVersion } from '../../../package.json'
 import BaseToolbar from '../../components/BaseToolbar'
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
-const platform = Platform.OS
 
-class SettingsPage extends BaseComponent {
+class SettingsPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -70,21 +64,29 @@ class SettingsPage extends BaseComponent {
     this.isConnected = false
     this.deviceW = Dimensions.get('window').width
   }
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+
+  componentDidMount() {
+    this._listenDeviceStatus()
+    this._onFocus()
+    this._onBlur()
+  }
+
+  _onFocus() {
+    this.props.navigation.addListener("willFocus", () => {
+      this._getPreference()
+      BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+    })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
     return true
-  }
-
-  componentDidMount() {
-    this._listenDeviceStatus()
-    this.props.navigation.addListener("willFocus", () => {
-      this._getPreference()
-    })
-    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
   }
 
   async _getPreference() {
@@ -112,24 +114,12 @@ class SettingsPage extends BaseComponent {
       console.log('state', state)
       if (state === BtTransmitter.connected) {
         this.isConnected = true
-        this._getWalletInfo()
+        this.setState({ cosVersion: cosVersion })
       } else if (state === BtTransmitter.disconnected) {
         this.isConnected = false
         this.setState({ cosVersion: 'unknown' })
       }
     })
-  }
-
-  _getWalletInfo() {
-    this.wallet
-      .getWalletInfo()
-      .then(value => {
-        this.setState({ cosVersion: cosVersion })
-      })
-      .catch(error => {
-        console.warn('getWalletInfo Error', error)
-        this.setState({ cosVersion: 'unknown' })
-      })
   }
 
   _updateCurrencyPreference(key, value, index) {
@@ -209,9 +199,7 @@ class SettingsPage extends BaseComponent {
               onPress={() => {
                 this.isConnected
                   ? ToastUtil.showShort(I18n.t('hasConnected'))
-                  : _that.props.navigation.navigate('PairList', {
-                      hasBackBtn: false
-                    })
+                  : _that.props.navigation.navigate('PairList', {hasBackBtn: false})
               }}>
               <Text>{I18n.t('connectDevice')}</Text>
               <Right>
