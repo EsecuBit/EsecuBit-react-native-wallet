@@ -5,6 +5,7 @@ import { Dimen, Color, CommonStyle } from '../common/Styles'
 import PropTypes from 'prop-types'
 import StringUtil from '../utils/StringUtil'
 import PercentageBar from '../components/PercentageBar'
+import I18n from '../lang/i18n'
 
 const platform = Platform.OS
 export default class ValueInput extends PureComponent {
@@ -49,7 +50,7 @@ export default class ValueInput extends PureComponent {
           iconRight
           error={this.state.sendValueError}
           success={this.state.sendValueStatus}>
-          <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>Value</Text>
+          <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>{I18n.t('value')}</Text>
           <Input
             selectionColor={Color.ACCENT}
             placeholder={placeholder}
@@ -77,7 +78,9 @@ export default class ValueInput extends PureComponent {
             />
           ) : null}
         </InputGroup>
-        <PercentageBar onItemClick={onItemClick} type="percent" data={[0.1, 0.3, 0.5, 0.7, 1]} />
+        {
+          this.props.enablePercentageBar ? <PercentageBar onItemClick={onItemClick} type="percent" data={[0.1, 0.3, 0.5, 0.7, 1]} /> : null
+        }
       </CardItem>
     )
   }
@@ -86,11 +89,13 @@ export default class ValueInput extends PureComponent {
 ValueInput.prototypes = {
   placeholder: PropTypes.string,
   value: PropTypes.string,
-  onItemClick: PropTypes.func.isRequired,
-  onChangeText: PropTypes.func.isRequired
+  onItemClick: PropTypes.func,
+  onChangeText: PropTypes.func.isRequired,
+  enablePercentageBar: PropTypes.bool.isRequired
 }
 
 ValueInput.defaultProps = {
   placeholder: '',
-  value: ''
+  value: '',
+  enablePercentageBar: true
 }

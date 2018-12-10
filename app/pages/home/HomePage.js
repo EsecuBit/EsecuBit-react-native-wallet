@@ -75,7 +75,7 @@ class HomePage extends Component {
   }
 
   onBackPress = () => {
-    this.props.navigation.pop()
+    AppUtil.exitApp()
     return true;
   }
 

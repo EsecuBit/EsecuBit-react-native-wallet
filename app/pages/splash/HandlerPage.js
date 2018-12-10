@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { View, Image, Dimensions } from 'react-native'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import ToastUtil from '../../utils/ToastUtil'
 import { NavigationActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
@@ -41,7 +40,7 @@ class HandlerPage extends Component {
     let languagePref = await PreferenceUtil.getLanguagePreference()
     if (languagePref) {
       I18n.locale = languagePref.label
-    }else {
+    } else {
       I18n.locale = 'en'
     }
   }
@@ -50,45 +49,47 @@ class HandlerPage extends Component {
     this.esWallet
       .enterOfflineMode()
       .then(() => {
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({
-              routeName: 'Home',
-              params: { offlineMode: true }
-            })
-          ]
-        })
-        this.props.navigation.dispatch(resetAction)
+        this._gotoHomePage(true)
         console.log('can enter offline mode')
       })
       .catch(e => {
         if (e === D.error.offlineModeNotAllowed) {
           if (D.test.jsWallet) {
-            this.props.navigation.replace('Splash')
+            const resetAction = NavigationActions.reset({
+              index: 0,
+              actions: [
+                NavigationActions.navigate({ routeName: 'Splash'})
+              ]
+            })
+            this.props.navigation.dispatch(resetAction)
           } else {
-            this.props.navigation.replace('PairList', { hasBackBtn: false })
+            const resetAction = NavigationActions.reset({
+              index: 0,
+              actions: [
+                NavigationActions.navigate({ routeName: 'PairList', params: { hasBackBtn: false } })
+              ]
+            })
+            this.props.navigation.dispatch(resetAction)
           }
           console.warn('offlineModeNotAllowed')
-          return
+        }else {
+          this._gotoHomePage(true)
+          console.warn('other error, stop', e)
         }
-        if (
-          e === D.error.offlineModeUnnecessary ||
-          e === D.error.networkProviderError ||
-          e === D.error.networkUnavailable ||
-          e === D.error.invalidParams ||
-          e === D.error.unknown
-        ) {
-          console.warn('offlineModeUnnecessary')
-          this.props.navigation.replace('Home', { offlineMode: true })
-          if (e === D.error.unknown) {
-            ToastUtil.showErrorMsgShort(e)
-          }
-          return
-        }
-        console.warn('other error, stop', e)
-        ToastUtil.showErrorMsgShort(e)
       })
+  }
+
+  _gotoHomePage(offlineMode) {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({
+          routeName: 'Home',
+          params: { offlineMode: offlineMode }
+        })
+      ]
+    })
+    this.props.navigation.dispatch(resetAction)
   }
 
   async _getCurrencyPreference() {
@@ -117,7 +118,7 @@ const mapDispatchToProps = {
 }
 
 const Handler = connect(
-  mapStateToProps,                            
+  mapStateToProps,
   mapDispatchToProps
 )(HandlerPage)
 export default Handler

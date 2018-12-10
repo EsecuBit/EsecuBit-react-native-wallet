@@ -44,8 +44,6 @@ class AccountDetailPage extends Component {
       dMemo: '',
       renameDialogVisible: false
     }
-    console.log('unit', props.accountCurrentUnit)
-
     this.cryptoCurrencyUnit = props.accountCurrentUnit
   }
 

@@ -73,7 +73,7 @@ class AccountDetailHeader extends PureComponent {
       return
     }
     this.props.account.label = name
-    this.setState({ accountName: name })
+    this.setState({ address: name })
   }
 
 

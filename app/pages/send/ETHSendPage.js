@@ -332,7 +332,7 @@ class ETHSendPage extends Component {
         this.setState({
           totalCostLegalCurrency: legalCurrencyResult,
           totalCostCryptoCurrency: cryptoCurrencyResult,
-          transactionFee: transactionFee
+          transactionFee: transactionFee,
         })
       })
       .catch(error => {
@@ -437,7 +437,7 @@ class ETHSendPage extends Component {
       })
       .catch(error => {
         ToastUtil.showErrorMsgLong(error)
-        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false })
+        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false})
         this.lockSend = false
       })
   }
@@ -720,7 +720,7 @@ class ETHSendPage extends Component {
             }}
           />
         </Dialog.Container>
-        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')} />
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')}/>
       </Container>
     )
   }

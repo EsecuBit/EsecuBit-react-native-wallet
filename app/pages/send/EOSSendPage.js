@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native'
 import { Color, Dimen } from '../../common/Styles'
 import FooterButton from '../../components/FooterButton'
 import ValueInput from '../../components/ValueInput'
-import AccountNameInput from '../../components/AccountNameInput'
+import EOSAccountNameInput from '../../components/EOSAccountNameInput'
 import MemoInput from '../../components/MemoInput'
 import SendToolbar from '../../components/SendToolbar'
 import { connect } from 'react-redux'
@@ -24,7 +24,7 @@ class EOSSendPage extends Component {
   }
 
   async _handleAccountNameInput(text) {
-    this.setState({ accountName: text })
+    this.setState({ address: text })
     this._checkFormData()
   }
 
@@ -52,7 +52,7 @@ class EOSSendPage extends Component {
       type: 'tokenTransfer',
       comment: this.state.memo,
       outputs: [{
-        account: this.state.accountName.trim(),
+        account: this.state.address.trim(),
         value: this.state.sendValue
       }
       ]
@@ -66,7 +66,7 @@ class EOSSendPage extends Component {
       type: 'tokenTransfer',
       comment: this.state.memo,
       outputs: [{
-        account: this.state.accountName.trim(),
+        account: this.state.address.trim(),
         value: this.state.sendValue
       }
       ]
@@ -106,7 +106,7 @@ class EOSSendPage extends Component {
             </Text>
           </View>
           <Card>
-            <AccountNameInput
+            <EOSAccountNameInput
               ref={ref => (this.accountNameInput = ref)}
               onChangeText={text => this._handleAccountNameInput(text)}
             />
