@@ -1,20 +1,6 @@
 import React, { Component } from 'react'
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  Linking,
-  BackHandler
-} from 'react-native'
-import {
-  Container,
-  Icon,
-  Right,
-  Card,
-  CardItem,
-  Text,
-  Content
-} from 'native-base'
+import { StyleSheet, View, Dimensions, Linking, BackHandler } from 'react-native'
+import { Container, Icon, Right, Card, CardItem, Text, Content } from 'native-base'
 import { SinglePickerMaterialDialog } from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
@@ -31,6 +17,7 @@ import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import { cosVersion } from '../../../package.json'
 import BaseToolbar from '../../components/BaseToolbar'
+import PopupDialog from 'react-native-popup-dialog'
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 
@@ -72,7 +59,7 @@ class SettingsPage extends Component {
   }
 
   _onFocus() {
-    this.props.navigation.addListener("willFocus", () => {
+    this.props.navigation.addListener('willFocus', () => {
       this._getPreference()
       BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
     })
@@ -92,20 +79,23 @@ class SettingsPage extends Component {
   async _getPreference() {
     let languagePref = await PreferenceUtil.getLanguagePreference()
     if (languagePref) {
-      this.setState({changeLanguageIndex: languagePref.index, changeLanguageLabel: languagePref.label})
+      this.setState({
+        changeLanguageIndex: languagePref.index,
+        changeLanguageLabel: languagePref.label
+      })
     }
     let btcPref = await PreferenceUtil.getCryptoCurrencyUnit(Coin.btc)
     if (btcPref) {
-      this.setState({btcIndex: btcPref.index, btcLabel: btcPref.label})
+      this.setState({ btcIndex: btcPref.index, btcLabel: btcPref.label })
     }
     let ethPref = await PreferenceUtil.getCryptoCurrencyUnit(Coin.eth)
     if (ethPref) {
-      this.setState({ethIndex: ethPref.index, ethLabel: ethPref.label})
+      this.setState({ ethIndex: ethPref.index, ethLabel: ethPref.label })
     }
     let legalPref = await PreferenceUtil.getCurrencyUnit(Coin.legal)
     console.log('legalPref', legalPref)
     if (legalPref) {
-      this.setState({legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index})
+      this.setState({ legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index })
     }
   }
 
@@ -143,6 +133,7 @@ class SettingsPage extends Component {
     console.log('disConnected')
     await this.setState({ disConnectDialogVisible: false })
     this.transmitter.disconnect()
+    this.disconnectPopupDialog.dismiss()
     this.props.navigation.pop()
   }
 
@@ -153,6 +144,7 @@ class SettingsPage extends Component {
         this.info = info
         if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
+            this.versionUpdatePopupDialog.show()
             this.setState({
               updateDesc: info.data.description,
               updateVersionDialogVisible: true
@@ -174,6 +166,7 @@ class SettingsPage extends Component {
     if (this.info && this.info.data.isForceUpdate) {
       AppUtil.exitApp()
     }
+    this.versionUpdatePopupDialog.dismiss()
   }
 
   _gotoBrowser() {
@@ -181,6 +174,7 @@ class SettingsPage extends Component {
       Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
     this.setState({ updateVersionDialogVisible: false })
+    this.versionUpdatePopupDialog.dismiss()
   }
 
   render() {
@@ -199,7 +193,7 @@ class SettingsPage extends Component {
               onPress={() => {
                 this.isConnected
                   ? ToastUtil.showShort(I18n.t('hasConnected'))
-                  : _that.props.navigation.navigate('PairList', {hasBackBtn: false})
+                  : _that.props.navigation.navigate('PairList', { hasBackBtn: false })
               }}>
               <Text>{I18n.t('connectDevice')}</Text>
               <Right>
@@ -210,7 +204,7 @@ class SettingsPage extends Component {
             <CardItem
               bordered
               button
-              onPress={() => this.setState({ disConnectDialogVisible: true })}>
+              onPress={() => this.disconnectPopupDialog.show()}>
               <Text>{I18n.t('disconnect')}</Text>
               <Right>
                 <Icon name="ios-arrow-forward" />
@@ -222,7 +216,7 @@ class SettingsPage extends Component {
             <CardItem
               bordered
               button
-              onPress={() => _that.setState({ legalCurrencyDialogVisible: true })}>
+              onPress={() => this.legalCurrencyPopupDialog.show()}>
               <Text>{I18n.t('legalCurrency')}</Text>
               <Right>
                 <View style={{ flexDirection: 'row' }}>
@@ -234,7 +228,7 @@ class SettingsPage extends Component {
               </Right>
             </CardItem>
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
-              <CardItem bordered button onPress={() => this.setState({ btcDialogVisible: true })}>
+              <CardItem bordered button onPress={() => this.btcPopupDialog.show()}>
                 <Text>{I18n.t('btc')}</Text>
                 <Right>
                   <View style={{ flexDirection: 'row' }}>
@@ -249,7 +243,7 @@ class SettingsPage extends Component {
               <View style={CommonStyle.divider} />
             )}
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
-              <CardItem bordered button onPress={() => this.setState({ ethDialogVisible: true })}>
+              <CardItem bordered button onPress={() => this.ethPopupDialog.show()}>
                 <Text>{I18n.t('eth')}</Text>
                 <Right>
                   <View style={{ flexDirection: 'row' }}>
@@ -266,10 +260,7 @@ class SettingsPage extends Component {
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={customStyle.headerText}>App</Text>
             </CardItem>
-            <CardItem
-              bordered
-              button
-              onPress={() => this.setState({ changeLanguageDialogVisible: true })}>
+            <CardItem bordered button onPress={() => this.languagePopupDialog.show()}>
               <Text>{I18n.t('language')}</Text>
             </CardItem>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
@@ -294,145 +285,216 @@ class SettingsPage extends Component {
             </CardItem>
           </Card>
         </Content>
-        <SinglePickerMaterialDialog
-          title={I18n.t('legalCurrency')}
-          items={Object.values(D.unit.legal).map((row, index) => ({
-            value: index,
-            label: row
-          }))}
-          colorAccent={Color.ACCENT}
-          okLabel={I18n.t('confirm')}
-          cancelLabel={I18n.t('cancel')}
-          visible={this.state.legalCurrencyDialogVisible}
-          selectedItem={{
-            value: this.state.legalCurrencyIndex,
-            label: this.state.legalCurrencyLabel
+        <PopupDialog
+          ref={refs => (this.legalCurrencyPopupDialog = refs)}
+          onDismissed={() => {
+            this.setState({ legalCurrencyDialogVisible: false })
           }}
-          onCancel={() => this.setState({ legalCurrencyDialogVisible: false })}
-          onOk={result => {
-            let label = result.selectedItem.label
-            let index = result.selectedItem.value
-            this._updateCurrencyPreference(Coin.legal, label, index)
-            this.setState({
-              legalCurrencyDialogVisible: false,
-              legalCurrencyLabel: label,
-              legalCurrencyIndex: index
-            })
+          width={0}
+          height={0}
+          onShown={() => this.setState({ legalCurrencyDialogVisible: true })}>
+          <SinglePickerMaterialDialog
+            title={I18n.t('legalCurrency')}
+            items={Object.values(D.unit.legal).map((row, index) => ({
+              value: index,
+              label: row
+            }))}
+            colorAccent={Color.ACCENT}
+            okLabel={I18n.t('confirm')}
+            cancelLabel={I18n.t('cancel')}
+            visible={this.state.legalCurrencyDialogVisible}
+            selectedItem={{
+              value: this.state.legalCurrencyIndex,
+              label: this.state.legalCurrencyLabel
+            }}
+            onCancel={() => {
+              this.setState({ legalCurrencyDialogVisible: false })
+              this.legalCurrencyPopupDialog.dismiss()
+            }}
+            onOk={result => {
+              let label = result.selectedItem.label
+              let index = result.selectedItem.value
+              this._updateCurrencyPreference(Coin.legal, label, index)
+              this.setState({
+                legalCurrencyDialogVisible: false,
+                legalCurrencyLabel: label,
+                legalCurrencyIndex: index
+              })
+              this.legalCurrencyPopupDialog.dismiss()
+            }}
+          />
+        </PopupDialog>
+        <PopupDialog
+          ref={refs => (this.btcPopupDialog = refs)}
+          onDismissed={() => {
+            this.setState({ btcDialogVisible: false })
           }}
-        />
-        <SinglePickerMaterialDialog
-          title={I18n.t('btc')}
-          items={btcUnit.map((row, index) => ({ value: index, label: row }))}
-          colorAccent={Color.ACCENT}
-          okLabel={I18n.t('confirm')}
-          cancelLabel={I18n.t('cancel')}
-          visible={this.state.btcDialogVisible}
-          selectedItem={{
-            value: this.state.btcIndex,
-            label: this.state.btcLabel
+          width={0}
+          height={0}
+          onShown={() => this.setState({ btcDialogVisible: true })}>
+          <SinglePickerMaterialDialog
+            title={I18n.t('btc')}
+            items={btcUnit.map((row, index) => ({ value: index, label: row }))}
+            colorAccent={Color.ACCENT}
+            okLabel={I18n.t('confirm')}
+            cancelLabel={I18n.t('cancel')}
+            visible={this.state.btcDialogVisible}
+            selectedItem={{
+              value: this.state.btcIndex,
+              label: this.state.btcLabel
+            }}
+            onCancel={() => {
+              this.setState({ btcDialogVisible: false })
+              this.btcPopupDialog.dismiss()
+            }}
+            onOk={result => {
+              let label = result.selectedItem.label
+              let index = result.selectedItem.value
+              this._updateCurrencyPreference(Coin.btc, label, index)
+              this.setState({
+                btcDialogVisible: false,
+                btcLabel: label,
+                btcIndex: index
+              })
+              this.btcPopupDialog.dismiss()
+            }}
+          />
+        </PopupDialog>
+        <PopupDialog
+          ref={refs => (this.ethPopupDialog = refs)}
+          onDismissed={() => {
+            this.setState({ ethDialogVisible: false })
           }}
-          onCancel={() => this.setState({ btcDialogVisible: false })}
-          onOk={result => {
-            let label = result.selectedItem.label
-            let index = result.selectedItem.value
-            this._updateCurrencyPreference(Coin.btc, label, index)
-            this.setState({
-              btcDialogVisible: false,
-              btcLabel: label,
-              btcIndex: index
-            })
-          }}
-        />
-        <SinglePickerMaterialDialog
-          title={I18n.t('eth')}
-          items={ethUnit.map((row, index) => ({ value: index, label: row }))}
-          colorAccent={Color.ACCENT}
-          okLabel={I18n.t('confirm')}
-          cancelLabel={I18n.t('cancel')}
-          visible={this.state.ethDialogVisible}
-          selectedItem={{
-            value: this.state.ethIndex,
-            label: this.state.ethLabel
-          }}
-          onCancel={() => this.setState({ ethDialogVisible: false })}
-          onOk={result => {
-            let label = result.selectedItem.label
-            let index = result.selectedItem.value
-            this._updateCurrencyPreference(Coin.eth, label, index)
-            this.setState({
-              ethDialogVisible: false,
-              ethLabel: label,
-              ethIndex: index
-            })
-          }}
-        />
-
-        <SinglePickerMaterialDialog
-          title={I18n.t('language')}
-          items={['English', '简体中文'].map((row, index) => ({
-            value: index,
-            label: row
-          }))}
-          colorAccent={Color.ACCENT}
-          okLabel={I18n.t('confirm')}
-          cancelLabel={I18n.t('cancel')}
-          selectedItem={{
-            value: this.state.changeLanguageIndex,
-            label: this.state.changeLanguageLabel
-          }}
-          visible={this.state.changeLanguageDialogVisible}
-          onCancel={() => this.setState({ changeLanguageDialogVisible: false })}
-          onOk={result => {
-            let index = result.selectedItem.value
-            switch (index) {
-              case 0:
-                I18n.locale = 'en'
-                PreferenceUtil.updateLanguagePrefrence('en', 0)
-                this.setState({ changeLanguageIndex: 0, changeLanguageLabel: 'en' })
-                break
-              case 1:
-                I18n.locale = 'zh-Hans'
-                PreferenceUtil.updateLanguagePrefrence('zh-Hans', 1)
-                this.setState({ changeLanguageIndex: 1, changeLanguageLabel: 'zh-Hans' })
-                break
-            }
+          width={0}
+          height={0}
+          onShown={() => this.setState({ ethDialogVisible: true })}>
+          <SinglePickerMaterialDialog
+            title={I18n.t('eth')}
+            items={ethUnit.map((row, index) => ({ value: index, label: row }))}
+            colorAccent={Color.ACCENT}
+            okLabel={I18n.t('confirm')}
+            cancelLabel={I18n.t('cancel')}
+            visible={this.state.ethDialogVisible}
+            selectedItem={{
+              value: this.state.ethIndex,
+              label: this.state.ethLabel
+            }}
+            onCancel={() => {
+              this.setState({ ethDialogVisible: false })
+              this.ethPopupDialog.dismiss()
+            }}
+            onOk={result => {
+              let label = result.selectedItem.label
+              let index = result.selectedItem.value
+              this._updateCurrencyPreference(Coin.eth, label, index)
+              this.setState({
+                ethDialogVisible: false,
+                ethLabel: label,
+                ethIndex: index
+              })
+              this.ethPopupDialog.dismiss()
+            }}
+          />
+        </PopupDialog>
+        <PopupDialog
+          ref={refs => (this.languagePopupDialog = refs)}
+          onDismissed={() => {
             this.setState({ changeLanguageDialogVisible: false })
-            this.forceUpdate()
           }}
-        />
-
-        <Dialog.Container
-          visible={this.state.updateVersionDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-          <Dialog.Title>{I18n.t('versionUpdate')}</Dialog.Title>
-          <Dialog.Description>{this.state.updateDesc}</Dialog.Description>
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={this._checkForceUpdate.bind(this)}
+          width={0}
+          height={0}
+          onShown={() => this.setState({ changeLanguageDialogVisible: true })}>
+          <SinglePickerMaterialDialog
+            title={I18n.t('language')}
+            items={['English', '简体中文'].map((row, index) => ({
+              value: index,
+              label: row
+            }))}
+            colorAccent={Color.ACCENT}
+            okLabel={I18n.t('confirm')}
+            cancelLabel={I18n.t('cancel')}
+            selectedItem={{
+              value: this.state.changeLanguageIndex,
+              label: this.state.changeLanguageLabel
+            }}
+            visible={this.state.changeLanguageDialogVisible}
+            onCancel={() => {
+              this.languagePopupDialog.dismiss()
+              this.setState({ changeLanguageDialogVisible: false })
+            }}
+            onOk={result => {
+              let index = result.selectedItem.value
+              switch (index) {
+                case 0:
+                  I18n.locale = 'en'
+                  PreferenceUtil.updateLanguagePrefrence('en', 0)
+                  this.setState({ changeLanguageIndex: 0, changeLanguageLabel: 'en' })
+                  break
+                case 1:
+                  I18n.locale = 'zh-Hans'
+                  PreferenceUtil.updateLanguagePrefrence('zh-Hans', 1)
+                  this.setState({ changeLanguageIndex: 1, changeLanguageLabel: 'zh-Hans' })
+                  break
+              }
+              this.setState({ changeLanguageDialogVisible: false })
+              this.languagePopupDialog.dismiss()
+              this.forceUpdate()
+            }}
           />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => this._gotoBrowser()}
-          />
-        </Dialog.Container>
-        <Dialog.Container
-          visible={this.state.disConnectDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-          <Dialog.Title>{I18n.t('disconnect')}</Dialog.Title>
-          <Dialog.Description>{I18n.t('disconnectTip')}</Dialog.Description>
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={() => this.setState({ disConnectDialogVisible: false })}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => this._disConnect()}
-          />
-        </Dialog.Container>
+        </PopupDialog>
+        <PopupDialog
+          ref={refs => (this.versionUpdatePopupDialog = refs)}
+          onDismissed={() => {
+            this.setState({ updateVersionDialogVisible: false })
+          }}
+          width={0}
+          height={0}
+          onShown={() => this.setState({ updateVersionDialogVisible: true })}>
+          <Dialog.Container
+            visible={this.state.updateVersionDialogVisible}
+            style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
+            <Dialog.Title>{I18n.t('versionUpdate')}</Dialog.Title>
+            <Dialog.Description>{this.state.updateDesc}</Dialog.Description>
+            <Dialog.Button
+              style={{ color: Color.ACCENT }}
+              label={I18n.t('cancel')}
+              onPress={this._checkForceUpdate.bind(this)}
+            />
+            <Dialog.Button
+              style={{ color: Color.ACCENT }}
+              label={I18n.t('confirm')}
+              onPress={() => this._gotoBrowser()}
+            />
+          </Dialog.Container>
+        </PopupDialog>
+        <PopupDialog
+          ref={refs => (this.disconnectPopupDialog = refs)}
+          onDismissed={() => {
+            this.setState({ disConnectDialogVisible: false })
+          }}
+          width={0}
+          height={0}
+          onShown={() => this.setState({ disConnectDialogVisible: true })}>
+          <Dialog.Container
+            visible={this.state.disConnectDialogVisible}
+            style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
+            <Dialog.Title>{I18n.t('disconnect')}</Dialog.Title>
+            <Dialog.Description>{I18n.t('disconnectTip')}</Dialog.Description>
+            <Dialog.Button
+              style={{ color: Color.ACCENT }}
+              label={I18n.t('cancel')}
+              onPress={() => {
+                this.disconnectPopupDialog.dismiss()
+                this.setState({ disConnectDialogVisible: false })
+              }}
+            />
+            <Dialog.Button
+              style={{ color: Color.ACCENT }}
+              label={I18n.t('confirm')}
+              onPress={() => this._disConnect()}
+            />
+          </Dialog.Container>
+        </PopupDialog>
       </Container>
     )
   }
