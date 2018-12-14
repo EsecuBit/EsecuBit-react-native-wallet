@@ -14,14 +14,16 @@ export default class ValueInput extends PureComponent {
     this.state = {
       sendValueError: false,
       sendValueStatus: false,
-      sendValue: props.value
     }
   }
 
   async _handleSendValueInput(text) {
-    await this.setState({ sendValue: text })
     await this._checkSendValue(text)
     this.props.onChangeText(text)
+  }
+
+  async _handleSendValueItemClick(text) {
+
   }
 
   async _checkSendValue(text) {
@@ -30,7 +32,6 @@ export default class ValueInput extends PureComponent {
   }
 
   _clear() {
-    this.setState({ sendValue: '' })
     this.props.onChangeText('')
   }
 
@@ -38,9 +39,6 @@ export default class ValueInput extends PureComponent {
     return this.state.sendValueStatus
   }
 
-  updateValue(value) {
-    this.setState({sendValue: value})
-  }
 
   render() {
     const { placeholder, onItemClick } = this.props
@@ -61,7 +59,7 @@ export default class ValueInput extends PureComponent {
                 : CommonStyle.multlineInputIOS
             }
             numberOfLines={3}
-            value={this.state.sendValue}
+            value={this.props.value}
             returnKeyType="done"
             onChangeText={this._handleSendValueInput.bind(this)}
             keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}

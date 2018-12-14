@@ -14,7 +14,7 @@ export default class EOSAccountNameInput extends PureComponent {
   }
 
   async _handleAccountNameInput(text) {
-    await this.setState({ address: text, addressStatus: text.length === 12 })
+    await this.setState({ address: text, checkAddressSuccess: text.length === 12 })
     this.props.onChangeText(text)
   }
 

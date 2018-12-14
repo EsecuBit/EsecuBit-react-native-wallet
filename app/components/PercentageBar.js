@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: Dimen.SPACE,
     marginTop: Dimen.SPACE,
-    marginBottom: Dimen.SPACE,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: Color.ACCENT,

@@ -19,15 +19,6 @@ const platform = Platform.OS
 class BTCSendPage extends Component {
   constructor(props) {
     super(props)
-    this.account = props.account
-    this.coinType = this.account.coinType
-    this.esWallet = new EsWallet()
-
-    this.legalCurrencyUnit = props.legalCurrencyUnit
-    this.cryptoCurrencyUnit = props.btcUnit
-    this.minimumUnit = D.unit.btc.satoshi
-    //prevent duplicate send
-    this.lockSend = false
     this.state = {
       balance: '',
       // target address
@@ -50,6 +41,15 @@ class BTCSendPage extends Component {
       transactionConfirmDialogVisible: false,
       transactionConfirmDesc: '',
     }
+    this.account = props.account
+    this.coinType = this.account.coinType
+    this.esWallet = new EsWallet()
+
+    this.legalCurrencyUnit = props.legalCurrencyUnit
+    this.cryptoCurrencyUnit = props.btcUnit
+    this.minimumUnit = D.unit.btc.satoshi
+    //prevent duplicate send
+    this.lockSend = false
   }
 
   _fillResendData() {
@@ -109,10 +109,6 @@ class BTCSendPage extends Component {
     )
     this.setState({ balance: balance })
     this._fillResendData()
-    this._getSuggestedFee().catch(err => {
-      console.warn('getSuggestedFee error', err)
-      ToastUtil.showErrorMsgLong(err)
-    })
   }
 
   _initListener() {
@@ -138,12 +134,10 @@ class BTCSendPage extends Component {
   _checkFormData() {
     return (
       this.addressInput.isValidInput() &&
-      this._checkValue(this.state.sendValue.trim()) &&
+      this.valueInput.isValidInput() &&
       this._checkFee(this.state.selectedFee.trim())
     )
   }
-
-
 
 
   _checkValue(value) {
@@ -383,22 +377,23 @@ class BTCSendPage extends Component {
     )
   }
 
-  _handleAddressInput(text) {
-    this.setState({address: text})
+  _handleAddressInput(address) {
+    this.setState({address: address})
     this._checkFormData()
   }
 
-  async _handleValueInput(text) {
-    await this.setState({sendValue: text})
+  async _handleValueInput(value) {
+    await this.setState({sendValue: value})
     this._checkFormData()
     this._calculateTotalCost()
   }
 
   async _handleSendValueItemClick(value) {
     let sendValue = Number(this.account.balance * value).toLocaleString('en').toString()
+    console.log('send value item click 1', sendValue)
     sendValue = this.esWallet.convertValue(this.account.coinType, sendValue, D.unit.btc.satoshi, this.props.btcUnit)
+    console.log('send value item click 2', sendValue)
     await this.setState({sendValue: sendValue})
-    this.valueInput.updateValue(sendValue)
     this._checkFormData()
     this._calculateTotalCost()
   }
@@ -415,7 +410,6 @@ class BTCSendPage extends Component {
                 color: Color.ACCENT,
                 textAlignVertical: 'center',
                 marginLeft: Dimen.SPACE,
-                numberOfLines: 3,
                 marginRight: Dimen.SPACE
               }}>
               {I18n.t('balance') + ': ' + this.state.balance + ' ' + this.cryptoCurrencyUnit}
@@ -425,12 +419,13 @@ class BTCSendPage extends Component {
             <AddressInput
               ref={refs => this.addressInput = refs}
               coinType={this.props.account.coinType}
-              value={this.state.address}
+              address={this.state.address}
               onChangeText={text => this._handleAddressInput(text)}
             />
             <ValueInput
               ref={refs => this.valueInput = refs}
               placeHolder={this.cryptoCurrencyUnit}
+              value={this.state.sendValue}
               onItemClick={text => this._handleSendValueItemClick(text)}
               onChangeText={text => this._handleValueInput(text)}
             />
@@ -438,7 +433,6 @@ class BTCSendPage extends Component {
               ref={refs => this.feeInput = refs}
               value={this.state.selectedFee}
               placeHolder='satoshi per byte'
-              account={this.props.account}
             />
             <CardItem>
               <Item>
@@ -452,7 +446,6 @@ class BTCSendPage extends Component {
                       ? CommonStyle.multlineInputAndroid
                       : CommonStyle.multlineInputIOS
                   }
-                  ref={refs => (this.addressInput = refs)}
                   multiline={true}
                   value={this.state.remarks}
                   onChangeText={text => this.setState({ remarks: text })}
