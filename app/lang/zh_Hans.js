@@ -159,5 +159,6 @@ export default {
   pairDeviceTip: '点击下面的序列号连接设备',
   deviceNotConnected: '请先连接设备获取COS版本信息',
   pleaseWait: '请稍等...',
-  noNewApp: '当前已是最新版本'
+  noNewApp: '当前已是最新版本',
+  optional: '可选的'
 }

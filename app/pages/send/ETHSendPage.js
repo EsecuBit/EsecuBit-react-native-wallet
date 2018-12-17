@@ -64,7 +64,7 @@ class ETHSendPage extends Component {
       value = value.toString()
       this.setState({
         address: this.txInfo.outputs[0].address,
-        remarks: this.txInfo.comment,
+        memo: this.txInfo.comment,
         sendValue: this.esWallet.convertValue(
           this.coinType,
           value,
@@ -119,8 +119,8 @@ class ETHSendPage extends Component {
     this.esWallet.listenTxInfo(async () => {
       let data = await this.account.getTxInfos()
       let txInfo = data.txInfos[0]
-      if (this.state.remarks !== undefined && this.state.remarks !== '') {
-        txInfo.comment = this.state.remarks
+      if (this.state.memo !== undefined && this.state.memo !== '') {
+        txInfo.comment = this.state.memo
         this.account
           .updateTxComment(txInfo)
           .then(() => console.log('update Tx Comment success'))
@@ -641,8 +641,8 @@ class ETHSendPage extends Component {
                   }
                   ref={refs => (this.addressInput = refs)}
                   multiline={true}
-                  value={this.state.remarks}
-                  onChangeText={text => this.setState({ remarks: text })}
+                  value={this.state.memo}
+                  onChangeText={text => this.setState({ memo: text })}
                   keyboardType="email-address"
                   returnKeyType="done"
                   blurOnSubmit={true}

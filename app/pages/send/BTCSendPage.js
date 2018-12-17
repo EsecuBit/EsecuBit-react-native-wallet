@@ -1,19 +1,21 @@
 import React, { Component } from 'react'
 import {View, Platform, DeviceEventEmitter, BackHandler} from 'react-native'
 import I18n from '../../lang/i18n'
-import { Container, Content, Text, Card, CardItem, Item, Input } from 'native-base'
+import { Container, Content, Text, Card } from 'native-base'
 import { CommonStyle, Color, Dimen } from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import { MaterialDialog } from 'react-native-material-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import Dialog from 'react-native-dialog'
-import StringUtil from '../../utils/StringUtil'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
 import AddressInput from "../../components/AddressInput";
 import ValueInput from "../../components/ValueInput";
 import FeeInput from "../../components/FeeInput";
+import MemoInput from "../../components/MemoInput";
+import TransactionTotalCostCard from "../../components/TransactionTotalCostCard";
+import TransactionFeeCard from "../../components/TransactionFeeCard";
 const platform = Platform.OS
 
 class BTCSendPage extends Component {
@@ -26,58 +28,25 @@ class BTCSendPage extends Component {
       sendValue: '',
       totalCostLegalCurrency: '0.00',
       totalCostCryptoCurrency: '0',
-      // standard or custom
-      currentFeeType: 'standard',
-      //3 level in BTC
-      fees: [],
       // BTC fee
       selectedFee: '',
-      feesTip: [],
-      selectedFeeTip: '',
       sendDialogVisible: false,
-      remarks: '',
+      memo: '',
       transactionFee: '0',
       deviceLimitDialogVisible: false,
       transactionConfirmDialogVisible: false,
       transactionConfirmDesc: '',
+      footerBtnDisable: true
     }
     this.account = props.account
     this.coinType = this.account.coinType
     this.esWallet = new EsWallet()
-
     this.legalCurrencyUnit = props.legalCurrencyUnit
     this.cryptoCurrencyUnit = props.btcUnit
     this.minimumUnit = D.unit.btc.satoshi
     //prevent duplicate send
     this.lockSend = false
-  }
 
-  _fillResendData() {
-    const { params }= this.props.navigation.state
-    if (params) {
-      this.txInfo = params.txInfo
-    }
-    if (this.txInfo) {
-      let value =
-        this.txInfo.outputs.find(output => !output.isMine) === undefined
-          ? this.txInfo.outputs[0].value
-          : this.txInfo.outputs.find(output => !output.isMine).value
-      value = value.toString()
-      this.setState({
-        address: this.txInfo.outputs[0].address,
-        remarks: this.txInfo.comment,
-        sendValue: this.esWallet.convertValue(
-          this.coinType,
-          value,
-          D.unit.btc.satoshi,
-          this.cryptoCurrencyUnit
-        )
-      })
-      if (this.account.balance === '0') {
-        ToastUtil.showShort(I18n.t('balanceNotEnough'))
-      }
-      this.oldTxId = this.txInfo.txId
-    }
   }
 
   _onFocus() {
@@ -118,8 +87,8 @@ class BTCSendPage extends Component {
     this.esWallet.listenTxInfo(async () => {
       let data = await this.account.getTxInfos()
       let txInfo = data.txInfos[0]
-      if (this.state.remarks) {
-        txInfo.comment = this.state.remarks
+      if (this.state.memo) {
+        txInfo.comment = this.state.memo
         this.account
           .updateTxComment(txInfo)
           .then(() => console.log('update Tx Comment success'))
@@ -127,56 +96,51 @@ class BTCSendPage extends Component {
       }
     })
   }
-
-  /**
-   *  check whether form data is valid
-   */
-  _checkFormData() {
-    return (
-      this.addressInput.isValidInput() &&
-      this.valueInput.isValidInput() &&
-      this._checkFee(this.state.selectedFee.trim())
-    )
-  }
-
-
-  _checkValue(value) {
-    if (value === '') {
-      ToastUtil.showLong(I18n.t('emptyValueError'))
-      return false
+  _fillResendData() {
+    const { params }= this.props.navigation.state
+    if (params) {
+      this.txInfo = params.txInfo
     }
-    return !StringUtil.isInvalidValue(value)
-  }
-
-  _checkFee(value) {
-    return !StringUtil.isInvalidValue(value)
-  }
-  /**
-   * get max amount
-   */
-  _maxAmount() {
-    console.log('maxAmount Fee before', this.state.selectedFee)
-    if (this.state.selectedFee === '' && this.state.currentFeeType === 'standard') {
-      this.setState({ selectedFee: this.state.fees[0] })
+    if (this.txInfo) {
+      let value = this.txInfo.outputs.find(output => !output.isMine) ? this.txInfo.outputs.find(output => !output.isMine).value : this.txInfo.outputs[0].value
+      value = value.toString()
+      this.addressInput.updateAddress(this.txInfo.outputs[0].address)
+      this.setState({
+        memo: this.txInfo.comment,
+        sendValue: this.esWallet.convertValue(
+          this.coinType,
+          value,
+          D.unit.btc.satoshi,
+          this.cryptoCurrencyUnit
+        )
+      })
+      if (this.account.balance === '0') {
+        ToastUtil.showShort(I18n.t('balanceNotEnough'))
+      }
+      this.oldTxId = this.txInfo.txId
     }
-    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
-    console.log('maxAmount Fee after', this.state.selectedFee)
-    let formData = this._buildBTCMaxAmountForm(fee)
-    console.log('_maxAmount formData', formData)
-    this._getBTCMaxAmount(formData)
   }
 
-  _buildBTCMaxAmountForm(fee) {
+  _buildBTCMaxAmountForm() {
     return {
       sendAll: true,
-      feeRate: fee,
+      feeRate: this.feeInput.getFee(),
       outputs: [
         {
-          address: this.state.address.trim(),
+          address: this.addressInput.getAddress(),
           value: '0'
         }
       ]
     }
+  }
+
+  /**
+   * get max amount
+   */
+  _maxAmount() {
+    let formData = this._buildBTCMaxAmountForm()
+    console.log('_maxAmount formData', formData)
+    this._getBTCMaxAmount(formData)
   }
 
   _getBTCMaxAmount(formData) {
@@ -200,105 +164,53 @@ class BTCSendPage extends Component {
       })
   }
 
-  async _calculateSendValue(text) {
-    await this.setState({ sendValue: text })
-    this._calculateTotalCost()
-  }
-
-  async _calculateBTCFee(fee) {
-    await this.setState({ selectedFee: fee })
-    this._calculateTotalCost()
+  _buildBTCTotalCostForm() {
+    return {
+      feeRate: this.feeInput.getFee(),
+      outputs: [
+        {
+          address: this.addressInput.getAddress(),
+          value: this._toMinimumUnit(this.valueInput.getValue())
+        }
+      ]
+    }
   }
 
   _calculateTotalCost() {
-    let value = this.state.sendValue ? this.state.sendValue.trim() : '0'
-
-    if (StringUtil.isInvalidValue(value)) {
-      this.setState({ sendValue: '' })
-      return
-    }
-    value = this._toMinimumUnit(value)
-
-    if (this.state.selectedFee === '' && this.state.currentFeeType === 'standard') {
-      this.setState({ selectedFee: this.state.fees[0] })
-    }
-    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
-    if (StringUtil.isInvalidValue(fee)) {
-      if (this.feeInput != null) {
-        this.feeInput._root.clear()
-      }
-      return
-    }
-    let formData = this._buildBTCTotalCostForm(fee, value)
+    let formData = this._buildBTCTotalCostForm()
     console.log('_calculateTotalCost formData', formData)
     this.account
       .prepareTx(formData)
       .then(value => {
         console.log('_calculateTotalCost result', value)
         this._checkIfDeviceLimit(value)
-        let fromUnit = D.isBtc(this.coinType) ? D.unit.btc.satoshi : D.unit.eth.Wei
-        let legalCurrencyResult = this.esWallet.convertValue(
-          this.coinType,
-          value.total,
-          fromUnit,
-          this.legalCurrencyUnit
-        )
-        let cryptoCurrencyResult = this.esWallet.convertValue(
-          this.coinType,
-          value.total,
-          fromUnit,
-          this.cryptoCurrencyUnit
-        )
-        let transactionFee = this.esWallet.convertValue(
-          this.coinType,
-          value.fee,
-          fromUnit,
-          this.cryptoCurrencyUnit
-        )
-        legalCurrencyResult = StringUtil.formatLegalCurrency(Number(legalCurrencyResult).toFixed(2))
-        this.canSend = true
-        this.setState({
-          totalCostLegalCurrency: legalCurrencyResult,
-          totalCostCryptoCurrency: cryptoCurrencyResult,
-          transactionFee: transactionFee
-        })
+        this.transactionTotalCostCard.updateTransactionCost(value)
+        this.transactionFeeCard.updateTransactionFee(value)
       })
       .catch(error => {
         console.warn('_calculateTotalCost error', error)
-        this.canSend = false
+        this.setState({footerBtnDisable: true})
         ToastUtil.showErrorMsgShort(error)
       })
   }
 
-  _buildBTCTotalCostForm(fee, value) {
+
+  _buildBTCSendForm() {
     return {
-      feeRate: fee,
+      oldTxId: this.oldTxId,
+      feeRate: this.feeInput.getFee(),
       outputs: [
         {
-          address: this.state.address.trim(),
-          value: value
+          address: this.addressInput.getAddress(),
+          value: this._toMinimumUnit(this.valueInput.getValue())
         }
       ]
     }
   }
 
-  _confirmTransaction() {
-    if (this.lockSend || !this._checkFormData()) {
-      console.log('asd', this.lockSend, !this._checkFormData())
-      return
-    }
-    if (this.canSend) {
-      this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.btcUnit + " "+ I18n.t('to1') +" "+ this.state.address})
-      this.setState({transactionConfirmDialogVisible: true})
-    }
-  }
 
   _send() {
-    let value = this.state.sendValue ? this.state.sendValue.trim() : '0'
-    let fee = this.state.selectedFee ? this.state.selectedFee.toString().trim() : '0'
-    value = this._toMinimumUnit(value)
-    let formData = this._buildBTCSendForm(fee, value)
-
+    let formData = this._buildBTCSendForm()
     // iOS render is too fast
     if(platform === 'ios') {
       setTimeout(() => {
@@ -322,8 +234,7 @@ class BTCSendPage extends Component {
       })
       .then(() => {
         ToastUtil.showLong(I18n.t('success'))
-        DeviceEventEmitter.emit('remarks', this.state.remarks)
-        this._clearFormData()
+        DeviceEventEmitter.emit('remarks', this.state.memo)
         this.setState({ sendDialogVisible: false })
         this.lockSend = false
         //refresh account balance
@@ -337,34 +248,20 @@ class BTCSendPage extends Component {
       })
   }
 
-  _buildBTCSendForm(fee, value) {
-    return {
-      oldTxId: this.oldTxId,
-      feeRate: fee,
-      outputs: [
-        {
-          address: this.state.address.trim(),
-          value: value
-        }
-      ]
+  _confirmTransaction() {
+    if (this.lockSend || !this._checkFormData()) {
+      return
+    }
+    if (this.canSend) {
+      this.setState({transactionConfirmDesc: I18n.t('send') +" "+ this.state.sendValue +' ' + this.props.btcUnit + " "+ I18n.t('to1') +" "+ this.addressInput.getAddress()})
+      this.setState({transactionConfirmDialogVisible: true})
     }
   }
+
 
   _checkIfDeviceLimit(result) {
     if (result.deviceLimit === true) {
       this.setState({ deviceLimitDialogVisible: true })
-    }
-  }
-
-  _clearFormData() {
-    this.setState({
-      totalCostLegalCurrency: '0',
-      totalCostCryptoCurrency: '0',
-      address: '',
-      sendValue: ''
-    })
-    if (this.state.currentFeeType === 'custom') {
-      this.setState({ selectedFee: '' })
     }
   }
 
@@ -377,25 +274,40 @@ class BTCSendPage extends Component {
     )
   }
 
-  _handleAddressInput(address) {
-    this.setState({address: address})
-    this._checkFormData()
-  }
 
   async _handleValueInput(value) {
-    await this.setState({sendValue: value})
+    this.valueInput.updateValue(value)
     this._checkFormData()
-    this._calculateTotalCost()
+    if (this.valueInput.isValidInput()) {
+      this._calculateTotalCost()
+    }
   }
 
   async _handleSendValueItemClick(value) {
-    let sendValue = Number(this.account.balance * value).toLocaleString('en').toString()
-    console.log('send value item click 1', sendValue)
-    sendValue = this.esWallet.convertValue(this.account.coinType, sendValue, D.unit.btc.satoshi, this.props.btcUnit)
-    console.log('send value item click 2', sendValue)
-    await this.setState({sendValue: sendValue})
+    let sendValue = this.esWallet.convertValue(this.account.coinType, this.props.account.balance, D.unit.btc.satoshi, this.props.btcUnit)
+    sendValue = Number(sendValue * value).toLocaleString('en').toString()
+    if (value !== '1') {
+      await this._handleValueInput(sendValue)
+    } else {
+      this._maxAmount()
+    }
+  }
+
+  async _handleFeeInput(value) {
+    await this.setState({selectedFee: value})
     this._checkFormData()
-    this._calculateTotalCost()
+    if (this.feeInput.isValidInput()){
+      this._calculateTotalCost()
+    }
+  }
+
+  /**
+   *  check whether form data is valid
+   */
+  _checkFormData() {
+    let result = this.addressInput.isValidInput() && this.valueInput.isValidInput() && this.feeInput.isValidInput()
+    this.setState({footerBtnDisable: !result})
+    return result
   }
 
   render() {
@@ -417,87 +329,33 @@ class BTCSendPage extends Component {
           </View>
           <Card>
             <AddressInput
-              ref={refs => this.addressInput = refs}
-              coinType={this.props.account.coinType}
-              address={this.state.address}
-              onChangeText={text => this._handleAddressInput(text)}
+              ref={refs => this.addressInput = refs && refs.getWrappedInstance()}
+              onChangeText={text => this._checkFormData()}
             />
             <ValueInput
               ref={refs => this.valueInput = refs}
               placeHolder={this.cryptoCurrencyUnit}
-              value={this.state.sendValue}
               onItemClick={text => this._handleSendValueItemClick(text)}
               onChangeText={text => this._handleValueInput(text)}
             />
             <FeeInput
-              ref={refs => this.feeInput = refs}
+              ref={refs => this.feeInput = refs && refs.getWrappedInstance()}
               value={this.state.selectedFee}
               placeHolder='satoshi per byte'
+              onChangeText={text => this._handleFeeInput(text)}
             />
-            <CardItem>
-              <Item>
-                <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
-                  {I18n.t('remarks')}
-                </Text>
-                <Input
-                  selectionColor={Color.ACCENT}
-                  style={
-                    Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
-                  }
-                  multiline={true}
-                  value={this.state.remarks}
-                  onChangeText={text => this.setState({ remarks: text })}
-                  returnKeyType="done"
-                  blurOnSubmit={true}
-                />
-              </Item>
-            </CardItem>
-            <CardItem>
-              <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
-                {I18n.t('transactionFee')}
-              </Text>
-              <View style={{ flex: 1, marginLeft: 32 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                  <Text>{this.state.transactionFee + ' '}</Text>
-                  <Text style={{ textAlignVertical: 'center' }}>{this.cryptoCurrencyUnit}</Text>
-                </View>
-              </View>
-            </CardItem>
-            <CardItem>
-              <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
-                {I18n.t('totalCost')}
-              </Text>
-              <View style={{ flex: 1, marginLeft: 32 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                  <Text>{this.state.totalCostCryptoCurrency + ' '}</Text>
-                  <Text style={{ textAlignVertical: 'center' }}>{this.cryptoCurrencyUnit}</Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-end',
-                    marginTop: Dimen.SPACE
-                  }}>
-                  <Text
-                    style={{
-                      color: Color.LIGHT_PARIMARY,
-                      fontSize: Dimen.SECONDARY_TEXT
-                    }}>
-                    {this.state.totalCostLegalCurrency + ' '}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Color.LIGHT_PARIMARY,
-                      fontSize: Dimen.SECONDARY_TEXT,
-                      textAlignVertical: 'center'
-                    }}>
-                    {this.props.legalCurrencyUnit}
-                  </Text>
-                </View>
-              </View>
-            </CardItem>
+            <MemoInput
+              ref={refs => this.memoInput = refs}
+              value={this.state.memo}
+              onChangeText={text => this.setState({memo: text})}
+              placeHolder={I18n.t('optional')}
+            />
+            <TransactionFeeCard
+              ref={refs => this.transactionFeeCard = refs && refs.getWrappedInstance()}
+            />
+            <TransactionTotalCostCard
+              ref={refs => this.transactionTotalCostCard = refs && refs.getWrappedInstance()}
+            />
           </Card>
         </Content>
         <MaterialDialog
@@ -542,7 +400,7 @@ class BTCSendPage extends Component {
             }}
           />
         </Dialog.Container>
-        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')}/>
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')} disabled={this.state.footerBtnDisable}/>
       </Container>
     )
   }

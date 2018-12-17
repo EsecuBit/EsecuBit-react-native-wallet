@@ -7,13 +7,13 @@ import StringUtil from '../utils/StringUtil'
 import PercentageBar from '../components/PercentageBar'
 import I18n from '../lang/i18n'
 
-const platform = Platform.OS
 export default class ValueInput extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
       sendValueError: false,
       sendValueStatus: false,
+      sendValue: ''
     }
   }
 
@@ -22,21 +22,30 @@ export default class ValueInput extends PureComponent {
     this.props.onChangeText(text)
   }
 
-  async _handleSendValueItemClick(text) {
-
-  }
 
   async _checkSendValue(text) {
     let result = StringUtil.isInvalidValue(text)
-    await this.setState({ sendValueError: result, sendValueStatus: !result && text !== '' })
+    await this.setState({ sendValueError: result, sendValueStatus: !result && text })
+    if (result) {
+      this.clear()
+    }
   }
 
-  _clear() {
+  clear() {
+    this.setState({sendValue: ''})
     this.props.onChangeText('')
   }
 
   isValidInput() {
     return this.state.sendValueStatus
+  }
+
+  getValue() {
+    return this.state.sendValue
+  }
+
+  updateValue(value) {
+    this.setState({sendValue: value})
   }
 
 
@@ -62,7 +71,7 @@ export default class ValueInput extends PureComponent {
             value={this.props.value}
             returnKeyType="done"
             onChangeText={this._handleSendValueInput.bind(this)}
-            keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+            keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
             blurOnSubmit={true}
           />
           {this.state.sendValueStatus ? (
@@ -72,7 +81,7 @@ export default class ValueInput extends PureComponent {
             <Icon
               name="close-circle"
               style={{ color: Color.DANGER }}
-              onPress={() => this._clear()}
+              onPress={() => this.clear()}
             />
           ) : null}
         </InputGroup>

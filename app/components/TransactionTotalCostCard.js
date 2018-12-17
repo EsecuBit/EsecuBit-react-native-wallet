@@ -8,7 +8,7 @@ import { EsWallet } from 'esecubit-wallet-sdk'
 import StringUtil from "../utils/StringUtil"
 import CoinUtil from "../utils/CoinUtil"
 
-class TransactionCostCard extends PureComponent {
+class TransactionTotalCostCard extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -86,4 +86,5 @@ const mapStateToProps = state => ({
   accountCurrentUnit: state.AccountReducer.accountCurrentUnit
 })
 
-export default connect(mapStateToProps)(TransactionCostCard)
+// To access the wrapped instance, you need to specify { withRef: true } in the options argument of the connect() call
+export default connect(mapStateToProps, null, null, { withRef: true })(TransactionTotalCostCard)

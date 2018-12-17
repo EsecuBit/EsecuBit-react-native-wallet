@@ -36,7 +36,7 @@
     "react": "16.0.0-alpha.6",
     "react-native": "0.44.0",
     "react-native-camera": "^1.3.0",
-    "react-native-dialog": "^git+https://github.com/sekfung/react-native-dialog.git",
+    "react-native-dialog": "git+https://github.com/sekfung/react-native-dialog.git",
     "react-native-i18n": "^2.0.12",
     "react-native-material-dialog": "git+https://github.com/sekfung/react-native-material-dialog.git",
     "react-native-material-dropdown": "^0.11.1",

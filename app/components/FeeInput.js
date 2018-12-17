@@ -9,6 +9,7 @@ import { D } from 'esecubit-wallet-sdk'
 import CoinUtil from "../utils/CoinUtil"
 import { Coin } from '../common/Constants'
 import { connect } from 'react-redux'
+import StringUtil from "../utils/StringUtil";
 
 const platform = Platform.OS
 const STANDARD_FEE_TYPE = 'standard'
@@ -38,10 +39,10 @@ class FeeInput extends PureComponent {
    */
   async _getSuggestedFee() {
     let fees = await this.props.account.getSuggestedFee()
-    this.setState({ fees: Object.values(fees) })
+    await this.setState({ fees: Object.values(fees) })
     this._convertFeeToSuggestedFeeTip(fees)
-    this.setState({ selectedFeeTip: this.state.feesTip[0].value })
-    this.setState({ selectedFee: this.state.fees[0] })
+    await this.setState({ selectedFeeTip: this.state.feesTip[0].value, selectedFee: this.state.fees[0] })
+    this.props.onChangeText(this.state.fees[0])
   }
 
 
@@ -52,7 +53,7 @@ class FeeInput extends PureComponent {
     for (let i = 0; i < feeLevel; i++) {
       const json = {}
       let feeValue = feeValues[i]
-      json.value = I18n.t(feeKeys[i]) + '( ' + feeValue + ' ' + this._getMinimumUnit() + ' / byte )'
+      json.value = I18n.t(feeKeys[i]) + '( ' + feeValue + ' ' + CoinUtil.getMinimumUnit(this.props.account.coinType) + ' / byte )'
       this.state.feesTip.push(json)
     }
   }
@@ -74,28 +75,18 @@ class FeeInput extends PureComponent {
     }
   }
 
-  _getMinimumUnit() {
-    let coinType = CoinUtil.getRealCoinType(this.props.account.coinType)
-    switch (coinType) {
-      case Coin.btc:
-        return D.unit.btc.satoshi
-      case Coin.eth:
-        return D.unit.eth.GWei
-      default:
-        throw D.error.coinNotSupported
-    }
-  }
-
 
   async _changeFeeType() {
     // standard -> custom
     if (this.state.currentFeeType === STANDARD_FEE_TYPE) {
       await this.setState({ currentFeeType: CUSTOM_FEE_TYPE, selectedFee: '' })
+      this.props.onChangeText('')
     } else {
       await this.setState({
         currentFeeType: STANDARD_FEE_TYPE,
         selectedFee: this.state.fees[0]
       })
+      this.props.onChangeText(this.state.fees[0])
     }
   }
 
@@ -103,6 +94,16 @@ class FeeInput extends PureComponent {
     await this.setState({selectedFee: value})
     this.props.onChangeText(value)
   }
+
+
+  isValidInput() {
+    return !StringUtil.isInvalidValue(this.state.selectedFee.trim())
+  }
+
+  getFee() {
+    return this.state.selectedFee
+  }
+
 
   render() {
     return (
@@ -131,7 +132,7 @@ class FeeInput extends PureComponent {
               selectionColor={Color.ACCENT}
               value={this.state.selectedFee}
               placeholder={this.props.placeHolder}
-              onChangeText={text => this._calculateBTCFee(text)}
+              onChangeText={text => this._handleFeeInput(text)}
               keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
               blurOnSubmit={true}
               returnKeyType="done"
@@ -157,5 +158,6 @@ const mapStateToProps = state => ({
   account: state.AccountReducer.account
 })
 
-export default connect(mapStateToProps)(FeeInput)
+// To access the wrapped instance, you need to specify { withRef: true } in the options argument of the connect() call
+export default connect(mapStateToProps, null, null, { withRef: true })(FeeInput)
 

@@ -5,33 +5,45 @@ import { Dimen, Color, CommonStyle } from '../common/Styles'
 import PropTypes from 'prop-types'
 import I18n from '../lang/i18n'
 import { D } from 'esecubit-wallet-sdk'
+import { connect } from 'react-redux'
 
-export default class AddressInput extends PureComponent {
+class AddressInput extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
       checkAddressSuccess: false,
-      checkAddressError: false
+      checkAddressError: false,
+      address: ''
     }
   }
 
   async _handleAddressInput(address) {
     try {
-      D.address.checkAddress(this.props.coinType, address)
+      D.address.checkAddress(this.props.account.coinType, address)
       this.setState({ checkAddressSuccess: true, checkAddressError: false })
     } catch (e) {
       console.warn('check Address error', address, e)
       this.setState({ checkAddressSuccess: false, checkAddressError: true })
     } finally {
+      this.setState({address: address})
       this.props.onChangeText(address)
     }
   }
 
   isValidInput() {
-    return this.state.checkAddressSuccess
+    return this.state.checkAddressSuccess && this.state.address
   }
 
-  _clear() {
+  getAddress() {
+    return this.state.address
+  }
+
+  updateAddress(address) {
+    this.setState({address: address})
+  }
+
+  clear() {
+    this.setState({address: ''})
     this.props.onChangeText('')
   }
 
@@ -50,7 +62,7 @@ export default class AddressInput extends PureComponent {
                 : CommonStyle.multlineInputIOS
             }
             multiline={true}
-            value={this.props.address}
+            value={this.state.address}
             onChangeText={text => this._handleAddressInput(text)}
             keyboardType="email-address"
             returnKeyType="done"
@@ -63,7 +75,7 @@ export default class AddressInput extends PureComponent {
             <Icon
               name="close-circle"
               style={{ color: Color.DANGER }}
-              onPress={() => this._clear()}
+              onPress={() => this.clear()}
             />
           ) : null}
         </InputGroup>
@@ -74,9 +86,7 @@ export default class AddressInput extends PureComponent {
 
 AddressInput.prototypes = {
   onChangeText: PropTypes.func.isRequired,
-  address: PropTypes.string.isRequired,
   placeHolder: PropTypes.string,
-  coinType: PropTypes.string.isRequired,
   label: PropTypes.string
 }
 
@@ -85,3 +95,10 @@ AddressInput.defaultProps = {
   placeHolder: '',
   label: I18n.t('address')
 }
+
+const mapStateToProps = state => ({
+  account: state.AccountReducer.account
+})
+
+// To access the wrapped instance, you need to specify { withRef: true } in the options argument of the connect() call
+export default connect(mapStateToProps, null, null, {withRef: true})(AddressInput)

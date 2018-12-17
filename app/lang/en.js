@@ -158,6 +158,7 @@ export default {
   pairDeviceTip: 'Connect Your Device',
   deviceNotConnected: 'Please connect device to get cos version',
   pleaseWait: 'Please Wait...',
-  noNewApp: 'This is the latest version'
+  noNewApp: 'This is the latest version',
+  optional: 'Optional'
 
 }
