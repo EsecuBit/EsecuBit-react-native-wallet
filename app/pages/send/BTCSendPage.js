@@ -6,7 +6,6 @@ import { CommonStyle, Color, Dimen } from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
-import Dialog from 'react-native-dialog'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
 import AddressInput from "../../components/AddressInput";
@@ -16,7 +15,7 @@ import MemoInput from "../../components/MemoInput"
 import TransactionTotalCostCard from "../../components/TransactionTotalCostCard"
 import TransactionFeeCard from "../../components/TransactionFeeCard"
 import BalanceHeader from "../../components/BalanceHeader"
-import PopupDialog, {DialogContent, DialogTitle} from "react-native-popup-dialog"
+import Dialog, {DialogContent, DialogTitle, DialogButton } from "react-native-popup-dialog"
 const platform = Platform.OS
 
 class BTCSendPage extends Component {
@@ -88,6 +87,7 @@ class BTCSendPage extends Component {
       }
     })
   }
+  
   _fillResendData() {
     const { params }= this.props.navigation.state
     if (params) {
@@ -330,49 +330,38 @@ class BTCSendPage extends Component {
             />
           </Card>
         </Content>
-        <PopupDialog
-          onDismissed={() => {this.setState({ sendDialogVisible: false })}}
-          onShown={() => this.setState({ sendDialogVisible: true })}>
+        <Dialog
+          width={0.8}
           visible={this.state.sendDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('transacting')}/>}
-          dialogContent={<DialogContent><Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text></DialogContent>}
-        </PopupDialog>
-        <Dialog.Container
+          onTouchOutside={() => {}}
+          dialogTitle={<DialogTitle title={I18n.t('transacting')}/>}>
+          <Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text>
+         </Dialog>
+        <Dialog
+          width={0.8}
           visible={this.state.deviceLimitDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-          <Dialog.Title>{I18n.t('tips')}</Dialog.Title>
-          <Dialog.Description>
-            {I18n.t('deviceLimitTips') +
-              this.state.totalCostCryptoCurrency +
-              ' ' +
-              this.cryptoCurrencyUnit}
-          </Dialog.Description>
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => this.setState({ deviceLimitDialogVisible: false })}
-          />
-        </Dialog.Container>
-        <Dialog.Container
-          visible={this.state.transactionConfirmDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}
+          actions={[<DialogButton text={I18n.t('confirm')} onPress={() => this.setState({deviceLimitDialogVisible: false})} />]}
+          onTouchOutside={() => this.setState({deviceLimitDialogVisible: false})}
+          dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
         >
-          <Dialog.Title>{I18n.t("transactionConfirm")}</Dialog.Title>
-          <Dialog.Description>{this.state.transactionConfirmDesc}</Dialog.Description>
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t("cancel")}
-            onPress={() => this.setState({transactionConfirmDialogVisible: false})}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t("confirm")}
-            onPress={() => {
-              this._send()
-              this.setState({transactionConfirmDialogVisible: false})
-            }}
-          />
-        </Dialog.Container>
+         <Text>{`${I18n.t('deviceLimitTips')} ${this.state.totalCostCryptoCurrency} ${this.cryptoCurrencyUnit}`}</Text>
+        </Dialog>
+        <Dialog
+          onTouchOutside={() => {
+            this.setState({transactionConfirmDialogVisible: false})
+          }}
+          width={0.8}
+          visible={this.state.transactionConfirmDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t("transactionConfirm")}/>}
+          actions={[
+          <DialogButton text={I18n.t("cancel")} onPress={() => this.setState({transactionConfirmDialogVisible: false})}/>,
+          <DialogButton text={I18n.t("confirm")} onPress={() => {
+            this.setState({transactionConfirmDialogVisible: false})
+          }}/>
+        ]}
+        >
+          <Text>{this.state.transactionConfirmDesc}</Text>
+        </Dialog>
         <FooterButton onPress={this._send.bind(this)} title={I18n.t('send')} disabled={this.state.footerBtnDisable}/>
       </Container>
     )
