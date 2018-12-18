@@ -49,7 +49,7 @@ export default {
   gasLimitTip: '最小21000',
   balance: '余额',
   through:'通过',
-  memo:'备忘录',
+  memo:'备注',
   confirmNum:'已在区块中确认',
   tradingID:'交易ID',
   expenditure:'已支出',

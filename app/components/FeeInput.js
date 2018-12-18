@@ -93,15 +93,28 @@ class FeeInput extends PureComponent {
   async _handleFeeInput(value) {
     await this.setState({selectedFee: value})
     this.props.onChangeText(value)
+    if (!this._checkFee(value)) {
+      this._clear()
+    }
   }
 
-
   isValidInput() {
-    return !StringUtil.isInvalidValue(this.state.selectedFee.trim())
+    return this._checkFee(this.state.selectedFee.trim())
   }
 
   getFee() {
     return this.state.selectedFee
+  }
+
+  _checkFee(fee) {
+    return !StringUtil.isInvalidValue(fee)
+  }
+
+  _clear() {
+    if (this.state.currentFeeType === CUSTOM_FEE_TYPE) {
+      this.setState({selectedFee: ''})
+      this.props.onChangeText('')
+    }
   }
 
 
@@ -150,7 +163,6 @@ class FeeInput extends PureComponent {
 }
 
 FeeInput.defaultProps = {
-  value: PropTypes.string.isRequired,
   placeHolder: PropTypes.string.isRequired,
   account: PropTypes.object.isRequired
 }

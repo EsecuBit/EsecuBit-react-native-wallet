@@ -25,6 +25,7 @@
   "dependencies": {
     "ac-qrcode-rn": "^0.2.1",
     "assert": "^1.4.1",
+    "babel-plugin-flow-react-proptypes": "^24.1.2",
     "bigi": "^1.4.2",
     "buffer": "^5.2.0",
     "crypto-browserify": "^3.12.0",
@@ -41,7 +42,7 @@
     "react-native-material-dialog": "git+https://github.com/sekfung/react-native-material-dialog.git",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-material-menu": "^0.4.0",
-    "react-native-popup-dialog": "^0.14.52",
+    "react-native-popup-dialog": "git+https://github.com/sekfung/react-native-popup-dialog.git",
     "react-native-qrcode": "^0.2.7",
     "react-native-simple-dialogs": "^1.0.0",
     "react-native-vector-icons": "^4.6.0",
@@ -54,7 +55,8 @@
     "redux-devtools-extension": "^2.13.5",
     "redux-thunk": "^2.3.0",
     "stream-browserify": "^2.0.1",
-    "vm-browserify": "^1.1.0"
+    "vm-browserify": "^1.1.0",
+    "react-native-root-siblings": "1.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

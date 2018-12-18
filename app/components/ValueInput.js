@@ -18,6 +18,7 @@ export default class ValueInput extends PureComponent {
   }
 
   async _handleSendValueInput(text) {
+    await this.setState({sendValue: text})
     await this._checkSendValue(text)
     this.props.onChangeText(text)
   }
@@ -25,7 +26,7 @@ export default class ValueInput extends PureComponent {
 
   async _checkSendValue(text) {
     let result = StringUtil.isInvalidValue(text)
-    await this.setState({ sendValueError: result, sendValueStatus: !result && text })
+    await this.setState({ sendValueError: result, sendValueStatus: !result && !!text })
     if (result) {
       this.clear()
     }
@@ -37,7 +38,7 @@ export default class ValueInput extends PureComponent {
   }
 
   isValidInput() {
-    return this.state.sendValueStatus
+    return this.state.sendValueStatus && this.state.sendValue
   }
 
   getValue() {
@@ -45,7 +46,7 @@ export default class ValueInput extends PureComponent {
   }
 
   updateValue(value) {
-    this.setState({sendValue: value})
+    this._handleSendValueInput(value)
   }
 
 
@@ -68,7 +69,7 @@ export default class ValueInput extends PureComponent {
                 : CommonStyle.multlineInputIOS
             }
             numberOfLines={3}
-            value={this.props.value}
+            value={this.state.sendValue}
             returnKeyType="done"
             onChangeText={this._handleSendValueInput.bind(this)}
             keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
