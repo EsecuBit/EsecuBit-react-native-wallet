@@ -15,7 +15,6 @@ export default class MemoInput extends PureComponent {
 
   _handleMemoInput(text) {
     this.setState({ memo: text })
-    this.props.onChangeText(text)
   }
 
   getMemo() {

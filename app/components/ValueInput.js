@@ -75,20 +75,10 @@ export default class ValueInput extends PureComponent {
             keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
             blurOnSubmit={true}
           />
-          {this.state.sendValueStatus ? (
-            <Icon name="ios-checkmark-circle" style={{ color: Color.SUCCESS }} />
-          ) : null}
-          {this.state.sendValueError ? (
-            <Icon
-              name="close-circle"
-              style={{ color: Color.DANGER }}
-              onPress={() => this.clear()}
-            />
-          ) : null}
+          {this.state.sendValueStatus  && <Icon name="ios-checkmark-circle" style={{ color: Color.SUCCESS }} /> }
+          {this.state.sendValueError && <Icon name="close-circle" style={{color: Color.DANGER}} onPress={() => this.clear()}/> }
         </InputGroup>
-        {
-          this.props.enablePercentageBar ? <PercentageBar onItemClick={onItemClick} type="percent" data={[0.1, 0.3, 0.5, 0.7, 1]} /> : null
-        }
+        { this.props.enablePercentageBar &&  <PercentageBar onItemClick={onItemClick} type="percent" data={[0.1, 0.3, 0.5, 0.7, 1]} /> }
       </CardItem>
     )
   }

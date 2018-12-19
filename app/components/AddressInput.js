@@ -17,7 +17,7 @@ class AddressInput extends PureComponent {
     }
   }
 
-  async _handleAddressInput(address) {
+  _handleAddressInput(address) {
     try {
       D.address.checkAddress(this.props.account.coinType, address)
       this.setState({ checkAddressSuccess: true, checkAddressError: false })
@@ -68,16 +68,16 @@ class AddressInput extends PureComponent {
             returnKeyType="done"
             blurOnSubmit={true}
           />
-          {this.state.checkAddressSuccess && !this.state.checkAddressError ? (
+          {this.state.checkAddressSuccess && !this.state.checkAddressError &&
             <Icon name="ios-checkmark-circle" style={{ color: Color.SUCCESS }} />
-          ) : null}
-          {this.state.checkAddressError && !this.state.checkAddressSuccess ? (
+          }
+          {this.state.checkAddressError && !this.state.checkAddressSuccess &&
             <Icon
               name="close-circle"
               style={{ color: Color.DANGER }}
               onPress={() => this.clear()}
             />
-          ) : null}
+          }
         </InputGroup>
       </CardItem>
     )

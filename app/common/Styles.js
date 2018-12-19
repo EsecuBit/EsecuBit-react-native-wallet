@@ -133,13 +133,19 @@ export const CommonStyle = StyleSheet.create({
     height: 68,
     paddingTop: 24
   },
-  progressDialogContent: {
+  horizontalDialogContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingTop: Dimen.MARGIN_HORIZONTAL
+  },
+  verticalDialogContent: {
     paddingTop: Dimen.MARGIN_VERTICAL
   },
-  progressDialogText: {
+  horizontalDialogText: {
     marginLeft: Dimen.MARGIN_HORIZONTAL,
+    fontSize: Dimen.SECONDARY_TEXT
+  },
+  verticalDialogText: {
     fontSize: Dimen.SECONDARY_TEXT
   }
 })

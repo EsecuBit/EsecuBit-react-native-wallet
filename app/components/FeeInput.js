@@ -11,7 +11,6 @@ import { Coin } from '../common/Constants'
 import { connect } from 'react-redux'
 import StringUtil from "../utils/StringUtil";
 
-const platform = Platform.OS
 const STANDARD_FEE_TYPE = 'standard'
 const CUSTOM_FEE_TYPE = 'custom'
 
@@ -103,7 +102,13 @@ class FeeInput extends PureComponent {
   }
 
   getFee() {
-    return this.state.selectedFee
+    let coinType = CoinUtil.getRealCoinType(this.props.account.coinType)
+    switch (coinType) {
+      case Coin.eth:
+        return this.esWallet.convertValue(this.props.account.coinType, this.state.selectedFee, D.unit.eth.GWei, D.unit.eth.Wei)
+      default:
+        return this.state.selectedFee
+    }
   }
 
   _checkFee(fee) {
@@ -146,7 +151,7 @@ class FeeInput extends PureComponent {
               value={this.state.selectedFee}
               placeholder={this.props.placeHolder}
               onChangeText={text => this._handleFeeInput(text)}
-              keyboardType={platform === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+              keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
               blurOnSubmit={true}
               returnKeyType="done"
             />
