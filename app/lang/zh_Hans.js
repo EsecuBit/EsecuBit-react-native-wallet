@@ -162,5 +162,6 @@ export default {
   noNewApp: '当前已是最新版本',
   optional: '可选的',
   checking: '正在查询',
-  transactionRecordHasBeenFound: '条交易记录已被找到'
+  transactionRecordHasBeenFound: '条交易记录已被找到',
+  searchingDevice: '正在搜索设备'
 }

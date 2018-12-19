@@ -106,7 +106,7 @@ export default class PairListPage extends Component {
     _that.transmitter.listenStatus(async (error, status) => {
       console.log('connect status', error, status)
       if (error !== D.error.succeed) {
-        ToastUtil.showLong('connectFailed')
+        ToastUtil.showShort(I18n.t('connectFailed'))
         _that.setState({ connectDialogVisible: false })
         return
       }

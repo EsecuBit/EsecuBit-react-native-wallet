@@ -150,6 +150,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:27.1.0'
     compile 'com.facebook.react:react-native:+'
+    compile 'com.facebook.fresco:animated-gif:1.10.0'
     // From node_modules
 }
 

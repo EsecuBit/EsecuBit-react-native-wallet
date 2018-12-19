@@ -161,6 +161,7 @@ export default {
   noNewApp: 'This is the latest version',
   optional: 'Optional',
   checking: 'Checking',
-  transactionRecordHasBeenFound: 'transaction records has been found'
+  transactionRecordHasBeenFound: 'transaction records has been found',
+  searchingDevice: 'Searching Device...'
 
 }
