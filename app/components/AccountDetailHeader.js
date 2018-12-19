@@ -226,4 +226,4 @@ const mapStateToProps = state => ({
   account: state.AccountReducer.account
 })
 
-export default connect(mapStateToProps)(AccountDetailHeader)
+export default connect(mapStateToProps, null, null, {withRef: true})(AccountDetailHeader)

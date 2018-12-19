@@ -10,12 +10,11 @@ import {
 } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
-import PopupDialog from 'react-native-popup-dialog'
+import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import Dialog from 'react-native-dialog'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AccountOperateBottomBar from '../../components/AccountOperateBottomBar'
@@ -42,7 +41,8 @@ class AccountDetailPage extends Component {
       refreshing: false,
       isShowBottomBar: true,
       dMemo: '',
-      renameDialogVisible: false
+      renameDialogVisible: false,
+      transactionDetailDialogVisible: false
     }
     this.cryptoCurrencyUnit = props.accountCurrentUnit
   }
@@ -430,18 +430,18 @@ class AccountDetailPage extends Component {
     if (rowData.shouldResend) {
       this.resendableText = I18n.t('adviceToResend')
     }
-    if (rowData.comment !== undefined && rowData.comment !== null) {
+    if (rowData.comment) {
       this.setState({ dMemo: rowData.comment })
     } else {
       this.setState({ dMemo: '' })
     }
 
-    if (rowData.data !== undefined && rowData.data !== null) {
+    if (rowData.data) {
       this.dSmartContract = rowData.data
     } else {
       this.dSmartContract = 'none'
     }
-    this.transactionDetailDialog.show()
+    this.setState({transactionDetailDialogVisible: true})
   }
 
   _getTxInfos() {
@@ -458,12 +458,10 @@ class AccountDetailPage extends Component {
   }
 
   _renameAccount() {
-    let _that = this
     this.account
       .rename(this.renameAccountname)
       .then(() => {
-        _that.props.account.label = this.renameAccountname
-        // _that.accountHeader.updateAccountName(this.renameAccountname)
+        this.accountHeader.updateAccountName(this.renameAccountname)
       })
       .catch(error => {
         console.log('rename', error)
@@ -490,7 +488,6 @@ class AccountDetailPage extends Component {
   }
 
   _gotoResendPage() {
-    this.transactionDetailDialog.dismiss()
     let param = { txInfo: this.rowData }
     switch (true) {
       case D.isBtc(this.account.coinType):
@@ -542,33 +539,39 @@ class AccountDetailPage extends Component {
     return (
       <Container style={[CommonStyle.safeAreaBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <AccountDetailHeader
-          ref={refs => this.accountHeader = refs}
+          ref={refs => this.accountHeader = refs && refs.getWrappedInstance()}
           onHideMenu={type => this._handleMenuItemClick(type)}
           navigation={this.props.navigation}
         />
-        <Dialog.Container visible={this.state.renameDialogVisible}>
-          <Dialog.Title>{I18n.t('renameAccount')}</Dialog.Title>
-          <Dialog.Description>{I18n.t('renameAccountHint')}</Dialog.Description>
-          <Dialog.Input
-            maxLength={7}
-            selectionColor={Color.ACCENT}
-            underlineColorAndroid={Color.ACCENT}
-            onChangeText={text => (this.renameAccountname = text)}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={() => this.setState({ renameDialogVisible: false })}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => {
-              this.setState({ renameDialogVisible: false })
-              this._renameAccount()
-            }}
-          />
-        </Dialog.Container>
+        <Dialog
+          visible={this.state.renameDialogVisible}
+          onTouchOutside={() => this.setState({renameDialogVisible: false})}
+          width={0.8}
+          dialogTitle={<DialogTitle  title={I18n.t('renameAccount')}/>}
+          actions={[
+            <DialogButton
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              key='rename_account_cancel'
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({ renameDialogVisible: false })} />,
+            <DialogButton
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              key='rename_account_confirm'
+              text={I18n.t('confirm')} onPress={() => {
+                this.setState({ renameDialogVisible: false })
+                this._renameAccount()}} />
+          ]}
+        >
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text style={CommonStyle.verticalDialogText}>{I18n.t('renameAccountHint')}</Text>
+            <TextInput
+              underlineColorAndroid={Color.ACCENT}
+              maxLength={7}
+              onChangeText={text => this.renameAccountname = text}
+              returnKeyType="done"
+            />
+          </DialogContent>
+        </Dialog>
         <View
           style={{
             height: 40,
@@ -602,16 +605,15 @@ class AccountDetailPage extends Component {
             onEndReachedThreshold={10}
           />
         </View>
-        <PopupDialog
-          ref={popupDialog => {
-            this.transactionDetailDialog = popupDialog
-          }}
+        <Dialog
+          visible={this.state.transactionDetailDialogVisible}
           width={0.9}
           height={
             D.isBtc(this.account.coinType)
               ? BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT
               : ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT
           }
+          onTouchOutside={() => this.setState({transactionDetailDialogVisible: false})}
           onDismissed={() => this._handleTransactionDetailDismiss()}
           onShown={() => this.setState({ isShowBottomBar: false })}>
           <Content>
@@ -633,7 +635,7 @@ class AccountDetailPage extends Component {
                     name="close"
                     type="MaterialCommunityIcons"
                     onPress={() => {
-                      this.transactionDetailDialog.dismiss()
+                      this.setState({transactionDetailDialogVisible: false})
                     }}
                   />
                 </View>
@@ -747,7 +749,7 @@ class AccountDetailPage extends Component {
               </View>
             ) : null}
           </Content>
-        </PopupDialog>
+        </Dialog>
         <AccountOperateBottomBar
           leftOnPress={this._gotoSendPage.bind(this)}
           rightOnPress={this._gotoAddressDetailPage.bind(this)}

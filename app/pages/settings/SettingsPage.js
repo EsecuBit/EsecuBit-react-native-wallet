@@ -8,7 +8,6 @@ import { version } from '../../../package.json'
 import { Api, Coin } from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import BtTransmitter from '../../device/BtTransmitter'
-import Dialog from 'react-native-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { Color, Dimen, CommonStyle } from '../../common/Styles'
 import AppUtil from '../../utils/AppUtil'
@@ -17,7 +16,7 @@ import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import { cosVersion } from '../../../package.json'
 import BaseToolbar from '../../components/BaseToolbar'
-import PopupDialog from 'react-native-popup-dialog'
+import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 
@@ -133,7 +132,6 @@ class SettingsPage extends Component {
     console.log('disConnected')
     await this.setState({ disConnectDialogVisible: false })
     this.transmitter.disconnect()
-    this.disconnectPopupDialog.dismiss()
     this.props.navigation.pop()
   }
 
@@ -144,7 +142,6 @@ class SettingsPage extends Component {
         this.info = info
         if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
-            this.versionUpdatePopupDialog.show()
             this.setState({
               updateDesc: info.data.description,
               updateVersionDialogVisible: true
@@ -166,7 +163,6 @@ class SettingsPage extends Component {
     if (this.info && this.info.data.isForceUpdate) {
       AppUtil.exitApp()
     }
-    this.versionUpdatePopupDialog.dismiss()
   }
 
   _gotoBrowser() {
@@ -174,7 +170,6 @@ class SettingsPage extends Component {
       Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
     this.setState({ updateVersionDialogVisible: false })
-    this.versionUpdatePopupDialog.dismiss()
   }
 
   render() {
@@ -185,7 +180,7 @@ class SettingsPage extends Component {
         <Content style={{ backgroundColor: Color.CONTAINER_BG }}>
           <Card style={{ flex: 1 }}>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
-              <Text style={customStyle.headerText}>{I18n.t('device')}</Text>
+              <Text style={styles.headerText}>{I18n.t('device')}</Text>
             </CardItem>
             <CardItem
               bordered
@@ -204,19 +199,16 @@ class SettingsPage extends Component {
             <CardItem
               bordered
               button
-              onPress={() => this.disconnectPopupDialog.show()}>
+              onPress={() => this.setState({ disConnectDialogVisible: true })}>
               <Text>{I18n.t('disconnect')}</Text>
               <Right>
                 <Icon name="ios-arrow-forward" />
               </Right>
             </CardItem>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
-              <Text style={customStyle.headerText}>{I18n.t('currency')}</Text>
+              <Text style={styles.headerText}>{I18n.t('currency')}</Text>
             </CardItem>
-            <CardItem
-              bordered
-              button
-              onPress={() => this.legalCurrencyPopupDialog.show()}>
+            <CardItem bordered button onPress={() => this.setState({legalCurrencyDialogVisible: true})}>
               <Text>{I18n.t('legalCurrency')}</Text>
               <Right>
                 <View style={{ flexDirection: 'row' }}>
@@ -228,7 +220,7 @@ class SettingsPage extends Component {
               </Right>
             </CardItem>
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
-              <CardItem bordered button onPress={() => this.btcPopupDialog.show()}>
+              <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
                 <Text>{I18n.t('btc')}</Text>
                 <Right>
                   <View style={{ flexDirection: 'row' }}>
@@ -243,7 +235,7 @@ class SettingsPage extends Component {
               <View style={CommonStyle.divider} />
             )}
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
-              <CardItem bordered button onPress={() => this.ethPopupDialog.show()}>
+              <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
                 <Text>{I18n.t('eth')}</Text>
                 <Right>
                   <View style={{ flexDirection: 'row' }}>
@@ -258,13 +250,13 @@ class SettingsPage extends Component {
               <View style={CommonStyle.divider} />
             )}
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
-              <Text style={customStyle.headerText}>App</Text>
+              <Text style={styles.headerText}>App</Text>
             </CardItem>
-            <CardItem bordered button onPress={() => this.languagePopupDialog.show()}>
+            <CardItem bordered button onPress={() => this.setState({changeLanguageDialogVisible: true})}>
               <Text>{I18n.t('language')}</Text>
             </CardItem>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
-              <Text style={customStyle.headerText}>{I18n.t('about')}</Text>
+              <Text style={styles.headerText}>{I18n.t('about')}</Text>
             </CardItem>
             <CardItem bordered button onPress={() => this._checkVersion()}>
               <Text>{I18n.t('checkVersion')}</Text>
@@ -285,14 +277,12 @@ class SettingsPage extends Component {
             </CardItem>
           </Card>
         </Content>
-        <PopupDialog
-          ref={refs => (this.legalCurrencyPopupDialog = refs)}
-          onDismissed={() => {
-            this.setState({ legalCurrencyDialogVisible: false })
-          }}
+        <Dialog
+          visible={this.state.legalCurrencyDialogVisible}
           width={0}
           height={0}
-          onShown={() => this.setState({ legalCurrencyDialogVisible: true })}>
+          onTouchOutside={() => this.setState({legalCurrencyDialogVisible: false})}
+        >
           <SinglePickerMaterialDialog
             title={I18n.t('legalCurrency')}
             items={Object.values(D.unit.legal).map((row, index) => ({
@@ -309,7 +299,6 @@ class SettingsPage extends Component {
             }}
             onCancel={() => {
               this.setState({ legalCurrencyDialogVisible: false })
-              this.legalCurrencyPopupDialog.dismiss()
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -320,18 +309,15 @@ class SettingsPage extends Component {
                 legalCurrencyLabel: label,
                 legalCurrencyIndex: index
               })
-              this.legalCurrencyPopupDialog.dismiss()
+
             }}
           />
-        </PopupDialog>
-        <PopupDialog
-          ref={refs => (this.btcPopupDialog = refs)}
-          onDismissed={() => {
-            this.setState({ btcDialogVisible: false })
-          }}
+        </Dialog>
+        <Dialog
+          onTouchOutside={() => this.setState({btcDialogVisible: false})}
           width={0}
           height={0}
-          onShown={() => this.setState({ btcDialogVisible: true })}>
+        >
           <SinglePickerMaterialDialog
             title={I18n.t('btc')}
             items={btcUnit.map((row, index) => ({ value: index, label: row }))}
@@ -345,7 +331,7 @@ class SettingsPage extends Component {
             }}
             onCancel={() => {
               this.setState({ btcDialogVisible: false })
-              this.btcPopupDialog.dismiss()
+
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -356,18 +342,15 @@ class SettingsPage extends Component {
                 btcLabel: label,
                 btcIndex: index
               })
-              this.btcPopupDialog.dismiss()
+
             }}
           />
-        </PopupDialog>
-        <PopupDialog
-          ref={refs => (this.ethPopupDialog = refs)}
-          onDismissed={() => {
-            this.setState({ ethDialogVisible: false })
-          }}
+        </Dialog>
+        <Dialog
+          onTouchOutside={() => this.setState({ethDialogVisible: false})}
+          visible={this.state.ethDialogVisible}
           width={0}
-          height={0}
-          onShown={() => this.setState({ ethDialogVisible: true })}>
+          height={0}>
           <SinglePickerMaterialDialog
             title={I18n.t('eth')}
             items={ethUnit.map((row, index) => ({ value: index, label: row }))}
@@ -381,7 +364,7 @@ class SettingsPage extends Component {
             }}
             onCancel={() => {
               this.setState({ ethDialogVisible: false })
-              this.ethPopupDialog.dismiss()
+
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -392,18 +375,15 @@ class SettingsPage extends Component {
                 ethLabel: label,
                 ethIndex: index
               })
-              this.ethPopupDialog.dismiss()
             }}
           />
-        </PopupDialog>
-        <PopupDialog
-          ref={refs => (this.languagePopupDialog = refs)}
-          onDismissed={() => {
-            this.setState({ changeLanguageDialogVisible: false })
-          }}
+        </Dialog>
+        <Dialog
+          onTouchOutside={() => this.setState({changeLanguageDialogVisible: false})}
+          visible={this.state.changeLanguageDialogVisible}
           width={0}
           height={0}
-          onShown={() => this.setState({ changeLanguageDialogVisible: true })}>
+        >
           <SinglePickerMaterialDialog
             title={I18n.t('language')}
             items={['English', '简体中文'].map((row, index) => ({
@@ -419,7 +399,6 @@ class SettingsPage extends Component {
             }}
             visible={this.state.changeLanguageDialogVisible}
             onCancel={() => {
-              this.languagePopupDialog.dismiss()
               this.setState({ changeLanguageDialogVisible: false })
             }}
             onOk={result => {
@@ -437,73 +416,70 @@ class SettingsPage extends Component {
                   break
               }
               this.setState({ changeLanguageDialogVisible: false })
-              this.languagePopupDialog.dismiss()
               this.forceUpdate()
             }}
           />
-        </PopupDialog>
-        <PopupDialog
-          ref={refs => (this.versionUpdatePopupDialog = refs)}
-          onDismissed={() => {
-            this.setState({ updateVersionDialogVisible: false })
-          }}
-          width={0}
-          height={0}
-          onShown={() => this.setState({ updateVersionDialogVisible: true })}>
-          <Dialog.Container
-            visible={this.state.updateVersionDialogVisible}
-            style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-            <Dialog.Title>{I18n.t('versionUpdate')}</Dialog.Title>
-            <Dialog.Description>{this.state.updateDesc}</Dialog.Description>
-            <Dialog.Button
-              style={{ color: Color.ACCENT }}
-              label={I18n.t('cancel')}
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.updateVersionDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')} />}
+          actions={[
+            <DialogButton
+              textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
+              key="update_version_cancel"
+              text={I18n.t('cancel')}
               onPress={this._checkForceUpdate.bind(this)}
-            />
-            <Dialog.Button
-              style={{ color: Color.ACCENT }}
-              label={I18n.t('confirm')}
+            />,
+            <DialogButton
+              textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
+              key="update_version_confirm"
+              text={I18n.t('confirm')}
               onPress={() => this._gotoBrowser()}
             />
-          </Dialog.Container>
-        </PopupDialog>
-        <PopupDialog
-          ref={refs => (this.disconnectPopupDialog = refs)}
-          onDismissed={() => {
-            this.setState({ disConnectDialogVisible: false })
-          }}
-          width={0}
-          height={0}
-          onShown={() => this.setState({ disConnectDialogVisible: true })}>
-          <Dialog.Container
-            visible={this.state.disConnectDialogVisible}
-            style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-            <Dialog.Title>{I18n.t('disconnect')}</Dialog.Title>
-            <Dialog.Description>{I18n.t('disconnectTip')}</Dialog.Description>
-            <Dialog.Button
-              style={{ color: Color.ACCENT }}
-              label={I18n.t('cancel')}
+          ]}>
+          <DialogContent>
+            <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.disConnectDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('disconnect')} />}
+          actions={[
+            <DialogButton
+              key="disconnect_cancel"
+              textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
+              text={I18n.t('cancel')}
               onPress={() => {
-                this.disconnectPopupDialog.dismiss()
                 this.setState({ disConnectDialogVisible: false })
               }}
-            />
-            <Dialog.Button
-              style={{ color: Color.ACCENT }}
-              label={I18n.t('confirm')}
+            />,
+            <DialogButton
+              key="disconnect_confirm"
+              textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
+              text={I18n.t('confirm')}
               onPress={() => this._disConnect()}
             />
-          </Dialog.Container>
-        </PopupDialog>
+          ]}>
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text>{I18n.t('disconnectTip')}</Text>
+          </DialogContent>
+        </Dialog>
       </Container>
     )
   }
 }
 
-const customStyle = StyleSheet.create({
+const styles = StyleSheet.create({
   headerText: {
     color: Color.SECONDARY_TEXT,
     fontSize: Dimen.SECONDARY_TEXT
+  },
+  updateDesc: {
+    fontSize: Dimen.PRIMARY_TEXT,
+    color: Color.PRIMARY_TEXT,
+    marginTop: Dimen.SPACE
   }
 })
 

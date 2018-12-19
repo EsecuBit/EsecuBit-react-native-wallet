@@ -2,19 +2,20 @@ import React, { Component } from 'react'
 import I18n from '../../lang/i18n'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import { ProgressDialog } from 'react-native-simple-dialogs'
+import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
 import BtTransmitter from '../../device/BtTransmitter'
-import { Color } from '../../common/Styles'
+import {Color, CommonStyle} from '../../common/Styles'
 import { NavigationActions } from 'react-navigation'
-import { NetInfo, Platform } from 'react-native'
+import { NetInfo, Platform, ActivityIndicator, Text } from 'react-native'
+import CoinUtil from "../../utils/CoinUtil";
 
-const platform = Platform.OS
 export default class SplashPage extends Component {
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
     this.state = {
-      syncDialogVisible: true
+      syncDialogVisible: true,
+      syncDesc: I18n.t('welcome')
     }
     this.btTransmitter = new BtTransmitter()
   }
@@ -43,7 +44,7 @@ export default class SplashPage extends Component {
 
   _handleConnectivityChange(ns) {
     let _that = this
-    if(platform === 'ios') {
+    if(Platform.OS === 'ios') {
       if (ns === 'none' || ns === 'unknown') {
         setTimeout(() => {
           _that._gotoHomePage(true)
@@ -54,8 +55,8 @@ export default class SplashPage extends Component {
 
   _listenWalletStatus() {
     let _that = this
-    this.wallet.listenStatus(async (error, status) => {
-      console.log('wallet status', error, status)
+    this.wallet.listenStatus(async (error, status, account) => {
+      console.log('wallet status', error, status, account)
       if (error !== D.error.succeed) {
         if (error === D.error.deviceNotInit) {
           console.log('deviceNotInit', error)
@@ -73,6 +74,10 @@ export default class SplashPage extends Component {
           }, 1000)
         }
       } else {
+        if (status === D.status.syncingNewAccount) {
+          let coinType = CoinUtil.getRealCoinType(account.coinType)
+          this.setState({syncDesc: `${I18n.t('checking')} ${coinType} ${account.label}, ${account.getTxInfos().length} ${I18n.t('transactionRecordHasBeenFound')}`})
+        }
         if (status === D.status.syncFinish) {
           _that._gotoHomePage(false)
         }
@@ -99,12 +104,17 @@ export default class SplashPage extends Component {
 
   render() {
     return (
-      <ProgressDialog
-        activityIndicatorColor={Color.ACCENT}
+      <Dialog
+        width={0.8}
+        onTouchOutside={() => {}}
         visible={this.state.syncDialogVisible}
-        title={I18n.t('syncing')}
-        message={I18n.t('welcome')}
-      />
+        dialogTitle={<DialogTitle title={I18n.t('syncing')}/>}
+      >
+        <DialogContent style={CommonStyle.horizontalDialogContent}>
+          <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+          <Text style={CommonStyle.horizontalDialogText}>{this.state.syncDesc}</Text>
+        </DialogContent>
+      </Dialog>
     )
   }
 }

@@ -1,14 +1,22 @@
 import React, { Component } from 'react'
-import { Text, Dimensions, TouchableOpacity, Platform, BackHandler, InteractionManager} from 'react-native'
+import {
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  Platform,
+  BackHandler,
+  InteractionManager,
+  ActivityIndicator,
+  TextInput
+} from 'react-native'
 import { Container, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
-import Dialog from 'react-native-dialog'
-import ProgressDialog from 'react-native-simple-dialogs/src/ProgressDialog'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import BaseToolbar from '../../components/BaseToolbar'
+import Dialog, { DialogTitle, DialogContent, DialogButton } from "react-native-popup-dialog"
 const platform = Platform.OS
 
 export default class NewAccountPage extends Component {
@@ -206,40 +214,51 @@ export default class NewAccountPage extends Component {
   }
 
   render() {
-    let _that = this
     return (
       <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
         <BaseToolbar title={I18n.t('newAccount')} />
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
-        <Dialog.Container visible={_that.state.newAccountDialogVisible}>
-          <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
-          <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>
-          <Dialog.Input
-            maxLength={7}
-            selectionColor={Color.ACCENT}
-            underlineColorAndroid="#EBBD36"
-            onChangeText={text => (_that.newAccountName = text)}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={() => _that.setState({ newAccountDialogVisible: false })}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => {
-              _that.setState({ newAccountDialogVisible: false })
-              _that._newAccount()
-            }}
-          />
-        </Dialog.Container>
-        <ProgressDialog
-          activityIndicatorColor={Color.ACCENT}
-          visible={_that.state.newAccountWaitDialog}
-          message={I18n.t('addAccount')}
-        />
+        <Dialog
+          visible={this.state.newAccountDialogVisible}
+          onTouchOutside={() => this.setState({newAccountDialogVisible: false})}
+          width={0.8}
+          dialogTitle={<DialogTitle  title={I18n.t('newAccount')}/>}
+          actions={[
+            <DialogButton
+              key='new_account_cancel'
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({ newAccountDialogVisible: false })}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}/>,
+            <DialogButton
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              key='new_account_confirm' text={I18n.t('confirm')}
+              onPress={() => {
+                this.setState({ newAccountDialogVisible: false })
+                this._newAccount()}} />
+          ]}
+        >
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text style={CommonStyle.verticalDialogText}>{I18n.t('newAccountHint')}</Text>
+            <TextInput
+              heigth={60}
+              underlineColorAndroid={Color.ACCENT}
+              maxLength={7}
+              onChangeText={text => this.newAccountName = text}
+              returnKeyType="done"
+            />
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.newAccountWaitDialog}
+          onTouchOutside={() => {}}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{I18n.t('addAccount')}</Text>
+          </DialogContent>
+        </Dialog>
       </Container>
     )
   }

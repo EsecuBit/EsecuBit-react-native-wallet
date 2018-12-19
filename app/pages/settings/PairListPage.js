@@ -1,26 +1,26 @@
 import React, { Component } from 'react'
 import {
   View,
-  StyleSheet,
   Text,
+  StyleSheet,
   RefreshControl,
   Image,
   StatusBar,
   Dimensions,
   Platform,
-  BackHandler
+  BackHandler,
+  ActivityIndicator
 } from 'react-native'
 import { Container, List, ListItem, Button, Icon } from 'native-base'
 import I18n from '../../lang/i18n'
 import BtTransmitter from '../../device/BtTransmitter'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import PreferenceUtil from '../../utils/PreferenceUtil'
-import Dialog from 'react-native-dialog'
+import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
-import { ProgressDialog } from 'react-native-simple-dialogs'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
+
 const deviceH = Dimensions.get('window').height
-const platform = Platform.OS
 
 export default class PairListPage extends Component {
   constructor(props) {
@@ -32,7 +32,7 @@ export default class PairListPage extends Component {
       authenticateDialogVisible: false,
       refreshing: false,
       scanText: '',
-      waitingDialogVisible: false
+      desc: ''
     }
     this.transmitter = new BtTransmitter()
     this.wallet = new EsWallet()
@@ -48,7 +48,6 @@ export default class PairListPage extends Component {
       console.log('wallet code', error, status, pairCode)
       if (error !== D.error.succeed) {
         this.setState({
-          waitingDialogVisible: false,
           authenticateDialogVisible: false,
           connectDialogVisible: false
         })
@@ -57,18 +56,16 @@ export default class PairListPage extends Component {
           console.log('wallet authenticating')
           if (pairCode) {
             console.log('has receive pairCode', pairCode)
-            this.setState({ waitingDialogVisible: false })
             this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
           }
         }
         if (status === D.status.syncing) {
           this.setState({
-            waitingDialogVisible: false,
             authenticateDialogVisible: false,
             connectDialogVisible: false
           })
           let timeout = 0;
-          if (platform === 'ios') {
+          if (Platform.OS === 'ios') {
             timeout = 400
           }
           setTimeout(() => {
@@ -83,7 +80,6 @@ export default class PairListPage extends Component {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
       this.setState({
-        waitingDialogVisible: false,
         authenticateDialogVisible: false,
         connectDialogVisible: false
       })
@@ -122,7 +118,6 @@ export default class PairListPage extends Component {
         _that.setState({
           authenticateDialogVisible: false,
           connectDialogVisible: false,
-          waitingDialogVisible: false
         })
         ToastUtil.showLong(I18n.t('disconnect'))
         this._onRefresh(false)
@@ -138,10 +133,9 @@ export default class PairListPage extends Component {
   async _gotoSyncPage() {
     console.log('device connected')
     this.transmitter.stopScan()
-    this.setState({ connectDialogVisible: false })
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-    this.setState({ waitingDialogVisible: true })
+    this.setState({desc: I18n.t('pleaseWait') })
   }
 
   _findDefaultDevice(autoConnect) {
@@ -177,7 +171,7 @@ export default class PairListPage extends Component {
     return (
       <View
         style={[
-          customStyle.itemContainer,
+          styles.itemContainer,
           { justifyContent: 'center', marginBottom: Dimen.SPACE }
         ]}>
         <Text
@@ -197,7 +191,7 @@ export default class PairListPage extends Component {
     console.log('connect device sn is', rowData)
     this.transmitter.connect(rowData)
     this.connectDeviceInfo = rowData
-    this.setState({ connectDialogVisible: true })
+    this.setState({ connectDialogVisible: true, desc: I18n.t('connecting') })
   }
 
   _onRefresh(autoConnect) {
@@ -207,12 +201,11 @@ export default class PairListPage extends Component {
       deviceList: []
     })
     this._findDefaultDevice(autoConnect)
-    
   }
 
   render() {
-    let bgHeight = platform === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
-    let height = platform === 'ios' ? 64 : 56
+    let bgHeight = Platform.OS === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
+    let height = Platform.OS === 'ios' ? 64 : 56
     if (isIphoneX) {
       height = 88
     }
@@ -232,7 +225,7 @@ export default class PairListPage extends Component {
                 }}
                 translucent={false}>
                 <StatusBar
-                  barStyle={platform === 'ios' ? 'light-content' : 'default'}
+                  barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
                   backgroundColor={Color.DARK_PRIMARY}
                   hidden={false}
                 />
@@ -290,7 +283,7 @@ export default class PairListPage extends Component {
           </Image>
         </View>
 
-        <View style={customStyle.listView}>
+        <View style={styles.listView}>
           <List
             dataArray={this.state.deviceList}
             refreshControl={
@@ -306,27 +299,32 @@ export default class PairListPage extends Component {
             )}
           />
         </View>
-        <ProgressDialog
-          activityIndicatorColor={Color.ACCENT}
+        <Dialog
+          width={0.8}
           visible={this.state.connectDialogVisible}
-          message={I18n.t('connecting')}
-        />
-        <Dialog.Container visible={this.state.authenticateDialogVisible}>
-          <Dialog.Title>{I18n.t('pairCode')}</Dialog.Title>
-          <Dialog.Description>{this.state.pairCode}</Dialog.Description>
-          <Dialog.Description>{I18n.t('pleaseWait')}</Dialog.Description>
-        </Dialog.Container>
-        <ProgressDialog
-          activityIndicatorColor={Color.ACCENT}
-          visible={this.state.waitingDialogVisible}
-          message={I18n.t('pleaseWait')}
-        />
+          onTouchOutside={() => {}}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.desc}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.authenticateDialogVisible}
+          onTouchOutside={() => {}}
+          dialogTitle={<DialogTitle title={I18n.t('pairCode')} />}
+        >
+          <DialogContent style={{ alignItems: 'center'}}>
+            <Text style={styles.pairCodeText}>{this.state.pairCode}</Text>
+          </DialogContent>
+        </Dialog>
       </Container>
     )
   }
 }
 
-const customStyle = StyleSheet.create({
+const styles = StyleSheet.create({
   listView: {
     flex: 1,
     marginTop: Dimen.MARGIN_VERTICAL
@@ -336,8 +334,10 @@ const customStyle = StyleSheet.create({
     flexDirection: 'row',
     height: 20
   },
-  message: {
-    marginLeft: Dimen.MARGIN_HORIZONTAL,
+  pairCodeText: {
+    fontSize: Dimen.PRIMARY_TEXT,
+    color: Color.PRIMARY_TEXT,
     marginTop: Dimen.SPACE
   }
+
 })

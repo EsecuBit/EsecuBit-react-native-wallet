@@ -7,7 +7,8 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
-  Linking, BackHandler
+  Linking, BackHandler,
+  StyleSheet
 } from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
@@ -19,7 +20,6 @@ import {
   List,
   Text
 } from 'native-base'
-import Dialog from 'react-native-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import { Api } from '../../common/Constants'
@@ -31,6 +31,7 @@ import { setAccount } from '../../actions/AccountAction'
 import { connect } from 'react-redux'
 import CoinCard from '../../components/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
+import Dialog, { DialogButton, DialogTitle, DialogContent } from 'react-native-popup-dialog'
 
 const platform = Platform.OS
 
@@ -363,26 +364,41 @@ class HomePage extends Component {
           </CardItem>
         ) : null}
         <List dataArray={_that.state.accounts} renderRow={_that._renderRow.bind(this)} />
-        <Dialog.Container
+        <Dialog
+          width={0.8}
           visible={this.state.updateVersionDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-          <Dialog.Title>{I18n.t('versionUpdate')}</Dialog.Title>
-          <Dialog.Description>{this.state.updateDesc}</Dialog.Description>
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={this._checkForceUpdate.bind(this)}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => this._gotoBrowser()}
-          />
-        </Dialog.Container>
+          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
+          actions={[
+            <DialogButton
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              key='update_version_cancel'
+              text={I18n.t('cancel')}
+              onPress={this._checkForceUpdate.bind(this)}
+            />,
+            <DialogButton
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              key='update_version_confirm'
+              text={I18n.t('confirm')}
+              onPress={() => this._gotoBrowser()}
+            />
+          ]}
+        >
+          <DialogContent>
+            <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
+          </DialogContent>
+        </Dialog>
       </Container>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  updateDesc: {
+    fontSize: Dimen.PRIMARY_TEXT,
+    color: Color.PRIMARY_TEXT,
+    marginTop: Dimen.SPACE
+  }
+})
 
 const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,

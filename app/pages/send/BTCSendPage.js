@@ -335,16 +335,16 @@ class BTCSendPage extends Component {
           visible={this.state.sendDialogVisible}
           onTouchOutside={() => {}}
           dialogTitle={<DialogTitle title={I18n.t('transacting')}/>}>
-          <Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text>
-         </Dialog>
+          <DialogContent><Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text></DialogContent>
+        </Dialog>
         <Dialog
           width={0.8}
           visible={this.state.deviceLimitDialogVisible}
-          actions={[<DialogButton text={I18n.t('confirm')} onPress={() => this.setState({deviceLimitDialogVisible: false})} />]}
+          actions={[<DialogButton key='device_limit_confirm' text={I18n.t('confirm')} onPress={() => this.setState({deviceLimitDialogVisible: false})} />]}
           onTouchOutside={() => this.setState({deviceLimitDialogVisible: false})}
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
         >
-         <Text>{`${I18n.t('deviceLimitTips')} ${this.state.totalCostCryptoCurrency} ${this.cryptoCurrencyUnit}`}</Text>
+          <DialogContent><Text>{`${I18n.t('deviceLimitTips')} ${this.state.totalCostCryptoCurrency} ${this.cryptoCurrencyUnit}`}</Text></DialogContent>
         </Dialog>
         <Dialog
           onTouchOutside={() => {
@@ -354,11 +354,11 @@ class BTCSendPage extends Component {
           visible={this.state.transactionConfirmDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t("transactionConfirm")}/>}
           actions={[
-          <DialogButton text={I18n.t("cancel")} onPress={() => this.setState({transactionConfirmDialogVisible: false})}/>,
-          <DialogButton text={I18n.t("confirm")} onPress={() => {
-            this.setState({transactionConfirmDialogVisible: false})
-          }}/>
-        ]}
+            <DialogButton key='transaction_cancel' text={I18n.t("cancel")} onPress={() => this.setState({transactionConfirmDialogVisible: false})} />,
+            <DialogButton key='transaction_confirm' text={I18n.t("confirm")} onPress={() => {
+              this.setState({transactionConfirmDialogVisible: false})
+            }}/>
+          ]}
         >
           <Text>{this.state.transactionConfirmDesc}</Text>
         </Dialog>

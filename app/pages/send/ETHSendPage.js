@@ -5,14 +5,13 @@ import { Dropdown } from 'react-native-material-dropdown'
 import { Container, Content, Icon, Text, Card, CardItem, Item, Input } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
-import { MaterialDialog } from 'react-native-material-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import { CommonStyle } from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
+import Dialog, { DialogTitle, DialogButton, DialogContent } from 'react-native-popup-dialog'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
-import Dialog from 'react-native-dialog'
 const platform = Platform.OS
 
 class ETHSendPage extends Component {
@@ -332,7 +331,7 @@ class ETHSendPage extends Component {
         this.setState({
           totalCostLegalCurrency: legalCurrencyResult,
           totalCostCryptoCurrency: cryptoCurrencyResult,
-          transactionFee: transactionFee,
+          transactionFee: transactionFee
         })
       })
       .catch(error => {
@@ -437,7 +436,7 @@ class ETHSendPage extends Component {
       })
       .catch(error => {
         ToastUtil.showErrorMsgLong(error)
-        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false})
+        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false })
         this.lockSend = false
       })
   }
@@ -694,33 +693,38 @@ class ETHSendPage extends Component {
               </View>
             </CardItem>
           </Card>
-          <MaterialDialog
-            title={I18n.t('transacting')}
-            visible={this.state.sendDialogVisible}
-            onCancel={() => {}}>
-            <Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text>
-          </MaterialDialog>
         </Content>
-        <Dialog.Container
+        <Dialog
+          width={0.8}
+          visible={this.state.sendDialogVisible}
+          onTouchOutside={() => {}}
+          dialogTitle={<DialogTitle title={I18n.t('transacting')}/>}>
+          <DialogContent><Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text></DialogContent>
+        </Dialog>
+        <Dialog
           visible={this.state.transactionConfirmDialogVisible}
-          style={{ marginHorizontal: Dimen.MARGIN_HORIZONTAL }}>
-          <Dialog.Title>{I18n.t('transactionConfirm')}</Dialog.Title>
-          <Dialog.Description>{this.state.transactionConfirmDesc}</Dialog.Description>
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={() => this.setState({ transactionConfirmDialogVisible: false })}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => {
-              this._send()
-              this.setState({ transactionConfirmDialogVisible: false })
-            }}
-          />
-        </Dialog.Container>
-        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')}/>
+          width={0.8}
+          onTouchOutside={() => this.setState({ transactionConfirmDialogVisible: true })}
+          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}
+          actions={[
+            <DialogButton
+              key='transaction_cancel'
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({ transactionConfirmDialogVisible: false })}
+            />,
+            <DialogButton
+              key='transaction_confirm'
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              text={I18n.t('confirm')}
+              onPress={() => {
+                this._send()
+                this.setState({ transactionConfirmDialogVisible: false })
+              }}
+            />
+          ]}
+        />
+        <FooterButton onPress={this._confirmTransaction.bind(this)} title={I18n.t('send')} />
       </Container>
     )
   }
