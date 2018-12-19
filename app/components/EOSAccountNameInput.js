@@ -33,8 +33,8 @@ export default class EOSAccountNameInput extends PureComponent {
             selectionColor={Color.ACCENT}
             style={
               Platform.OS === 'android'
-                ? CommonStyle.multlineInputAndroid
-                : CommonStyle.multlineInputIOS
+                ? CommonStyle.multilineInputAndroid
+                : CommonStyle.multilineInputIOS
             }
             multiline={true}
             maxLength={12}

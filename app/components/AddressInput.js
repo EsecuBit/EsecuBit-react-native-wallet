@@ -58,8 +58,8 @@ class AddressInput extends PureComponent {
             selectionColor={Color.ACCENT}
             style={
               Platform.OS === 'android'
-                ? CommonStyle.multlineInputAndroid
-                : CommonStyle.multlineInputIOS
+                ? CommonStyle.multilineInputAndroid
+                : CommonStyle.multilineInputIOS
             }
             multiline={true}
             value={this.state.address}

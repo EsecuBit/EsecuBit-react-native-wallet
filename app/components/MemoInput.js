@@ -36,8 +36,8 @@ export default class MemoInput extends PureComponent {
             selectionColor={Color.ACCENT}
             style={
               Platform.OS === 'android'
-                ? CommonStyle.multlineInputAndroid
-                : CommonStyle.multlineInputIOS
+                ? CommonStyle.multilineInputAndroid
+                : CommonStyle.multilineInputIOS
             }
             multiline={true}
             placeholder={placeholder}

@@ -65,8 +65,8 @@ export default class ValueInput extends PureComponent {
             multiline={true}
             style={
               Platform.OS === 'android'
-                ? CommonStyle.multlineInputAndroid
-                : CommonStyle.multlineInputIOS
+                ? CommonStyle.multilineInputAndroid
+                : CommonStyle.multilineInputIOS
             }
             numberOfLines={3}
             value={this.state.sendValue}

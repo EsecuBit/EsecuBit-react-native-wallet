@@ -500,8 +500,8 @@ class ETHSendPage extends Component {
                   selectionColor={Color.ACCENT}
                   style={
                     Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
+                      ? CommonStyle.multilineInputAndroid
+                      : CommonStyle.multilineInputIOS
                   }
                   ref={refs => (this.addressInput = refs)}
                   multiline={true}
@@ -522,8 +522,8 @@ class ETHSendPage extends Component {
                   selectionColor={Color.ACCENT}
                   style={
                     Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
+                      ? CommonStyle.multilineInputAndroid
+                      : CommonStyle.multilineInputIOS
                   }
                   ref={refs => (this.valueInput = refs)}
                   placeholder={this.cryptoCurrencyUnit}
@@ -615,8 +615,8 @@ class ETHSendPage extends Component {
                   multiline={true}
                   style={
                     Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
+                      ? CommonStyle.multilineInputAndroid
+                      : CommonStyle.multilineInputIOS
                   }
                   numberOfLines={4}
                   value={this.state.ethData}
@@ -636,8 +636,8 @@ class ETHSendPage extends Component {
                   selectionColor={Color.ACCENT}
                   style={
                     Platform.OS === 'android'
-                      ? CommonStyle.multlineInputAndroid
-                      : CommonStyle.multlineInputIOS
+                      ? CommonStyle.multilineInputAndroid
+                      : CommonStyle.multilineInputIOS
                   }
                   ref={refs => (this.addressInput = refs)}
                   multiline={true}

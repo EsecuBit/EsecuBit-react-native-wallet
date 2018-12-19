@@ -126,11 +126,20 @@ export const CommonStyle = StyleSheet.create({
     marginLeft: DIMEN_MARGIN_HORIZONTAL + DIMEN_MARGIN_HORIZONTAL,
     height: DIMEN_TOOLBAR_ANDROID
   },
-  multlineInputAndroid: {
+  multilineInputAndroid: {
     height: 68
   },
-  multlineInputIOS: {
+  multilineInputIOS: {
     height: 68,
     paddingTop: 24
+  },
+  progressDialogContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Dimen.MARGIN_VERTICAL
+  },
+  progressDialogText: {
+    marginLeft: Dimen.MARGIN_HORIZONTAL,
+    fontSize: Dimen.SECONDARY_TEXT
   }
 })
