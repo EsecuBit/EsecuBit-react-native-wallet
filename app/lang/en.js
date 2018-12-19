@@ -159,6 +159,8 @@ export default {
   deviceNotConnected: 'Please connect device to get cos version',
   pleaseWait: 'Please Wait...',
   noNewApp: 'This is the latest version',
-  optional: 'Optional'
+  optional: 'Optional',
+  checking: 'Checking',
+  transactionRecordHasBeenFound: 'transaction records has been found'
 
 }

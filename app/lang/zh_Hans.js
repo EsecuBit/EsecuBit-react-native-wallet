@@ -160,5 +160,7 @@ export default {
   deviceNotConnected: '请先连接设备获取COS版本信息',
   pleaseWait: '请稍等...',
   noNewApp: '当前已是最新版本',
-  optional: '可选的'
+  optional: '可选的',
+  checking: '正在查询',
+  transactionRecordHasBeenFound: '条交易记录已被找到'
 }

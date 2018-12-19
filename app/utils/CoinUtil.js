@@ -6,7 +6,7 @@ export default class CoinUtil {
     let isContains = false;
     coinTypes.map(item => {
       if (item.includes(coinType)) {
-        isContains = true;
+        isContains = true
       }
     });
     return isContains;
@@ -15,7 +15,7 @@ export default class CoinUtil {
   static getRealCoinType(coinType) {
     //slice coinType string, only if coinType is testnet type
     //eg: btc_testnet3 -> btc
-    if (coinType && coinType.indexOf("_") != -1) {
+    if (coinType && coinType.indexOf("_") !== -1) {
       coinType = coinType.slice(0, coinType.indexOf("_"));
     }
     return coinType
@@ -47,7 +47,6 @@ export default class CoinUtil {
    */
   static getDefaultUnit(coinType) {
     coinType = CoinUtil.getRealCoinType(coinType)
-    let _that = this
     switch (coinType) {
       case Coin.btc:
         return D.unit.btc.BTC

@@ -73,7 +73,7 @@ class BTCSendPage extends Component {
 
   _initListener() {
     DeviceEventEmitter.addListener('qrCode', value => {
-      this.setState({ address: value })
+      this.addressInput.updateAddress(value)
     })
     this.esWallet.listenTxInfo(async () => {
       let data = await this.account.getTxInfos()
@@ -150,7 +150,6 @@ class BTCSendPage extends Component {
   }
 
   _buildBTCTotalCostForm() {
-    console.log('_buildBTCTotalCostForm', this.valueInput.getValue(), this._toMinimumUnit(this.valueInput.getValue()))
     return {
       feeRate: this.feeInput.getFee(),
       outputs: [
@@ -256,7 +255,7 @@ class BTCSendPage extends Component {
   }
 
 
-  async _handleValueInput() {
+  _handleValueInput() {
     this._checkFormData()
     if (this.valueInput.isValidInput()) {
       this._calculateTotalCost()
@@ -277,7 +276,7 @@ class BTCSendPage extends Component {
     this._checkFormData()
   }
 
-  async _handleFeeInput() {
+  _handleFeeInput() {
     if (this.feeInput.isValidInput()){
       this._calculateTotalCost()
     }
