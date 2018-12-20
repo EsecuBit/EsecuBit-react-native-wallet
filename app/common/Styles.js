@@ -143,6 +143,7 @@ export const CommonStyle = StyleSheet.create({
   },
   horizontalDialogText: {
     marginLeft: Dimen.MARGIN_HORIZONTAL,
+    marginRight: Dimen.MARGIN_HORIZONTAL,
     fontSize: Dimen.SECONDARY_TEXT
   },
   verticalDialogText: {

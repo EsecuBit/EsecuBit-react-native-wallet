@@ -81,10 +81,12 @@ class AccountDetailPage extends Component {
           }
         }
         else if(status === BtTransmitter.disconnected){
+          this.transmitter.stopScan()
           ToastUtil.showShort(I18n.t('disconnected'))
           this.setState({bluetoothConnectDialogVisible: false})
         }
       }else {
+        this.transmitter.stopScan()
         ToastUtil.showShort(I18n.t('connectFailed'))
         this.setState({bluetoothConnectDialogVisible: false})
       }
@@ -122,7 +124,6 @@ class AccountDetailPage extends Component {
     let deviceState = await this.transmitter.getState()
     //soft wallet no need to connect hardware
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
-      this.setState({bluetoothConnectDialogVisible: true})
       this._findAndConnectDevice()
     }else {
       switch(this._goToPage) {
@@ -137,7 +138,7 @@ class AccountDetailPage extends Component {
   }
 
   async _findAndConnectDevice() {
-    this.setState({bluetoothCinnectDialogDesc: I18n.t('searchingDevice')})
+    this.setState({bluetoothConnectDialogVisible: true, bluetoothCinnectDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo.sn === info.sn) {

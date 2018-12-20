@@ -2,14 +2,14 @@ import React, { Component } from 'react'
 import { Platform, DeviceEventEmitter, BackHandler} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Container, Content, Text, Card } from 'native-base'
-import { CommonStyle, Color, Dimen } from '../../common/Styles'
+import { CommonStyle, Color} from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
-import AddressInput from "../../components/AddressInput";
-import ValueInput from "../../components/ValueInput";
+import AddressInput from "../../components/AddressInput"
+import ValueInput from "../../components/ValueInput"
 import FeeInput from "../../components/FeeInput"
 import MemoInput from "../../components/MemoInput"
 import TransactionTotalCostCard from "../../components/TransactionTotalCostCard"

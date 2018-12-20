@@ -40,24 +40,4 @@ export default class CoinUtil {
     }
   }
 
-  /**
-   * Get default unit of user settings
-   * To use this method, you should add CoinUtil.getDefaultUnit.bind(this) in your React.Component constructor
-   * @param coinType
-   */
-  static getDefaultUnit(coinType) {
-    coinType = CoinUtil.getRealCoinType(coinType)
-    switch (coinType) {
-      case Coin.btc:
-        return D.unit.btc.BTC
-      case Coin.eth:
-        return D.unit.eth.ETH
-      case Coin.eos:
-        return D.unit.eos.EOS
-      case Coin.legal:
-        return D.unit.legal.USD
-      default:
-        throw D.error.coinNotSupported
-    }
-  }
 }

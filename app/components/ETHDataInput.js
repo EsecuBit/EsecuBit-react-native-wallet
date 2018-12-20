@@ -23,7 +23,7 @@ export default class ETHDataInput extends PureComponent {
   }
 
   isValidInput() {
-    return this.state.checkDataSuccess || this.state.data
+    return this.state.checkDataSuccess || !this.state.data
   }
 
   clear() {

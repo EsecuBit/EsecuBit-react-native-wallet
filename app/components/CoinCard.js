@@ -16,7 +16,7 @@ class CoinCard extends PureComponent {
   constructor() {
     super()
     this.wallet = new EsWallet()
-    CoinUtil.getDefaultUnit.bind(this)
+
   }
 
   async _gotoDetailPage(item) {
