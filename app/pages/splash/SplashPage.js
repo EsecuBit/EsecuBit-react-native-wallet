@@ -18,6 +18,7 @@ export default class SplashPage extends Component {
       syncDesc: I18n.t('welcome')
     }
     this.btTransmitter = new BtTransmitter()
+    this.timers = []
   }
 
   _onFocus() {
@@ -40,15 +41,21 @@ export default class SplashPage extends Component {
     this._onBlur()
   }
 
+  componentWillUnmount() {
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
+  }
 
 
   _handleConnectivityChange(ns) {
     let _that = this
     if(Platform.OS === 'ios') {
       if (ns === 'none' || ns === 'unknown') {
-        setTimeout(() => {
+        let timer = setTimeout(() => {
           _that._gotoHomePage(true)
         }, 2000)
+        this.timers.push(timer)
       }
     }
   }
@@ -68,15 +75,16 @@ export default class SplashPage extends Component {
           ToastUtil.showErrorMsgShort(error)
           _that.props.navigation.pop()
         } else {
-          setTimeout(() => {
+          let timer = setTimeout(() => {
             ToastUtil.showErrorMsgLong(error)
             _that._gotoHomePage(false)
           }, 1000)
+          this.timers.push(timer)
         }
       } else {
         if (status === D.status.syncingNewAccount) {
           let coinType = CoinUtil.getRealCoinType(account.coinType)
-          this.setState({syncDesc: `${I18n.t('checking')} ${coinType} ${account.label}, ${account.getTxInfos().length} ${I18n.t('transactionRecordHasBeenFound')}`})
+          this.setState({syncDesc: `${I18n.t('checking')} ${coinType.toUpperCase()} ${account.label}, ${account.txInfos.length} ${I18n.t('transactionRecordHasBeenFound')}`})
         }
         if (status === D.status.syncFinish) {
           _that._gotoHomePage(false)
