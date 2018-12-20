@@ -164,6 +164,8 @@ export default {
   checking: 'Checking',
   transactionRecordHasBeenFound: 'transaction records has been found',
   searchingDevice: 'Searching Device...',
-  noDeviceFound: 'No device found'
+  noDeviceFound: 'No device found',
+  accountManage: 'Account Manage',
+  hideAccountDesc: 'Determine hidden account? After hiding, the account can be restored in the settings.'
 
 }

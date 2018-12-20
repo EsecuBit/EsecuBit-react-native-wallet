@@ -4,7 +4,7 @@ import { Container, Icon, Right, Card, CardItem, Text, Content } from 'native-ba
 import { SinglePickerMaterialDialog } from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import { version } from '../../../package.json'
+import { version, cosVersion } from '../../../package.json'
 import { Api, Coin } from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import BtTransmitter from '../../device/BtTransmitter'
@@ -14,9 +14,9 @@ import AppUtil from '../../utils/AppUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
-import { cosVersion } from '../../../package.json'
 import BaseToolbar from '../../components/BaseToolbar'
 import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
+import { withNavigation } from 'react-navigation'
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 
@@ -249,6 +249,12 @@ class SettingsPage extends Component {
             ) : (
               <View style={CommonStyle.divider} />
             )}
+            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+              <Text style={styles.headerText}>{I18n.t('account')}</Text>
+            </CardItem>
+            <CardItem bordered button onPress={() => this.props.navigation.navigate('AccountManage')}>
+              <Text>{I18n.t('accountManage')}</Text>
+            </CardItem>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={styles.headerText}>App</Text>
             </CardItem>
@@ -494,8 +500,5 @@ const mapDispatchToProps = {
   setLegalCurrencyUnit
 }
 
-const Settings = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SettingsPage)
-export default Settings
+
+export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(SettingsPage))

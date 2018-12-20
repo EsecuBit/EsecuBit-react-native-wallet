@@ -69,7 +69,7 @@ class CoinCard extends PureComponent {
       this.props.legalCurrencyUnit
     )
     return (
-      <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(data)}>
+      <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(data)} onLongPress={this.props.onLongPress}>
         <Left style={{ flexDirection: "row" }}>
           <CustomIcon coinType={this.props.data.coinType} />
           <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>{data.label}</Title>
@@ -102,7 +102,8 @@ class CoinCard extends PureComponent {
 }
 
 CoinCard.propTypes = {
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
+  onLongPress: PropTypes.func
 }
 
 const mapStateToProps = state => ({

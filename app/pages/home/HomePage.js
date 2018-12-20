@@ -54,7 +54,8 @@ class HomePage extends Component {
       deviceConnected: !this.offlineMode,
       showDeviceConnectCard: true,
       syncIndicatorVisible: false,
-      updateVersionDialogVisible: false
+      updateVersionDialogVisible: false,
+      hideAccountDialogVisible: false
     }
     this.deviceW = Dimensions.get('window').width
   }
@@ -205,7 +206,16 @@ class HomePage extends Component {
   }
 
   _renderRow(item) {
-    return <CoinCard data={item} />
+    return <CoinCard data={item} onLongPress={() => {
+      this.currentHideAccount = item
+      this.setState({hideAccountDialogVisible: true})
+    }}/>
+  }
+
+  _hideAccount() {
+    this.setState({hideAccountDialogVisible: false})
+    this.currentHideAccount.hideAccount()
+    this._updateUI()
   }
 
   render() {
@@ -384,7 +394,30 @@ class HomePage extends Component {
           ]}
         >
           <DialogContent>
-            <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
+            <Text style={styles.desc}>{this.state.updateDesc}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.hideAccountDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
+          actions={[
+            <DialogButton
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              key='hide_account_cancel'
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({hideAccountDialogVisible: false})}
+            />,
+            <DialogButton
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              key='hide_account_confirm'
+              text={I18n.t('confirm')}
+              onPress={() => this._hideAccount()}
+            />
+          ]}
+        >
+          <DialogContent>
+            <Text style={styles.desc}>{I18n.t('hideAccountDesc')}</Text>
           </DialogContent>
         </Dialog>
       </Container>
@@ -393,7 +426,7 @@ class HomePage extends Component {
 }
 
 const styles = StyleSheet.create({
-  updateDesc: {
+  desc: {
     fontSize: Dimen.PRIMARY_TEXT,
     color: Color.PRIMARY_TEXT,
     marginTop: Dimen.SPACE

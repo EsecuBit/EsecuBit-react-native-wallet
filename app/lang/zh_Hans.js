@@ -165,5 +165,7 @@ export default {
   checking: '正在查询',
   transactionRecordHasBeenFound: '条交易记录已被找到',
   searchingDevice: '正在搜索设备',
-  noDeviceFound: '没有找到设备'
+  noDeviceFound: '没有找到设备',
+  accountManage: '帐户管理',
+  hideAccountDesc: '确定隐藏帐户？隐藏后可以在设置中的帐户管理恢复显示'
 }
