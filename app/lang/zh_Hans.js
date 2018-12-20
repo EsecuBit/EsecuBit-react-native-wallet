@@ -17,6 +17,7 @@ export default {
   privacyPolicy: '隐私政策',
   connecting:'正在连接设备...',
   disconnect:'断开连接',
+  disconnected: '设备已断开连接',
   //home
   newAccount: '新建账户',
   newAccountHint: '请输入账户名',
@@ -163,5 +164,6 @@ export default {
   optional: '可选的',
   checking: '正在查询',
   transactionRecordHasBeenFound: '条交易记录已被找到',
-  searchingDevice: '正在搜索设备'
+  searchingDevice: '正在搜索设备',
+  noDeviceFound: '没有找到设备'
 }

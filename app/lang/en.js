@@ -17,6 +17,7 @@ export default {
   privacyPolicy: 'Privacy Policy',
   connecting:'Connecting Device...',
   disconnect:'Disconnect',
+  disconnected: 'Disconnected',
   //home
   newAccount: 'New Account',
   newAccountHint: 'Please input the account name',
@@ -162,6 +163,7 @@ export default {
   optional: 'Optional',
   checking: 'Checking',
   transactionRecordHasBeenFound: 'transaction records has been found',
-  searchingDevice: 'Searching Device...'
+  searchingDevice: 'Searching Device...',
+  noDeviceFound: 'No device found'
 
 }

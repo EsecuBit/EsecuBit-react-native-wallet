@@ -27,6 +27,7 @@ class AddressDetailPage extends PureComponent {
     this._getAddress(this.state.storeAddress)
   }
 
+
   _onFocus() {
     this.props.navigation.addListener("willFocus", () => {
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
@@ -36,10 +37,12 @@ class AddressDetailPage extends PureComponent {
   _onBlur() {
     this.props.navigation.addListener("willBlur", () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+      this.setState({dialogVisible: false})
     })
   }
 
   onBackPress = () => {
+    
     this.props.navigation.pop()
     return true
   }

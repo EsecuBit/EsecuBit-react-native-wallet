@@ -7,7 +7,7 @@ import {
   Platform,
   TextInput,
   BackHandler,
-  Image
+  ActivityIndicator
 } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
@@ -50,6 +50,7 @@ class AccountDetailPage extends Component {
     }
     this.cryptoCurrencyUnit = props.accountCurrentUnit
     this.transmitter = new BtTransmitter()
+    this.timers = []
   }
 
   componentDidMount() {
@@ -66,17 +67,21 @@ class AccountDetailPage extends Component {
           this.setState({bluetoothCinnectDialogDesc: I18n.t('connecting')})
           this.transmitter.stopScan()
         } else if(status === BtTransmitter.connected) {
+          this.setState({bluetoothConnectDialogVisible: false})
           switch(this._goToPage) {
             case 'send':
               this._gotoSendPage()
               break
             case 'address':
-              this._gotoAddressDetailPage()
+              this.navigateTimer = setTimeout(() => {
+                this._gotoAddressDetailPage()
+              }, 3000)
+              this.timers.push(this.navigateTimer)
               break
           }
         }
-        else {
-          ToastUtil.showShort(I18n.t('connectFailed'))
+        else if(status === BtTransmitter.disconnected){
+          ToastUtil.showShort(I18n.t('disconnected'))
           this.setState({bluetoothConnectDialogVisible: false})
         }
       }else {
@@ -95,6 +100,7 @@ class AccountDetailPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+      this.setState({bluetoothConnectDialogVisible: false})
       this.wallet.listenTxInfo(() => {})
     })
   }
@@ -104,12 +110,20 @@ class AccountDetailPage extends Component {
     return true;
   }
 
+  componentWillUnmount() {
+    // clearTimeout
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
+  }
+
 
   async _showBluetoothConnectDialog() {
     let deviceState = await this.transmitter.getState()
     //soft wallet no need to connect hardware
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       this.setState({bluetoothConnectDialogVisible: true})
+      this._findAndConnectDevice()
     }else {
       switch(this._goToPage) {
         case 'send':
@@ -130,9 +144,19 @@ class AccountDetailPage extends Component {
         this.transmitter.connect(deviceInfo)
       }
     })
+    // if search device no response after 10s, toast tip to notify user no device found
+    this.findDeviceTimer = setTimeout(async () => {
+      let state = await this.transmitter.getState()
+      if(state === BtTransmitter.disconnected) {
+        this.setState({bluetoothConnectDialogVisible: false})
+        ToastUtil.showShort(I18n.t('noDeviceFound'))
+        this.transmitter.stopScan()
+      }
+    }, 10000)
+    this.timers.push(this.findDeviceTimer)
   }
 
-  async _gotoSendPage() {
+  _gotoSendPage() {
     let coinType = CoinUtil.getRealCoinType(this.account.coinType)
     switch (coinType) {
       case Coin.btc:
@@ -149,12 +173,7 @@ class AccountDetailPage extends Component {
     }
   }
 
-  async _gotoAddressDetailPage() {
-    let deviceState = await this.transmitter.getState()
-    if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
-      ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
-      return
-    }
+  _gotoAddressDetailPage() {
     this.props.navigation.navigate('AddressDetail')
   }
 
@@ -578,9 +597,10 @@ class AccountDetailPage extends Component {
     let _that = this
     if(platform === 'ios') {
       // iOS render is too fast
-      setTimeout(() => {
+      this.iOSTimer = setTimeout(() => {
         _that.setState({renameDialogVisible: true})
       }, 400)
+      this.timers.push(this.iOSTimer)
     }else {
       _that.setState({renameDialogVisible: true})
     }
@@ -818,7 +838,7 @@ class AccountDetailPage extends Component {
           onTouchOutside={() => {}}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
-            <Image source={require('../../imgs/bluetooth.gif')} style={{width: 30, height: 30}}/>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
             <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothCinnectDialogDesc}</Text>
           </DialogContent>
         </Dialog>
