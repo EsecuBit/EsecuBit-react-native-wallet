@@ -46,7 +46,7 @@ class AccountDetailPage extends Component {
       renameDialogVisible: false,
       transactionDetailDialogVisible: false,
       bluetoothConnectDialogVisible: false,
-      bluetoothCinnectDialogDesc: ''
+      bluetoothConnectDialogDesc: ''
     }
     this.cryptoCurrencyUnit = props.accountCurrentUnit
     this.transmitter = new BtTransmitter()
@@ -64,7 +64,7 @@ class AccountDetailPage extends Component {
     this.transmitter.listenStatus((error, status) => {
       if (error === D.error.succeed) {
         if (status === BtTransmitter.connecting) {
-          this.setState({bluetoothCinnectDialogDesc: I18n.t('connecting')})
+          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
           this.transmitter.stopScan()
         } else if(status === BtTransmitter.connected) {
           this.setState({bluetoothConnectDialogVisible: false})
@@ -103,7 +103,6 @@ class AccountDetailPage extends Component {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
       this.setState({bluetoothConnectDialogVisible: false})
-      this.wallet.listenTxInfo(() => {})
     })
   }
 
@@ -138,7 +137,7 @@ class AccountDetailPage extends Component {
   }
 
   async _findAndConnectDevice() {
-    this.setState({bluetoothConnectDialogVisible: true, bluetoothCinnectDialogDesc: I18n.t('searchingDevice')})
+    this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo.sn === info.sn) {
@@ -213,7 +212,7 @@ class AccountDetailPage extends Component {
 
     rowData.showAddresses.forEach((item, index) => {
       let addr = ''
-      if (item === 'self' || item === 'Self' || item === 'SELF') {
+      if (item.toUpperCase() === 'SELF') {
         addr = item
         isToSelf = true
       } else {
@@ -256,7 +255,7 @@ class AccountDetailPage extends Component {
       confirmStr = I18n.t('confirming')
     }
 
-    if (memo !== undefined && memo !== null && memo !== '') {
+    if (memo) {
       title = memo
     }
 
@@ -541,12 +540,14 @@ class AccountDetailPage extends Component {
   }
 
   _handleTransactionDetailDismiss() {
+    console.log('dismiss')
+
     //lose focus
     this.memoTextInput.blur()
     this.setState({
       isShowBottomBar: true
     })
-    if (this.state.dMemo !== '') {
+    if (this.state.dMemo) {
       this.dTxInfo.comment = this.state.dMemo
       this.account
         .updateTxComment(this.dTxInfo)
@@ -685,8 +686,10 @@ class AccountDetailPage extends Component {
               ? BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT
               : ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT
           }
-          onTouchOutside={() => this.setState({transactionDetailDialogVisible: false})}
-          onDismissed={() => this._handleTransactionDetailDismiss()}
+          onTouchOutside={() => {
+            this.setState({transactionDetailDialogVisible: false})
+            this._handleTransactionDetailDismiss()
+          }}
           onShown={() => this.setState({ isShowBottomBar: false })}>
           <Content>
             <View style={{ flex: 1 }}>
@@ -708,6 +711,7 @@ class AccountDetailPage extends Component {
                     type="MaterialCommunityIcons"
                     onPress={() => {
                       this.setState({transactionDetailDialogVisible: false})
+                      this._handleTransactionDetailDismiss()
                     }}
                   />
                 </View>
@@ -840,7 +844,7 @@ class AccountDetailPage extends Component {
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
-            <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothCinnectDialogDesc}</Text>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothConnectDialogDesc}</Text>
           </DialogContent>
         </Dialog>
       </Container>

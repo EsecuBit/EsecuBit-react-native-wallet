@@ -65,7 +65,7 @@ class AccountManagePage extends Component {
     accounts.map(account => {
       if (account.status === D.account.status.hideByUser) {
         let coinType = CoinUtil.getRealCoinType(account.coinType).toUpperCase()
-        // the first time to push array
+        // the first time to push to array
         if (!data.title) {
           data.title = coinType
           data.content.push(account)

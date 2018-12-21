@@ -26,6 +26,8 @@ class ETHSendPage extends Component {
     super(props)
     this.state = {
       balance: '',
+      sendValue: '',
+      address: '',
       sendDialogVisible: false,
       transactionConfirmDialogVisible: false,
       transactionConfirmDesc: '',
@@ -355,35 +357,21 @@ class ETHSendPage extends Component {
           </Card>
         </Content>
         <Dialog
-          width={0.8}
-          visible={this.state.sendDialogVisible}
-          onTouchOutside={() => {}}
-          dialogTitle={<DialogTitle title={I18n.t('transacting')}/>}>
-          <DialogContent><Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text></DialogContent>
-        </Dialog>
-        <Dialog
           visible={this.state.transactionConfirmDialogVisible}
           width={0.8}
           onTouchOutside={() => this.setState({ transactionConfirmDialogVisible: true })}
           dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}
-          actions={[
-            <DialogButton
-              key='transaction_cancel'
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({ transactionConfirmDialogVisible: false })}
-            />,
-            <DialogButton
-              key='transaction_confirm'
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('confirm')}
-              onPress={() => {
-                this._send()
-                this.setState({ transactionConfirmDialogVisible: false })
-              }}
-            />
-          ]}
-        />
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
+              {`${I18n.t('send')} `}
+              <Text style={{color: Color.DANGER }}>{this.valueInput.getValue()}</Text>
+              <Text>{this.props.ethUnit}</Text>
+              <Text>{`${I18n.t('to1')} `}</Text>
+              <Text style={{color: Color.ACCENT }}>{this.addressInput.getAddress()}</Text>
+            </Text>
+          </DialogContent>
+        </Dialog>
         <FooterButton onPress={this._send.bind(this)} title={I18n.t('send')} disabled={this.state.footerBtnDisable}/>
       </Container>
     )

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { Platform, DeviceEventEmitter, BackHandler} from 'react-native'
+import { Platform, DeviceEventEmitter, BackHandler, Text, InteractionManager } from 'react-native'
 import I18n from '../../lang/i18n'
-import { Container, Content, Text, Card } from 'native-base'
-import { CommonStyle, Color} from '../../common/Styles'
+import { Container, Content, Card } from 'native-base'
+import {CommonStyle, Color, Dimen} from '../../common/Styles'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
@@ -23,7 +23,8 @@ class BTCSendPage extends Component {
     super(props)
     this.state = {
       balance: '',
-      sendDialogVisible: false,
+      sendValue: '',
+      address: '',
       deviceLimitDialogVisible: false,
       transactionConfirmDialogVisible: false,
       transactionConfirmDesc: '',
@@ -181,9 +182,11 @@ class BTCSendPage extends Component {
 
 
   _buildBTCSendForm() {
+    console.log('memo send', this.memoInput.getMemo())
     return {
       oldTxId: this.oldTxId,
       feeRate: this.feeInput.getFee(),
+      comment: this.memoInput.getMemo(),
       outputs: [
         {
           address: this.addressInput.getAddress(),
@@ -193,16 +196,25 @@ class BTCSendPage extends Component {
     }
   }
 
+  _showConfirmTransactionDialog() {
+    if (this.lockSend) {
+      return
+    }
+    this.setState({sendValue: this.valueInput.getValue(), address: this.addressInput.getAddress()})
+    this.setState({ transactionConfirmDialogVisible: true })
+
+  }
+
 
   _send() {
     let formData = this._buildBTCSendForm()
     // iOS render is too fast
     if(platform === 'ios') {
       setTimeout(() => {
-        this.setState({ sendDialogVisible: true })
+        this._showConfirmTransactionDialog()
       }, 400)
     }else{
-      this.setState({ sendDialogVisible: true })
+      this._showConfirmTransactionDialog()
     }
 
     this.lockSend = true
@@ -219,28 +231,21 @@ class BTCSendPage extends Component {
       })
       .then(() => {
         ToastUtil.showLong(I18n.t('success'))
-        DeviceEventEmitter.emit('remarks', this.memoInput.getMemo())
-        this.setState({ sendDialogVisible: false })
+        this.setState({ transactionConfirmDialogVisible: false })
         this.lockSend = false
-        //refresh account balance
-        DeviceEventEmitter.emit('balance')
         this.props.navigation.pop()
       })
       .catch(error => {
+        InteractionManager.runAfterInteractions(() => {
+          this.setState({ transactionConfirmDialogVisible: false })
+        })
         ToastUtil.showErrorMsgLong(error)
-        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false})
         this.lockSend = false
       })
   }
 
-  _showConfirmTransactionDialog() {
-    this.setState({transactionConfirmDialogVisible: true})
-    this.setState({transactionConfirmDesc: `${I18n.t('send')}  ${this.state.sendValue}  ${this.props.btcUnit}  ${I18n.t('to1')}  ${this.addressInput.getAddress()}`})
-  }
-
-
   _checkIfDeviceLimit(result) {
-    if (result.deviceLimit === true) {
+    if (result.deviceLimit) {
       this.setState({ deviceLimitDialogVisible: true })
     }
   }
@@ -331,13 +336,6 @@ class BTCSendPage extends Component {
         </Content>
         <Dialog
           width={0.8}
-          visible={this.state.sendDialogVisible}
-          onTouchOutside={() => {}}
-          dialogTitle={<DialogTitle title={I18n.t('transacting')}/>}>
-          <DialogContent><Text style={{ color: Color.PRIMARY_TEXT }}>{I18n.t('pleaseInputPassword')}</Text></DialogContent>
-        </Dialog>
-        <Dialog
-          width={0.8}
           visible={this.state.deviceLimitDialogVisible}
           actions={[<DialogButton key='device_limit_confirm' text={I18n.t('confirm')} onPress={() => this.setState({deviceLimitDialogVisible: false})} />]}
           onTouchOutside={() => this.setState({deviceLimitDialogVisible: false})}
@@ -346,20 +344,19 @@ class BTCSendPage extends Component {
           <DialogContent><Text>{`${I18n.t('deviceLimitTips')} ${this.state.totalCostCryptoCurrency} ${this.cryptoCurrencyUnit}`}</Text></DialogContent>
         </Dialog>
         <Dialog
-          onTouchOutside={() => {
-            this.setState({transactionConfirmDialogVisible: false})
-          }}
+          onTouchOutside={() => {}}
           width={0.8}
           visible={this.state.transactionConfirmDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t("transactionConfirm")}/>}
-          actions={[
-            <DialogButton key='transaction_cancel' text={I18n.t("cancel")} onPress={() => this.setState({transactionConfirmDialogVisible: false})} />,
-            <DialogButton key='transaction_confirm' text={I18n.t("confirm")} onPress={() => {
-              this.setState({transactionConfirmDialogVisible: false})
-            }}/>
-          ]}
         >
-          <Text>{this.state.transactionConfirmDesc}</Text>
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
+              {`${I18n.t('send')} `}
+              <Text style={{color: Color.DANGER }}>{`${this.state.sendValue} ${this.props.btcUnit} `}</Text>
+              <Text>{`${I18n.t('to1')} `}</Text>
+              <Text style={{color: Color.ACCENT }}>{this.state.address}</Text>
+            </Text>
+          </DialogContent>
         </Dialog>
         <FooterButton onPress={this._send.bind(this)} title={I18n.t('send')} disabled={this.state.footerBtnDisable}/>
       </Container>
