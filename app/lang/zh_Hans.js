@@ -167,5 +167,7 @@ export default {
   searchingDevice: '正在搜索设备',
   noDeviceFound: '没有找到设备',
   accountManage: '帐户管理',
-  hideAccountDesc: '确定隐藏帐户？隐藏后可以在设置中的帐户管理恢复显示'
+  hideAccountDesc: '确定隐藏帐户？隐藏后可以在设置中的帐户管理恢复显示',
+  showAccountDesc: '执行此操作后，该帐户将重新显示到界面',
+  noAccountToShow: '暂时没有帐户可以取消隐藏'
 }

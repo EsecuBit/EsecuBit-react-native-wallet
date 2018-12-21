@@ -166,6 +166,8 @@ export default {
   searchingDevice: 'Searching Device...',
   noDeviceFound: 'No device found',
   accountManage: 'Account Manage',
-  hideAccountDesc: 'Determine hidden account? After hiding, the account can be restored in the settings.'
+  hideAccountDesc: 'Determine hidden account? After hiding, the account can be restored in the settings.',
+  showAccountDesc: 'After doing this, the account will reappear to the interface.',
+  noAccountToShow: 'No Account To Show'
 
 }
