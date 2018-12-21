@@ -31,7 +31,7 @@
     "esecubit-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop",
     "events": "^3.0.0",
     "jsc-android": "^216113.0.0",
-    "native-base": "^2.9.0",
+    "native-base": "^2.9.1",
     "prop-types": "^15.6.2",
     "react": "16.0.0-alpha.6",
     "react-native": "0.44.0",
