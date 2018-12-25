@@ -65,9 +65,9 @@ export default class SplashPage extends Component {
     this.wallet.listenStatus(async (error, status, account) => {
       console.log('wallet status', error, status, account)
       if (error !== D.error.succeed) {
+        _that.setState({ syncDialogVisible: false })
         if (error === D.error.deviceNotInit) {
           console.log('deviceNotInit', error)
-          _that.setState({ syncDialogVisible: false })
           let state = await this.btTransmitter.getState()
           if (state === BtTransmitter.connected) {
             this.btTransmitter.disconnect()
@@ -93,6 +93,7 @@ export default class SplashPage extends Component {
           console.log('device change')
         }
         if (status === D.status.plugOut) {
+          ToastUtil.showShort(I18n.t('disconnected'))
           _that._gotoHomePage(true)
         }
       }
@@ -100,7 +101,6 @@ export default class SplashPage extends Component {
   }
 
   _gotoHomePage(offlineMode) {
-    this.setState({ syncDialogVisible: false })
     const resetAction = NavigationActions.reset({
       index: 0,
       actions: [

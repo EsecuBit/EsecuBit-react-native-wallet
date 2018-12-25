@@ -31,7 +31,7 @@ class AddressInput extends PureComponent {
   }
 
   isValidInput() {
-    return this.state.checkAddressSuccess && this.state.address
+    return this.state.checkAddressSuccess && !!this.state.address
   }
 
   getAddress() {

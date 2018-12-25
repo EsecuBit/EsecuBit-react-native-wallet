@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Platform, DeviceEventEmitter, BackHandler } from 'react-native'
+import { Platform, DeviceEventEmitter, BackHandler, InteractionManager } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Container, Content, Text, Card } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
@@ -92,17 +92,6 @@ class ETHSendPage extends Component {
     DeviceEventEmitter.addListener('qrCode', value => {
       this.addressInput.updateAddress(value)
     })
-    this.esWallet.listenTxInfo(async () => {
-      let data = await this.account.getTxInfos()
-      let txInfo = data.txInfos[0]
-      if (this.memoInput.getMemo()) {
-        txInfo.comment = this.memoInput.getMemo()
-        this.account
-          .updateTxComment(txInfo)
-          .then(() => console.log('update Tx Comment success'))
-          .catch(error => console.warn('update Tx Comment error', error))
-      }
-    })
   }
 
   /**
@@ -117,9 +106,9 @@ class ETHSendPage extends Component {
   _buildETHMaxAmountForm() {
     return {
       sendAll: true,
-      gasPrice: this._toMinimumUnit(this.feeInput.getFee()),
+      gasPrice: this.feeInput.getFee(),
       gasLimit: this.gasLimitInput.getGasLimit(),
-      data: this.state.ethData.toString().trim(),
+      data: this.ethDataInput.getData(),
       output: {
         address: this.addressInput.getAddress(),
         value: '0'
@@ -183,7 +172,7 @@ class ETHSendPage extends Component {
       gasPrice: this.feeInput.getFee(),
       data: StringUtil.removeOxHexString(this.ethDataInput.getData()),
       output: {
-        address: this.state.address.trim(),
+        address: this.state.address,
         value: this.valueInput.getValue()
       }
     }
@@ -196,7 +185,6 @@ class ETHSendPage extends Component {
     if (this.lockSend) {
       return
     }
-    this.setState({transactionConfirmDesc: `${I18n.t('send')}  ${this.valueInput.getValue()}  ${this.props.ethUnit}  ${I18n.t('to1')}  ${this.addressInput.getAddress()}`})
     this.setState({ transactionConfirmDialogVisible: true })
 
   }
@@ -206,10 +194,10 @@ class ETHSendPage extends Component {
     // iOS render is too fast
     if (Platform.OS === 'ios') {
       setTimeout(() => {
-        this.setState({ sendDialogVisible: true })
+        this._showConfirmTransactionDialog()
       }, 400)
     } else {
-      this.setState({ sendDialogVisible: true })
+      this._showConfirmTransactionDialog()
     }
     this.lockSend = true
     console.log('_send formData', formData)
@@ -225,15 +213,16 @@ class ETHSendPage extends Component {
       })
       .then(() => {
         ToastUtil.showLong(I18n.t('success'))
-        this.setState({ sendDialogVisible: false })
         this.lockSend = false
-        //refresh account balance
-        DeviceEventEmitter.emit('balance')
         this.props.navigation.pop()
       })
       .catch(error => {
-        ToastUtil.showErrorMsgLong(error)
-        this.setState({ sendDialogVisible: false, transactionConfirmDialogVisible: false })
+        // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
+        // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
+        InteractionManager.runAfterInteractions(() => {
+          this.setState({transactionConfirmDialogVisible: false })
+        })
+        ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
       })
   }
@@ -244,6 +233,7 @@ class ETHSendPage extends Component {
       gasLimit: this.gasLimitInput.getGasLimit(),
       gasPrice: this.feeInput.getFee(),
       data: StringUtil.removeOxHexString(this.ethDataInput.getData()),
+      comment: this.memoInput.getMemo(),
       output: {
         address: this.addressInput.getAddress(),
         value: this.valueInput.getValue()
@@ -251,7 +241,7 @@ class ETHSendPage extends Component {
     }
   }
 
-  async _handleValueInput() {
+  _handleValueInput() {
     this._checkFormData()
     if (this.valueInput.isValidInput()) {
       this._calculateTotalCost()
@@ -303,6 +293,7 @@ class ETHSendPage extends Component {
       && this.feeInput.isValidInput()
       && this.gasLimitInput.isValidInput()
       && this.ethDataInput.isValidInput()
+    console.log('result ', !result, this.addressInput.isValidInput(), this.valueInput.isValidInput(), this.feeInput.isValidInput(), this.gasLimitInput.isValidInput(),  this.ethDataInput.isValidInput());
     this.setState({footBtnDisable: !result})
   }
 
@@ -362,13 +353,13 @@ class ETHSendPage extends Component {
           onTouchOutside={() => this.setState({ transactionConfirmDialogVisible: true })}
           dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}
         >
-          <DialogContent style={CommonStyle.horizontalDialogContent}>
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text>{I18n.t('pleaseInputPassword')}</Text>
             <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
               {`${I18n.t('send')} `}
-              <Text style={{color: Color.DANGER }}>{this.valueInput.getValue()}</Text>
-              <Text>{this.props.ethUnit}</Text>
+              <Text style={{color: Color.DANGER }}>{`${this.state.sendValue} ${this.props.ethUnit} `}</Text>
               <Text>{`${I18n.t('to1')} `}</Text>
-              <Text style={{color: Color.ACCENT }}>{this.addressInput.getAddress()}</Text>
+              <Text style={{color: Color.ACCENT }}>{this.state.address}</Text>
             </Text>
           </DialogContent>
         </Dialog>

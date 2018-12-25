@@ -38,9 +38,8 @@ export default class ScanQrCodePage extends Component {
 
   _qrCodeReceived(e) {
     if (!this.hadReceiveResult) {
-      let _that = this
       DeviceEventEmitter.emit('qrCode', e.data)
-      _that.props.navigation.pop()
+      this.props.navigation.pop()
       this.hadReceiveResult = true
     }
   }

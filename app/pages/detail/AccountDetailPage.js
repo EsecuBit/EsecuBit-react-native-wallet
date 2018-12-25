@@ -540,8 +540,6 @@ class AccountDetailPage extends Component {
   }
 
   _handleTransactionDetailDismiss() {
-    console.log('dismiss')
-
     //lose focus
     this.memoTextInput.blur()
     this.setState({

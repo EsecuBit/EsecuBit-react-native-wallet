@@ -5,7 +5,7 @@ import I18n from "../lang/i18n";
 import { Dropdown } from 'react-native-material-dropdown'
 import { TouchableOpacity, Platform } from "react-native"
 import PropTypes from 'prop-types'
-import { D } from 'esecubit-wallet-sdk'
+import { D, EsWallet } from 'esecubit-wallet-sdk'
 import CoinUtil from "../utils/CoinUtil"
 import { Coin } from '../common/Constants'
 import { connect } from 'react-redux'
@@ -20,10 +20,11 @@ class FeeInput extends PureComponent {
     this.state = {
       currentFeeType: STANDARD_FEE_TYPE,
       selectedFeeTip: '',
-      selectedFee: '',
+      selectedFee: '0',
       fees: [],
       feesTip: [],
     }
+    this.esWallet = new EsWallet()
 
   }
 
@@ -40,7 +41,7 @@ class FeeInput extends PureComponent {
     let fees = await this.props.account.getSuggestedFee()
     await this.setState({ fees: Object.values(fees) })
     this._convertFeeToSuggestedFeeTip(fees)
-    await this.setState({ selectedFeeTip: this.state.feesTip[0].value, selectedFee: this.state.fees[0] })
+    await this.setState({ selectedFeeTip: this.state.feesTip[0].value, selectedFee: this.state.fees[0].toString() })
     this.props.onChangeText(this.state.fees[0])
   }
 
@@ -52,8 +53,21 @@ class FeeInput extends PureComponent {
     for (let i = 0; i < feeLevel; i++) {
       const json = {}
       let feeValue = feeValues[i]
-      json.value = I18n.t(feeKeys[i]) + '( ' + feeValue + ' ' + CoinUtil.getMinimumUnit(this.props.account.coinType) + ' / byte )'
+      json.value = `${I18n.t(feeKeys[i])} ( ${this._toMinimunValue(this.props.account.coinType, feeValue)} / byte )`
       this.state.feesTip.push(json)
+    }
+  }
+
+  _toMinimunValue(coinType, value) {
+    coinType = CoinUtil.getRealCoinType(coinType)
+    switch(coinType) {
+      case Coin.btc:
+        return `${value} ${D.unit.btc.satoshi}`
+      case Coin.eth:
+        value = this.esWallet.convertValue(coinType, value, D.unit.eth.Wei, D.unit.eth.GWei)
+        return `${value} ${D.unit.eth.GWei}`
+      default:
+        throw D.error.coinNotSupported
     }
   }
 
@@ -83,9 +97,9 @@ class FeeInput extends PureComponent {
     } else {
       await this.setState({
         currentFeeType: STANDARD_FEE_TYPE,
-        selectedFee: this.state.fees[0]
+        selectedFee: this.state.fees[0].toString()
       })
-      this.props.onChangeText(this.state.fees[0])
+      this.props.onChangeText(this.state.fees[0].toString())
     }
   }
 
@@ -98,17 +112,11 @@ class FeeInput extends PureComponent {
   }
 
   isValidInput() {
-    return this._checkFee(this.state.selectedFee.trim())
+    return this._checkFee(this.state.selectedFee)
   }
 
   getFee() {
-    let coinType = CoinUtil.getRealCoinType(this.props.account.coinType)
-    switch (coinType) {
-      case Coin.eth:
-        return this.esWallet.convertValue(this.props.account.coinType, this.state.selectedFee, D.unit.eth.GWei, D.unit.eth.Wei)
-      default:
-        return this.state.selectedFee
-    }
+    return this.state.selectedFee
   }
 
   _checkFee(fee) {

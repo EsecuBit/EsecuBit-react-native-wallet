@@ -76,17 +76,6 @@ class BTCSendPage extends Component {
     DeviceEventEmitter.addListener('qrCode', value => {
       this.addressInput.updateAddress(value)
     })
-    this.esWallet.listenTxInfo(async () => {
-      let data = await this.account.getTxInfos()
-      let txInfo = data.txInfos[0]
-      if (this.memoInput.getMemo()) {
-        txInfo.comment = this.memoInput.getMemo()
-        this.account
-          .updateTxComment(txInfo)
-          .then(() => console.log('update Tx Comment success'))
-          .catch(error => console.warn('update Tx Comment error', error))
-      }
-    })
   }
   
   _fillResendData() {
@@ -236,10 +225,12 @@ class BTCSendPage extends Component {
         this.props.navigation.pop()
       })
       .catch(error => {
+        // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
+        // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
           this.setState({ transactionConfirmDialogVisible: false })
         })
-        ToastUtil.showErrorMsgLong(error)
+        ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
       })
   }
@@ -349,7 +340,8 @@ class BTCSendPage extends Component {
           visible={this.state.transactionConfirmDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t("transactionConfirm")}/>}
         >
-          <DialogContent style={CommonStyle.horizontalDialogContent}>
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text>{I18n.t('pleaseInputPassword')}</Text>
             <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
               {`${I18n.t('send')} `}
               <Text style={{color: Color.DANGER }}>{`${this.state.sendValue} ${this.props.btcUnit} `}</Text>

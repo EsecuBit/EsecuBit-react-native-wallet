@@ -37,8 +37,6 @@ class PreferenceUtil {
 
   static async getLanguagePreference() {
     let languagePref = await realmDB.getPreference('language')
-    console.log('languagePref', languagePref);
-    
     if(languagePref) {
       return JSON.parse(languagePref.value)
     }
