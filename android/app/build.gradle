@@ -64,9 +64,7 @@ import com.android.build.OutputFile
  *   extraPackagerArgs: []
  * ]
  */
- project.ext.react = [
-   bundleInDebug: true,
- ]
+
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
@@ -101,7 +99,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
-        versionName "0.3.4"
+        versionName "0.4.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -150,7 +148,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:27.1.0'
     compile 'com.facebook.react:react-native:+'
-    compile 'com.facebook.fresco:animated-gif:1.10.0'
     // From node_modules
 }
 
