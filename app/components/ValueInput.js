@@ -38,7 +38,8 @@ export default class ValueInput extends PureComponent {
   }
 
   isValidInput() {
-    return this.state.sendValueStatus && this.state.sendValue
+    console.log('valueInput', this.state.sendValue)
+    return this.state.sendValueStatus && !!this.state.sendValue
   }
 
   getValue() {

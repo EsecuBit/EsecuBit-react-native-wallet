@@ -128,7 +128,7 @@ export default {
   transactionFee: 'Transaction Fee',
   newAccountSuccess: 'New account successfully',
   copyRemind:'Long press the QR code to copy the address',
-  pleaseInputPassword: 'Please enter your password on the device and comfirm transaction info',
+  pleaseInputPassword: 'Please enter your password on the device and confirm transaction info',
   tips: 'Tips',
   deviceLimitTips: 'Due to device limitations, the transaction message cannot be more than 2k (about 45 utxo) when signed. The maximum amount that can be sent is: ',
   canResend: 'Resendable',

@@ -9,7 +9,7 @@ import { D, EsWallet } from 'esecubit-wallet-sdk'
 import CoinUtil from "../utils/CoinUtil"
 import { Coin } from '../common/Constants'
 import { connect } from 'react-redux'
-import StringUtil from "../utils/StringUtil";
+import StringUtil from "../utils/StringUtil"
 
 const STANDARD_FEE_TYPE = 'standard'
 const CUSTOM_FEE_TYPE = 'custom'
@@ -25,7 +25,6 @@ class FeeInput extends PureComponent {
       feesTip: [],
     }
     this.esWallet = new EsWallet()
-
   }
 
   componentDidMount() {
@@ -42,7 +41,6 @@ class FeeInput extends PureComponent {
     await this.setState({ fees: Object.values(fees) })
     this._convertFeeToSuggestedFeeTip(fees)
     await this.setState({ selectedFeeTip: this.state.feesTip[0].value, selectedFee: this.state.fees[0].toString() })
-    this.props.onChangeText(this.state.fees[0])
   }
 
 
@@ -53,14 +51,14 @@ class FeeInput extends PureComponent {
     for (let i = 0; i < feeLevel; i++) {
       const json = {}
       let feeValue = feeValues[i]
-      json.value = `${I18n.t(feeKeys[i])} ( ${this._toMinimunValue(this.props.account.coinType, feeValue)} / byte )`
+      json.value = `${I18n.t(feeKeys[i])} ( ${this._toMinimumValue(this.props.account.coinType, feeValue.toString())} / byte )`
       this.state.feesTip.push(json)
     }
   }
 
-  _toMinimunValue(coinType, value) {
-    coinType = CoinUtil.getRealCoinType(coinType)
-    switch(coinType) {
+  _toMinimumValue(coinType, value) {
+    let type = CoinUtil.getRealCoinType(coinType)
+    switch(type) {
       case Coin.btc:
         return `${value} ${D.unit.btc.satoshi}`
       case Coin.eth:
@@ -118,6 +116,7 @@ class FeeInput extends PureComponent {
   getFee() {
     return this.state.selectedFee
   }
+
 
   _checkFee(fee) {
     return !StringUtil.isInvalidValue(fee)

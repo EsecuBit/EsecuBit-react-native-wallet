@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import {CardItem, Icon, Input, InputGroup, Text} from "native-base";
 import {Color, CommonStyle, Dimen} from "../common/Styles";
 import {Platform} from "react-native";
+import StringUtil from "../utils/StringUtil";
 
 export default class ETHDataInput extends PureComponent {
 
@@ -23,6 +24,7 @@ export default class ETHDataInput extends PureComponent {
   }
 
   isValidInput() {
+    console.log('data valid', this.state.checkDataSuccess || !this.state.data, !this.state.data, this.state.data)
     return this.state.checkDataSuccess || !this.state.data
   }
 
@@ -31,9 +33,15 @@ export default class ETHDataInput extends PureComponent {
     this.props.onChangeText('')
   }
 
-  _handleDataInput(data) {
-    this.updateData(data)
-    this.props.onChangeText('')
+  async _handleDataInput(data) {
+    await this.updateData(data)
+    await this._checkData(data)
+    this.props.onChangeText(data)
+  }
+
+  async _checkData(data) {
+    let result =  StringUtil.isHexString(data)
+    await this.setState({checkDataSuccess: result, checkDataError: !result})
   }
 
 

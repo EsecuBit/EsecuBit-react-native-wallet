@@ -26,7 +26,7 @@ export default class GasLimitInput extends PureComponent {
   }
 
   isValidInput() {
-    return this.state.checkGasLimitSuccess && this.state.gasLimit && this.state.gasLimit > 21000
+    return this.state.checkGasLimitSuccess && !!this.state.gasLimit && this.state.gasLimit >= 21000
   }
 
   clear() {
@@ -35,11 +35,9 @@ export default class GasLimitInput extends PureComponent {
   }
 
   async _checkGasLimit(text) {
-    let result = StringUtil.isInvalidValue(text)
-    await this.setState({checkGasLimitError: result, checkGasLimitSuccess: !result && !!text})
-    if (result) {
-      this.clear()
-    }
+    let result = StringUtil.isInvalidValue(text) || text < 21000
+    await this.setState({gasLimit: text})
+    await this.setState({checkGasLimitError: result, checkGasLimitSuccess: !result && text >= 21000})
   }
 
   async _handleGasLimitInput(text) {

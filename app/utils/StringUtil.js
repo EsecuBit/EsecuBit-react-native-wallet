@@ -104,7 +104,7 @@ export default class StringUtil {
   }
 
   static isInvalidValue(value) {
-    if (isNaN(value) || value.startsWith('-') || value.startsWith('0x') || value.indexOf(" ") !== -1 || !value) {
+    if (isNaN(value) || value.startsWith('-') || value.startsWith('0x') || value.indexOf(" ") !== -1 ) {
       ToastUtil.showShort(I18n.t('invalidValue'))
       return true
     }

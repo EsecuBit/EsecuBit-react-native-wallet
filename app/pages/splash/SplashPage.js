@@ -84,7 +84,7 @@ export default class SplashPage extends Component {
       } else {
         if (status === D.status.syncingNewAccount) {
           let coinType = CoinUtil.getRealCoinType(account.coinType)
-          this.setState({syncDesc: `${I18n.t('checking')} ${coinType.toUpperCase()} ${account.label}, ${account.txInfos.length.toString()} ${I18n.t('transactionRecordHasBeenFound')}`})
+          this.setState({syncDesc: `${I18n.t('checking')} ${coinType.toUpperCase()} ${account.label}`})
         }
         if (status === D.status.syncFinish) {
           _that._gotoHomePage(false)
