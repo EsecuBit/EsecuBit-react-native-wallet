@@ -29,7 +29,7 @@ import StringUtil from '../../utils/StringUtil'
 import AppUtil from '../../utils/AppUtil'
 import { setAccount } from '../../actions/AccountAction'
 import { connect } from 'react-redux'
-import CoinCard from '../../components/CoinCard'
+import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, { DialogButton, DialogTitle, DialogContent } from 'react-native-popup-dialog'
 

@@ -15,7 +15,7 @@ import { Color, CommonStyle, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import BaseToolbar from '../../components/BaseToolbar'
+import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, { DialogTitle, DialogContent, DialogButton } from "react-native-popup-dialog"
 const platform = Platform.OS
 

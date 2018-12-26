@@ -14,7 +14,7 @@ import AppUtil from '../../utils/AppUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
-import BaseToolbar from '../../components/BaseToolbar'
+import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
 import { withNavigation } from 'react-navigation'
 const btcUnit = ['BTC', 'mBTC']
