@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
-import {BackHandler, DeviceEventEmitter, Dimensions, Platform, View} from 'react-native'
+import {BackHandler, Dimensions, Platform, View } from 'react-native'
 import { Container } from 'native-base'
 import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color } from '../../common/Styles'
-const platform = Platform.OS
-export default class ScanQrCodePage extends Component {
+import { connect } from 'react-redux'
+import { setAddress } from "../../actions/AccountAction"
+
+class ScanQrCodePage extends Component {
   constructor(props) {
     super(props)
     this.hadReceiveResult = false
-    this.isIPhone = platform === 'ios'
     this.deviceW = Dimensions.get('window').width
   }
 
@@ -38,29 +39,27 @@ export default class ScanQrCodePage extends Component {
 
   _qrCodeReceived(e) {
     if (!this.hadReceiveResult) {
-      DeviceEventEmitter.emit('qrCode', e.data)
+      this.props.setAddress(e.data)
       this.props.navigation.pop()
       this.hadReceiveResult = true
     }
   }
 
   _renderTopBar() {
-    let _that = this
-    return _that.isIPhone ? null : (
-      <Button light transparent onPress={() => _that.props.navigation.pop()}>
+    return Platform.OS === 'ios'? null : (
+      <Button light transparent onPress={() => this.props.navigation.pop()}>
         <Icon name="close" color={Color.DIVIDER} />
       </Button>
     )
   }
   _renderBottomBar() {
-    let _that = this
-    return _that.isIPhone ? (
+    return Platform.OS === 'ios' ? (
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <View>
           <Button
             light
             transparent
-            onPress={() => _that.props.navigation.pop()}>
+            onPress={() => this.props.navigation.pop()}>
             <Icon
               name="x"
               type="Feather"
@@ -75,7 +74,7 @@ export default class ScanQrCodePage extends Component {
     return (
       <Container>
         <QRScannerView
-          hintTextPosition={this.isIPhone ? 150 : 120}
+          hintTextPosition={Platform.OS === 'ios' ? 150 : 120}
           hintTextStyle={{ color: Color.HINT_TEXT }}
           maskColor={Color.MASK}
           hintText={I18n.t('qrCodeHintText')}
@@ -91,3 +90,9 @@ export default class ScanQrCodePage extends Component {
     )
   }
 }
+
+const mapDispatchToProps = {
+  setAddress
+}
+
+export default connect(null, mapDispatchToProps)(ScanQrCodePage)

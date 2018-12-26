@@ -13,9 +13,16 @@ class AddressInput extends PureComponent {
     this.state = {
       checkAddressSuccess: false,
       checkAddressError: false,
-      address: ''
+      address: props.address
     }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.address !== this.state.address) {
+      this._handleAddressInput(nextProps.address)
+    }
+  }
+  
 
   _handleAddressInput(address) {
     try {
@@ -39,7 +46,7 @@ class AddressInput extends PureComponent {
   }
 
   updateAddress(address) {
-    this.setState({address: address})
+    this._handleAddressInput(address)
   }
 
   clear() {
@@ -97,7 +104,8 @@ AddressInput.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  account: state.AccountReducer.account
+  account: state.AccountReducer.account,
+  address: state.AccountReducer.address
 })
 
 // To access the wrapped instance, you need to specify { withRef: true } in the options argument of the connect() call

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Platform, DeviceEventEmitter, BackHandler, InteractionManager, Text } from 'react-native'
+import { Platform, BackHandler, InteractionManager, Text } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
@@ -8,7 +8,7 @@ import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/SendToolbar'
 import { CommonStyle } from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
-import Dialog, { DialogTitle, DialogButton, DialogContent } from 'react-native-popup-dialog'
+import Dialog, { DialogTitle, DialogContent } from 'react-native-popup-dialog'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
 import BalanceHeader from "../../components/BalanceHeader"
@@ -63,7 +63,6 @@ class ETHSendPage extends Component {
   }
 
   componentDidMount() {
-    this._initListener()
     this._onFocus()
     this._onBlur()
     let balance = this.esWallet.convertValue(
@@ -87,13 +86,7 @@ class ETHSendPage extends Component {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     })
   }
-
-  _initListener() {
-    DeviceEventEmitter.addListener('qrCode', value => {
-      this.addressInput.updateAddress(value)
-    })
-  }
-
+  
   /**
    * get max amount
    */
@@ -145,7 +138,6 @@ class ETHSendPage extends Component {
     } else {
       gasLimit = 21000
     }
-    console.log('data send', data, gasLimit)
     await this.gasLimitInput.updateGasLimit(gasLimit.toString())
     await this.ethDataInput.updateData(data)
     this._calculateTotalCost()
@@ -301,12 +293,6 @@ class ETHSendPage extends Component {
       && this.ethDataInput.isValidInput()
     console.log('result ', !result, this.addressInput.isValidInput(), this.valueInput.isValidInput(), this.feeInput.isValidInput(), this.gasLimitInput.isValidInput(),  this.ethDataInput.isValidInput());
     this.setState({footBtnDisable: !result})
-    console.log('address', this.addressInput.isValidInput())
-    console.log('value', this.valueInput.isValidInput())
-    console.log('fee', this.feeInput.isValidInput())
-    console.log('gasLimit', this.gasLimitInput.isValidInput())
-    console.log('ethData', this.ethDataInput.isValidInput())
-    console.log('result', !result)
 
   }
 
