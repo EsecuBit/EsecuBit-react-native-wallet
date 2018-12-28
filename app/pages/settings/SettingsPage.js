@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Dimensions, Linking, BackHandler } from 'react-native'
+import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator} from 'react-native'
 import { Container, Icon, Right, Card, CardItem, Text, Content } from 'native-base'
 import { SinglePickerMaterialDialog } from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
-import { withNavigation } from 'react-navigation'
+import { withNavigation, NavigationActions } from 'react-navigation'
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 
@@ -42,7 +42,9 @@ class SettingsPage extends Component {
       updateDesc: '',
       changeLanguageIndex: 0,
       changeLanguageLabel: 'English',
-      changeLanguageDialogVisible: false
+      changeLanguageDialogVisible: false,
+      clearDataDialogVisible: false,
+      clearDataWaitingDialogVisible: false
     }
     this.coinTypes = D.supportedCoinTypes()
     this.wallet = new EsWallet()
@@ -172,6 +174,25 @@ class SettingsPage extends Component {
     this.setState({ updateVersionDialogVisible: false })
   }
 
+  async clearData() {
+    this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
+    try {
+      await this.wallet.reset()
+      const resetAction = NavigationActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({ routeName: 'PairList', params: { hasBackBtn: false } })
+        ]
+      })
+      this.props.navigation.dispatch(resetAction)
+      this.setState({clearDataWaitingDialogVisible: false})
+    } catch (error) {
+      ToastUtil.showErrorMsgShort(error)
+      this.setState({clearDataWaitingDialogVisible: false})
+    }
+
+  }
+
   render() {
     let _that = this
     return (
@@ -208,7 +229,10 @@ class SettingsPage extends Component {
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={styles.headerText}>{I18n.t('currency')}</Text>
             </CardItem>
-            <CardItem bordered button onPress={() => this.setState({legalCurrencyDialogVisible: true})}>
+            <CardItem
+              bordered
+              button
+              onPress={() => this.setState({ legalCurrencyDialogVisible: true })}>
               <Text>{I18n.t('legalCurrency')}</Text>
               <Right>
                 <View style={{ flexDirection: 'row' }}>
@@ -220,7 +244,7 @@ class SettingsPage extends Component {
               </Right>
             </CardItem>
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
-              <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
+              <CardItem bordered button onPress={() => this.setState({ btcDialogVisible: true })}>
                 <Text>{I18n.t('btc')}</Text>
                 <Right>
                   <View style={{ flexDirection: 'row' }}>
@@ -235,7 +259,7 @@ class SettingsPage extends Component {
               <View style={CommonStyle.divider} />
             )}
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
-              <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
+              <CardItem bordered button onPress={() => this.setState({ ethDialogVisible: true })}>
                 <Text>{I18n.t('eth')}</Text>
                 <Right>
                   <View style={{ flexDirection: 'row' }}>
@@ -252,20 +276,31 @@ class SettingsPage extends Component {
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={styles.headerText}>{I18n.t('account')}</Text>
             </CardItem>
-            <CardItem bordered button onPress={() => this.props.navigation.navigate('AccountManage')}>
+            <CardItem
+              bordered
+              button
+              onPress={() => this.props.navigation.navigate('AccountManage')}>
               <Text>{I18n.t('accountManage')}</Text>
             </CardItem>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={styles.headerText}>App</Text>
             </CardItem>
-            <CardItem bordered button onPress={() => this.setState({changeLanguageDialogVisible: true})}>
+            <CardItem
+              bordered
+              button
+              onPress={() => this.setState({ changeLanguageDialogVisible: true })}>
               <Text>{I18n.t('language')}</Text>
             </CardItem>
             <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
               <Text style={styles.headerText}>{I18n.t('about')}</Text>
             </CardItem>
-            <CardItem bordered button onPress={() => this._checkVersion()}>
-              <Text>{I18n.t('checkVersion')}</Text>
+            <View style={CommonStyle.divider} />
+            <CardItem
+              bordered
+              button
+              onPress={() => this.setState({clearDataDialogVisible: true})}
+            >
+              <Text>{I18n.t('clearData')}</Text>
             </CardItem>
             <View style={CommonStyle.divider} />
             <CardItem bordered>
@@ -281,14 +316,19 @@ class SettingsPage extends Component {
                 <Text>{this.state.cosVersion}</Text>
               </Right>
             </CardItem>
+            <View style={CommonStyle.divider} />
+            <CardItem bordered button onPress={() => this._checkVersion()}>
+              <Text>{I18n.t('checkVersion')}</Text>
+            </CardItem>
           </Card>
         </Content>
+
+        {/* Legal Unit Dialog */}
         <Dialog
           visible={this.state.legalCurrencyDialogVisible}
           width={0}
           height={0}
-          onTouchOutside={() => this.setState({legalCurrencyDialogVisible: false})}
-        >
+          onTouchOutside={() => this.setState({ legalCurrencyDialogVisible: false })}>
           <SinglePickerMaterialDialog
             title={I18n.t('legalCurrency')}
             items={Object.values(D.unit.legal).map((row, index) => ({
@@ -315,15 +355,16 @@ class SettingsPage extends Component {
                 legalCurrencyLabel: label,
                 legalCurrencyIndex: index
               })
-
             }}
           />
         </Dialog>
+        {/* Legal Unit Dialog */}
+
+        {/* BTC Unit Dialog */}
         <Dialog
-          onTouchOutside={() => this.setState({btcDialogVisible: false})}
+          onTouchOutside={() => this.setState({ btcDialogVisible: false })}
           width={0}
-          height={0}
-        >
+          height={0}>
           <SinglePickerMaterialDialog
             title={I18n.t('btc')}
             items={btcUnit.map((row, index) => ({ value: index, label: row }))}
@@ -337,7 +378,6 @@ class SettingsPage extends Component {
             }}
             onCancel={() => {
               this.setState({ btcDialogVisible: false })
-
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -348,12 +388,14 @@ class SettingsPage extends Component {
                 btcLabel: label,
                 btcIndex: index
               })
-
             }}
           />
         </Dialog>
+        {/* BTC Unit Dialog */}
+
+        {/* ETH Unit Dialog */}
         <Dialog
-          onTouchOutside={() => this.setState({ethDialogVisible: false})}
+          onTouchOutside={() => this.setState({ ethDialogVisible: false })}
           visible={this.state.ethDialogVisible}
           width={0}
           height={0}>
@@ -370,7 +412,6 @@ class SettingsPage extends Component {
             }}
             onCancel={() => {
               this.setState({ ethDialogVisible: false })
-
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -384,12 +425,14 @@ class SettingsPage extends Component {
             }}
           />
         </Dialog>
+        {/* ETH Unit Dialog */}
+
+        {/* Language Dialog */}
         <Dialog
-          onTouchOutside={() => this.setState({changeLanguageDialogVisible: false})}
+          onTouchOutside={() => this.setState({ changeLanguageDialogVisible: false })}
           visible={this.state.changeLanguageDialogVisible}
           width={0}
-          height={0}
-        >
+          height={0}>
           <SinglePickerMaterialDialog
             title={I18n.t('language')}
             items={['English', '简体中文'].map((row, index) => ({
@@ -426,6 +469,9 @@ class SettingsPage extends Component {
             }}
           />
         </Dialog>
+        {/* Language Dialog */}
+
+        {/* Update Version Dialog */}
         <Dialog
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
@@ -448,6 +494,47 @@ class SettingsPage extends Component {
             <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
           </DialogContent>
         </Dialog>
+        {/* Update Version Dialog */}
+
+        {/* Clear Data Dialog */}
+        <Dialog
+          width={0.8}
+          visible={this.state.clearDataDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('clearData')} />}
+          actions={[
+            <DialogButton
+              textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
+              key="clear_data_cancel"
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({clearDataDialogVisible: false})}
+            />,
+            <DialogButton
+              textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
+              key="clear_data_confirm"
+              text={I18n.t('confirm')}
+              onPress={() => this.clearData()}
+            />
+          ]}>
+          <DialogContent>
+            <Text style={styles.updateDesc}>{I18n.t('clearDataDesc')}</Text>
+          </DialogContent>
+        </Dialog>
+        {/* Clear Data Dialog */}
+
+        {/* Clear Data Waiting Dialog */}
+        <Dialog
+          width={0.8}
+          visible={this.state.clearDataWaitingDialogVisible}
+          onTouchOutside={() => {}}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{I18n.t('clearing')}</Text>
+          </DialogContent>
+        </Dialog>
+        {/* Clear Data Waiting Dialog */}
+
+        {/* Disconnect Dialog */}
         <Dialog
           width={0.8}
           visible={this.state.disConnectDialogVisible}
@@ -472,6 +559,8 @@ class SettingsPage extends Component {
             <Text>{I18n.t('disconnectTip')}</Text>
           </DialogContent>
         </Dialog>
+        {/* Disconnect Dialog */}
+
       </Container>
     )
   }
@@ -500,5 +589,9 @@ const mapDispatchToProps = {
   setLegalCurrencyUnit
 }
 
-
-export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(SettingsPage))
+export default withNavigation(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SettingsPage)
+)

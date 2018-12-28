@@ -38,7 +38,7 @@ class RealmDB extends IDatabase {
   }
 
   clearDatabase() {
-    return Realm.open(this._config).deleteAll()
+    return Realm.open(this._config).then(realm => realm.write(() => realm.deleteAll()))
   }
 
   deleteDatabase() {

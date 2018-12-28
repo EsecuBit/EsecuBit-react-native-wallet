@@ -169,5 +169,8 @@ export default {
   accountManage: '帐户管理',
   hideAccountDesc: '确定隐藏帐户？隐藏后可以在设置中的帐户管理恢复显示',
   showAccountDesc: '执行此操作后，该帐户将重新显示到界面',
-  noAccountToShow: '暂时没有帐户可以取消隐藏'
+  noAccountToShow: '暂时没有帐户可以取消隐藏',
+  clearData: "清空数据",
+  clearDataDesc: "确定清空数据？下一次将会重新进行同步",
+  clearing: "正在清除数据"
 }
