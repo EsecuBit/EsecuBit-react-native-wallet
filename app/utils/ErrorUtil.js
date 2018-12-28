@@ -1,11 +1,11 @@
 import I18n from '../lang/i18n'
 class ErrorUtil {
-  static getErrorMsg(msg) {
-    if (errorMap[msg] === undefined) {
-      console.log('getErrorMsg,undefined')
+  static getErrorMsg(errCode: number) {
+    if (errorMap[errCode] === undefined) {
+      console.log('getErrorMsg,undefined', errCode)
       return I18n.t(errorMap[10001])
     }
-    return I18n.t(errorMap[msg])
+    return I18n.t(errorMap[errCode])
   }
 }
 const errorMap = {

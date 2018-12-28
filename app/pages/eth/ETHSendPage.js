@@ -86,7 +86,7 @@ class ETHSendPage extends Component {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     })
   }
-  
+
   /**
    * get max amount
    */
@@ -213,7 +213,7 @@ class ETHSendPage extends Component {
       })
       .catch(error => {
         console.log('error', error);
-        
+
         // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
         // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
@@ -304,7 +304,7 @@ class ETHSendPage extends Component {
   render() {
     return (
       <Container style={CommonStyle.safeAreaBottom}>
-        <SendToolbar coinType="ETH" navigation={this.props.navigation} />
+        <SendToolbar title="ETH"  />
         <Content padder>
           <BalanceHeader
             value={this.state.balance}
@@ -325,7 +325,7 @@ class ETHSendPage extends Component {
               ref={refs => this.feeInput = refs && refs.getWrappedInstance()}
               placeHolder='GWei per byte'
               onChangeText={text => this._handleFeeInput()}
-            />
+             account={}/>
             <GasLimitInput
               ref={refs => this.gasLimitInput = refs}
               onChangeText={text => this._handleGasLimitInput(text)}
@@ -374,3 +374,4 @@ const mapStateToProps = state => ({
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
 })
 export default connect(mapStateToProps)(ETHSendPage)
+

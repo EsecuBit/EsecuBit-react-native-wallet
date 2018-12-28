@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, Dimensions, ViewPropTypes } from 'react-native'
-import PropTypes from 'prop-types'
 import ProgressBar from './ProgressBar'
 import { Dimen, Color } from '../../common/Styles'
 import { Card } from 'native-base'
@@ -31,15 +30,39 @@ const styles = StyleSheet.create({
   }
 })
 
+type Props = {
+  title: string,
+  staked: string,
+  style: ViewPropTypes.style,
+  unit: string,
+  total: string,
+  used: string
+}
 
-export default class AssetsProgressBar extends PureComponent {
-  constructor(props) {
-    super(props)
+type State = {
+  total: number,
+  used: number,
+  totalUnit: string,
+  usedUnit: string
+}
+
+export default class AssetsProgressBar extends PureComponent<Props, State> {
+  static defaultProps = {
+    title: '',
+    unit: '',
+    staked: '',
+    style: styles,
+    total: '0',
+    used: '0'
+  }
+
+  constructor() {
+    super()
     this.state = {
-      total: props.total,
-      used: props.used,
-      totalUnit: props.unit,
-      usedUnit: props.unit
+      total: this.props.total,
+      used: this.props.used,
+      totalUnit: this.props.unit,
+      usedUnit: this.props.unit
     }
   }
 
@@ -148,20 +171,3 @@ export default class AssetsProgressBar extends PureComponent {
   }
 }
 
-AssetsProgressBar.prototypes = {
-  title: PropTypes.string,
-  staked: PropTypes.string,
-  style: ViewPropTypes.style,
-  unit: PropTypes.string,
-  total: PropTypes.string,
-  used: PropTypes.string
-}
-
-AssetsProgressBar.defaultProps = {
-  title: '',
-  unit: '',
-  staked: '',
-  style: styles,
-  total: '0',
-  used: '0'
-}

@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
-import {CardItem, Icon, Input, InputGroup, Text} from "native-base";
-import {Color, CommonStyle, Dimen} from "../../common/Styles";
-import {Platform} from "react-native";
-import StringUtil from "../../utils/StringUtil";
+import {CardItem, Icon, Input, InputGroup, Text} from "native-base"
+import {Color, CommonStyle, Dimen} from "../../common/Styles"
+import {Platform} from "react-native"
+import StringUtil from "../../utils/StringUtil"
 
 export default class ETHDataInput extends PureComponent {
 
-  constructor(props) {
-    super(props);
+  constructor() {
+    super()
     this.state = {
       data: '',
       checkDataSuccess: false,
@@ -15,16 +15,15 @@ export default class ETHDataInput extends PureComponent {
     }
   }
 
-  getData() {
+  getData(): string {
     return this.state.data
   }
 
-  updateData(data) {
+  updateData(data: string) {
     this.setState({data: data})
   }
 
-  isValidInput() {
-    console.log('data valid', this.state.checkDataSuccess || !this.state.data, !this.state.data, this.state.data)
+  isValidInput(): boolean {
     return this.state.checkDataSuccess || !this.state.data
   }
 
@@ -33,13 +32,13 @@ export default class ETHDataInput extends PureComponent {
     this.props.onChangeText('')
   }
 
-  async _handleDataInput(data) {
+  async _handleDataInput(data: string) {
     await this.updateData(data)
     await this._checkData(data)
     this.props.onChangeText(data)
   }
 
-  async _checkData(data) {
+  async _checkData(data: string) {
     let result =  StringUtil.isHexString(data)
     await this.setState({checkDataSuccess: result, checkDataError: !result})
   }

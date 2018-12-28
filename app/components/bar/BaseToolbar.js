@@ -1,21 +1,25 @@
+// @flow
 import React, { PureComponent } from 'react'
 import { Button, Header, Icon, Left, Right } from 'native-base'
-import { Dimensions, StatusBar, Text, View, Platform } from 'react-native'
+import { StatusBar, Text, View, Platform } from 'react-native'
 import { Color, CommonStyle, Dimen, isIphoneX } from '../../common/Styles'
-import PropTypes from 'prop-types'
-import { withNavigation }from 'react-navigation'
+import { withNavigation  }from 'react-navigation'
 
-const platform = Platform.OS
+type Props = {
+  navigation: {
+    pop: () => void
+  },
+  title: string
+};
+class BaseToolbar extends PureComponent<Props> {
 
-class BaseToolbar extends PureComponent {
-  constructor() {
-    super()
-    this.deviceW = Dimensions.get('window').width
+  shouldComponentUpdate() {
+    return false;
   }
 
   render() {
     const { title } = this.props
-    let height = platform === 'ios' ? 64 : 56
+    let height = Platform.OS === 'ios' ? 64 : 56
     if (isIphoneX) {
       height = 88
     }
@@ -26,7 +30,7 @@ class BaseToolbar extends PureComponent {
           translucent={false}
         >
           <StatusBar
-            barStyle={platform === 'ios' ? 'light-content' : 'default'}
+            barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
             backgroundColor={Color.DARK_PRIMARY}
             hidden={false}
           />
@@ -37,7 +41,7 @@ class BaseToolbar extends PureComponent {
           </Left>
           <View
             style={[
-              platform === 'ios'
+              Platform.OS === 'ios'
                 ? CommonStyle.toolbarIOS
                 : CommonStyle.toolbarAndroid]
             }
@@ -48,7 +52,7 @@ class BaseToolbar extends PureComponent {
                 textAlign: 'center',
                 color: Color.ACCENT,
                 fontSize: Dimen.PRIMARY_TEXT,
-                marginBottom: platform === 'ios' ? 15 : 0    
+                marginBottom: Platform.OS === 'ios' ? 15 : 0
               }}
             >
               {title}
@@ -59,13 +63,5 @@ class BaseToolbar extends PureComponent {
       </View>
     )
   }
-}
-
-BaseToolbar.prototypes = {
-  title: PropTypes.string
-}
-
-BaseToolbar.defaultProps = {
-  title: ''
 }
 export default withNavigation(BaseToolbar)

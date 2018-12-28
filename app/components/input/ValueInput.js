@@ -2,12 +2,18 @@ import React, { PureComponent } from 'react'
 import { Platform } from 'react-native'
 import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
-import PropTypes from 'prop-types'
 import StringUtil from '../../utils/StringUtil'
 import PercentageBar from '../bar/PercentageBar'
 import I18n from '../../lang/i18n'
 
 export default class ValueInput extends PureComponent {
+
+  static defaultProps = {
+    placeholder: '',
+    value: '',
+    enablePercentageBar: true
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -17,14 +23,15 @@ export default class ValueInput extends PureComponent {
     }
   }
 
-  async _handleSendValueInput(text) {
+  // @flow
+  async _handleSendValueInput(text: string) {
     await this.setState({sendValue: text})
     await this._checkSendValue(text)
     this.props.onChangeText(text)
   }
 
-
-  async _checkSendValue(text) {
+  // @flow
+  async _checkSendValue(text: string) {
     let result = StringUtil.isInvalidValue(text)
     await this.setState({ sendValueError: result, sendValueStatus: !result && !!text })
     if (result) {
@@ -37,16 +44,18 @@ export default class ValueInput extends PureComponent {
     this.props.onChangeText('')
   }
 
-  isValidInput() {
-    console.log('valueInput', this.state.sendValue)
+  // @flow
+  isValidInput(): boolean {
     return this.state.sendValueStatus && !!this.state.sendValue
   }
 
-  getValue() {
+  // @flow
+  getValue(): string {
     return this.state.sendValue
   }
 
-  updateValue(value) {
+  // @flow
+  updateValue(value: string) {
     this._handleSendValueInput(value)
   }
 
@@ -85,16 +94,4 @@ export default class ValueInput extends PureComponent {
   }
 }
 
-ValueInput.prototypes = {
-  placeholder: PropTypes.string,
-  value: PropTypes.string,
-  onItemClick: PropTypes.func,
-  onChangeText: PropTypes.func.isRequired,
-  enablePercentageBar: PropTypes.bool.isRequired
-}
 
-ValueInput.defaultProps = {
-  placeholder: '',
-  value: '',
-  enablePercentageBar: true
-}

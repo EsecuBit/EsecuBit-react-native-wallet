@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Platform } from 'react-native'
-import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
+import { CardItem, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
-import PropTypes from 'prop-types'
 import I18n from '../../lang/i18n'
 
 export default class MemoInput extends PureComponent {
@@ -13,15 +12,18 @@ export default class MemoInput extends PureComponent {
     }
   }
 
-  _handleMemoInput(text) {
-    this.setState({ memo: text })
+  // @flow
+  async _handleMemoInput(text: string) {
+    await this.setState({ memo: text })
   }
 
-  getMemo() {
+  // @flow
+  getMemo(): string {
     return this.state.memo
   }
 
-  updateMemo(memo) {
+  // @flow
+  updateMemo(memo: string) {
     this._handleMemoInput(memo)
   }
 
@@ -51,11 +53,3 @@ export default class MemoInput extends PureComponent {
   }
 }
 
-MemoInput.prototypes = {
-  placeholder: PropTypes.string,
-  onChangeText: PropTypes.func.isRequired
-}
-
-MemoInput.defaultProps = {
-  placeholder: '',
-}

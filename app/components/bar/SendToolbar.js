@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import { Button, Header, Icon, Left, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import {
-  Dimensions,
   StatusBar,
   Text,
   View,
@@ -12,17 +11,24 @@ import {
 import { Color, CommonStyle, Dimen, isIphoneX } from '../../common/Styles'
 import { withNavigation }from 'react-navigation'
 
-const platform = Platform.OS
+type Props = {
+  navigation: {
+    navigate: string => void,
+    pop: () => void
+  },
+  title: string
+};
+class SendToolbar extends PureComponent<Props> {
+  constructor(props) {
+    super(props)
+  }
 
-class SendToolbar extends PureComponent {
-  constructor() {
-    super()
-    this.deviceW = Dimensions.get('window').width
+  shouldComponentUpdate() {
+    return false;
   }
 
   render() {
-    let _that = this
-    let height = platform === 'ios' ? 64 : 56
+    let height = Platform.OS === 'ios' ? 64 : 56
     if (isIphoneX) {
       height = 88
     }
@@ -32,7 +38,7 @@ class SendToolbar extends PureComponent {
           style={{ backgroundColor: Color.DARK_PRIMARY, height: height, alignContent: 'center', alignItems: 'center' }}
           translucent={false}>
           <StatusBar
-            barStyle={platform === 'ios' ? 'light-content' : 'default'}
+            barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
             backgroundColor={Color.DARK_PRIMARY}
             hidden={false}
           />
@@ -43,7 +49,7 @@ class SendToolbar extends PureComponent {
           </Left>
           <View
             style={
-              platform === 'ios'
+              Platform.OS === 'ios'
                 ? CommonStyle.toolbarIOS
                 : CommonStyle.toolbarAndroid
             }>
@@ -53,16 +59,16 @@ class SendToolbar extends PureComponent {
                 textAlign: 'center',
                 color: Color.ACCENT,
                 fontSize: Dimen.PRIMARY_TEXT,
-                marginBottom: platform === 'ios' ? 15 : 0
+                marginBottom: Platform.OS === 'ios' ? 15 : 0
               }}>
-              {I18n.t('send') + ' ' + _that.props.coinType}
+              {`${I18n.t('send')} ${this.props.title}`}
             </Text>
           </View>
           <Right>
             <Button
               transparent
               onPress={() => {
-                _that.props.navigation.navigate('Scan')
+                this.props.navigation.navigate('Scan')
               }}>
               <Image source={require('../../imgs/ic_scan.png')} />
             </Button>

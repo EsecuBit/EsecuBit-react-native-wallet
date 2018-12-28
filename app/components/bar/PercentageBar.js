@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { Dimen, Color } from '../../common/Styles'
-import PropTypes from 'prop-types'
 
 const styles = StyleSheet.create({
   textWrapper: {
@@ -21,7 +20,20 @@ const styles = StyleSheet.create({
   }
 })
 
-export default class PercentageBar extends PureComponent {
+type Props = {
+  data: Array<number>,
+  type: 'normal' | 'percent',
+  onItemClick: number => string
+}
+
+
+export default class PercentageBar extends PureComponent<Props> {
+
+  static defaultProps = {
+    type: 'percent',
+    data: []
+  }
+
   render() {
     const { data, type, onItemClick } = this.props
     return (
@@ -56,13 +68,5 @@ export default class PercentageBar extends PureComponent {
   }
 }
 
-PercentageBar.prototypes = {
-  onItemClick: PropTypes.func.isRequired,
-  type: PropTypes.oneOf(['normal', 'percent']).isRequired,
-  data: PropTypes.array.isRequired
-}
 
-PercentageBar.defaultProps = {
-  type: 'percent',
-  data: []
-}
+

@@ -1,20 +1,28 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { StyleSheet, Platform } from 'react-native'
 import { Footer, FooterTab, Button, Text } from 'native-base'
-import PropTypes from 'prop-types'
 import { Dimen, Color } from '../common/Styles'
 
-const platform = Platform.OS
 const styles = StyleSheet.create({
   btnText: {
     flex: 1,
     textAlign: 'center',
     textAlignVertical: 'center',
     fontSize: Dimen.PRIMARY_TEXT,
-    marginTop: platform === 'ios' ? 15 : 0
+    marginTop: Platform.OS === 'ios' ? 15 : 0
   },
 })
-export default class FooterButton extends PureComponent {
+
+export default class FooterButton extends Component {
+  static defaultProps = {
+    title: '',
+    disabled: false
+  }
+
+  shouldComponentUpdate() {
+    return false;
+  }
+  
   render() {
     const { title, onPress, disabled } = this.props
     return (
@@ -31,15 +39,4 @@ export default class FooterButton extends PureComponent {
       </Footer>
     )
   }
-}
-
-FooterButton.prototypes = {
-  title: PropTypes.string,
-  onPress: PropTypes.func,
-  disabled: PropTypes.bool
-}
-
-FooterButton.defaultProps = {
-  title: '',
-  disabled: false
 }

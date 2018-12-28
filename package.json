@@ -12,6 +12,8 @@
   },
   "license": "LGPLv3",
   "scripts": {
+    "eslint": "eslint",
+    "flow": "flow",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "android-dev": "adb reverse tcp:8081 tcp:8081",
@@ -81,6 +83,7 @@
     "eslint-plugin-react": "^7.10.0",
     "eslint-plugin-react-native": "^3.2.1",
     "eslint-plugin-standard": "^3.1.0",
+    "flow-bin": "^0.89.0",
     "jest": "23.3.0",
     "react-test-renderer": "16.0.0-alpha.6"
   },

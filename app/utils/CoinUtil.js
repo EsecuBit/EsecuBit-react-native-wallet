@@ -1,8 +1,9 @@
+// @flow
 import { Coin } from '../common/Constants'
 import { D } from 'esecubit-wallet-sdk'
 
 export default class CoinUtil {
-  static contains(coinTypes, coinType) {
+  static contains(coinTypes: Array<string>, coinType: string) {
     let isContains = false;
     coinTypes.map(item => {
       if (item.includes(coinType)) {
@@ -12,7 +13,7 @@ export default class CoinUtil {
     return isContains;
   }
 
-  static getRealCoinType(coinType) {
+  static getRealCoinType(coinType: string) {
     //slice coinType string, only if coinType is testnet type
     //eg: btc_testnet3 -> btc
     if (coinType && coinType.indexOf("_") !== -1) {
@@ -26,7 +27,7 @@ export default class CoinUtil {
    * @param coinType
    * @returns {string}
    */
-  static getMinimumUnit(coinType) {
+  static getMinimumUnit(coinType: string) {
     coinType = this.getRealCoinType(coinType)
     switch (coinType) {
       case Coin.btc:

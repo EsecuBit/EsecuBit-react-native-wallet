@@ -1,8 +1,9 @@
+// @flow
 import ActionType from './ActionType'
 import CoinUtil from '../utils/CoinUtil'
 import { Coin } from '../common/Constants'
 
-export function setCryptoCurrencyUnit(coinType, unit) {
+export function setCryptoCurrencyUnit(coinType: string, unit: string) {
   coinType = CoinUtil.getRealCoinType(coinType)
   let actionType = ''
   switch (coinType) {
@@ -24,7 +25,7 @@ export function setCryptoCurrencyUnit(coinType, unit) {
   }
 }
 
-export function setLegalCurrencyUnit(unit) {
+export function setLegalCurrencyUnit(unit: string) {
   return {
     type: ActionType.SET_LEGAL_CURRENCY_UNIT,
     unit: unit

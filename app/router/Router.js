@@ -11,7 +11,7 @@ const EsecuBitNavigator = StackNavigator(RouterConfig, {
     return {
       screenInterpolator: CardStackStyleInterpolator.forHorizontal,
       transitionSpec: {
-        duration: 550,
+        duration: 350,
         easing: Easing.out(Easing.poly(4)),
         timing: Animated.timing,
         useNativeDriver: true

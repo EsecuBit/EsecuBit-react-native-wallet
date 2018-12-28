@@ -5,7 +5,7 @@ import CoinUtil from './CoinUtil'
 
 const realmDB = new RealmDB('default')
 class PreferenceUtil {
-  static async getCurrencyUnit(key) {
+  static async getCurrencyUnit(key: string) {
     let defaultUnit = PreferenceUtil.prototype._getDefaultUnit(key)
     let result = await realmDB.getPreference(key)
     if (result) {
@@ -20,7 +20,7 @@ class PreferenceUtil {
     }
   }
 
-  _getDefaultUnit(coinType) {
+  _getDefaultUnit(coinType: string) {
     switch (coinType) {
       case Coin.btc:
         return D.unit.btc.BTC
@@ -42,7 +42,7 @@ class PreferenceUtil {
     }
   }
 
-  static async updateLanguagePrefrence(label, index) {
+  static async updateLanguagePrefrence(label: string, index: number) {
     let value = {
       label: label,
       index: index
@@ -50,7 +50,7 @@ class PreferenceUtil {
     realmDB.saveOrUpdatePreference('language', JSON.stringify(value))
   }
 
-  static async updateCurrencyUnit(key, label, index) {
+  static async updateCurrencyUnit(key: string, label: string, index: number) {
     let value = {
       label: label,
       index: index
@@ -58,12 +58,12 @@ class PreferenceUtil {
     realmDB.saveOrUpdatePreference(key, JSON.stringify(value))
   }
 
-  static async getCryptoCurrencyUnit(coinType) {
+  static async getCryptoCurrencyUnit(coinType: string) {
     let key = CoinUtil.getRealCoinType(coinType)
     return await this.getCurrencyUnit(key)
   }
 
-  static async setDefaultDevice(obj) {
+  static async setDefaultDevice(obj: {}) {
     obj = JSON.stringify(obj)
     realmDB.saveOrUpdatePreference('sn', obj)
   }

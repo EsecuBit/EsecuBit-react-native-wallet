@@ -3,19 +3,22 @@ import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, Icon, Text } from 'native-base'
 import { Color, Dimen } from '../../common/Styles'
 import I18n from '../../lang/i18n'
-import PropTypes from 'prop-types'
 
-const deviceW = Dimensions.get('window').width
+type Props = {
+  leftOnPress: () => void,
+  rightOnPress: () => void,
+}
 
-export default class AccountOperateBottomBar extends PureComponent {
-  constructor() {
-    super()
+export default class AccountOperateBottomBar extends PureComponent<Props> {
+
+  shouldComponentUpdate() {
+    return false;
   }
 
   render() {
-    const { leftOnPress, rightOnPress, visible } = this.props
+    const { leftOnPress, rightOnPress } = this.props
     return (
-      <View style={[styles.bottom, { display: visible ? 'flex' : 'none' }]}>
+      <View style={styles.bottom}>
         <Button full light style={styles.sendButton} onPress={leftOnPress}>
           <Icon name="send" />
           <Text style={styles.btnSendText}>{I18n.t('send')}</Text>
@@ -44,7 +47,7 @@ const styles = StyleSheet.create({
   sendButton: {
     flex: 1,
     flexDirection: 'row',
-    width: deviceW * 0.5,
+    width: Dimensions.get('window').width * 0.5,
     height: 55,
     justifyContent: 'center',
     alignItems: 'center',
@@ -69,12 +72,5 @@ const styles = StyleSheet.create({
   }
 })
 
-AccountOperateBottomBar.prototypes = {
-  leftOnPress: PropTypes.func,
-  rightOnPress: PropTypes.func,
-  visible: PropTypes.bool
-}
 
-AccountOperateBottomBar.defaultProps = {
-  visible: true
-}
+

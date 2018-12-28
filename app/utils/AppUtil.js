@@ -1,11 +1,10 @@
 import { version, versionCode, cosVersion } from '../../package.json'
 import { EsWallet } from 'esecubit-wallet-sdk'
 import { Platform, BackAndroid, NativeModules } from 'react-native'
-
 import StringUtil from './StringUtil'
 import { D } from 'esecubit-wallet-sdk'
 import { Api } from '../common/Constants'
-import PreferenceUtil from './PreferenceUtil.js';
+import PreferenceUtil from './PreferenceUtil.js'
 
 const BackIOS = NativeModules.BackIOS
 export default class AppUtil {

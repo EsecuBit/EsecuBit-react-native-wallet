@@ -3,12 +3,12 @@ import { Platform } from 'react-native'
 import {CardItem, Icon, Input, InputGroup, Text} from "native-base"
 import {Color, CommonStyle, Dimen} from "../../common/Styles"
 import I18n from "../../lang/i18n"
-import StringUtil from "../../utils/StringUtil";
+import StringUtil from "../../utils/StringUtil"
 
 export default class GasLimitInput extends PureComponent {
 
-  constructor(props) {
-    super(props)
+  constructor() {
+    super()
     this.state = {
       checkGasLimitSuccess: true,
       checkGasLimitError: false,
@@ -17,15 +17,18 @@ export default class GasLimitInput extends PureComponent {
     }
   }
 
-  getGasLimit() {
+  // @flow
+  getGasLimit(): string {
     return this.state.gasLimit
   }
 
-  updateGasLimit(gasLimit) {
+  // @flow
+  updateGasLimit(gasLimit: string) {
     this.setState({gasLimit: gasLimit})
   }
 
-  isValidInput() {
+  // @flow
+  isValidInput(): boolean {
     return this.state.checkGasLimitSuccess && !!this.state.gasLimit && this.state.gasLimit >= 21000
   }
 
@@ -34,13 +37,15 @@ export default class GasLimitInput extends PureComponent {
     this.props.onChangeText('')
   }
 
-  async _checkGasLimit(text) {
+  // @flow
+  async _checkGasLimit(text: string) {
     let result = StringUtil.isInvalidValue(text) || text < 21000
     await this.setState({gasLimit: text})
     await this.setState({checkGasLimitError: result, checkGasLimitSuccess: !result && text >= 21000})
   }
 
-  async _handleGasLimitInput(text) {
+  // @flow
+  async _handleGasLimitInput(text: string) {
     await this.setState({gasLimit: text})
     await this._checkGasLimit(text)
     this.props.onChangeText(text)

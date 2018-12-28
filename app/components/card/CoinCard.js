@@ -4,7 +4,6 @@ import { CardItem, Left, Subtitle, Title } from "native-base"
 import { Color, CommonStyle, Dimen } from "../../common/Styles"
 import { View } from "react-native"
 import StringUtil from "../../utils/StringUtil"
-import PropTypes from "prop-types"
 import CoinUtil from "../../utils/CoinUtil"
 import { setAccount, setAccountCryptoCurrencyUnit } from "../../actions/AccountAction"
 import { connect } from "react-redux"
@@ -12,20 +11,21 @@ import { withNavigation } from "react-navigation"
 import CustomIcon from "../CustomIcon"
 import { Coin } from "../../common/Constants"
 
-class CoinCard extends PureComponent {
+class CoinCard extends PureComponent{
   constructor() {
     super()
     this.wallet = new EsWallet()
-
   }
 
-  async _gotoDetailPage(item) {
+  // @flow
+  async _gotoDetailPage(item: {coinType: string}) {
     this.props.setAccount(item)
     this._setAccountCurrencyUnit(item.coinType)
     this.props.navigation.navigate("Detail")
   }
 
-  _setAccountCurrencyUnit(coinType) {
+  // @flow
+  _setAccountCurrencyUnit(coinType: string) {
     coinType = CoinUtil.getRealCoinType(coinType)
     switch (coinType) {
       case Coin.btc:
@@ -40,7 +40,8 @@ class CoinCard extends PureComponent {
     }
   }
 
-  _getAccountCurrencyUnit(coinType) {
+  // @flow
+  _getAccountCurrencyUnit(coinType: string) {
     coinType = CoinUtil.getRealCoinType(coinType)
     switch (coinType) {
       case Coin.btc:
@@ -101,10 +102,6 @@ class CoinCard extends PureComponent {
   }
 }
 
-CoinCard.propTypes = {
-  data: PropTypes.object.isRequired,
-  onLongPress: PropTypes.func
-}
 
 const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,

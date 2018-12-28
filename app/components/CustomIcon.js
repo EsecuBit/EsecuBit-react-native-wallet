@@ -1,17 +1,16 @@
-import React, { PureComponent } from "react"
-import { Image } from "react-native"
+import React, { Component } from "react"
 import { Icon } from "native-base"
-import PropTypes from "prop-types"
 import CoinUtil from "../utils/CoinUtil"
 import { Coin } from "../common/Constants"
 import { Color } from '../common/Styles'
 
-export default class CustomIcon extends PureComponent {
-  constructor() {
-    super()
-  }
+export default class CustomIcon extends Component {
 
-  _generateIcon() {
+  shouldComponentUpdate() {
+    return false;
+  }
+  
+  render() {
     let coinType = CoinUtil.getRealCoinType(this.props.coinType)
     switch (coinType) {
       case Coin.btc:
@@ -40,12 +39,4 @@ export default class CustomIcon extends PureComponent {
         )
     }
   }
-
-  render() {
-    return this._generateIcon()
-  }
-}
-
-CustomIcon.prototypes = {
-  coinType: PropTypes.string.isRequired
 }

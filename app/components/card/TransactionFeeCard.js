@@ -5,22 +5,22 @@ import I18n from "../../lang/i18n"
 import { View } from "react-native"
 import { connect } from 'react-redux'
 import { EsWallet } from 'esecubit-wallet-sdk'
-import CoinUtil from "../../utils/CoinUtil";
+import CoinUtil from "../../utils/CoinUtil"
 
 class TransactionFeeCard extends PureComponent {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super()
     this.state = {
       transactionFee: '0'
     }
     this.wallet = new EsWallet()
-    this.coinType = props.account.coinType
   }
 
-  updateTransactionFee(value) {
-    let fromUnit = CoinUtil.getMinimumUnit(this.coinType)
+  // @flow
+  updateTransactionFee(value: string) {
+    let fromUnit = CoinUtil.getMinimumUnit(this.props.account.coinType)
     let transactionFee = this.wallet.convertValue(
-      this.coinType,
+      this.props.account.coinType,
       value.fee,
       fromUnit,
       this.props.accountCurrentUnit

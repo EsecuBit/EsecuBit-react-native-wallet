@@ -5,13 +5,11 @@ import StringUtil from '../../utils/StringUtil'
 import { Button, Icon, Text } from 'native-base'
 import Menu, { MenuItem } from 'react-native-material-menu'
 import I18n from '../../lang/i18n'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
-import CoinUtil from '../../utils/CoinUtil';
+import CoinUtil from '../../utils/CoinUtil'
 
-const platform = Platform.OS
-const deviceW = Dimensions.get('window').width
+
 class AccountDetailHeader extends PureComponent {
   constructor(props) {
     super(props)
@@ -24,6 +22,7 @@ class AccountDetailHeader extends PureComponent {
       legalCurrencyBalance: '0'
     }
     this._hideMenu.bind(this)
+    this.deviceW = Dimensions.get('window').width
   }
 
   componentDidMount() {
@@ -33,7 +32,8 @@ class AccountDetailHeader extends PureComponent {
     })
   }
 
-  _getBalance(balance) {
+  // @flow
+  _getBalance(balance: string) {
     let fromUnit = ''
     let toUnit = ''
     if (D.isBtc(this.account.coinType)) {
@@ -61,12 +61,14 @@ class AccountDetailHeader extends PureComponent {
     })
   }
 
-  _hideMenu(type) {
+  // @flow
+  _hideMenu(type: string) {
     this.moreMenu.hide()
     this.props.onHideMenu(type)
   }
 
-  updateAccountName(name) {
+  // @flow
+  updateAccountName(name: string) {
     //EOS not support rename account
     let coinType = CoinUtil.getRealCoinType(this.account.coinType)
     if (coinType === 'eos') {
@@ -78,7 +80,7 @@ class AccountDetailHeader extends PureComponent {
 
 
   render() {
-    let height = platform === 'ios' ? 64 : 56
+    let height = Platform.OS === 'ios' ? 64 : 56
     const { navigation } = this.props
     return (
       <View style={{ height: 205 }}>
@@ -92,7 +94,7 @@ class AccountDetailHeader extends PureComponent {
               }}
               translucent={false}>
               <StatusBar
-                barStyle={platform === 'ios' ? 'light-content' : 'default'}
+                barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
                 backgroundColor={Color.DARK_PRIMARY}
                 hidden={false}
               />
@@ -113,7 +115,7 @@ class AccountDetailHeader extends PureComponent {
               </View>
               <View
                 style={{
-                  width: deviceW - 48 - 48,
+                  width: this.deviceW - 48 - 48,
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}
@@ -182,11 +184,6 @@ class AccountDetailHeader extends PureComponent {
   }
 }
 
-AccountDetailHeader.prototypes = {
-  account: PropTypes.object.isRequired,
-  onHideMenu: PropTypes.func.isRequired,
-  navigation: PropTypes.func.isRequired
-}
 
 const styles = StyleSheet.create({
   accountNameText: {

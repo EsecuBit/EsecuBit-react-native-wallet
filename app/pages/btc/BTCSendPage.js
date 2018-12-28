@@ -16,7 +16,6 @@ import TransactionTotalCostCard from "../../components/card/TransactionTotalCost
 import TransactionFeeCard from "../../components/card/TransactionFeeCard"
 import BalanceHeader from "../../components/header/BalanceHeader"
 import Dialog, {DialogContent, DialogTitle, DialogButton } from "react-native-popup-dialog"
-const platform = Platform.OS
 
 class BTCSendPage extends Component {
   constructor(props) {
@@ -27,7 +26,6 @@ class BTCSendPage extends Component {
       address: '',
       deviceLimitDialogVisible: false,
       transactionConfirmDialogVisible: false,
-      transactionConfirmDesc: '',
       footerBtnDisable: true
     }
     this.account = props.account
@@ -72,7 +70,7 @@ class BTCSendPage extends Component {
   }
 
 
-  
+
   _fillResendData() {
     const { params }= this.props.navigation.state
     if (params) {
@@ -113,7 +111,8 @@ class BTCSendPage extends Component {
     this._getBTCMaxAmount(formData)
   }
 
-  _getBTCMaxAmount(formData) {
+  // @flow
+  _getBTCMaxAmount(formData: {}) {
     this.account
       .prepareTx(formData)
       .then(result => {
@@ -193,7 +192,7 @@ class BTCSendPage extends Component {
   _send() {
     let formData = this._buildBTCSendForm()
     // iOS render is too fast
-    if(platform === 'ios') {
+    if(Platform.OS === 'ios') {
       setTimeout(() => {
         this._showConfirmTransactionDialog()
       }, 400)
@@ -230,13 +229,15 @@ class BTCSendPage extends Component {
       })
   }
 
-  _checkIfDeviceLimit(result) {
+  // @flow
+  _checkIfDeviceLimit(result :{}) {
     if (result.deviceLimit) {
       this.setState({ deviceLimitDialogVisible: true })
     }
   }
 
-  _toMinimumUnit(value) {
+  // @flow
+  _toMinimumUnit(value: string) {
     return this.esWallet.convertValue(
       this.coinType,
       value,
@@ -253,10 +254,12 @@ class BTCSendPage extends Component {
     }
   }
 
-  async _handleSendValueItemClick(value) {
+  // @flow
+  async _handleSendValueItemClick(value: string) {
     let sendValue = this.esWallet.convertValue(this.account.coinType, this.props.account.balance, D.unit.btc.satoshi, this.props.btcUnit)
-    sendValue = Number(sendValue * value).toFixed(8).toString()
-    if (value !== '1') {// click item is not 100% (max amount)
+    sendValue = (Number(sendValue) * Number(value)).toFixed(8).toString()
+    // click item is not 100% (max amount)
+    if (value !== '1') {
       await this.valueInput.updateValue(sendValue)
       if (this.valueInput.isValidInput()) {
         this._calculateTotalCost()
@@ -277,7 +280,8 @@ class BTCSendPage extends Component {
   /**
    *  check whether form data is valid
    */
-  _checkFormData() {
+  // @flow
+  _checkFormData(): boolean {
     let result = this.addressInput.isValidInput() && this.valueInput.isValidInput() && this.feeInput.isValidInput()
     this.setState({footerBtnDisable: !result})
     return result
@@ -286,7 +290,7 @@ class BTCSendPage extends Component {
   render() {
     return (
       <Container style={CommonStyle.safeAreaBottom}>
-        <SendToolbar coinType="BTC" navigation={this.props.navigation} />
+        <SendToolbar title="BTC"  />
         <Content padder>
           <BalanceHeader
             value={this.state.balance}
@@ -359,3 +363,4 @@ const mapStateToProps = state => ({
 
 const BTCSend = connect(mapStateToProps)(BTCSendPage)
 export default BTCSend
+

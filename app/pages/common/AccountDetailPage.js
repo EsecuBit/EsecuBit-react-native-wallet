@@ -23,7 +23,7 @@ import AccountDetailHeader from '../../components/header/AccountDetailHeader'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import { Coin } from '../../common/Constants'
-import PreferenceUtil from '../../utils/PreferenceUtil';
+import PreferenceUtil from '../../utils/PreferenceUtil'
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS

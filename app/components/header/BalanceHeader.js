@@ -1,11 +1,14 @@
-import React, { PureComponent} from 'react'
+import React, { Component } from 'react'
 import {View} from "react-native"
 import {Color, Dimen} from "../../common/Styles"
 import { Text} from "native-base"
 import I18n from "../../lang/i18n"
-import PropTypes from 'prop-types'
 
-export default class BalanceHeader extends PureComponent {
+export default class BalanceHeader extends Component {
+
+  shouldComponentUpdate() {
+    return false;
+  }
   render() {
     return (
       <View style={{ marginTop: Dimen.SPACE, marginBottom: Dimen.SPACE }}>
@@ -22,9 +25,4 @@ export default class BalanceHeader extends PureComponent {
       </View>
     )
   }
-}
-
-BalanceHeader.prototypes = {
-  value: PropTypes.string.isRequired,
-  unit: PropTypes.string.isRequired,
 }

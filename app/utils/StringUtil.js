@@ -7,7 +7,7 @@ export default class StringUtil {
    * @param num
    * @returns {string}
    */
-  static formatLegalCurrency(num) {
+  static formatLegalCurrency(num: number) {
     num = num.toString().replace(/\$|\,/g, '')
     if (isNaN(num)) {
       num = '0'
@@ -19,10 +19,7 @@ export default class StringUtil {
       cents = '0' + cents
     }
     for (let i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++) {
-      num =
-        num.substring(0, num.length - (4 * i + 3)) +
-        ',' +
-        num.substring(num.length - (4 * i + 3))
+      num = num.substring(0, num.length - (4 * i + 3)) + ',' + num.substring(num.length - (4 * i + 3))
     }
     return num + '.' + cents
   }

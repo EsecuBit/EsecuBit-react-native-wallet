@@ -16,19 +16,19 @@ class TransactionTotalCostCard extends PureComponent {
       totalCostCryptoCurrency: '0'
     }
     this.wallet = new EsWallet()
-    this.coinType = this.props.account.coinType
   }
 
-  updateTransactionCost(value) {
-    let fromUnit = CoinUtil.getMinimumUnit(this.coinType)
+  // @flow
+  updateTransactionCost(value: string) {
+    let fromUnit = CoinUtil.getMinimumUnit(this.props.account.coinType)
     let legalCurrencyResult = this.wallet.convertValue(
-      this.coinType,
+      this.props.account.coinType,
       value.total,
       fromUnit,
       this.props.legalCurrencyUnit
     )
     let cryptoCurrencyResult = this.wallet.convertValue(
-      this.coinType,
+      this.props.account.coinType,
       value.total,
       fromUnit,
       this.props.accountCurrentUnit
@@ -49,7 +49,7 @@ class TransactionTotalCostCard extends PureComponent {
         </Text>
         <View style={{ flex: 1, marginLeft: 32 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-            <Text>{this.state.totalCostCryptoCurrency + ' '}</Text>
+            <Text>{`${this.state.totalCostCryptoCurrency} `}</Text>
             <Text style={{ textAlignVertical: 'center' }}>{this.props.accountCurrentUnit}</Text>
           </View>
           <View
@@ -63,7 +63,7 @@ class TransactionTotalCostCard extends PureComponent {
                 color: Color.LIGHT_PARIMARY,
                 fontSize: Dimen.SECONDARY_TEXT
               }}>
-              {this.state.totalCostLegalCurrency + ' '}
+              {`${this.state.totalCostLegalCurrency} `}
             </Text>
             <Text
               style={{

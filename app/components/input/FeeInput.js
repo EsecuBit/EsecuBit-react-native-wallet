@@ -4,7 +4,6 @@ import {Color, CommonStyle, Dimen} from "../../common/Styles"
 import I18n from "../../lang/i18n";
 import { Dropdown } from 'react-native-material-dropdown'
 import { TouchableOpacity, Platform } from "react-native"
-import PropTypes from 'prop-types'
 import { D, EsWallet } from 'esecubit-wallet-sdk'
 import CoinUtil from "../../utils/CoinUtil"
 import { Coin } from '../../common/Constants'
@@ -14,9 +13,10 @@ import StringUtil from "../../utils/StringUtil"
 const STANDARD_FEE_TYPE = 'standard'
 const CUSTOM_FEE_TYPE = 'custom'
 
+
 class FeeInput extends PureComponent {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super()
     this.state = {
       currentFeeType: STANDARD_FEE_TYPE,
       selectedFeeTip: '',
@@ -43,8 +43,8 @@ class FeeInput extends PureComponent {
     await this.setState({ selectedFeeTip: this.state.feesTip[0].value, selectedFee: this.state.fees[0].toString() })
   }
 
-
-  _convertFeeToSuggestedFeeTip(fees) {
+  // @flow
+  _convertFeeToSuggestedFeeTip(fees: number[]) {
     let feeLevel = this._getFeeLevel()
     let feeKeys = Object.keys(fees)
     let feeValues = Object.values(fees)
@@ -55,8 +55,8 @@ class FeeInput extends PureComponent {
       this.state.feesTip.push(json)
     }
   }
-
-  _toMinimumValue(coinType, value) {
+  // @flow
+  _toMinimumValue(coinType: string, value: string) {
     let type = CoinUtil.getRealCoinType(coinType)
     switch(type) {
       case Coin.btc:
@@ -74,7 +74,8 @@ class FeeInput extends PureComponent {
    * @returns {number} fee level
    * @private
    */
-  _getFeeLevel() {
+  // @flow
+  _getFeeLevel(): number {
     let coinType = CoinUtil.getRealCoinType(this.props.account.coinType)
     switch (coinType) {
       case Coin.btc:
@@ -101,7 +102,8 @@ class FeeInput extends PureComponent {
     }
   }
 
-  async _handleFeeInput(value) {
+  // @flow
+  async _handleFeeInput(value: string) {
     await this.setState({selectedFee: value})
     this.props.onChangeText(value)
     if (!this._checkFee(value)) {
@@ -109,16 +111,18 @@ class FeeInput extends PureComponent {
     }
   }
 
-  isValidInput() {
+  // @flow
+  isValidInput(): boolean {
     return this._checkFee(this.state.selectedFee)
   }
 
-  getFee() {
+  // @flow
+  getFee(): string {
     return this.state.selectedFee
   }
 
-
-  _checkFee(fee) {
+  // @flow
+  _checkFee(fee: string) {
     return !StringUtil.isInvalidValue(fee)
   }
 
@@ -128,7 +132,6 @@ class FeeInput extends PureComponent {
       this.props.onChangeText('')
     }
   }
-
 
   render() {
     return (
@@ -174,10 +177,6 @@ class FeeInput extends PureComponent {
   }
 }
 
-FeeInput.defaultProps = {
-  placeHolder: PropTypes.string.isRequired,
-  account: PropTypes.object.isRequired
-}
 const mapStateToProps = state => ({
   account: state.AccountReducer.account
 })

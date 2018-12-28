@@ -2,23 +2,30 @@ import React, { PureComponent } from 'react'
 import { Platform } from 'react-native'
 import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
-import PropTypes from 'prop-types'
 
 export default class EOSAccountNameInput extends PureComponent {
-  constructor(props) {
-    super(props)
+
+  static defaultProps = {
+    value: '',
+    placeHolder: ''
+  }
+  
+  constructor() {
+    super()
     this.state = {
       accountNameStatus: false,
       accountName: ''
     }
   }
 
-  async _handleAccountNameInput(text) {
+  // @flow
+  async _handleAccountNameInput(text: string) {
     await this.setState({ address: text, checkAddressSuccess: text.length === 12 })
     this.props.onChangeText(text)
   }
-
-  isValidInput() {
+  
+  // @flow
+  isValidInput(): boolean {
     return this.state.accountNameStatus
   }
 
@@ -53,13 +60,3 @@ export default class EOSAccountNameInput extends PureComponent {
   }
 }
 
-EOSAccountNameInput.prototypes = {
-  onChangeText: PropTypes.func.isRequired,
-  value: PropTypes.string,
-  placeHolder: PropTypes.string
-}
-
-EOSAccountNameInput.defaultProps = {
-  value: '',
-  placeHolder: ''
-}

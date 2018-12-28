@@ -8,6 +8,7 @@ import I18n from "../../lang/i18n"
 import { CommonStyle, Dimen, Color } from "../../common/Styles"
 import ToastUtil from "../../utils/ToastUtil"
 import { connect } from "react-redux"
+
 class AddressDetailPage extends PureComponent {
   constructor(props) {
     super()
@@ -42,7 +43,6 @@ class AddressDetailPage extends PureComponent {
   }
 
   onBackPress = () => {
-    
     this.props.navigation.pop()
     return true
   }
