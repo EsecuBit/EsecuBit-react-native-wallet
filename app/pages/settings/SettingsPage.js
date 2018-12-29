@@ -24,10 +24,10 @@ class SettingsPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      //version
+      // version
       appVersion: version,
       cosVersion: '1.0',
-      //dialog
+      // dialog
       legalCurrencyLabel: props.legalCurrencyUnit,
       legalCurrencyIndex: 0,
       legalCurrencyDialogVisible: false,
@@ -44,13 +44,14 @@ class SettingsPage extends Component {
       changeLanguageLabel: 'English',
       changeLanguageDialogVisible: false,
       clearDataDialogVisible: false,
-      clearDataWaitingDialogVisible: false
+      clearDataWaitingDialogVisible: false,
+      bluetoothConnectDialogVisible: false,
+      bluetoothConnectDialogDesc: ''
     }
     this.coinTypes = D.supportedCoinTypes()
     this.wallet = new EsWallet()
     this.transmitter = new BtTransmitter()
-    this.isConnected = false
-    this.deviceW = Dimensions.get('window').width
+    this.timers = []
   }
 
   componentDidMount() {
@@ -101,14 +102,16 @@ class SettingsPage extends Component {
   }
 
   _listenDeviceStatus() {
-    this.transmitter.getState().then(state => {
-      console.log('state', state)
-      if (state === BtTransmitter.connected) {
-        this.isConnected = true
-        this.setState({ cosVersion: cosVersion })
-      } else if (state === BtTransmitter.disconnected) {
-        this.isConnected = false
-        this.setState({ cosVersion: 'unknown' })
+    this.transmitter.listenStatus((error, status) => {
+      if (error === D.error.succeed) {
+        if (status === BtTransmitter.connecting) {
+          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting'), cosVersion: cosVersion })
+        } else if (status === BtTransmitter.disconnected) {
+          this.setState({bluetoothConnectDialogVisible: false, cosVersion: 'unknown'})
+        }else if (status === BtTransmitter.connected) {
+          this.setState({bluetoothConnectDialogVisible: false})
+          this.transmitter.stopScan()
+        }
       }
     })
   }
@@ -128,6 +131,15 @@ class SettingsPage extends Component {
         break
     }
     PreferenceUtil.updateCurrencyUnit(key, value, index)
+  }
+
+  async _showDisconnectDialog() {
+    let state = await this.transmitter.getState()
+    if (state === BtTransmitter.disconnected) {
+      ToastUtil.showShort(I18n.t('disconnected'))
+    }else {
+      this.setState({disConnectDialogVisible: true})
+    }
   }
 
   async _disConnect() {
@@ -177,20 +189,52 @@ class SettingsPage extends Component {
   async clearData() {
     this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
     try {
+      this.transmitter.disconnect()
       await this.wallet.reset()
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'PairList', params: { hasBackBtn: false } })
-        ]
-      })
-      this.props.navigation.dispatch(resetAction)
-      this.setState({clearDataWaitingDialogVisible: false})
+      setTimeout(() => {
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({ routeName: 'PairList', params: { autoConnect: false } })
+          ]
+        })
+        this.props.navigation.dispatch(resetAction)
+        this.setState({clearDataWaitingDialogVisible: false})
+      }, 3000)
     } catch (error) {
       ToastUtil.showErrorMsgShort(error)
       this.setState({clearDataWaitingDialogVisible: false})
     }
 
+  }
+
+  async _connectDevice() {
+    let state = await this.transmitter.getState()
+    if (state === BtTransmitter.connected) {
+      ToastUtil.showShort(I18n.t('hasConnected'))
+    }else {
+      this._findAndConnectDevice()
+    }
+  }
+
+  async _findAndConnectDevice() {
+    this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
+    let deviceInfo = await PreferenceUtil.getDefaultDevice()
+    this.transmitter.startScan((error, info) => {
+      if (deviceInfo.sn === info.sn) {
+        this.transmitter.connect(deviceInfo)
+      }
+    })
+    // if search device no response after 10s, toast tip to notify user no device found
+    this.findDeviceTimer = setTimeout(async () => {
+      let state = await this.transmitter.getState()
+      if(state === BtTransmitter.disconnected) {
+        this.setState({bluetoothConnectDialogVisible: false})
+        ToastUtil.showShort(I18n.t('noDeviceFound'))
+        this.transmitter.stopScan()
+      }
+    }, 10000)
+    this.timers.push(this.findDeviceTimer)
   }
 
   render() {
@@ -206,11 +250,7 @@ class SettingsPage extends Component {
             <CardItem
               bordered
               button
-              onPress={() => {
-                this.isConnected
-                  ? ToastUtil.showShort(I18n.t('hasConnected'))
-                  : _that.props.navigation.navigate('PairList', { hasBackBtn: false })
-              }}>
+              onPress={() => this._connectDevice()}>
               <Text>{I18n.t('connectDevice')}</Text>
               <Right>
                 <Icon name="ios-arrow-forward" />
@@ -220,7 +260,7 @@ class SettingsPage extends Component {
             <CardItem
               bordered
               button
-              onPress={() => this.setState({ disConnectDialogVisible: true })}>
+              onPress={() => this._showDisconnectDialog()}>
               <Text>{I18n.t('disconnect')}</Text>
               <Right>
                 <Icon name="ios-arrow-forward" />
@@ -561,6 +601,18 @@ class SettingsPage extends Component {
         </Dialog>
         {/* Disconnect Dialog */}
 
+        {/*Bluetooth Connect Dialog*/}
+        <Dialog
+          width={0.8}
+          visible={this.state.bluetoothConnectDialogVisible}
+          onTouchOutside={() => {}}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothConnectDialogDesc}</Text>
+          </DialogContent>
+        </Dialog>
+        {/*Bluetooth Connect Dialog*/}
       </Container>
     )
   }

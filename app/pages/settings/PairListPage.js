@@ -20,7 +20,7 @@ import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
 
-const deviceH = Dimensions.get('window').height
+
 
 export default class PairListPage extends Component {
   constructor(props) {
@@ -31,20 +31,23 @@ export default class PairListPage extends Component {
       connectDialogVisible: false,
       authenticateDialogVisible: false,
       refreshing: false,
-      scanText: '',
-      desc: ''
+      dialogDesc: ''
     }
     this.transmitter = new BtTransmitter()
     this.wallet = new EsWallet()
     this.connectDeviceInfo = {}
-    this.hasBackBtn = this.props.navigation.state.params.hasBackBtn
     this._renderRowView.bind(this)
+    this.timers = []
   }
 
   componentDidMount() {
     this._onFocus()
     this._onBlur()
-    this.wallet.listenStatus(async (error, status, pairCode) => {
+    this.listenWallet()
+  }
+
+  listenWallet() {
+    this.wallet.listenStatus((error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
       if (error !== D.error.succeed) {
         this.setState({
@@ -68,9 +71,10 @@ export default class PairListPage extends Component {
           if (Platform.OS === 'ios') {
             timeout = 400
           }
-          setTimeout(() => {
+          let timer = setTimeout(() => {
             this.props.navigation.navigate('Splash')
           }, timeout)
+          this.timers.push(timer)
         }
       }
     })
@@ -84,6 +88,7 @@ export default class PairListPage extends Component {
         connectDialogVisible: false
       })
     })
+    this.transmitter.listenStatus()
   }
 
   _onFocus() {
@@ -91,7 +96,12 @@ export default class PairListPage extends Component {
     this.props.navigation.addListener('willFocus', async () => {
       this._listenTransmitter()
       await this.setState({ deviceList: [] })
-      this._findDefaultDevice(true)
+      const { params } = this.props.navigation.state
+      let autoConnect = true
+      if (params) {
+        autoConnect = params.autoConnect
+      }
+      this._findDefaultDevice(autoConnect)
       BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
     })
   }
@@ -135,7 +145,7 @@ export default class PairListPage extends Component {
     this.transmitter.stopScan()
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-    this.setState({desc: I18n.t('pleaseWait') })
+    this.setState({dialogDesc: I18n.t('pleaseWait') })
   }
 
   _findDefaultDevice(autoConnect) {
@@ -191,7 +201,7 @@ export default class PairListPage extends Component {
     console.log('connect device sn is', rowData)
     this.transmitter.connect(rowData)
     this.connectDeviceInfo = rowData
-    this.setState({ connectDialogVisible: true, desc: I18n.t('connecting') })
+    this.setState({ connectDialogVisible: true, dialogDesc: I18n.t('connecting') })
   }
 
   _onRefresh(autoConnect) {
@@ -204,6 +214,7 @@ export default class PairListPage extends Component {
   }
 
   render() {
+    let deviceH = Dimensions.get('window').height
     let bgHeight = Platform.OS === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
     let height = Platform.OS === 'ios' ? 64 : 56
     if (isIphoneX) {
@@ -236,15 +247,6 @@ export default class PairListPage extends Component {
                     height: height,
                     marginTop: isIphoneX ? 20 : 0
                   }}>
-                  {this.hasBackBtn ? (
-                    <Button
-                      transparent
-                      onPress={() => {
-                        this.props.navigation.pop()
-                      }}>
-                      <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
-                    </Button>
-                  ) : null}
                 </View>
               </View>
             </View>
@@ -306,7 +308,7 @@ export default class PairListPage extends Component {
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
-            <Text style={CommonStyle.horizontalDialogText}>{this.state.desc}</Text>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.dialogDesc}</Text>
           </DialogContent>
         </Dialog>
         <Dialog

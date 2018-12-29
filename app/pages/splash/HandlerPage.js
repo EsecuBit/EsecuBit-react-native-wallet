@@ -9,11 +9,11 @@ import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import I18n from '../../lang/i18n'
 
-const deviceW = Dimensions.get('window').width
 class HandlerPage extends Component {
   constructor(props) {
     super(props)
     this.esWallet = new EsWallet()
+    this.deviceW = Dimensions.get('window').width
   }
 
   render() {
@@ -21,7 +21,7 @@ class HandlerPage extends Component {
       <View style={{ flex: 1 }}>
         <Image
           source={require('../../imgs/ic_background.png')}
-          style={{ flex: 1, width: deviceW, height: deviceW }}
+          style={{ flex: 1, width: this.deviceW, height: this.deviceW }}
         />
       </View>
     )
@@ -55,21 +55,9 @@ class HandlerPage extends Component {
       .catch(e => {
         if (e === D.error.offlineModeNotAllowed) {
           if (D.test.jsWallet) {
-            const resetAction = NavigationActions.reset({
-              index: 0,
-              actions: [
-                NavigationActions.navigate({ routeName: 'Splash'})
-              ]
-            })
-            this.props.navigation.dispatch(resetAction)
+            this._resetRouter('Splash')
           } else {
-            const resetAction = NavigationActions.reset({
-              index: 0,
-              actions: [
-                NavigationActions.navigate({ routeName: 'PairList', params: { hasBackBtn: false } })
-              ]
-            })
-            this.props.navigation.dispatch(resetAction)
+            this._resetRouter('PairList', { autoConnect: true })
           }
           console.warn('offlineModeNotAllowed')
         }else {
@@ -80,12 +68,16 @@ class HandlerPage extends Component {
   }
 
   _gotoHomePage(offlineMode) {
+    this._resetRouter('Home', { offlineMode: offlineMode })
+  }
+
+  _resetRouter(routeName, params) {
     const resetAction = NavigationActions.reset({
       index: 0,
       actions: [
         NavigationActions.navigate({
-          routeName: 'Home',
-          params: { offlineMode: offlineMode }
+          routeName: routeName,
+          params: params
         })
       ]
     })

@@ -325,7 +325,7 @@ class ETHSendPage extends Component {
               ref={refs => this.feeInput = refs && refs.getWrappedInstance()}
               placeHolder='GWei per byte'
               onChangeText={text => this._handleFeeInput()}
-             account={}/>
+            />
             <GasLimitInput
               ref={refs => this.gasLimitInput = refs}
               onChangeText={text => this._handleGasLimitInput(text)}

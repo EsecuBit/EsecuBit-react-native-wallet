@@ -8,7 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
   Linking, BackHandler,
-  StyleSheet
+  StyleSheet, ActivityIndicator
 } from 'react-native'
 import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
 import {
@@ -32,6 +32,7 @@ import { connect } from 'react-redux'
 import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, { DialogButton, DialogTitle, DialogContent } from 'react-native-popup-dialog'
+import PreferenceUtil from "../../utils/PreferenceUtil";
 
 const platform = Platform.OS
 
@@ -41,23 +42,23 @@ class HomePage extends Component {
     //offlineMode
     this.offlineMode = this.props.navigation.state.params.offlineMode
     //coinType
-    this.supportCoinType = D.supportedCoinTypes()
     this.btTransmitter = new BtTransmitter()
     this.wallet = new EsWallet()
-
     this.state = {
       accounts: [],
-      //total balance
+      // total balance
       totalLegalCurrencyBalance: '0.00',
-      //state
+      // state
       networkConnected: true,
       deviceConnected: !this.offlineMode,
       showDeviceConnectCard: true,
-      syncIndicatorVisible: false,
       updateVersionDialogVisible: false,
-      hideAccountDialogVisible: false
+      hideAccountDialogVisible: false,
+      bluetoothConnectDialogVisible: false,
+      bluetoothConnectDialogDesc: ''
     }
     this.deviceW = Dimensions.get('window').width
+    this.timers = []
   }
 
 
@@ -101,10 +102,11 @@ class HomePage extends Component {
     this._onBlur()
     this._initListener()
     this._updateUI()
-    //delay to check app version
-    setTimeout(() => {
+    // delay to check app version
+    let timer = setTimeout(() => {
       this._checkVersion()
     }, 3000)
+    this.timers.push(timer)
 
   }
 
@@ -130,6 +132,26 @@ class HomePage extends Component {
       })
   }
 
+  async _findAndConnectDevice() {
+    this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
+    let deviceInfo = await PreferenceUtil.getDefaultDevice()
+    this.btTransmitter.startScan((error, info) => {
+      if (deviceInfo.sn === info.sn) {
+        this.btTransmitter.connect(deviceInfo)
+      }
+    })
+    // if search device no response after 10s, toast tip to notify user no device found
+    this.findDeviceTimer = setTimeout(async () => {
+      let state = await this.btTransmitter.getState()
+      if(state === BtTransmitter.disconnected) {
+        this.setState({bluetoothConnectDialogVisible: false})
+        ToastUtil.showShort(I18n.t('noDeviceFound'))
+        this.btTransmitter.stopScan()
+      }
+    }, 10000)
+    this.timers.push(this.findDeviceTimer)
+  }
+
   _checkForceUpdate() {
     this.setState({ updateVersionDialogVisible: false })
     if (this.info !== undefined && this.info.data.isForceUpdate) {
@@ -145,13 +167,16 @@ class HomePage extends Component {
   }
 
   _initListener() {
-    //device status
+    // device status
     this.btTransmitter.listenStatus((error, status) => {
       if (status === BtTransmitter.disconnected) {
         this.setState({ deviceConnected: false, showDeviceConnectCard: true })
       }
       if (status === BtTransmitter.connected) {
-        this.setState({ deviceConnected: true, showDeviceConnectCard: false })
+        this.setState({ deviceConnected: true, showDeviceConnectCard: false, bluetoothConnectDialogVisible: false })
+      }
+      if (status === BtTransmitter.connecting) {
+        this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
       }
     })
   }
@@ -362,11 +387,7 @@ class HomePage extends Component {
               <Right>
                 <Button
                   transparent
-                  onPress={() =>
-                    _that.props.navigation.navigate('PairList', {
-                      hasBackBtn: false
-                    })
-                  }>
+                  onPress={() => this._findAndConnectDevice()}>
                   <Text style={{ color: Color.ACCENT }}>{I18n.t('confirm')}</Text>
                 </Button>
               </Right>
@@ -394,7 +415,7 @@ class HomePage extends Component {
           ]}
         >
           <DialogContent>
-            <Text style={styles.desc}>{this.state.updateDesc}</Text>
+            <Text style={styles.dialogDesc}>{this.state.updateDesc}</Text>
           </DialogContent>
         </Dialog>
         <Dialog
@@ -417,7 +438,17 @@ class HomePage extends Component {
           ]}
         >
           <DialogContent>
-            <Text style={styles.desc}>{I18n.t('hideAccountDesc')}</Text>
+            <Text style={styles.dialogDesc}>{I18n.t('hideAccountDesc')}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.bluetoothConnectDialogVisible}
+          onTouchOutside={() => {}}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothConnectDialogDesc}</Text>
           </DialogContent>
         </Dialog>
       </Container>
