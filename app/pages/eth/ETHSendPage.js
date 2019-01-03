@@ -31,13 +31,14 @@ class ETHSendPage extends Component {
       sendDialogVisible: false,
       transactionConfirmDialogVisible: false,
       transactionConfirmDesc: '',
-      footBtnDisable: true
+      footerBtnDisable: true
     }
     this.account = props.account
     this.coinType = props.account.coinType
     this.esWallet = new EsWallet()
     this.legalCurrencyUnit = props.legalCurrencyUnit
     this.cryptoCurrencyUnit = props.ethUnit
+
     // prevent duplicate send
     this.lockSend = false
   }
@@ -65,6 +66,10 @@ class ETHSendPage extends Component {
   componentDidMount() {
     this._onFocus()
     this._onBlur()
+    this._fillResendData()
+  }
+
+  componentWillMount() {
     let balance = this.esWallet.convertValue(
       this.coinType,
       this.account.balance,
@@ -72,7 +77,6 @@ class ETHSendPage extends Component {
       this.cryptoCurrencyUnit
     )
     this.setState({ balance: balance })
-    this._fillResendData()
   }
 
   _onFocus() {
@@ -154,6 +158,7 @@ class ETHSendPage extends Component {
         this.transactionTotalCostCard.updateTransactionCost(value)
       })
       .catch(error => {
+        this.setState({ footerBtnDisable: true })
         console.warn('_calculateTotalCost error', error)
         ToastUtil.showErrorMsgShort(error)
       })
@@ -213,7 +218,6 @@ class ETHSendPage extends Component {
       })
       .catch(error => {
         console.log('error', error);
-
         // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
         // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
@@ -274,12 +278,12 @@ class ETHSendPage extends Component {
     this._checkFormData()
   }
 
-  _handleDataInput(data) {
+  async _handleDataInput(data) {
     console.log('data input cal', data)
     if (this.ethDataInput.isValidInput()) {
       this._calculateEthData(data)
     }
-    this._checkFormData()
+    await this._checkFormData()
   }
 
   /**
@@ -291,8 +295,8 @@ class ETHSendPage extends Component {
       && this.feeInput.isValidInput()
       && this.gasLimitInput.isValidInput()
       && this.ethDataInput.isValidInput()
-    console.log('result ', !result, this.addressInput.isValidInput(), this.valueInput.isValidInput(), this.feeInput.isValidInput(), this.gasLimitInput.isValidInput(),  this.ethDataInput.isValidInput());
-    this.setState({footBtnDisable: !result})
+    console.log('result ', !result);
+    this.setState({footerBtnDisable: !result})
 
   }
 
@@ -362,7 +366,7 @@ class ETHSendPage extends Component {
             </Text>
           </DialogContent>
         </Dialog>
-        <FooterButton onPress={this._send.bind(this)} title={I18n.t('send')} disabled={this.state.footBtnDisable}/>
+        <FooterButton onPress={this._send.bind(this)} title={I18n.t('send')} disabled={this.state.footerBtnDisable}/>
       </Container>
     )
   }

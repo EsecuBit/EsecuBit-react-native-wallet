@@ -10,7 +10,6 @@ class AddressInput extends PureComponent {
   static defaultProps = {
     value: '',
     placeHolder: '',
-    label: I18n.t('address')
   }
 
   constructor(props) {
@@ -65,7 +64,7 @@ class AddressInput extends PureComponent {
       <CardItem>
         <InputGroup iconRight success={this.state.checkAddressSuccess}>
           <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
-            {this.props.label}
+            {I18n.t('address')}
           </Text>
           <Input
             selectionColor={Color.ACCENT}

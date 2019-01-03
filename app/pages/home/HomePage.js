@@ -63,15 +63,16 @@ class HomePage extends Component {
 
 
   _onFocus() {
-    this.props.navigation.addListener('willFocus', () => {
+    this.props.navigation.addListener('didFocus', () => {
       this._updateUI()
+      this._initListener()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
       NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
   }
 
   _onBlur() {
-    this.props.navigation.addListener('willBlur', () => {
+    this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
       NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
@@ -132,6 +133,15 @@ class HomePage extends Component {
       })
   }
 
+  async _connectDevice() {
+    let accounts = await this.wallet.getAccounts()
+    if (accounts.length === 0) {
+      this.props.navigation.navigate('PairList', {autoConnect: true})
+    } else {
+      this._findAndConnectDevice()
+    }
+  }
+
   async _findAndConnectDevice() {
     this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
@@ -170,6 +180,7 @@ class HomePage extends Component {
     // device status
     this.btTransmitter.listenStatus((error, status) => {
       if (status === BtTransmitter.disconnected) {
+        console.log('status device disconnected', status)
         this.setState({ deviceConnected: false, showDeviceConnectCard: true })
       }
       if (status === BtTransmitter.connected) {
@@ -177,6 +188,14 @@ class HomePage extends Component {
       }
       if (status === BtTransmitter.connecting) {
         this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
+      }
+    })
+    this.btTransmitter.getState().then(state => {
+      if (state === BtTransmitter.disconnected) {
+        this.setState({ deviceConnected: false, showDeviceConnectCard: true })
+      }
+      if (state === BtTransmitter.connected) {
+        this.setState({ deviceConnected: true, showDeviceConnectCard: false })
       }
     })
   }
@@ -200,6 +219,9 @@ class HomePage extends Component {
       let accounts = await this.wallet.getAccounts()
       console.log('accounts', accounts)
       await this.setState({ accounts: accounts })
+      if (accounts.length === 0) {
+        this.btTransmitter.disconnect()
+      }
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -387,7 +409,7 @@ class HomePage extends Component {
               <Right>
                 <Button
                   transparent
-                  onPress={() => this._findAndConnectDevice()}>
+                  onPress={() => this._connectDevice()}>
                   <Text style={{ color: Color.ACCENT }}>{I18n.t('confirm')}</Text>
                 </Button>
               </Right>

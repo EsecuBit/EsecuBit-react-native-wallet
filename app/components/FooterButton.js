@@ -16,13 +16,9 @@ const styles = StyleSheet.create({
 export default class FooterButton extends Component {
   static defaultProps = {
     title: '',
-    disabled: false
+    disabled: true
   }
 
-  shouldComponentUpdate() {
-    return false;
-  }
-  
   render() {
     const { title, onPress, disabled } = this.props
     return (

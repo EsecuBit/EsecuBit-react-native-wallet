@@ -146,7 +146,7 @@ class SettingsPage extends Component {
     console.log('disConnected')
     await this.setState({ disConnectDialogVisible: false })
     this.transmitter.disconnect()
-    this.props.navigation.pop()
+    ToastUtil.showShort(I18n.t('disconnected'))
   }
 
   _checkVersion() {
@@ -213,7 +213,12 @@ class SettingsPage extends Component {
     if (state === BtTransmitter.connected) {
       ToastUtil.showShort(I18n.t('hasConnected'))
     }else {
-      this._findAndConnectDevice()
+      let accounts = await this.wallet.getAccounts()
+      if (accounts.length === 0) {
+        this.props.navigation.navigate('PairList', {autoConnect: true})
+      } else {
+        this._findAndConnectDevice()
+      }
     }
   }
 
@@ -238,7 +243,6 @@ class SettingsPage extends Component {
   }
 
   render() {
-    let _that = this
     return (
       <Container style={[CommonStyle.safeAreaBottom, { backgroundColor: Color.CONTAINER_BG }]}>
         <BaseToolbar title={I18n.t('settings')} />
@@ -404,7 +408,9 @@ class SettingsPage extends Component {
         <Dialog
           onTouchOutside={() => this.setState({ btcDialogVisible: false })}
           width={0}
-          height={0}>
+          height={0}
+          visible={this.state.btcDialogVisible}
+        >
           <SinglePickerMaterialDialog
             title={I18n.t('btc')}
             items={btcUnit.map((row, index) => ({ value: index, label: row }))}

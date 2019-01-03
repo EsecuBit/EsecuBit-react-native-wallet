@@ -132,6 +132,9 @@ class AccountDetailPage extends Component {
         case 'address':
           this._gotoAddressDetailPage()
           break
+        case 'resend':
+          this._gotoResendPage()
+          break
       }
     }
   }
@@ -569,6 +572,7 @@ class AccountDetailPage extends Component {
       default:
         break
     }
+    this.setState({transactionDetailDialogVisible: false})
   }
   /**
    * Handle Menu Item Click
@@ -817,7 +821,10 @@ class AccountDetailPage extends Component {
             </View>
             {this.canResend ? (
               <View style={styles.resendBtnWrapper}>
-                <Button style={styles.resendButton} onPress={this._gotoResendPage.bind(this)}>
+                <Button style={styles.resendButton} onPress={() => {
+                  this._showBluetoothConnectDialog()
+                  this._goToPage = 'resend'
+                }}>
                   <Text style={{ textAlign: 'center' }}>{I18n.t('resend')}</Text>
                 </Button>
               </View>

@@ -88,7 +88,6 @@ export default class PairListPage extends Component {
         connectDialogVisible: false
       })
     })
-    this.transmitter.listenStatus()
   }
 
   _onFocus() {

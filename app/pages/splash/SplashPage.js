@@ -65,7 +65,6 @@ export default class SplashPage extends Component {
     this.wallet.listenStatus(async (error, status, account) => {
       console.log('wallet status', error, status, account)
       if (error !== D.error.succeed) {
-        _that.setState({ syncDialogVisible: false })
         if (error === D.error.deviceNotInit) {
           console.log('deviceNotInit', error)
           let state = await this.btTransmitter.getState()
@@ -78,7 +77,7 @@ export default class SplashPage extends Component {
           let timer = setTimeout(() => {
             ToastUtil.showErrorMsgLong(error)
             _that._gotoHomePage(false)
-          }, 1000)
+          }, 2000)
           this.timers.push(timer)
         }
       } else {
