@@ -63,12 +63,13 @@ class AccountDetailPage extends Component {
     this.wallet.listenTxInfo(() => {
       console.log('listen TxInfo')
       this._getTxInfos()
-      this.accountHeader.updateBalance()
+
     })
   }
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
+      this._getTxInfos()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
   }
@@ -567,6 +568,7 @@ class AccountDetailPage extends Component {
         console.log('txInfo error', error)
         ToastUtil.showErrorMsgLong(error)
       })
+    this.accountHeader.updateBalance()
   }
 
   _renameAccount() {

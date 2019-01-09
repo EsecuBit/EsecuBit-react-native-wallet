@@ -27,13 +27,13 @@ class AccountDetailHeader extends PureComponent {
 
   componentDidMount() {
     this.props.navigation.addListener('willFocus', () => {
-      this._getBalance(this.props.account.balance)
+      this._updateBalance(this.props.account.balance)
       this.updateAccountName(this.props.account.label)
     })
   }
 
   // @flow
-  _getBalance(balance: string) {
+  _updateBalance(balance: string) {
     let fromUnit = ''
     let toUnit = ''
     if (D.isBtc(this.account.coinType)) {
@@ -59,6 +59,10 @@ class AccountDetailHeader extends PureComponent {
       legalCurrencyBalance: legalCurrencyBalance,
       cryptoCurrencyBalance: cryptoCurrencyBalance
     })
+  }
+
+  updateBalance() {
+    this._updateBalance(this.props.account.balance)
   }
 
   // @flow
