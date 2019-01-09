@@ -50,6 +50,7 @@ class ETHSendPage extends Component {
     }
     if (this.txInfo) {
       let value = this.txInfo.outputs[0].value.toString()
+      value = this.esWallet.convertValue(this.coinType, value, D.unit.eth.Wei, this.cryptoCurrencyUnit)
       this.valueInput.updateValue(value)
       this.addressInput.updateAddress(this.txInfo.outputs[0].address)
       this.memoInput.updateMemo(this.txInfo.comment)
