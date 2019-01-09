@@ -172,5 +172,6 @@ export default {
   noAccountToShow: '暂时没有帐户可以取消隐藏',
   clearData: "清空数据",
   clearDataDesc: "确定清空数据？下一次将会重新进行同步",
-  clearing: "正在清除数据"
+  clearing: "正在清除数据",
+  deviceChange: '该设备和上次连接的设备不同，请清除数据后重新连接'
 }

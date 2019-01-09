@@ -56,8 +56,19 @@ class SettingsPage extends Component {
 
   componentDidMount() {
     this._listenDeviceStatus()
+    this._listenWallet()
     this._onFocus()
     this._onBlur()
+  }
+
+  _listenWallet() {
+    this.wallet.listenStatus((error, status) => {
+      if (status === D.status.deviceChange) {
+        ToastUtil.showLong(I18n.t('deviceChange'))
+        this.transmitter.disconnect()
+        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      }
+    })
   }
 
   _onFocus() {

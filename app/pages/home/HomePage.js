@@ -102,6 +102,7 @@ class HomePage extends Component {
     this._onFocus()
     this._onBlur()
     this._initListener()
+    this._listenWallet()
     this._updateUI()
     // delay to check app version
     let timer = setTimeout(() => {
@@ -109,6 +110,16 @@ class HomePage extends Component {
     }, 3000)
     this.timers.push(timer)
 
+  }
+
+  _listenWallet() {
+    this.wallet.listenStatus((error, status) => {
+      if (status === D.status.deviceChange) {
+        ToastUtil.showLong(I18n.t('deviceChange'))
+        this.transmitter.disconnect()
+        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      }
+    })
   }
 
   _checkVersion() {

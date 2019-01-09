@@ -171,6 +171,7 @@ export default {
   noAccountToShow: 'No Account To Show',
   clearData: "Clear Data",
   clearDataDesc: "Determine clear data? it will be sync data again at next time",
-  clearing: 'Clearing'
+  clearing: 'Clearing',
+  deviceChange: 'This device is different from the last connected device, please clear the data and reconnect'
 
 }

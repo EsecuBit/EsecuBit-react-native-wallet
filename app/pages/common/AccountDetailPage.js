@@ -57,40 +57,14 @@ class AccountDetailPage extends Component {
     this._onFocus()
     this._onBlur()
     this._getTxInfos()
+    this._listenTransmitter()
+    this._listenWallet()
+    this._isMounted = true
     this.wallet.listenTxInfo(() => {
       console.log('listen TxInfo')
       this._getTxInfos()
+      this.accountHeader.updateBalance()
     })
-    this.transmitter.listenStatus((error, status) => {
-      if (error === D.error.succeed) {
-        if (status === BtTransmitter.connecting) {
-          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
-          this.transmitter.stopScan()
-        } else if(status === BtTransmitter.connected) {
-          this.setState({bluetoothConnectDialogVisible: false})
-          switch(this._goToPage) {
-            case 'send':
-              this._gotoSendPage()
-              break
-            case 'address':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoAddressDetailPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
-          }
-        }
-        else if(status === BtTransmitter.disconnected){
-          this.transmitter.stopScan()
-          ToastUtil.showShort(I18n.t('disconnected'))
-          this.setState({bluetoothConnectDialogVisible: false})
-        }
-      }else {
-        this.transmitter.stopScan()
-        ToastUtil.showShort(I18n.t('connectFailed'))
-        this.setState({bluetoothConnectDialogVisible: false})
-      }
-    }) 
   }
 
   _onFocus() {
@@ -111,7 +85,65 @@ class AccountDetailPage extends Component {
     return true;
   }
 
+  _listenTransmitter() {
+    this.transmitter.listenStatus((error, status) => {
+      if (error === D.error.succeed) {
+        if (status === BtTransmitter.connecting) {
+          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
+          this.transmitter.stopScan()
+        } else if(status === BtTransmitter.connected) {
+          switch(this._goToPage) {
+            case 'send':
+              this.navigateTimer = setTimeout(() => {
+                this._gotoSendPage()
+              }, 2000)
+              this.timers.push(this.navigateTimer)
+              break
+            case 'address':
+              this.navigateTimer = setTimeout(() => {
+                this._gotoAddressDetailPage()
+              }, 2000)
+              this.timers.push(this.navigateTimer)
+              break
+            case 'resend':
+              this.navigateTimer = setTimeout(() => {
+                this._gotoResendPage()
+              }, 2000)
+              this.timers.push(this.navigateTimer)
+              break
+          }
+        }
+        else if(status === BtTransmitter.disconnected){
+          this.transmitter.stopScan()
+          // if device has changed, app will auto disconnect. no need to toast
+          if (!this._isDeviceChange) {
+            ToastUtil.showShort(I18n.t('disconnected'))
+          }
+          this.setState({bluetoothConnectDialogVisible: false})
+        }
+      }else {
+        this.transmitter.stopScan()
+        ToastUtil.showShort(I18n.t('connectFailed'))
+        this.setState({bluetoothConnectDialogVisible: false})
+      }
+    })
+  }
+
+
+
+  _listenWallet() {
+    this.wallet.listenStatus((error, status) => {
+      if (status === D.status.deviceChange) {
+        this._isDeviceChange = true
+        ToastUtil.showLong(I18n.t('deviceChange'))
+        this.transmitter.disconnect()
+        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      }
+    })
+  }
+
   componentWillUnmount() {
+    this._isMounted = false
     // clearTimeout
     this.timers.map(it => {
       it && clearTimeout(it)
@@ -160,6 +192,7 @@ class AccountDetailPage extends Component {
   }
 
   _gotoSendPage() {
+    if (this._isDeviceChange) return
     let coinType = CoinUtil.getRealCoinType(this.account.coinType)
     switch (coinType) {
       case Coin.btc:
@@ -174,26 +207,32 @@ class AccountDetailPage extends Component {
       default:
         throw D.error.coinNotSupported
     }
+    if (this._isMounted) {
+      this.setState({bluetoothConnectDialogVisible: false})
+    }
   }
 
   _gotoAddressDetailPage() {
+    if (this._isDeviceChange) return
+    if (this._isMounted) {
+      this.setState({bluetoothConnectDialogVisible: false})
+    }
     this.props.navigation.navigate('AddressDetail')
   }
 
-  _onRefresh() {
+  async _onRefresh() {
     this.setState({ refreshing: true })
-    this.account
-      .sync()
-      .then(() => {
-        console.log('sync _getTxInfos')
-        this._getTxInfos()
-        this.setState({ refreshing: false })
-      })
-      .catch(error => {
-        console.warn('_onRefresh', error)
-        this.setState({ refreshing: false })
-        ToastUtil.showErrorMsgShort(error)
-      })
+    try {
+      await this._getTxInfos()
+    }catch (error) {
+      console.warn('_onRefresh', error)
+      ToastUtil.showErrorMsgShort(error)
+    }finally {
+      this.setState({ refreshing: false })
+    }
+
+
+
   }
 
   /**
@@ -572,7 +611,10 @@ class AccountDetailPage extends Component {
       default:
         break
     }
-    this.setState({transactionDetailDialogVisible: false})
+    if (this._isMounted) {
+      this.setState({bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false})
+    }
+
   }
   /**
    * Handle Menu Item Click
@@ -959,6 +1001,7 @@ const mapStateToProps = state => ({
   account: state.AccountReducer.account,
   accountCurrentUnit: state.AccountReducer.accountCurrentUnit
 })
+
 
 const AccountDetail = connect(mapStateToProps)(AccountDetailPage)
 export default AccountDetail
