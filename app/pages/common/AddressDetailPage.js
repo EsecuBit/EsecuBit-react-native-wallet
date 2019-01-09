@@ -23,11 +23,18 @@ class AddressDetailPage extends PureComponent {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this._onFocus()
     this._onBlur()
     this._getAddress(this.state.storeAddress)
   }
 
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
+  
 
   _onFocus() {
     this.props.navigation.addListener("willFocus", () => {
@@ -38,12 +45,19 @@ class AddressDetailPage extends PureComponent {
   _onBlur() {
     this.props.navigation.addListener("willBlur", () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      this.setState({dialogVisible: false})
     })
   }
 
+  _hideDialog() {
+    if(this._isMounted) {
+      this.setState({dialogVisible: false}, () => {
+        this.props.navigation.pop()
+      })
+    }
+  }
+
   onBackPress = () => {
-    this.props.navigation.pop()
+    this._hideDialog()
     return true
   }
 
@@ -57,7 +71,9 @@ class AddressDetailPage extends PureComponent {
   async _getAddress(storeAddress) {
     try {
       let address = await this.account.getAddress(storeAddress)
-      this.setState({ address: address.address })
+      if (this._isMounted) {
+        this.setState({ address: address.address })
+      }
     } catch (error) {
       console.warn("getAddress", error)
       ToastUtil.showLong(I18n.t("getAddressError"))
@@ -79,7 +95,7 @@ class AddressDetailPage extends PureComponent {
         width={0.8}
         height={D.isBtc(this.coinType) ? 465 : 425}
         visible={this.state.dialogVisible}
-        onDismissed={() => this.setState({ dialogVisible: false })}
+        onDismissed={() => this._hideDialog()}
         rounded
         onTouchOutside={() => {
           this.setState({ dialogVisible: false })

@@ -29,7 +29,6 @@ export default class SplashPage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
-      this.setState({ syncDialogVisible: false })
       NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
       this.wallet.listenStatus(() => {} )
     })
@@ -39,9 +38,11 @@ export default class SplashPage extends Component {
     this._listenWalletStatus()
     this._onFocus()
     this._onBlur()
+    this._isMounted = true
   }
 
   componentWillUnmount() {
+    this._isMounted = false
     this.timers.map(it => {
       it && clearTimeout(it)
     })
@@ -100,13 +101,17 @@ export default class SplashPage extends Component {
   }
 
   _gotoHomePage(offlineMode) {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [
-        NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: offlineMode } })
-      ]
-    })
-    this.props.navigation.dispatch(resetAction)
+    if (this._isMounted) {
+      this.setState({ syncDialogVisible: false }, () => {
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: offlineMode } })
+          ]
+        })
+        this.props.navigation.dispatch(resetAction)
+      })
+    }
   }
 
   render() {
