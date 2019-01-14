@@ -51,6 +51,7 @@ class AccountDetailPage extends Component {
     this.cryptoCurrencyUnit = props.accountCurrentUnit
     this.transmitter = new BtTransmitter()
     this.timers = []
+    // prevent duplicate click
   }
 
   componentDidMount() {
@@ -75,7 +76,7 @@ class AccountDetailPage extends Component {
   }
 
   _onBlur() {
-    this.props.navigation.addListener('willBlur', () => {
+    this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
       this.setState({bluetoothConnectDialogVisible: false})
     })
@@ -97,22 +98,23 @@ class AccountDetailPage extends Component {
             case 'send':
               this.navigateTimer = setTimeout(() => {
                 this._gotoSendPage()
-              }, 2000)
+              }, 3000)
               this.timers.push(this.navigateTimer)
               break
             case 'address':
               this.navigateTimer = setTimeout(() => {
                 this._gotoAddressDetailPage()
-              }, 2000)
+              }, 3000)
               this.timers.push(this.navigateTimer)
               break
             case 'resend':
               this.navigateTimer = setTimeout(() => {
                 this._gotoResendPage()
-              }, 2000)
+              }, 3000)
               this.timers.push(this.navigateTimer)
               break
           }
+
         }
         else if(status === BtTransmitter.disconnected){
           this.transmitter.stopScan()
@@ -153,6 +155,7 @@ class AccountDetailPage extends Component {
 
 
   async _showBluetoothConnectDialog() {
+    if (this._isDeviceChange) return
     let deviceState = await this.transmitter.getState()
     //soft wallet no need to connect hardware
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
@@ -193,7 +196,6 @@ class AccountDetailPage extends Component {
   }
 
   _gotoSendPage() {
-    if (this._isDeviceChange) return
     let coinType = CoinUtil.getRealCoinType(this.account.coinType)
     switch (coinType) {
       case Coin.btc:
@@ -214,26 +216,27 @@ class AccountDetailPage extends Component {
   }
 
   _gotoAddressDetailPage() {
-    if (this._isDeviceChange) return
     if (this._isMounted) {
       this.setState({bluetoothConnectDialogVisible: false})
     }
     this.props.navigation.navigate('AddressDetail')
+
   }
 
-  async _onRefresh() {
+  _onRefresh() {
     this.setState({ refreshing: true })
-    try {
-      await this._getTxInfos()
-    }catch (error) {
-      console.warn('_onRefresh', error)
-      ToastUtil.showErrorMsgShort(error)
-    }finally {
-      this.setState({ refreshing: false })
-    }
-
-
-
+    this.account
+      .sync(null, false, this.props.offlineMode)
+      .then(() => {
+        console.log('sync _getTxInfos')
+        this._getTxInfos()
+        this.setState({ refreshing: false })
+      })
+      .catch(error => {
+        console.warn('_onRefresh', error)
+        this.setState({ refreshing: false })
+        ToastUtil.showErrorMsgShort(error)
+      })
   }
 
   /**
@@ -613,10 +616,10 @@ class AccountDetailPage extends Component {
       default:
         break
     }
+
     if (this._isMounted) {
       this.setState({bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false})
     }
-
   }
   /**
    * Handle Menu Item Click
@@ -663,6 +666,7 @@ class AccountDetailPage extends Component {
           navigation={this.props.navigation}
         />
         <Dialog
+          style={{backgroundColor: 'white'}}
           visible={this.state.renameDialogVisible}
           onTouchOutside={() => this.setState({renameDialogVisible: false})}
           width={0.8}
@@ -681,15 +685,17 @@ class AccountDetailPage extends Component {
                 this._renameAccount()}} />
           ]}
         >
-          <DialogContent style={CommonStyle.verticalDialogContent}>
-            <Text style={CommonStyle.verticalDialogText}>{I18n.t('renameAccountHint')}</Text>
+          <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
+            <Text style={[CommonStyle.verticalDialogText, {marginTop: Dimen.MARGIN_VERTICAL}]}>{I18n.t('renameAccountHint')}</Text>
             <TextInput
+              style={Platform.OS === 'ios' ? CommonStyle.iosTextInput : CommonStyle.androidTextInput}
+              selectionColor={Color.ACCENT}
               underlineColorAndroid={Color.ACCENT}
               maxLength={7}
               onChangeText={text => this.renameAccountname = text}
               returnKeyType="done"
             />
-          </DialogContent>
+          </View>
         </Dialog>
         <View
           style={{
@@ -1001,7 +1007,8 @@ const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
   account: state.AccountReducer.account,
-  accountCurrentUnit: state.AccountReducer.accountCurrentUnit
+  accountCurrentUnit: state.AccountReducer.accountCurrentUnit,
+  offlineMode: state.WalletReducer.offlineMode
 })
 
 
