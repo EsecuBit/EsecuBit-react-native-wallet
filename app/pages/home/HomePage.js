@@ -59,6 +59,8 @@ class HomePage extends Component {
     }
     this.deviceW = Dimensions.get('window').width
     this.timers = []
+    // prevent duplicate click
+    this.throttleFirst = false
   }
 
 
@@ -88,11 +90,6 @@ class HomePage extends Component {
     if (ns === 'WIFI' || ns === 'CELL') {
       console.log('networkChange', ns)
       this.setState({ networkConnected: true })
-      this.wallet.getAccounts().then(accounts => {
-        if (accounts.length === 0) {
-          this.btTransmitter.disconnect()
-        }
-      })
     } else {
       this.setState({ networkConnected: false })
     }
@@ -230,9 +227,6 @@ class HomePage extends Component {
       let accounts = await this.wallet.getAccounts()
       console.log('accounts', accounts)
       await this.setState({ accounts: accounts })
-      if (accounts.length === 0) {
-        this.btTransmitter.disconnect()
-      }
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)

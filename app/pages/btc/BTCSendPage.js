@@ -16,6 +16,7 @@ import TransactionTotalCostCard from '../../components/card/TransactionTotalCost
 import TransactionFeeCard from '../../components/card/TransactionFeeCard'
 import BalanceHeader from '../../components/header/BalanceHeader'
 import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
+import StringUtil from "../../utils/StringUtil";
 
 class BTCSendPage extends Component {
   constructor(props) {
@@ -38,6 +39,7 @@ class BTCSendPage extends Component {
     this.lockSend = false
   }
 
+
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
@@ -59,6 +61,11 @@ class BTCSendPage extends Component {
     this._onFocus()
     this._onBlur()
     this._fillResendData()
+    this._isMounted = true
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   componentWillMount() {
@@ -163,6 +170,9 @@ class BTCSendPage extends Component {
         this.transactionFeeCard.updateTransactionFee(value)
       })
       .catch(error => {
+        if (error === D.error.balanceNotEnough || error === D.error.valueIsDecimal) {
+          this.valueInput.setError()
+        }
         console.warn('_calculateTotalCost error', error)
         this.setState({ footerBtnDisable: true })
         ToastUtil.showErrorMsgShort(error)
@@ -197,15 +207,7 @@ class BTCSendPage extends Component {
 
   _send() {
     let formData = this._buildBTCSendForm()
-    // iOS render is too fast
-    if (Platform.OS === 'ios') {
-      setTimeout(() => {
-        this._showConfirmTransactionDialog()
-      }, 400)
-    } else {
-      this._showConfirmTransactionDialog()
-    }
-
+    this._showConfirmTransactionDialog()
     this.lockSend = true
     console.log('_send formData', formData)
     this.account
@@ -220,7 +222,9 @@ class BTCSendPage extends Component {
       })
       .then(() => {
         ToastUtil.showLong(I18n.t('success'))
-        this.setState({ transactionConfirmDialogVisible: false })
+        if (this._isMounted) {
+          this.setState({ transactionConfirmDialogVisible: false })
+        }
         this.lockSend = false
         this.props.navigation.pop()
       })
@@ -228,7 +232,9 @@ class BTCSendPage extends Component {
         // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
         // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
-          this.setState({ transactionConfirmDialogVisible: false })
+          if (this._isMounted) {
+            this.setState({transactionConfirmDialogVisible: false })
+          }
         })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
@@ -267,7 +273,11 @@ class BTCSendPage extends Component {
       D.unit.btc.satoshi,
       this.props.btcUnit
     )
-    sendValue = (Number(sendValue) * Number(value)).toFixed(8).toString()
+    if (this.props.btcUnit === D.unit.btc.mBTC) {
+      sendValue = StringUtil.toFixNum((Number(sendValue) * Number(value)), 5)
+    }else {
+      sendValue = StringUtil.toFixNum((Number(sendValue) * Number(value)), 8)
+    }
     // click item is not 100% (max amount)
     if (value !== '1') {
       await this.valueInput.updateValue(sendValue)
@@ -306,7 +316,7 @@ class BTCSendPage extends Component {
 
   render() {
     return (
-      <Container style={CommonStyle.safeAreaBottom}>
+      <Container>
         <SendToolbar title="BTC" />
         <Content padder>
           <BalanceHeader value={this.state.balance} unit={this.cryptoCurrencyUnit} />
@@ -383,7 +393,7 @@ class BTCSendPage extends Component {
 const mapStateToProps = state => ({
   account: state.AccountReducer.account,
   btcUnit: state.SettingsReducer.btcUnit,
-  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
 })
 
 const BTCSend = connect(mapStateToProps)(BTCSendPage)

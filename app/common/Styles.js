@@ -1,4 +1,5 @@
-import { StyleSheet, Platform, Dimensions } from 'react-native'
+import {StyleSheet, Platform, Dimensions, TextInput} from 'react-native'
+import React from "react";
 const COLOR_PRIMARY = '#1D1D1D'
 const COLOR_DARK_PRIMARY = '#1D1D1D'
 const COLOR_LIGHT_PRIMARY = '#DED1A4'
@@ -139,7 +140,7 @@ export const CommonStyle = StyleSheet.create({
     paddingTop: Dimen.MARGIN_HORIZONTAL
   },
   verticalDialogContent: {
-    paddingTop: Dimen.MARGIN_VERTICAL
+    paddingTop: Dimen.MARGIN_VERTICAL,
   },
   horizontalDialogText: {
     marginLeft: Dimen.MARGIN_HORIZONTAL,
@@ -148,5 +149,15 @@ export const CommonStyle = StyleSheet.create({
   },
   verticalDialogText: {
     fontSize: Dimen.SECONDARY_TEXT
+  },
+  iosTextInput: {
+    height: 40,
+    marginTop: Dimen.SPACE,
+    borderWidth: 0.8,
+    borderColor: Color.DISABLE_BG
+  },
+  androidTextInput: {
+    height: 40,
+    marginTop: Dimen.SPACE,
   }
 })

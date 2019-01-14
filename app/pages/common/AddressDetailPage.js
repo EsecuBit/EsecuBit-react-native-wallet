@@ -15,7 +15,7 @@ class AddressDetailPage extends PureComponent {
     this.state = {
       address: "",
       storeAddress: false,
-      dialogVisible: true
+      dialogVisible: false
     }
     this.eswallet = new EsWallet()
     this.account = props.account
@@ -70,6 +70,9 @@ class AddressDetailPage extends PureComponent {
 
   async _getAddress(storeAddress) {
     try {
+      if (this._isMounted) {
+        this.setState({dialogVisible: true})
+      }
       let address = await this.account.getAddress(storeAddress)
       if (this._isMounted) {
         this.setState({ address: address.address })
@@ -97,10 +100,7 @@ class AddressDetailPage extends PureComponent {
         visible={this.state.dialogVisible}
         onDismissed={() => this._hideDialog()}
         rounded
-        onTouchOutside={() => {
-          this.setState({ dialogVisible: false })
-          this.props.navigation.pop()
-        }}
+        onTouchOutside={() => {this._hideDialog()}}
       >
         <View style={styles.qrCodeWrapper}>
           <Text style={CommonStyle.secondaryText}>{I18n.t("showAddressTip")}</Text>

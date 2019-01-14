@@ -11,15 +11,50 @@ type Props = {
 
 export default class AccountOperateBottomBar extends PureComponent<Props> {
 
+  constructor(props) {
+    super(props)
+    // prevent duplicate click, true means that it can click
+    this._throttleLeftFirst = true
+    this._throttleRightFirst = true
+  }
+
   shouldComponentUpdate() {
     return false;
   }
 
+  _handleLeftPress() {
+    if (this._throttleLeftFirst) {
+      console.log('_handleLeftPress')
+      this._throttleLeftFirst = false
+      this.props.leftOnPress()
+    }
+
+    this.leftTimer = setTimeout(() => {
+      this._throttleLeftFirst = true
+    }, 1500)
+  }
+
+  _handleRightPress() {
+    if (this._throttleRightFirst) {
+      this._throttleRightFirst = false
+      this.props.rightOnPress()
+      console.log('_handleRightPress')
+    }
+
+    this.rightTimer = setTimeout(() => {
+      this._throttleRightFirst = true
+    }, 1500)
+  }
+
+  componentWillUnmount() {
+    this.leftTimer && clearTimeout(this.leftTimer)
+    this.rightTimer && clearTimeout(this.rightTimer)
+  }
+
   render() {
-    const { leftOnPress, rightOnPress } = this.props
     return (
       <View style={styles.bottom}>
-        <Button full light style={styles.sendButton} onPress={leftOnPress}>
+        <Button full light style={styles.sendButton} onPress={() => this._handleLeftPress()}>
           <Icon name="send" />
           <Text style={styles.btnSendText}>{I18n.t('send')}</Text>
         </Button>
@@ -27,7 +62,7 @@ export default class AccountOperateBottomBar extends PureComponent<Props> {
           full
           warning
           style={styles.receiveButton}
-          onPress={rightOnPress}>
+          onPress={() => this._handleRightPress()}>
           <Icon name="download" />
           <Text style={styles.btnReceiveText}>{I18n.t('receive')}</Text>
         </Button>

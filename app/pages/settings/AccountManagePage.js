@@ -102,11 +102,13 @@ class AccountManagePage extends Component {
           return (
             <View>
               <CardItem button onPress={() => {
-                this.props.setAccount(it)
+                _that.props.setAccount(it)
                 _that.props.navigation.navigate('Detail')
               }} onLongPress={() => {
+                console.log('onLongPress', it)
                 _that.setState({showAccountDialogVisible: true})
                 _that.currentAccount = it
+                console.log('_that', this)
               }}>
                 <CustomIcon  coinType={it.coinType}/>
                 <Text style={styles.cardText}>{it.label}</Text>
@@ -121,10 +123,12 @@ class AccountManagePage extends Component {
   }
 
   async _showAccount() {
+    console.log('')
     this.currentAccount.showAccount()
     await this.setState({showAccountDialogVisible: false})
     let accounts = await this._getHiddenAccount()
-    this.setState({dataArray: D.copy(accounts)})
+    this.setState({dataArray: []})
+    this.setState({dataArray: accounts})
   }
   render() {
     return (

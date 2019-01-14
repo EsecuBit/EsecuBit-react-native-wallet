@@ -68,6 +68,11 @@ class ETHSendPage extends Component {
     this._onFocus()
     this._onBlur()
     this._fillResendData()
+    this._isMounted = true
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   componentWillMount() {
@@ -159,6 +164,9 @@ class ETHSendPage extends Component {
         this.transactionTotalCostCard.updateTransactionCost(value)
       })
       .catch(error => {
+        if (error === D.error.balanceNotEnough || error === D.error.valueIsDecimal) {
+          this.valueInput.setError()
+        }
         this.setState({ footerBtnDisable: true })
         console.warn('_calculateTotalCost error', error)
         ToastUtil.showErrorMsgShort(error)
@@ -192,13 +200,7 @@ class ETHSendPage extends Component {
   _send() {
     let formData = this._buildETHSendForm()
     // iOS render is too fast
-    if (Platform.OS === 'ios') {
-      setTimeout(() => {
-        this._showConfirmTransactionDialog()
-      }, 400)
-    } else {
-      this._showConfirmTransactionDialog()
-    }
+    this._showConfirmTransactionDialog()
     this.lockSend = true
     console.log('_send formData', formData)
     this.account
@@ -212,7 +214,9 @@ class ETHSendPage extends Component {
         return this.account.sendTx(value)
       })
       .then(() => {
-        this.setState({ transactionConfirmDialogVisible: false })
+        if (this._isMounted) {
+          this.setState({ transactionConfirmDialogVisible: false })
+        }
         ToastUtil.showLong(I18n.t('success'))
         this.lockSend = false
         this.props.navigation.pop()
@@ -222,7 +226,9 @@ class ETHSendPage extends Component {
         // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
         // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
-          this.setState({transactionConfirmDialogVisible: false })
+          if (this._isMounted) {
+            this.setState({transactionConfirmDialogVisible: false })
+          }
         })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
@@ -252,7 +258,11 @@ class ETHSendPage extends Component {
 
   async _handleSendValueItemClick(value) {
     let sendValue = this.esWallet.convertValue(this.account.coinType, this.props.account.balance, D.unit.eth.Wei, this.props.ethUnit)
-    sendValue = Number(sendValue * value).toFixed(8).toString()
+    if (this.props.ethUnit === D.unit.eth.GWei) {
+      sendValue = StringUtil.toFixNum((Number(sendValue) * Number(value)), 9)
+    }else {
+      sendValue = StringUtil.toFixNum((Number(sendValue) * Number(value)), 18)
+    }
     // click item is not 100% (max amount)
     if (value !== '1') {
       await this.valueInput.updateValue(sendValue)
@@ -308,7 +318,7 @@ class ETHSendPage extends Component {
 
   render() {
     return (
-      <Container style={CommonStyle.safeAreaBottom}>
+      <Container>
         <SendToolbar title="ETH"  />
         <Content padder>
           <BalanceHeader
@@ -354,7 +364,7 @@ class ETHSendPage extends Component {
         <Dialog
           visible={this.state.transactionConfirmDialogVisible}
           width={0.8}
-          onTouchOutside={() => this.setState({ transactionConfirmDialogVisible: true })}
+          onTouchOutside={() => {}}
           dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}
         >
           <DialogContent style={CommonStyle.verticalDialogContent}>

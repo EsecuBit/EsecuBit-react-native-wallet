@@ -4,6 +4,7 @@ import { EsWallet, D } from 'esecubit-wallet-sdk'
 import { NavigationActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
+import { setOfflineMode } from '../../actions/WalletAction'
 import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
@@ -32,8 +33,14 @@ class HandlerPage extends Component {
     this.esWallet.setTestSeed(
       '90b41b9c4720b3f522a9e0d783c70fcabc43d5529f2d7d8ecc798da2c436259f052d697718e3297f1512c71e51b3d762099653d20d019cad931576f5d1c00775'
     )
-    this._enterOfflineMode()
+    this.esWallet.enterOfflineMode()
+      .catch(error => {
+        this._gotoHomePage(true)
+        this.props.setOfflineMode(true)
+        console.log('enter offline mode error', error)
+      })
     this._getLanguagePreference()
+    this._listenWalletStatus()
   }
 
   async _getLanguagePreference() {
@@ -45,26 +52,30 @@ class HandlerPage extends Component {
     }
   }
 
-  _enterOfflineMode() {
-    this.esWallet
-      .enterOfflineMode()
-      .then(() => {
-        this._gotoHomePage(true)
-        console.log('can enter offline mode')
-      })
-      .catch(e => {
-        if (e === D.error.offlineModeNotAllowed) {
+  _listenWalletStatus() {
+    this.esWallet.listenStatus((error, status) => {
+      if (error === D.error.succeed) {
+        if (status === D.status.syncing) {
+          this._gotoHomePage(true)
+          this.props.setOfflineMode(true)
+          console.log('can enter offline mode')
+        }
+      }else {
+        if (error === D.error.offlineModeNotAllowed) {
           if (D.test.jsWallet) {
             this._resetRouter('Splash')
           } else {
             this._resetRouter('PairList', { autoConnect: true })
           }
+          this.props.setOfflineMode(false)
           console.warn('offlineModeNotAllowed')
         }else {
           this._gotoHomePage(true)
-          console.warn('other error, stop', e)
+          this.props.setOfflineMode(true)
+          console.warn('other error, stop', error)
         }
-      })
+      }
+    })
   }
 
   _gotoHomePage(offlineMode) {
@@ -72,16 +83,18 @@ class HandlerPage extends Component {
   }
 
   _resetRouter(routeName, params) {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [
-        NavigationActions.navigate({
-          routeName: routeName,
-          params: params
-        })
-      ]
-    })
-    this.props.navigation.dispatch(resetAction)
+    setTimeout(() => {
+      const resetAction = NavigationActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({
+            routeName: routeName,
+            params: params
+          })
+        ]
+      })
+      this.props.navigation.dispatch(resetAction)
+    }, 2000)
   }
 
   async _getCurrencyPreference() {
@@ -106,8 +119,11 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   setCryptoCurrencyUnit,
-  setLegalCurrencyUnit
+  setLegalCurrencyUnit,
+  setOfflineMode,
 }
+
+
 
 const Handler = connect(
   mapStateToProps,

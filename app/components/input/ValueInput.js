@@ -59,6 +59,10 @@ export default class ValueInput extends PureComponent {
     this._handleSendValueInput(value)
   }
 
+  async setError() {
+    await this.setState({sendValueError: true, sendValueStatus: false})
+  }
+
 
   render() {
     const { placeholder, onItemClick } = this.props
