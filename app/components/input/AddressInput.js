@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Platform } from 'react-native'
+import { Platform, DeviceEventEmitter } from 'react-native'
 import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
 import I18n from '../../lang/i18n'
@@ -17,15 +17,17 @@ class AddressInput extends PureComponent {
     this.state = {
       checkAddressSuccess: false,
       checkAddressError: false,
-      address: props.address
+      address: ''
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.address && nextProps.address !== this.state.address) {
-      this._handleAddressInput(nextProps.address)
-    }
+
+  componentDidMount() {
+    DeviceEventEmitter.addListener('address', address => {
+      this._handleAddressInput(address)
+    })
   }
+
 
   // @flow
   async _handleAddressInput(address: string) {

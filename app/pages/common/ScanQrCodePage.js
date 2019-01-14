@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {BackHandler, Dimensions, Platform, View } from 'react-native'
+import {BackHandler, Dimensions, Platform, View, DeviceEventEmitter } from 'react-native'
 import { Container } from 'native-base'
 import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
@@ -39,7 +39,7 @@ class ScanQrCodePage extends Component {
 
   _qrCodeReceived(e) {
     if (!this.hadReceiveResult) {
-      this.props.setAddress(e.data)
+      DeviceEventEmitter.emit('address', e.data)
       this.props.navigation.pop()
       this.hadReceiveResult = true
     }
@@ -48,7 +48,7 @@ class ScanQrCodePage extends Component {
   _renderTopBar() {
     return Platform.OS === 'ios'? null : (
       <Button light transparent onPress={() => this.props.navigation.pop()}>
-        <Icon name="close" color={Color.DIVIDER} />
+        <Icon name="ios-close" color={Color.DIVIDER} />
       </Button>
     )
   }
@@ -61,7 +61,7 @@ class ScanQrCodePage extends Component {
             transparent
             onPress={() => this.props.navigation.pop()}>
             <Icon
-              name="x"
+              name="ios-close"
               type="Feather"
               style={{ backgroundColor: 'transparent', color: Color.ACCENT }}
             />
