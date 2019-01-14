@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import {
   Text,
+  TextInput,
   Dimensions,
   TouchableOpacity,
   Platform,
   BackHandler,
   InteractionManager,
   ActivityIndicator,
-  TextInput
+  View
 } from 'react-native'
-import { Container, Left, Icon, CardItem, Title, Right } from 'native-base'
+import { Container, Left, Icon, CardItem, Title, Right,Input } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
@@ -79,10 +80,9 @@ export default class NewAccountPage extends Component {
     }
 
     if (platform === 'ios') {
-      let accounts = []
-      let isNeedDialog = true
+      this.isNeedDialog = true
       //all account
-      accounts = await this.wallet.getAccounts()
+      let accounts = await this.wallet.getAccounts()
       //accounts of selected coinType
       let coinAccount = []
       accounts.map(it => {
@@ -92,13 +92,15 @@ export default class NewAccountPage extends Component {
       })
       coinAccount.map(item => {
         if (item.txInfos.length === 0) {
-          isNeedDialog = false
+          this.isNeedDialog = false
         }
       })
 
-      if (isNeedDialog) {
+      if (this.isNeedDialog) {
         setTimeout(() => {
-          this.setState({ newAccountWaitDialog: true })
+          if (this.isNeedDialog) {
+            this.setState({ newAccountWaitDialog: true })
+          }
         }, 400)
       }
     }else {
@@ -114,6 +116,7 @@ export default class NewAccountPage extends Component {
       ToastUtil.showShort(msg)
       this.props.navigation.pop()
     } catch (error) {
+      this.isNeedDialog = false
       console.warn('newAccount Error', error)
       // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
       // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
@@ -220,6 +223,7 @@ export default class NewAccountPage extends Component {
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
         <Dialog
+          style={{backgroundColor: 'white'}}
           visible={this.state.newAccountDialogVisible}
           onTouchOutside={() => this.setState({newAccountDialogVisible: false})}
           width={0.8}
@@ -238,16 +242,17 @@ export default class NewAccountPage extends Component {
                 this._newAccount()}} />
           ]}
         >
-          <DialogContent style={CommonStyle.verticalDialogContent}>
-            <Text style={CommonStyle.verticalDialogText}>{I18n.t('newAccountHint')}</Text>
+          <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
+            <Text style={[CommonStyle.verticalDialogText, {marginTop: Dimen.MARGIN_VERTICAL}]}>{I18n.t('newAccountHint')}</Text>
             <TextInput
-              heigth={60}
+              style={Platform.OS === 'ios' ? CommonStyle.iosTextInput : CommonStyle.androidTextInput}
+              selectionColor={Color.ACCENT}
               underlineColorAndroid={Color.ACCENT}
               maxLength={7}
               onChangeText={text => this.newAccountName = text}
               returnKeyType="done"
             />
-          </DialogContent>
+          </View>
         </Dialog>
         <Dialog
           width={0.8}
