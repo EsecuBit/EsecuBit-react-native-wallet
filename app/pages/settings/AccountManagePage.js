@@ -155,12 +155,14 @@ class AccountManagePage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key='show_account_cancel'
               text={I18n.t('cancel')}
               onPress={() => this.setState({showAccountDialogVisible: false})}
             />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='show_account_confirm'
               text={I18n.t('confirm')}

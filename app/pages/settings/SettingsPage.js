@@ -535,12 +535,14 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')} />}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
               key="update_version_cancel"
               text={I18n.t('cancel')}
               onPress={this._checkForceUpdate.bind(this)}
             />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
               key="update_version_confirm"
               text={I18n.t('confirm')}
@@ -560,12 +562,14 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('clearData')} />}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
               key="clear_data_cancel"
               text={I18n.t('cancel')}
               onPress={() => this.setState({clearDataDialogVisible: false})}
             />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
               key="clear_data_confirm"
               text={I18n.t('confirm')}
@@ -598,6 +602,7 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('disconnect')} />}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               key="disconnect_cancel"
               textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
               text={I18n.t('cancel')}
@@ -606,6 +611,7 @@ class SettingsPage extends Component {
               }}
             />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               key="disconnect_confirm"
               textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
               text={I18n.t('confirm')}

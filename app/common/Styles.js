@@ -154,10 +154,12 @@ export const CommonStyle = StyleSheet.create({
     height: 40,
     marginTop: Dimen.SPACE,
     borderWidth: 0.8,
-    borderColor: Color.DISABLE_BG
+    borderColor: Color.DISABLE_BG,
+    paddingLeft: Dimen.SPACE
   },
   androidTextInput: {
     height: 40,
     marginTop: Dimen.SPACE,
+    paddingLeft: Dimen.SPACE
   }
 })

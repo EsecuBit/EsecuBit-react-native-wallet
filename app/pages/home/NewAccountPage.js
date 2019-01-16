@@ -230,11 +230,13 @@ export default class NewAccountPage extends Component {
           dialogTitle={<DialogTitle  title={I18n.t('newAccount')}/>}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               key='new_account_cancel'
               text={I18n.t('cancel')}
               onPress={() => this.setState({ newAccountDialogVisible: false })}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}/>,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='new_account_confirm' text={I18n.t('confirm')}
               onPress={() => {

@@ -673,11 +673,13 @@ class AccountDetailPage extends Component {
           dialogTitle={<DialogTitle  title={I18n.t('renameAccount')}/>}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key='rename_account_cancel'
               text={I18n.t('cancel')}
               onPress={() => this.setState({ renameDialogVisible: false })} />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='rename_account_confirm'
               text={I18n.t('confirm')} onPress={() => {

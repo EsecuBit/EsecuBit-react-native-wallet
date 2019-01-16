@@ -428,12 +428,14 @@ class HomePage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key='update_version_cancel'
               text={I18n.t('cancel')}
               onPress={this._checkForceUpdate.bind(this)}
             />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='update_version_confirm'
               text={I18n.t('confirm')}
@@ -448,15 +450,17 @@ class HomePage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.hideAccountDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
+          dialogTitle={<DialogTitle title={I18n.t('tips')} />}
           actions={[
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key='hide_account_cancel'
               text={I18n.t('cancel')}
               onPress={() => this.setState({hideAccountDialogVisible: false})}
             />,
             <DialogButton
+              style={{backgroundColor: '#fff'}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='hide_account_confirm'
               text={I18n.t('confirm')}
