@@ -23,8 +23,12 @@
   NSURL *jsCodeLocation;
 
 #ifdef DEBUG
-  // debug
-  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"main" fallbackResource:nil];
+   // debug
+  NSInteger port = 8081;
+   // replace your pc ip
+  NSString *host = @"192.168.43.162";
+  NSString  *url = [NSString stringWithFormat: @"http://%@:%zd/index.ios.bundle?platform=ios&dev=true", host, port];
+  jsCodeLocation = [NSURL URLWithString:url];
 #else
   // offline
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/index.ios" withExtension:@"jsbundle"];

@@ -19,7 +19,6 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
-		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		14B690B2C4C944EF85DD7DB2 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E1D93F80AC044EF39FF32B24 /* Roboto.ttf */; };
 		1B354E23A75047BEAA36CFB1 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04B6BA54A08C4FA095DB754D /* EvilIcons.ttf */; };
 		210FCA96210D73BE00F6981B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FCA95210D73BE00F6981B /* AudioToolbox.framework */; };
@@ -58,6 +57,8 @@
 		920C5FC27C20421CBFBD42E6 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */; };
 		936D0EE97B9A462EA33B3116 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */; };
 		9B325E6521AC1A0D0026627F /* bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B325E6421AC1A0D0026627F /* bundle */; };
+		9B762B8321EDBFBC0071D0F4 /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 210B49612160DBB600A41EE9 /* libRCTWebSocket.a */; };
+		9B96D78621EDC75F00672322 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		9BA72AEF216DA047007E215C /* BackIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA72AEE216DA047007E215C /* BackIOS.m */; };
 		9BBE256547B84A218CD45363 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7A69D490A6854312A9C2672B /* Octicons.ttf */; };
 		A0DA747E0C6F4BADB251B1C6 /* libRNI18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D615EF93173248719DF93C5C /* libRNI18n.a */; };
@@ -324,7 +325,7 @@
 		054F9FC3095F45A0B30B672C /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		068D5E373724495989AB852C /* RNI18n.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNI18n.xcodeproj; path = "../node_modules/react-native-i18n/ios/RNI18n.xcodeproj"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* EsWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EsWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* ESECUBIT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ESECUBIT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = EsWallet/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = EsWallet/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -410,13 +411,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B96D78621EDC75F00672322 /* libReact.a in Frameworks */,
+				9B762B8321EDBFBC0071D0F4 /* libRCTWebSocket.a in Frameworks */,
 				210FCAA0210D740F00F6981B /* libiconv.tbd in Frameworks */,
 				210FCA9E210D73FD00F6981B /* CoreBluetooth.framework in Frameworks */,
 				210FCA9C210D73E000F6981B /* OpenAL.framework in Frameworks */,
 				210FCA98210D73C900F6981B /* MediaPlayer.framework in Frameworks */,
 				210FCA96210D73BE00F6981B /* AudioToolbox.framework in Frameworks */,
 				2169E759210AEE720039D751 /* libEsHDWallet.a in Frameworks */,
-				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
@@ -669,7 +671,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* EsWallet.app */,
+				13B07F961A680F5B00A75B9A /* ESECUBIT.app */,
 				00E356EE1AD99517003FC87E /* EsWalletTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* EsWallet-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* EsWallet-tvOSTests.xctest */,
@@ -792,7 +794,7 @@
 			);
 			name = EsWallet;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* EsWallet.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* ESECUBIT.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* EsWallet-tvOS */ = {
@@ -1431,13 +1433,10 @@
 					"ealmsrc/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
-					"$(SRCROOT)/../node_modules/react-native-preference/ios",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
-					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
-					"$(SRCROOT)/../node_modules/react-native-blur/ios",
-					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"/Users/dev12/Library/Developer/Xcode/DerivedData/EsWallet-godhgosmzeuaeifdltmhhvkhxzuj/Build/Products/Staging-iphoneos/include",
 				);
 				INFOPLIST_FILE = EsWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
@@ -1453,7 +1452,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.excelsecu.wallet.EsWallet;
-				PRODUCT_NAME = EsWallet;
+				PRODUCT_NAME = ESECUBIT;
 				PROVISIONING_PROFILE = "df628a32-278d-4d07-b968-195d5a1df7a4";
 				PROVISIONING_PROFILE_SPECIFIER = devlop_sz;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1478,13 +1477,10 @@
 					"ealmsrc/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-i18n/ios",
-					"$(SRCROOT)/../node_modules/react-native-preference/ios",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
-					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
-					"$(SRCROOT)/../node_modules/react-native-blur/ios",
-					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"/Users/dev12/Library/Developer/Xcode/DerivedData/EsWallet-godhgosmzeuaeifdltmhhvkhxzuj/Build/Products/Staging-iphoneos/include",
 				);
 				INFOPLIST_FILE = EsWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
@@ -1499,7 +1495,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.excelsecu.wallet.EsWallet;
-				PRODUCT_NAME = EsWallet;
+				PRODUCT_NAME = ESECUBIT;
 				PROVISIONING_PROFILE = "9a635a40-3be3-4319-9be5-c3a1b57278bd";
 				PROVISIONING_PROFILE_SPECIFIER = es_inhouse_sz;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1677,9 +1673,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "~/Library/Developer/Xcode/DerivedData/EsWallet-godhgosmzeuaeifdltmhhvkhxzuj/Build/Products/Debug-iphoneos/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1713,8 +1710,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "~/Library/Developer/Xcode/DerivedData/EsWallet-godhgosmzeuaeifdltmhhvkhxzuj/Build/Products/Debug-iphoneos/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
