@@ -1,4 +1,4 @@
-import {StyleSheet, Platform, Dimensions, TextInput} from 'react-native'
+import {StyleSheet, Platform, Dimensions } from 'react-native'
 import React from "react";
 const COLOR_PRIMARY = '#1D1D1D'
 const COLOR_DARK_PRIMARY = '#1D1D1D'
@@ -23,6 +23,7 @@ const COLOR_SUCCESS = '#5cb85c'
 const COLOR_WARNING = '#f0ad4e'
 const COLOR_DANGER = '#d9534f'
 const COLOR_DISABLE_BG = '#CFCFCF'
+const COLOR_WHITE = '#FFF'
 
 export const Color = {
   PRIMARY: COLOR_PRIMARY,
@@ -47,7 +48,8 @@ export const Color = {
   SUCCESS: COLOR_SUCCESS,
   WARNING: COLOR_WARNING,
   DANGER: COLOR_DANGER,
-  DISABLE_BG: COLOR_DISABLE_BG
+  DISABLE_BG: COLOR_DISABLE_BG,
+  WHITE: COLOR_WHITE
 }
 
 const DIMEN_SECONDAT_TEXT = 14

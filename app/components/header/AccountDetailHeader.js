@@ -107,14 +107,15 @@ class AccountDetailHeader extends PureComponent {
                   justifyContent: 'center',
                   width: 48,
                   height: height,
-                  marginTop: isIphoneX ? 20 : 0
+                  marginTop: isIphoneX ? 24 : 0,
+                  paddingLeft: Dimen.MARGIN_HORIZONTAL
                 }}>
                 <Button
                   transparent
                   onPress={() => {
                     navigation.pop()
                   }}>
-                  <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
+                  <Image source={require('../../imgs/ic_back.png')} />
                 </Button>
               </View>
               <View
@@ -129,7 +130,7 @@ class AccountDetailHeader extends PureComponent {
                   justifyContent: 'center',
                   width: 48,
                   height: height,
-                  marginTop: isIphoneX ? 20 : 0,
+                  marginTop: isIphoneX ? 24 : 0,
                   marginRight: Dimen.SPACE
                 }}>
                 <Menu

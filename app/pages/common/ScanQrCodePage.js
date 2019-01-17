@@ -1,18 +1,15 @@
 import React, { Component } from 'react'
-import {BackHandler, Dimensions, Platform, View, DeviceEventEmitter } from 'react-native'
+import {BackHandler, Platform, View, DeviceEventEmitter } from 'react-native'
 import { Container } from 'native-base'
 import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
-import { Color } from '../../common/Styles'
-import { connect } from 'react-redux'
-import { setAddress } from "../../actions/AccountAction"
+import {Color, Dimen} from '../../common/Styles'
 
 class ScanQrCodePage extends Component {
   constructor(props) {
     super(props)
     this.hadReceiveResult = false
-    this.deviceW = Dimensions.get('window').width
   }
 
   componentDidMount() {
@@ -48,7 +45,7 @@ class ScanQrCodePage extends Component {
   _renderTopBar() {
     return Platform.OS === 'ios'? null : (
       <Button light transparent onPress={() => this.props.navigation.pop()}>
-        <Icon name="ios-close" color={Color.DIVIDER} />
+        <Icon  name="md-close" color={Color.DIVIDER} />
       </Button>
     )
   }
@@ -61,8 +58,7 @@ class ScanQrCodePage extends Component {
             transparent
             onPress={() => this.props.navigation.pop()}>
             <Icon
-              name="ios-close"
-              type="Feather"
+              name="md-close"
               style={{ backgroundColor: 'transparent', color: Color.ACCENT }}
             />
           </Button>
@@ -75,7 +71,7 @@ class ScanQrCodePage extends Component {
       <Container>
         <QRScannerView
           hintTextPosition={Platform.OS === 'ios' ? 150 : 120}
-          hintTextStyle={{ color: Color.HINT_TEXT }}
+          hintTextStyle={{ color: Color.WHITE, fontSize: Dimen.PRIMARY_TEXT, backgroundColor: 'transparent' }}
           maskColor={Color.MASK}
           hintText={I18n.t('qrCodeHintText')}
           borderWidth={0}
@@ -91,8 +87,6 @@ class ScanQrCodePage extends Component {
   }
 }
 
-const mapDispatchToProps = {
-  setAddress
-}
 
-export default connect(null, mapDispatchToProps)(ScanQrCodePage)
+
+export default ScanQrCodePage
