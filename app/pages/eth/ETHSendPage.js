@@ -28,7 +28,6 @@ class ETHSendPage extends Component {
       balance: '',
       sendValue: '',
       address: '',
-      sendDialogVisible: false,
       transactionConfirmDialogVisible: false,
       transactionConfirmDesc: '',
       footerBtnDisable: true
@@ -193,7 +192,7 @@ class ETHSendPage extends Component {
       return
     }
     this.setState({sendValue: this.valueInput.getValue(), address: this.addressInput.getAddress()})
-    this.setState({ transactionConfirmDialogVisible: true })
+    this._isMounted && this.setState({ transactionConfirmDialogVisible: true })
 
   }
 
@@ -214,9 +213,7 @@ class ETHSendPage extends Component {
         return this.account.sendTx(value)
       })
       .then(() => {
-        if (this._isMounted) {
-          this.setState({ transactionConfirmDialogVisible: false })
-        }
+        this._isMounted &&  this.setState({ transactionConfirmDialogVisible: false })
         ToastUtil.showLong(I18n.t('success'))
         this.lockSend = false
         this.props.navigation.pop()
@@ -226,9 +223,7 @@ class ETHSendPage extends Component {
         // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
         // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
-          if (this._isMounted) {
-            this.setState({transactionConfirmDialogVisible: false })
-          }
+          this._isMounted && this.setState({transactionConfirmDialogVisible: false })
         })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false

@@ -19,6 +19,7 @@ import PreferenceUtil from '../../utils/PreferenceUtil'
 import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
+import AppUtil from "../../utils/AppUtil";
 
 
 
@@ -106,7 +107,8 @@ export default class PairListPage extends Component {
   }
 
   onBackPress = () => {
-    this.props.navigation.pop()
+    console.log('route', this.props.navigation)
+    AppUtil.exitApp()
     return true
   }
 

@@ -55,10 +55,15 @@ class SettingsPage extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this._listenDeviceStatus()
     this._listenWallet()
     this._onFocus()
     this._onBlur()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   _listenWallet() {
@@ -81,6 +86,7 @@ class SettingsPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+      this._isMounted && this.setState({ clearDataWaitingDialogVisible: false})
     })
   }
 
@@ -535,14 +541,14 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')} />}
           actions={[
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
               key="update_version_cancel"
               text={I18n.t('cancel')}
               onPress={this._checkForceUpdate.bind(this)}
             />,
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
               key="update_version_confirm"
               text={I18n.t('confirm')}
@@ -562,14 +568,14 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('clearData')} />}
           actions={[
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
               key="clear_data_cancel"
               text={I18n.t('cancel')}
               onPress={() => this.setState({clearDataDialogVisible: false})}
             />,
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
               key="clear_data_confirm"
               text={I18n.t('confirm')}
@@ -602,7 +608,7 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('disconnect')} />}
           actions={[
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               key="disconnect_cancel"
               textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
               text={I18n.t('cancel')}
@@ -611,7 +617,7 @@ class SettingsPage extends Component {
               }}
             />,
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               key="disconnect_confirm"
               textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
               text={I18n.t('confirm')}

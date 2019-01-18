@@ -15,7 +15,7 @@ export default class SplashPage extends Component {
     this.wallet = new EsWallet()
     this.state = {
       syncDialogVisible: true,
-      syncDesc: I18n.t('welcome')
+      syncDesc: I18n.t('welcome'),
     }
     this.btTransmitter = new BtTransmitter()
     this.timers = []
@@ -61,6 +61,7 @@ export default class SplashPage extends Component {
     }
   }
 
+
   _listenWalletStatus() {
     let _that = this
     this.wallet.listenStatus(async (error, status, account) => {
@@ -77,7 +78,8 @@ export default class SplashPage extends Component {
         } else {
           let timer = setTimeout(() => {
             ToastUtil.showErrorMsgLong(error)
-            _that._gotoHomePage(false)
+            this.btTransmitter.disconnect()
+            _that._gotoHomePage(true)
           }, 2000)
           this.timers.push(timer)
         }

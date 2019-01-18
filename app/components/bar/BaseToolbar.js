@@ -36,7 +36,7 @@ class BaseToolbar extends PureComponent<Props> {
           />
           <Left>
             <Button transparent onPress={() => this.props.navigation.pop()}>
-              <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS, paddingLeft: Dimen.SPACE }} />
+              <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS, paddingLeft: Platform.OS === 'ios' ? Dimen.MARGIN_HORIZONTAL : 0 }} />
             </Button>
           </Left>
           <View

@@ -34,7 +34,7 @@ class AddressDetailPage extends PureComponent {
     this._isMounted = false
   }
 
-  
+
 
   _onFocus() {
     this.props.navigation.addListener("willFocus", () => {
@@ -45,15 +45,12 @@ class AddressDetailPage extends PureComponent {
   _onBlur() {
     this.props.navigation.addListener("willBlur", () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+      this._isMounted && this.setState({dialogVisible: false})
     })
   }
 
   _hideDialog() {
-    if(this._isMounted) {
-      this.setState({dialogVisible: false}, () => {
-        this.props.navigation.pop()
-      })
-    }
+    this.props.navigation.pop()
   }
 
   onBackPress = () => {
@@ -62,7 +59,7 @@ class AddressDetailPage extends PureComponent {
   }
 
   async _handleStoreAddress() {
-    await this.setState({ storeAddress: !this.state.storeAddress })
+    this._isMounted && await this.setState({ storeAddress: !this.state.storeAddress })
     if (this.state.storeAddress === true) {
       this._getAddress(this.state.storeAddress)
     }
@@ -70,13 +67,9 @@ class AddressDetailPage extends PureComponent {
 
   async _getAddress(storeAddress) {
     try {
-      if (this._isMounted) {
-        this.setState({dialogVisible: true})
-      }
+      this._isMounted && await this.setState({dialogVisible: true})
       let address = await this.account.getAddress(storeAddress)
-      if (this._isMounted) {
-        this.setState({ address: address.address })
-      }
+      this._isMounted && this.setState({ address: address.address })
     } catch (error) {
       console.warn("getAddress", error)
       ToastUtil.showLong(I18n.t("getAddressError"))
@@ -88,7 +81,7 @@ class AddressDetailPage extends PureComponent {
       Clipboard.setString(addr)
       ToastUtil.showShort(I18n.t("copySuccess"))
     } catch (error) {
-      ToastUtil.showLong(I18n.t("copyFailed"))
+      ToastUtil.showShort(I18n.t("copyFailed"))
     }
   }
 
@@ -98,9 +91,8 @@ class AddressDetailPage extends PureComponent {
         width={0.8}
         height={D.isBtc(this.coinType) ? 465 : 425}
         visible={this.state.dialogVisible}
-        onDismissed={() => this._hideDialog()}
         rounded
-        onTouchOutside={() => {this._hideDialog()}}
+        onTouchOutside={() => this._hideDialog()}
       >
         <View style={styles.qrCodeWrapper}>
           <Text style={CommonStyle.secondaryText}>{I18n.t("showAddressTip")}</Text>

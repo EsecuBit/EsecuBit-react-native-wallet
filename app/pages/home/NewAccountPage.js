@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import {
   Text,
   TextInput,
-  Dimensions,
   TouchableOpacity,
   Platform,
   BackHandler,
@@ -10,7 +9,7 @@ import {
   ActivityIndicator,
   View
 } from 'react-native'
-import { Container, Left, Icon, CardItem, Title, Right,Input } from 'native-base'
+import { Container, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
 import { Color, CommonStyle, Dimen } from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
@@ -23,7 +22,6 @@ const platform = Platform.OS
 export default class NewAccountPage extends Component {
   constructor(props) {
     super(props)
-    this.deviceW = Dimensions.get('window').width
     this.state = {
       newAccountDialogVisible: false,
       newAccountWaitDialog: false
@@ -38,8 +36,13 @@ export default class NewAccountPage extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this._onFocus()
     this._onBlur()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   _onFocus() {
@@ -98,20 +101,18 @@ export default class NewAccountPage extends Component {
 
       if (this.isNeedDialog) {
         setTimeout(() => {
-          if (this.isNeedDialog) {
-            this.setState({ newAccountWaitDialog: true })
-          }
+          this._isMounted && this.isNeedDialog &&  this.setState({ newAccountWaitDialog: true })
         }, 400)
       }
     }else {
-      this.setState({ newAccountWaitDialog: true })
+      this._isMounted && this.setState({ newAccountWaitDialog: true })
     }
 
     try {
       let account = await this.wallet.newAccount(coinType)
       await account.rename(this.newAccountName)
       this.newAccountName = ''
-      await this.setState({ newAccountWaitDialog: false })
+      this._isMounted && await this.setState({ newAccountWaitDialog: false })
       let msg = I18n.t('newAccountSuccess')
       ToastUtil.showShort(msg)
       this.props.navigation.pop()
@@ -121,7 +122,7 @@ export default class NewAccountPage extends Component {
       // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
       // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
       InteractionManager.runAfterInteractions(() => {
-        this.setState({ newAccountWaitDialog: false })
+        this._isMounted && this.setState({ newAccountWaitDialog: false })
       })
       ToastUtil.showErrorMsgLong(error)
     }
@@ -170,7 +171,7 @@ export default class NewAccountPage extends Component {
               this.setState({ newAccountDialogVisible: true })
               this.newAccountType = coinType
             }}>
-            <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
+            <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}} />
           </TouchableOpacity>
         </Right>
       </CardItem>
@@ -209,7 +210,7 @@ export default class NewAccountPage extends Component {
               _that.setState({ newAccountDialogVisible: true })
               this.newAccountType = coinType
             }}>
-            <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
+            <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}} />
           </TouchableOpacity>
         </Right>
       </CardItem>

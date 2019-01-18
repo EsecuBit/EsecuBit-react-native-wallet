@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, Icon, Text } from 'native-base'
 import { Color, Dimen } from '../../common/Styles'
 import I18n from '../../lang/i18n'
+import ToastUtil from "../../utils/ToastUtil";
 
 type Props = {
   leftOnPress: () => void,
@@ -13,9 +14,6 @@ export default class AccountOperateBottomBar extends PureComponent<Props> {
 
   constructor(props) {
     super(props)
-    // prevent duplicate click, true means that it can click
-    this._throttleLeftFirst = true
-    this._throttleRightFirst = true
   }
 
   shouldComponentUpdate() {
@@ -23,32 +21,11 @@ export default class AccountOperateBottomBar extends PureComponent<Props> {
   }
 
   _handleLeftPress() {
-    if (this._throttleLeftFirst) {
-      console.log('_handleLeftPress')
-      this._throttleLeftFirst = false
-      this.props.leftOnPress()
-    }
-
-    this.leftTimer = setTimeout(() => {
-      this._throttleLeftFirst = true
-    }, 1500)
+    this.props.leftOnPress()
   }
 
   _handleRightPress() {
-    if (this._throttleRightFirst) {
-      this._throttleRightFirst = false
-      this.props.rightOnPress()
-      console.log('_handleRightPress')
-    }
-
-    this.rightTimer = setTimeout(() => {
-      this._throttleRightFirst = true
-    }, 1500)
-  }
-
-  componentWillUnmount() {
-    this.leftTimer && clearTimeout(this.leftTimer)
-    this.rightTimer && clearTimeout(this.rightTimer)
+    this.props.rightOnPress()
   }
 
   render() {

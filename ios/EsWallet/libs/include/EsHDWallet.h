@@ -22,8 +22,6 @@ typedef NS_ENUM(NSInteger, EsBLEState) {
     ESBLEStateDisconnected,                   //断开
     ESBLEStateConnecting,                     //正在连接
     ESBLEStateConnected,                      //已连接
-    ESBLEStateWillAuthenticate,               //准备认证
-    ESBLEStateDidAuthenticate                 //认证完成
 };
 
 @protocol EsHDWalletDelegate
@@ -51,7 +49,6 @@ typedef void(^EsResultCallBack)(NSNumber *errorCode,NSString *result);
 /**
  发送指令
  @param data APDU
- @param sec 是否加密
  @return response
  */
 - (NSData *)sendAPDUWithData:(NSData *)data;

@@ -51,16 +51,17 @@ class AccountDetailPage extends Component {
     this.cryptoCurrencyUnit = props.accountCurrentUnit
     this.transmitter = new BtTransmitter()
     this.timers = []
+    this.transmitter = new BtTransmitter()
     // prevent duplicate click
   }
 
   componentDidMount() {
+    this._isMounted = true
     this._onFocus()
     this._onBlur()
     this._getTxInfos()
     this._listenTransmitter()
     this._listenWallet()
-    this._isMounted = true
     this.wallet.listenTxInfo(() => {
       console.log('listen TxInfo')
       this._getTxInfos()
@@ -78,7 +79,7 @@ class AccountDetailPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      this.setState({bluetoothConnectDialogVisible: false})
+      this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
     })
   }
 
@@ -122,12 +123,12 @@ class AccountDetailPage extends Component {
           if (!this._isDeviceChange) {
             ToastUtil.showShort(I18n.t('disconnected'))
           }
-          this.setState({bluetoothConnectDialogVisible: false})
+          this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
         }
       }else {
         this.transmitter.stopScan()
         ToastUtil.showShort(I18n.t('connectFailed'))
-        this.setState({bluetoothConnectDialogVisible: false})
+        this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
       }
     })
   }
@@ -176,7 +177,7 @@ class AccountDetailPage extends Component {
   }
 
   async _findAndConnectDevice() {
-    this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
+    this._isMounted && this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo.sn === info.sn) {
@@ -187,7 +188,7 @@ class AccountDetailPage extends Component {
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
       if(state === BtTransmitter.disconnected) {
-        this.setState({bluetoothConnectDialogVisible: false})
+        this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
       }
@@ -197,6 +198,7 @@ class AccountDetailPage extends Component {
 
   _gotoSendPage() {
     let coinType = CoinUtil.getRealCoinType(this.account.coinType)
+    this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
     switch (coinType) {
       case Coin.btc:
         this.props.navigation.navigate('BTCSend')
@@ -210,31 +212,27 @@ class AccountDetailPage extends Component {
       default:
         throw D.error.coinNotSupported
     }
-    if (this._isMounted) {
-      this.setState({bluetoothConnectDialogVisible: false})
-    }
   }
 
   _gotoAddressDetailPage() {
-    if (this._isMounted) {
-      this.setState({bluetoothConnectDialogVisible: false})
-    }
+    this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
     this.props.navigation.navigate('AddressDetail')
 
   }
 
-  _onRefresh() {
-    this.setState({ refreshing: true })
+  async _onRefresh() {
+    let state = await this.transmitter.getState()
+    this._isMounted && this.setState({ refreshing: true })
     this.account
-      .sync(null, false, this.props.offlineMode)
+      .sync(null, false, state === BtTransmitter.disconnected)
       .then(() => {
         console.log('sync _getTxInfos')
         this._getTxInfos()
-        this.setState({ refreshing: false })
+        this._isMounted && this.setState({ refreshing: false })
       })
       .catch(error => {
         console.warn('_onRefresh', error)
-        this.setState({ refreshing: false })
+        this._isMounted && this.setState({ refreshing: false })
         ToastUtil.showErrorMsgShort(error)
       })
   }
@@ -557,7 +555,7 @@ class AccountDetailPage extends Component {
     } else {
       this.dSmartContract = 'none'
     }
-    this.setState({transactionDetailDialogVisible: true})
+    this._isMounted && this.setState({transactionDetailDialogVisible: true})
   }
 
   _getTxInfos() {
@@ -565,20 +563,20 @@ class AccountDetailPage extends Component {
       .getTxInfos()
       .then(txInfos => {
         console.log('txInfo', txInfos)
-        this.setState({ data: txInfos.txInfos })
+        this._isMounted && this.setState({ data: txInfos.txInfos })
       })
       .catch(error => {
         console.log('txInfo error', error)
         ToastUtil.showErrorMsgLong(error)
       })
-    this.accountHeader.updateBalance()
+    this.accountHeader && this.accountHeader.updateBalance()
   }
 
   _renameAccount() {
     this.account
       .rename(this.renameAccountname)
       .then(() => {
-        this.accountHeader.updateAccountName(this.renameAccountname)
+        this.accountHeader && this.accountHeader.updateAccountName(this.renameAccountname)
       })
       .catch(error => {
         console.log('rename', error)
@@ -589,9 +587,7 @@ class AccountDetailPage extends Component {
   _handleTransactionDetailDismiss() {
     //lose focus
     this.memoTextInput.blur()
-    this.setState({
-      isShowBottomBar: true
-    })
+    this._isMounted && this.setState({isShowBottomBar: true})
     if (this.state.dMemo) {
       this.dTxInfo.comment = this.state.dMemo
       this.account
@@ -616,10 +612,7 @@ class AccountDetailPage extends Component {
       default:
         break
     }
-
-    if (this._isMounted) {
-      this.setState({bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false})
-    }
+    this._isMounted && this.setState({bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false})
   }
   /**
    * Handle Menu Item Click
@@ -649,11 +642,11 @@ class AccountDetailPage extends Component {
     if(platform === 'ios') {
       // iOS render is too fast
       this.iOSTimer = setTimeout(() => {
-        _that.setState({renameDialogVisible: true})
+        _that._isMounted && _that.setState({renameDialogVisible: true})
       }, 400)
       this.timers.push(this.iOSTimer)
     }else {
-      _that.setState({renameDialogVisible: true})
+      _that._isMounted && _that.setState({renameDialogVisible: true})
     }
   }
 
@@ -666,24 +659,27 @@ class AccountDetailPage extends Component {
           navigation={this.props.navigation}
         />
         <Dialog
-          style={{backgroundColor: 'white'}}
           visible={this.state.renameDialogVisible}
-          onTouchOutside={() => this.setState({renameDialogVisible: false})}
+          onTouchOutside={() => {
+            this._isMounted && this.setState({renameDialogVisible: false})
+          }}
           width={0.8}
           dialogTitle={<DialogTitle  title={I18n.t('renameAccount')}/>}
           actions={[
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key='rename_account_cancel'
               text={I18n.t('cancel')}
-              onPress={() => this.setState({ renameDialogVisible: false })} />,
+              onPress={() => {
+                this._isMounted && this.setState({ renameDialogVisible: false })
+              }} />,
             <DialogButton
-              style={{backgroundColor: '#fff'}}
+              style={{backgroundColor: Color.WHITE}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='rename_account_confirm'
               text={I18n.t('confirm')} onPress={() => {
-                this.setState({ renameDialogVisible: false })
+                this._isMounted && this.setState({ renameDialogVisible: false })
                 this._renameAccount()}} />
           ]}
         >
@@ -741,10 +737,12 @@ class AccountDetailPage extends Component {
               : ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT
           }
           onTouchOutside={() => {
-            this.setState({transactionDetailDialogVisible: false})
+            this._isMounted && this.setState({transactionDetailDialogVisible: false})
             this._handleTransactionDetailDismiss()
           }}
-          onShown={() => this.setState({ isShowBottomBar: false })}>
+          onShown={() => {
+            this._isMounted && this.setState({ isShowBottomBar: false })
+          }}>
           <Content>
             <View style={{ flex: 1 }}>
               <View
@@ -764,7 +762,7 @@ class AccountDetailPage extends Component {
                     name="close"
                     type="MaterialCommunityIcons"
                     onPress={() => {
-                      this.setState({transactionDetailDialogVisible: false})
+                      this._isMounted && this.setState({transactionDetailDialogVisible: false})
                       this._handleTransactionDetailDismiss()
                     }}
                   />
@@ -1010,7 +1008,6 @@ const mapStateToProps = state => ({
   ethUnit: state.SettingsReducer.ethUnit,
   account: state.AccountReducer.account,
   accountCurrentUnit: state.AccountReducer.accountCurrentUnit,
-  offlineMode: state.WalletReducer.offlineMode
 })
 
 

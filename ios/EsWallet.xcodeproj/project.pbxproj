@@ -349,7 +349,6 @@
 		2169E717210ACDEF0039D751 /* BtDeviceModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BtDeviceModule.h; path = EsWallet/BtDeviceModule.h; sourceTree = "<group>"; };
 		2169E739210AEE720039D751 /* libEsHDWallet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libEsHDWallet.a; path = EsWallet/libs/libEsHDWallet.a; sourceTree = "<group>"; };
 		2169E75A210AEE7C0039D751 /* EsHDWallet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EsHDWallet.h; path = EsWallet/libs/include/EsHDWallet.h; sourceTree = "<group>"; };
-		2169E75B210AEE7C0039D751 /* ESSerialNumber.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ESSerialNumber.h; path = EsWallet/libs/include/ESSerialNumber.h; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* EsWallet-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EsWallet-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* EsWallet-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EsWallet-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRealmReact.a; sourceTree = "<group>"; };
@@ -377,6 +376,7 @@
 		8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		8D7F0B08CE9744D1AA8DDBF7 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		9B1BC8F321F08F6500644678 /* ESSerialNumber.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ESSerialNumber.h; path = EsWallet/libs/include/ESSerialNumber.h; sourceTree = "<group>"; };
 		9B325E6421AC1A0D0026627F /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
 		9BA72AEE216DA047007E215C /* BackIOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackIOS.m; sourceTree = "<group>"; };
 		A1E559E5AD134D9883EEAE55 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
@@ -542,7 +542,7 @@
 				2169E717210ACDEF0039D751 /* BtDeviceModule.h */,
 				2169E6F7210ACDEF0039D751 /* BtDeviceModule.m */,
 				2169E75A210AEE7C0039D751 /* EsHDWallet.h */,
-				2169E75B210AEE7C0039D751 /* ESSerialNumber.h */,
+				9B1BC8F321F08F6500644678 /* ESSerialNumber.h */,
 				2137A568210B148900477DCD /* BtScanHelper.h */,
 				2137A569210B148900477DCD /* BtScanHelper.m */,
 				87737D2B21B7F0D80088013B /* DDRSAWrapper.h */,

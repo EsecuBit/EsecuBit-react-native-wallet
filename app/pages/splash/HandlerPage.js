@@ -4,7 +4,6 @@ import { EsWallet, D } from 'esecubit-wallet-sdk'
 import { NavigationActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
-import { setOfflineMode } from '../../actions/WalletAction'
 import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
@@ -36,7 +35,6 @@ class HandlerPage extends Component {
     this.esWallet.enterOfflineMode()
       .catch(error => {
         this._gotoHomePage(true)
-        this.props.setOfflineMode(true)
         console.log('enter offline mode error', error)
       })
     this._getLanguagePreference()
@@ -57,7 +55,6 @@ class HandlerPage extends Component {
       if (error === D.error.succeed) {
         if (status === D.status.syncing) {
           this._gotoHomePage(true)
-          this.props.setOfflineMode(true)
           console.log('can enter offline mode')
         }
       }else {
@@ -67,11 +64,9 @@ class HandlerPage extends Component {
           } else {
             this._resetRouter('PairList', { autoConnect: true })
           }
-          this.props.setOfflineMode(false)
           console.warn('offlineModeNotAllowed')
         }else {
           this._gotoHomePage(true)
-          this.props.setOfflineMode(true)
           console.warn('other error, stop', error)
         }
       }
@@ -120,7 +115,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   setCryptoCurrencyUnit,
   setLegalCurrencyUnit,
-  setOfflineMode,
 }
 
 

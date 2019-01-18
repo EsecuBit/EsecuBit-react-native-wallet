@@ -202,7 +202,7 @@ class BTCSendPage extends Component {
       sendValue: this.valueInput.getValue(),
       address: this.addressInput.getAddress()
     })
-    this.setState({ transactionConfirmDialogVisible: true })
+    this._isMounted && this.setState({ transactionConfirmDialogVisible: true })
   }
 
   _send() {
@@ -222,9 +222,7 @@ class BTCSendPage extends Component {
       })
       .then(() => {
         ToastUtil.showLong(I18n.t('success'))
-        if (this._isMounted) {
-          this.setState({ transactionConfirmDialogVisible: false })
-        }
+        this._isMounted && this.setState({ transactionConfirmDialogVisible: false })
         this.lockSend = false
         this.props.navigation.pop()
       })
@@ -232,9 +230,7 @@ class BTCSendPage extends Component {
         // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
         // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
         InteractionManager.runAfterInteractions(() => {
-          if (this._isMounted) {
-            this.setState({transactionConfirmDialogVisible: false })
-          }
+          this._isMounted && this.setState({transactionConfirmDialogVisible: false })
         })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
@@ -244,7 +240,7 @@ class BTCSendPage extends Component {
   // @flow
   _checkIfDeviceLimit(result: {}) {
     if (result.deviceLimit) {
-      this.setState({ deviceLimitDialogVisible: true })
+      this._isMounted && this.setState({ deviceLimitDialogVisible: true })
     }
   }
 

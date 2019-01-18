@@ -44,7 +44,7 @@ class SendToolbar extends PureComponent<Props> {
           />
           <Left>
             <Button transparent onPress={() => this.props.navigation.pop()}>
-              <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS, paddingLeft: Dimen.MARGIN_HORIZONTAL }} />
+              <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS, paddingLeft: Platform.OS === 'ios' ? Dimen.MARGIN_HORIZONTAL : 0 }} />
             </Button>
           </Left>
           <View
