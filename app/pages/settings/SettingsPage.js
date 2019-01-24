@@ -564,6 +564,7 @@ class SettingsPage extends Component {
         {/* Clear Data Dialog */}
         <Dialog
           width={0.8}
+          onTouchOutside={() => {}}
           visible={this.state.clearDataDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('clearData')} />}
           actions={[
