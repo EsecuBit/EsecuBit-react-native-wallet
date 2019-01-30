@@ -63,7 +63,11 @@ export default class PairListPage extends Component {
             this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
           }
         }
+        if (status === D.status.authFinish) {
+          console.log('wallet authFinish')
+        }
         if (status === D.status.syncing) {
+          console.log('wallet syncing')
           this.setState({
             authenticateDialogVisible: false,
             connectDialogVisible: false
@@ -342,5 +346,4 @@ const styles = StyleSheet.create({
     color: Color.PRIMARY_TEXT,
     marginTop: Dimen.SPACE
   }
-
 })

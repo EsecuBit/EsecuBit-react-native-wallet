@@ -103,9 +103,13 @@ public class BtScanHelper {
     @SuppressLint("NewApi")
     private void stopScanBluetooth() {
         if (isSupportBLE) {
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            if(mBluetoothAdapter != null) {
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            }
         } else {
-            mBluetoothAdapter.cancelDiscovery();
+            if(mBluetoothAdapter != null) {
+                mBluetoothAdapter.cancelDiscovery();
+            }
             mContext.unregisterReceiver(deviceReceiver);
         }
     }

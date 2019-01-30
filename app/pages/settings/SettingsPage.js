@@ -206,6 +206,7 @@ class SettingsPage extends Component {
   async clearData() {
     this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
     try {
+      this.wallet.listenStatus(() => {})
       this.transmitter.disconnect()
       await this.wallet.reset()
       setTimeout(() => {
@@ -564,7 +565,6 @@ class SettingsPage extends Component {
         {/* Clear Data Dialog */}
         <Dialog
           width={0.8}
-          onTouchOutside={() => {}}
           visible={this.state.clearDataDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('clearData')} />}
           actions={[
