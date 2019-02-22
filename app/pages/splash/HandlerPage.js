@@ -30,7 +30,7 @@ class HandlerPage extends Component {
   componentDidMount() {
     this._getCurrencyPreference()
     this.esWallet.setTestSeed(
-      '90b41b9c4720b3f522a9e0d783c70fcabc43d5529f2d7d8ecc798da2c436259f052d697718e3297f1512c71e51b3d762099653d20d019cad931576f5d1c00775'
+      'ef3a397c6af3bce6f05b75dd8437f1552d17190eeb6b1b9e85872f207db5b5e5db4aade19ebdc47f90935cb5bec30cbab68dbce67a139f923ca697e04311284c'
     )
     this.esWallet.enterOfflineMode()
       .catch(error => {
@@ -52,6 +52,7 @@ class HandlerPage extends Component {
 
   _listenWalletStatus() {
     this.esWallet.listenStatus((error, status) => {
+      console.log('wallet status code', error, status)
       if (error === D.error.succeed) {
         if (status === D.status.syncing) {
           this._gotoHomePage(true)

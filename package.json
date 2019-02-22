@@ -46,6 +46,7 @@
     "react-native-popup-dialog": "git+https://github.com/sekfung/react-native-popup-dialog.git",
     "react-native-qrcode": "^0.2.7",
     "react-native-root-siblings": "1.2.0",
+    "react-native-tab-view": "^1.3.2",
     "react-native-vector-icons": "^4.6.0",
     "react-navigation": "^1.5.11",
     "react-navigation-redux-helpers": "^1.1.2",

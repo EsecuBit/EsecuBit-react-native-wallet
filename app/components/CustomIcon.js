@@ -3,6 +3,7 @@ import { Icon } from "native-base"
 import CoinUtil from "../utils/CoinUtil"
 import { Coin } from "../common/Constants"
 import { Color } from '../common/Styles'
+import { Image } from 'react-native'
 
 export default class CustomIcon extends Component {
 
@@ -31,9 +32,8 @@ export default class CustomIcon extends Component {
         )
       case Coin.eos:
         return (
-          <Icon
-            name="ethereum"
-            type="MaterialCommunityIcons"
+          <Image
+            source={require('../imgs/eos.png')}
             style={{ width: 28, height: 28, color: Color.ETH }}
           />
         )
