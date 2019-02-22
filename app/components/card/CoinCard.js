@@ -10,6 +10,7 @@ import { connect } from "react-redux"
 import { withNavigation } from "react-navigation"
 import CustomIcon from "../CustomIcon"
 import { Coin } from "../../common/Constants"
+import { D } from 'esecubit-wallet-sdk'
 
 class CoinCard extends PureComponent{
   constructor() {
@@ -21,7 +22,11 @@ class CoinCard extends PureComponent{
   async _gotoDetailPage(item: {coinType: string}) {
     this.props.setAccount(item)
     this._setAccountCurrencyUnit(item.coinType)
-    this.props.navigation.navigate("Detail")
+    if (D.isEos(item.coinType)) {
+      this.props.navigation.navigate("EOSAccountDetail")
+    }else {
+      this.props.navigation.navigate("Detail")
+    }
   }
 
   // @flow
@@ -69,6 +74,9 @@ class CoinCard extends PureComponent{
       fromUnit,
       this.props.legalCurrencyUnit
     )
+    if (D.isEos(data.coinType)) {
+      data.checkAccountPermissions(() => {})
+    }
     return (
       <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(data)} onLongPress={this.props.onLongPress}>
         <Left style={{ flexDirection: "row" }}>

@@ -174,5 +174,12 @@ export default {
   clearDataDesc: "确定清空数据？下一次将会重新进行同步",
   clearing: "正在清除数据",
   deviceChange: '该设备和上次连接的设备不同，请清除数据后重新连接',
-  clickTooFast: '操作太频繁，请稍后重试'
+  clickTooFast: '操作太频繁，请稍后重试',
+  proxyVoteTextHint: '将代表你投票的账户',
+  proxyVoteInputHint: '代理投票帐户名称',
+  invalidDataNotHex: '无效数据，非十六进制',
+  valueIsNotDecimal: '无效数据，非十进制',
+  invalidParams: '无效参数',
+  permissionNotFound: '权限未找到',
+  permissionNoNeedToConfirmed: '权限无需确认'
 }

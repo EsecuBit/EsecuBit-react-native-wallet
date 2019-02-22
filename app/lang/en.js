@@ -173,6 +173,14 @@ export default {
   clearDataDesc: "Determine clear data? it will be sync data again at next time",
   clearing: 'Clearing',
   deviceChange: 'This device is different from the last connected device, please clear the data and reconnect',
-  clickTooFast: 'Click too fast, please try again later'
+  clickTooFast: 'Click too fast, please try again later',
+  proxyVoteTextHint: 'The account that will vote on your behalf.',
+  proxyVoteInputHint: 'proxy vote account name',
+  invalidDataNotHex: 'invalid data not hex',
+  valueIsNotDecimal: 'value is not decimal',
+  invalidParams: 'invalid params',
+  permissionNotFound: 'permission not found',
+  permissionNoNeedToConfirmed: 'permission no need to confirmed'
+
 
 }

@@ -26,7 +26,11 @@ class AddressDetailPage extends PureComponent {
     this._isMounted = true
     this._onFocus()
     this._onBlur()
-    this._getAddress(this.state.storeAddress)
+    if (D.isEos(this.coinType)) {
+      this._getAccountName()
+    }else {
+      this._getAddress(this.state.storeAddress)
+    }
   }
 
 
@@ -74,6 +78,11 @@ class AddressDetailPage extends PureComponent {
       console.warn("getAddress", error)
       ToastUtil.showLong(I18n.t("getAddressError"))
     }
+  }
+
+  async _getAccountName() {
+    this._isMounted && await this.setState({dialogVisible: true})
+    this._isMounted && this.setState({ address: this.account.label })
   }
 
   _setClipboardContent(addr) {

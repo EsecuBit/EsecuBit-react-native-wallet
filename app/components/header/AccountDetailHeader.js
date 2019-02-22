@@ -15,7 +15,7 @@ class AccountDetailHeader extends PureComponent {
     super(props)
     this.account = props.account
     this.wallet = new EsWallet()
-    this.cryptoCurrencyUnit = D.isBtc(this.account.coinType) ? props.btcUnit : props.ethUnit
+    this.cryptoCurrencyUnit = this.props.accountCurrentUnit
     this.state = {
       accountName: this.account.label,
       cryptoCurrencyBalance: '0',
@@ -222,10 +222,9 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
-  btcUnit: state.SettingsReducer.btcUnit,
-  ethUnit: state.SettingsReducer.ethUnit,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
-  account: state.AccountReducer.account
+  account: state.AccountReducer.account,
+  accountCurrentUnit: state.AccountReducer.accountCurrentUnit
 })
 
 export default connect(mapStateToProps, null, null, {withRef: true})(AccountDetailHeader)

@@ -40,6 +40,11 @@ const errorMap = {
   602: 'noAddressCheckSum',
   603: 'invalidAddressChecksum',
   604: 'valueIsDecimal',
+  605: 'invalidDataNotHex',
+  606:'valueIsNotDecimal',
+  607: 'invalidParams',
+  608: 'permissionNotFound',
+  609: 'permissionNoNeedToConfirmed',
   10000: 'notImplemented',
   10001: 'unknown',
   10002: 'coinNotSupported'

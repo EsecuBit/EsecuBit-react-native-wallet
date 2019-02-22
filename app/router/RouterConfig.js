@@ -16,6 +16,7 @@ import EOSBandWidthManagePage from '../pages/eos/EOSBandWidthManagePage'
 import EOSNetworkSettingPage from '../pages/eos/EOSNetworkSettingPage'
 import EOSVotePage from "../pages/eos/EOSVotePage"
 import AccountManagePage from "../pages/settings/AccountManagePage"
+import EOSAccountDetail from "../pages/eos/EOSAccountDetailPage";
 
 export default {
   Handler: {
@@ -71,5 +72,8 @@ export default {
   },
   AccountManage: {
     screen: AccountManagePage
+  },
+  EOSAccountDetail: {
+    screen: EOSAccountDetail
   }
 }

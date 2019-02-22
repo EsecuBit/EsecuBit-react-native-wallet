@@ -12,17 +12,13 @@ import {
 import I18n from '../../lang/i18n'
 import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
 import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
-import BigInteger from 'bigi'
 import { CommonStyle, Dimen, Color } from '../../common/Styles'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
-import StringUtil from '../../utils/StringUtil'
 import AccountOperateBottomBar from '../../components/bar/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/header/AccountDetailHeader'
 import { connect } from 'react-redux'
-import CoinUtil from '../../utils/CoinUtil'
-import { Coin } from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 
 const deviceW = Dimensions.get('window').width
@@ -31,7 +27,7 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 434
 const ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT = 520
 
-class AccountDetailPage extends Component {
+class EOSAccountDetailPage extends Component {
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
@@ -68,9 +64,9 @@ class AccountDetailPage extends Component {
 
     })
     this.account.getPermissions()
-        .then(result => {
-          console.log("permission", result)
-        })
+      .then(result => {
+        console.log("permission", result)
+      })
   }
 
   _onFocus() {
@@ -109,12 +105,6 @@ class AccountDetailPage extends Component {
             case 'address':
               this.navigateTimer = setTimeout(() => {
                 this._gotoAddressDetailPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
-            case 'resend':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoResendPage()
               }, 3000)
               this.timers.push(this.navigateTimer)
               break
@@ -173,9 +163,6 @@ class AccountDetailPage extends Component {
         case 'address':
           this._gotoAddressDetailPage()
           break
-        case 'resend':
-          this._gotoResendPage()
-          break
       }
     }
   }
@@ -201,21 +188,8 @@ class AccountDetailPage extends Component {
   }
 
   _gotoSendPage() {
-    let coinType = CoinUtil.getRealCoinType(this.account.coinType)
     this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
-    switch (coinType) {
-      case Coin.btc:
-        this.props.navigation.navigate('BTCSend')
-        break
-      case Coin.eth:
-        this.props.navigation.navigate('ETHSend')
-        break
-      case Coin.eos:
-        this.props.navigation.navigate('EOSSend')
-        break
-      default:
-        throw D.error.coinNotSupported
-    }
+    this.props.navigation.navigate('EOSSend')
   }
 
   _gotoAddressDetailPage() {
@@ -246,321 +220,266 @@ class AccountDetailPage extends Component {
    * @param {object} rowData
    */
   _renderRowView(rowData) {
-    let title = ''
-    let date = StringUtil.formatTimeStamp(rowData.time)
-    let price = '0'
-    let temp = ''
-    let symbol = ''
-    let priceColor = Color.ACCENT
-    let isToSelf = false
-    let rowHeight = 0
-    let memo = rowData.comment
-    let confirmStr = ''
-    let confirmColor = Color.ACCENT
-
-    rowData.showAddresses.forEach((item, index) => {
-      let addr = ''
-      if (item.toUpperCase() === 'SELF') {
-        addr = item
-        isToSelf = true
-      } else {
-        addr = item.substr(0, 16) + '*****'
-      }
-      if (index !== rowData.showAddresses.length - 1) {
-        temp = temp + addr + ','
-      } else {
-        temp = temp + addr
-      }
-    })
-
-    if (rowData.direction === D.tx.direction.in) {
-      title = 'From:' + temp
-      symbol = '+'
-      priceColor = Color.INCREASE
-    } else {
-      title = 'To:' + temp
-      symbol = '-'
-      priceColor = Color.REDUCED
-    }
-
-    if (D.isBtc(rowData.coinType)) {
-      price = this._getBTCPrice(rowData, isToSelf)
-    } else {
-      price = this._getETHPrice(rowData, isToSelf)
-    }
-
-    if (price < 0) {
-      price = -price
-    }
-
-    if (rowData.confirmations === -1) {
-      confirmStr = I18n.t('pending')
-    } else if (rowData.confirmations === -2) {
-      confirmStr = I18n.t('invalid')
-    } else if (rowData.confirmations >= 6) {
-      confirmStr = ''
-    } else if (0 <= rowData.confirmations && rowData.confirmations < 6) {
-      confirmStr = I18n.t('confirming')
-    }
-
-    if (memo) {
-      title = memo
-    }
-
-    if (platform === 'ios') {
-      rowHeight = 85
-    } else {
-      rowHeight = 100
-    }
-
     return (
-      <CardItem
-        button
-        style={{ backgroundColor: Color.CONTAINER_BG }}
-        onPress={() => {
-          this._showTransactionDetailDialog(rowData)
-        }}>
-        <View
-          style={{
-            height: rowHeight,
-            width: deviceW - 2 * Dimen.MARGIN_HORIZONTAL,
-            backgroundColor: Color.TEXT_ICONS,
-            borderRadius: 10,
-            elevation: 3
-          }}>
-          <View style={styles.itemContainer}>
-            <View
-              style={{
-                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
-                marginTop: 15,
-                marginLeft: 10
-              }}>
-              <Text style={styles.leftText} numberOfLines={2} ellipsizeMode="tail">
-                {title}
-              </Text>
-            </View>
-            <View
-              style={{
-                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
-                alignItems: 'flex-end',
-                marginTop: 15,
-                marginRight: 10
-              }}>
-              <Text style={[styles.rightText, { color: priceColor }]}>
-                {symbol + ' ' + StringUtil.formatCryptoCurrency(price)}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.itemContainer}>
-            <View
-              style={{
-                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
-                justifyContent: 'flex-end',
-                marginBottom: 15,
-                marginLeft: 10
-              }}>
-              <Text style={styles.leftText}>{date}</Text>
-            </View>
-            <View
-              style={{
-                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
-                alignItems: 'flex-end',
-                justifyContent: 'flex-end',
-                marginBottom: 15,
-                marginRight: 10
-              }}>
-              <Text style={{ fontSize: Dimen.SECONDARY_TEXT, color: confirmColor }}>
-                {confirmStr}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </CardItem>
+      <View></View>
     )
+    // let title = ''
+    // let date = StringUtil.formatTimeStamp(rowData.time)
+    // let price = '0'
+    // let temp = ''
+    // let symbol = ''
+    // let priceColor = Color.ACCENT
+    // let isToSelf = false
+    // let rowHeight = 0
+    // let memo = rowData.comment
+    // let confirmStr = ''
+    // let confirmColor = Color.ACCENT
+    //
+    // rowData.showAddresses.forEach((item, index) => {
+    //   let addr = ''
+    //   if (item.toUpperCase() === 'SELF') {
+    //     addr = item
+    //     isToSelf = true
+    //   } else {
+    //     addr = item.substr(0, 16) + '*****'
+    //   }
+    //   if (index !== rowData.showAddresses.length - 1) {
+    //     temp = temp + addr + ','
+    //   } else {
+    //     temp = temp + addr
+    //   }
+    // })
+    //
+    // if (rowData.direction === D.tx.direction.in) {
+    //   title = 'From:' + temp
+    //   symbol = '+'
+    //   priceColor = Color.INCREASE
+    // } else {
+    //   title = 'To:' + temp
+    //   symbol = '-'
+    //   priceColor = Color.REDUCED
+    // }
+    //
+    // if (D.isBtc(rowData.coinType)) {
+    //   price = this._getBTCPrice(rowData, isToSelf)
+    // } else {
+    //   price = this._getETHPrice(rowData, isToSelf)
+    // }
+    //
+    // if (price < 0) {
+    //   price = -price
+    // }
+    //
+    // if (rowData.confirmations === -1) {
+    //   confirmStr = I18n.t('pending')
+    // } else if (rowData.confirmations === -2) {
+    //   confirmStr = I18n.t('invalid')
+    // } else if (rowData.confirmations >= 6) {
+    //   confirmStr = ''
+    // } else if (0 <= rowData.confirmations && rowData.confirmations < 6) {
+    //   confirmStr = I18n.t('confirming')
+    // }
+    //
+    // if (memo) {
+    //   title = memo
+    // }
+    //
+    // if (platform === 'ios') {
+    //   rowHeight = 85
+    // } else {
+    //   rowHeight = 100
+    // }
+    //
+    // return (
+    //   <CardItem
+    //     button
+    //     style={{ backgroundColor: Color.CONTAINER_BG }}
+    //     onPress={() => {
+    //       this._showTransactionDetailDialog(rowData)
+    //     }}>
+    //     <View
+    //       style={{
+    //         height: rowHeight,
+    //         width: deviceW - 2 * Dimen.MARGIN_HORIZONTAL,
+    //         backgroundColor: Color.TEXT_ICONS,
+    //         borderRadius: 10,
+    //         elevation: 3
+    //       }}>
+    //       <View style={styles.itemContainer}>
+    //         <View
+    //           style={{
+    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
+    //             marginTop: 15,
+    //             marginLeft: 10
+    //           }}>
+    //           <Text style={styles.leftText} numberOfLines={2} ellipsizeMode="tail">
+    //             {title}
+    //           </Text>
+    //         </View>
+    //         <View
+    //           style={{
+    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
+    //             alignItems: 'flex-end',
+    //             marginTop: 15,
+    //             marginRight: 10
+    //           }}>
+    //           <Text style={[styles.rightText, { color: priceColor }]}>
+    //             {symbol + ' ' + StringUtil.formatCryptoCurrency(price)}
+    //           </Text>
+    //         </View>
+    //       </View>
+    //       <View style={styles.itemContainer}>
+    //         <View
+    //           style={{
+    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
+    //             justifyContent: 'flex-end',
+    //             marginBottom: 15,
+    //             marginLeft: 10
+    //           }}>
+    //           <Text style={styles.leftText}>{date}</Text>
+    //         </View>
+    //         <View
+    //           style={{
+    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
+    //             alignItems: 'flex-end',
+    //             justifyContent: 'flex-end',
+    //             marginBottom: 15,
+    //             marginRight: 10
+    //           }}>
+    //           <Text style={{ fontSize: Dimen.SECONDARY_TEXT, color: confirmColor }}>
+    //             {confirmStr}
+    //           </Text>
+    //         </View>
+    //       </View>
+    //     </View>
+    //   </CardItem>
+    // )CardItem
   }
 
-  _getBTCPrice(rowData, isToSelf) {
-    let price = '0'
-    let value = StringUtil.removeNegativeSymbol(rowData.value)
-    if (rowData.direction === D.tx.direction.in) {
-      price = this.wallet.convertValue(
-        this.account.coinType,
-        value,
-        D.unit.btc.satoshi,
-        this.cryptoCurrencyUnit
-      )
-    } else {
-      price = this.wallet.convertValue(
-        this.account.coinType,
-        value,
-        D.unit.btc.satoshi,
-        this.cryptoCurrencyUnit
-      )
-      if (isToSelf) {
-        price = this.wallet.convertValue(
-          this.account.coinType,
-          rowData.fee,
-          D.unit.btc.satoshi,
-          this.cryptoCurrencyUnit
-        )
-      }
-    }
-    return price
-  }
 
-  _getETHPrice(rowData, isToSelf) {
-    let price = '0'
-    let value = StringUtil.removeNegativeSymbol(rowData.value)
-    if (rowData.direction === D.tx.direction.in) {
-      price = this.wallet.convertValue(
-        this.account.coinType,
-        rowData.value,
-        D.unit.eth.Wei,
-        this.cryptoCurrencyUnit
-      )
-    } else {
-      if (!isToSelf) {
-        price = new BigInteger(rowData.fee).add(new BigInteger(value)).toString(10)
-        price = this.wallet.convertValue(
-          this.account.coinType,
-          price,
-          D.unit.eth.Wei,
-          this.cryptoCurrencyUnit
-        )
-      } else {
-        price = this.wallet.convertValue(
-          this.account.coinType,
-          rowData.fee,
-          D.unit.eth.Wei,
-          this.cryptoCurrencyUnit
-        )
-      }
-    }
-    return price
-  }
 
-  async _showTransactionDetailDialog(rowData) {
-    this.dTxInfo = rowData
-    let price = '0'
-    let unit = this.cryptoCurrencyUnit
-    let isToSelf = false
-    let total = '0'
-    let addr = ''
-    this.rowData = rowData
-
-    rowData.showAddresses.forEach(function(item, index) {
-      if (item === 'self' || item === 'Self' || item === 'SELF') {
-        isToSelf = true
-        addr = item
-      } else {
-        if (index !== rowData.showAddresses.length - 1) {
-          addr = addr + item + ','
-        } else {
-          addr = addr + item
-        }
-      }
-    })
-
-    this.dAddr = addr
-
-    if (D.isBtc(rowData.coinType)) {
-      if (rowData.direction === D.tx.direction.in) {
-        price = '0'
-      } else {
-        let value = rowData.value
-        if (value.startsWith('-')) {
-          value = value.slice(1, value.length)
-        }
-        price = this.wallet.convertValue(
-          this.account.coinType,
-          value,
-          D.unit.btc.satoshi,
-          this.cryptoCurrencyUnit
-        )
-        if (isToSelf) {
-          price = this.wallet.convertValue(
-            this.account.coinType,
-            rowData.fee,
-            D.unit.btc.satoshi,
-            this.cryptoCurrencyUnit
-          )
-        }
-      }
-      total = price
-    } else {
-      if (rowData.direction === D.tx.direction.in) {
-        price = '0'
-      } else {
-        if (!isToSelf) {
-          let value = rowData.value
-          if (value.startsWith('-')) {
-            value = value.slice(1, value.length)
-          }
-          price = new BigInteger(rowData.fee).add(new BigInteger(value)).toString(10)
-          price = this.wallet.convertValue(
-            this.account.coinType,
-            price,
-            D.unit.eth.Wei,
-            this.cryptoCurrencyUnit
-          )
-        } else {
-          price = this.wallet.convertValue(
-            this.account.coinType,
-            rowData.fee,
-            D.unit.eth.Wei,
-            this.cryptoCurrencyUnit
-          )
-        }
-      }
-      total = price
-    }
-
-    if (rowData.direction === D.tx.direction.in) {
-      this.dTitle = I18n.t('income')
-      this.dAmountColor = Color.INCREASE
-    } else {
-      this.dTitle = I18n.t('expenditure')
-      this.dAmountColor = Color.REDUCED
-    }
-
-    if (D.isEth(rowData.coinType)) {
-      this.dAmount = this._getETHPrice(rowData, isToSelf) + ' ' + unit
-    } else {
-      this.dAmount = this._getBTCPrice(rowData, isToSelf) + ' ' + unit
-    }
-
-    this.dDate = StringUtil.formatTimeStamp(rowData.time)
-
-    if (rowData.confirmations >= 6) {
-      this.dConfirmStr = I18n.t('complete')
-    } else {
-      this.dConfirmStr = I18n.t('unfinished')
-    }
-
-    if (total < 0) {
-      total = -total
-    }
-    this.dTotal = total + ' ' + unit
-    this.dConfirmNum = rowData.confirmations
-    this.dTxId = rowData.txId
-    this.resendableText = rowData.canResend ? I18n.t('yes') : I18n.t('no')
-    this.canResend = rowData.canResend
-    if (rowData.shouldResend) {
-      this.resendableText = I18n.t('adviceToResend')
-    }
-    if (rowData.comment) {
-      this.setState({ dMemo: rowData.comment })
-    } else {
-      this.setState({ dMemo: '' })
-    }
-
-    if (rowData.data) {
-      this.dSmartContract = rowData.data
-    } else {
-      this.dSmartContract = 'none'
-    }
-    this._isMounted && this.setState({transactionDetailDialogVisible: true})
-  }
+  // async _showTransactionDetailDialog(rowData) {
+  //   this.dTxInfo = rowData
+  //   let price = '0'
+  //   let unit = this.cryptoCurrencyUnit
+  //   let isToSelf = false
+  //   let total = '0'
+  //   let addr = ''
+  //   this.rowData = rowData
+  //
+  //   rowData.showAddresses.forEach(function(item, index) {
+  //     if (item === 'self' || item === 'Self' || item === 'SELF') {
+  //       isToSelf = true
+  //       addr = item
+  //     } else {
+  //       if (index !== rowData.showAddresses.length - 1) {
+  //         addr = addr + item + ','
+  //       } else {
+  //         addr = addr + item
+  //       }
+  //     }
+  //   })
+  //
+  //   this.dAddr = addr
+  //
+  //   if (D.isBtc(rowData.coinType)) {
+  //     if (rowData.direction === D.tx.direction.in) {
+  //       price = '0'
+  //     } else {
+  //       let value = rowData.value
+  //       if (value.startsWith('-')) {
+  //         value = value.slice(1, value.length)
+  //       }
+  //       price = this.wallet.convertValue(
+  //         this.account.coinType,
+  //         value,
+  //         D.unit.btc.satoshi,
+  //         this.cryptoCurrencyUnit
+  //       )
+  //       if (isToSelf) {
+  //         price = this.wallet.convertValue(
+  //           this.account.coinType,
+  //           rowData.fee,
+  //           D.unit.btc.satoshi,
+  //           this.cryptoCurrencyUnit
+  //         )
+  //       }
+  //     }
+  //     total = price
+  //   } else {
+  //     if (rowData.direction === D.tx.direction.in) {
+  //       price = '0'
+  //     } else {
+  //       if (!isToSelf) {
+  //         let value = rowData.value
+  //         if (value.startsWith('-')) {
+  //           value = value.slice(1, value.length)
+  //         }
+  //         price = new BigInteger(rowData.fee).add(new BigInteger(value)).toString(10)
+  //         price = this.wallet.convertValue(
+  //           this.account.coinType,
+  //           price,
+  //           D.unit.eth.Wei,
+  //           this.cryptoCurrencyUnit
+  //         )
+  //       } else {
+  //         price = this.wallet.convertValue(
+  //           this.account.coinType,
+  //           rowData.fee,
+  //           D.unit.eth.Wei,
+  //           this.cryptoCurrencyUnit
+  //         )
+  //       }
+  //     }
+  //     total = price
+  //   }
+  //
+  //   if (rowData.direction === D.tx.direction.in) {
+  //     this.dTitle = I18n.t('income')
+  //     this.dAmountColor = Color.INCREASE
+  //   } else {
+  //     this.dTitle = I18n.t('expenditure')
+  //     this.dAmountColor = Color.REDUCED
+  //   }
+  //
+  //   if (D.isEth(rowData.coinType)) {
+  //     this.dAmount = this._getETHPrice(rowData, isToSelf) + ' ' + unit
+  //   } else {
+  //     this.dAmount = this._getBTCPrice(rowData, isToSelf) + ' ' + unit
+  //   }
+  //
+  //   this.dDate = StringUtil.formatTimeStamp(rowData.time)
+  //
+  //   if (rowData.confirmations >= 6) {
+  //     this.dConfirmStr = I18n.t('complete')
+  //   } else {
+  //     this.dConfirmStr = I18n.t('unfinished')
+  //   }
+  //
+  //   if (total < 0) {
+  //     total = -total
+  //   }
+  //   this.dTotal = total + ' ' + unit
+  //   this.dConfirmNum = rowData.confirmations
+  //   this.dTxId = rowData.txId
+  //   this.resendableText = rowData.canResend ? I18n.t('yes') : I18n.t('no')
+  //   this.canResend = rowData.canResend
+  //   if (rowData.shouldResend) {
+  //     this.resendableText = I18n.t('adviceToResend')
+  //   }
+  //   if (rowData.comment) {
+  //     this.setState({ dMemo: rowData.comment })
+  //   } else {
+  //     this.setState({ dMemo: '' })
+  //   }
+  //
+  //   if (rowData.data) {
+  //     this.dSmartContract = rowData.data
+  //   } else {
+  //     this.dSmartContract = 'none'
+  //   }
+  //   this._isMounted && this.setState({transactionDetailDialogVisible: true})
+  // }
 
   _getTxInfos() {
     this.account
@@ -576,17 +495,7 @@ class AccountDetailPage extends Component {
     this.accountHeader && this.accountHeader.updateBalance()
   }
 
-  _renameAccount() {
-    this.account
-      .rename(this.renameAccountname)
-      .then(() => {
-        this.accountHeader && this.accountHeader.updateAccountName(this.renameAccountname)
-      })
-      .catch(error => {
-        console.log('rename', error)
-        ToastUtil.showErrorMsgShort(error)
-      })
-  }
+
 
   _handleTransactionDetailDismiss() {
     //lose focus
@@ -604,20 +513,6 @@ class AccountDetailPage extends Component {
     }
   }
 
-  _gotoResendPage() {
-    let param = { txInfo: this.rowData }
-    switch (true) {
-      case D.isBtc(this.account.coinType):
-        this.props.navigation.navigate('BTCSend', param)
-        break
-      case D.isEth(this.account.coinType):
-        this.props.navigation.navigate('ETHSend', param)
-        break
-      default:
-        break
-    }
-    this._isMounted && this.setState({bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false})
-  }
   /**
    * Handle Menu Item Click
    * @param type: [accountAssets, permissionManage, renameAccount]
@@ -630,9 +525,6 @@ class AccountDetailPage extends Component {
       case 'permissionManage':
         this.props.navigation.navigate('EOSKeyDetail')
         break
-      case 'renameAccount':
-        this._showRenameDialog()
-        break
       case 'vote':
         this.props.navigation.navigate('EOSVote')
         break
@@ -641,18 +533,6 @@ class AccountDetailPage extends Component {
     }
   }
 
-  _showRenameDialog() {
-    let _that = this
-    if(platform === 'ios') {
-      // iOS render is too fast
-      this.iOSTimer = setTimeout(() => {
-        _that._isMounted && _that.setState({renameDialogVisible: true})
-      }, 400)
-      this.timers.push(this.iOSTimer)
-    }else {
-      _that._isMounted && _that.setState({renameDialogVisible: true})
-    }
-  }
 
   render() {
     return (
@@ -683,8 +563,8 @@ class AccountDetailPage extends Component {
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='rename_account_confirm'
               text={I18n.t('confirm')} onPress={() => {
-                this._isMounted && this.setState({ renameDialogVisible: false })
-                this._renameAccount()}} />
+              this._isMounted && this.setState({ renameDialogVisible: false })
+              this._renameAccount()}} />
           ]}
         >
           <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
@@ -707,11 +587,11 @@ class AccountDetailPage extends Component {
           }}>
           <Text style={styles.listTitleText}>
             {I18n.t('transactionRecord') +
-              '( ' +
-              I18n.t('value') +
-              ': ' +
-              this.props.accountCurrentUnit +
-              ' )'}
+            '( ' +
+            I18n.t('value') +
+            ': ' +
+            this.props.accountCurrentUnit +
+            ' )'}
           </Text>
         </View>
         <View style={{ height: 1 }} />
@@ -1015,5 +895,5 @@ const mapStateToProps = state => ({
 })
 
 
-const AccountDetail = connect(mapStateToProps)(AccountDetailPage)
-export default AccountDetail
+const EOSAccountDetail = connect(mapStateToProps)(EOSAccountDetailPage)
+export default EOSAccountDetail
