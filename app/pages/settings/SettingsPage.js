@@ -1,22 +1,23 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator} from 'react-native'
-import { Container, Icon, Right, Card, CardItem, Text, Content } from 'native-base'
-import { SinglePickerMaterialDialog } from 'react-native-material-dialog'
+import {Container, Icon, Right, Card, CardItem, Text, Content} from 'native-base'
+import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import { version, cosVersion } from '../../../package.json'
-import { Api, Coin } from '../../common/Constants'
+import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {version, cosVersion} from '../../../package.json'
+import {Api, Coin} from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import ToastUtil from '../../utils/ToastUtil'
-import { Color, Dimen, CommonStyle } from '../../common/Styles'
+import {Color, Dimen, CommonStyle} from '../../common/Styles'
 import AppUtil from '../../utils/AppUtil'
-import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
-import { connect } from 'react-redux'
+import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
+import {connect} from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import BaseToolbar from '../../components/bar/BaseToolbar'
-import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
-import { withNavigation, NavigationActions } from 'react-navigation'
+import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-popup-dialog'
+import {withNavigation, NavigationActions} from 'react-navigation'
+
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 
@@ -68,10 +69,16 @@ class SettingsPage extends Component {
 
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
-      if (status === D.status.deviceChange) {
-        ToastUtil.showLong(I18n.t('deviceChange'))
-        this.transmitter.disconnect()
-        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      console.log('settings wallet status',error, status)
+      if (error === D.error.succeed) {
+        if (status === D.status.deviceChange) {
+          ToastUtil.showLong(I18n.t('deviceChange'))
+          this.transmitter.disconnect()
+          this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+        }
+        if (status === D.status.syncFinish || status === D.status.syncing) {
+          this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+        }
       }
     })
   }
@@ -79,6 +86,8 @@ class SettingsPage extends Component {
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       this._getPreference()
+      this._listenDeviceStatus()
+      this._listenWallet()
       BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
     })
   }
@@ -86,7 +95,7 @@ class SettingsPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-      this._isMounted && this.setState({ clearDataWaitingDialogVisible: false})
+      this._isMounted && this.setState({clearDataWaitingDialogVisible: false})
     })
   }
 
@@ -105,16 +114,16 @@ class SettingsPage extends Component {
     }
     let btcPref = await PreferenceUtil.getCryptoCurrencyUnit(Coin.btc)
     if (btcPref) {
-      this.setState({ btcIndex: btcPref.index, btcLabel: btcPref.label })
+      this.setState({btcIndex: btcPref.index, btcLabel: btcPref.label})
     }
     let ethPref = await PreferenceUtil.getCryptoCurrencyUnit(Coin.eth)
     if (ethPref) {
-      this.setState({ ethIndex: ethPref.index, ethLabel: ethPref.label })
+      this.setState({ethIndex: ethPref.index, ethLabel: ethPref.label})
     }
     let legalPref = await PreferenceUtil.getCurrencyUnit(Coin.legal)
     console.log('legalPref', legalPref)
     if (legalPref) {
-      this.setState({ legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index })
+      this.setState({legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index})
     }
   }
 
@@ -122,12 +131,12 @@ class SettingsPage extends Component {
     this.transmitter.listenStatus((error, status) => {
       if (error === D.error.succeed) {
         if (status === BtTransmitter.connecting) {
-          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting'), cosVersion: cosVersion })
+          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting'), cosVersion: cosVersion})
         } else if (status === BtTransmitter.disconnected) {
           this.setState({bluetoothConnectDialogVisible: false, cosVersion: 'unknown'})
-        }else if (status === BtTransmitter.connected) {
-          this.setState({bluetoothConnectDialogVisible: false})
+        } else if (status === BtTransmitter.connected) {
           this.transmitter.stopScan()
+          this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
         }
       }
     })
@@ -154,14 +163,14 @@ class SettingsPage extends Component {
     let state = await this.transmitter.getState()
     if (state === BtTransmitter.disconnected) {
       ToastUtil.showShort(I18n.t('disconnected'))
-    }else {
+    } else {
       this.setState({disConnectDialogVisible: true})
     }
   }
 
   async _disConnect() {
     console.log('disConnected')
-    await this.setState({ disConnectDialogVisible: false })
+    await this.setState({disConnectDialogVisible: false})
     this.transmitter.disconnect()
     ToastUtil.showShort(I18n.t('disconnected'))
   }
@@ -190,7 +199,7 @@ class SettingsPage extends Component {
   }
 
   _checkForceUpdate() {
-    this.setState({ updateVersionDialogVisible: false })
+    this.setState({updateVersionDialogVisible: false})
     if (this.info && this.info.data.isForceUpdate) {
       AppUtil.exitApp()
     }
@@ -200,20 +209,21 @@ class SettingsPage extends Component {
     if (this.info.data) {
       Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
-    this.setState({ updateVersionDialogVisible: false })
+    this.setState({updateVersionDialogVisible: false})
   }
 
   async clearData() {
     this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
     try {
-      this.wallet.listenStatus(() => {})
+      this.wallet.listenStatus(() => {
+      })
       this.transmitter.disconnect()
       await this.wallet.reset()
       setTimeout(() => {
         const resetAction = NavigationActions.reset({
           index: 0,
           actions: [
-            NavigationActions.navigate({ routeName: 'PairList', params: { autoConnect: false } })
+            NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
           ]
         })
         this.props.navigation.dispatch(resetAction)
@@ -230,7 +240,7 @@ class SettingsPage extends Component {
     let state = await this.transmitter.getState()
     if (state === BtTransmitter.connected) {
       ToastUtil.showShort(I18n.t('hasConnected'))
-    }else {
+    } else {
       let accounts = await this.wallet.getAccounts()
       if (accounts.length === 0) {
         this.props.navigation.navigate('PairList', {autoConnect: true})
@@ -251,7 +261,7 @@ class SettingsPage extends Component {
     // if search device no response after 10s, toast tip to notify user no device found
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
-      if(state === BtTransmitter.disconnected) {
+      if (state === BtTransmitter.disconnected) {
         this.setState({bluetoothConnectDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
@@ -262,11 +272,11 @@ class SettingsPage extends Component {
 
   render() {
     return (
-      <Container style={[CommonStyle.safeAreaBottom, { backgroundColor: Color.CONTAINER_BG }]}>
-        <BaseToolbar title={I18n.t('settings')} />
-        <Content style={{ backgroundColor: Color.CONTAINER_BG }}>
-          <Card style={{ flex: 1 }}>
-            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+      <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
+        <BaseToolbar title={I18n.t('settings')}/>
+        <Content style={{backgroundColor: Color.CONTAINER_BG}}>
+          <Card style={{flex: 1}}>
+            <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>{I18n.t('device')}</Text>
             </CardItem>
             <CardItem
@@ -275,67 +285,67 @@ class SettingsPage extends Component {
               onPress={() => this._connectDevice()}>
               <Text>{I18n.t('connectDevice')}</Text>
               <Right>
-                <Icon name="ios-arrow-forward" />
+                <Icon name="ios-arrow-forward"/>
               </Right>
             </CardItem>
-            <View style={CommonStyle.divider} />
+            <View style={CommonStyle.divider}/>
             <CardItem
               bordered
               button
               onPress={() => this._showDisconnectDialog()}>
               <Text>{I18n.t('disconnect')}</Text>
               <Right>
-                <Icon name="ios-arrow-forward" />
+                <Icon name="ios-arrow-forward"/>
               </Right>
             </CardItem>
-            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>{I18n.t('currency')}</Text>
             </CardItem>
             <CardItem
               bordered
               button
-              onPress={() => this.setState({ legalCurrencyDialogVisible: true })}>
+              onPress={() => this.setState({legalCurrencyDialogVisible: true})}>
               <Text>{I18n.t('legalCurrency')}</Text>
               <Right>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text style={{ marginRight: Dimen.MARGIN_HORIZONTAL }}>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
                     {this.state.legalCurrencyLabel}
                   </Text>
-                  <Icon name="ios-arrow-forward" />
+                  <Icon name="ios-arrow-forward"/>
                 </View>
               </Right>
             </CardItem>
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
-              <CardItem bordered button onPress={() => this.setState({ btcDialogVisible: true })}>
+              <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
                 <Text>{I18n.t('btc')}</Text>
                 <Right>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ marginRight: Dimen.MARGIN_HORIZONTAL }}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
                       {this.state.btcLabel}
                     </Text>
-                    <Icon name="ios-arrow-forward" />
+                    <Icon name="ios-arrow-forward"/>
                   </View>
                 </Right>
               </CardItem>
             ) : (
-              <View style={CommonStyle.divider} />
+              <View style={CommonStyle.divider}/>
             )}
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
-              <CardItem bordered button onPress={() => this.setState({ ethDialogVisible: true })}>
+              <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
                 <Text>{I18n.t('eth')}</Text>
                 <Right>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ marginRight: Dimen.MARGIN_HORIZONTAL }}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
                       {this.state.ethLabel}
                     </Text>
-                    <Icon name="ios-arrow-forward" />
+                    <Icon name="ios-arrow-forward"/>
                   </View>
                 </Right>
               </CardItem>
             ) : (
-              <View style={CommonStyle.divider} />
+              <View style={CommonStyle.divider}/>
             )}
-            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>{I18n.t('account')}</Text>
             </CardItem>
             <CardItem
@@ -344,19 +354,19 @@ class SettingsPage extends Component {
               onPress={() => this.props.navigation.navigate('AccountManage')}>
               <Text>{I18n.t('accountManage')}</Text>
             </CardItem>
-            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>App</Text>
             </CardItem>
             <CardItem
               bordered
               button
-              onPress={() => this.setState({ changeLanguageDialogVisible: true })}>
+              onPress={() => this.setState({changeLanguageDialogVisible: true})}>
               <Text>{I18n.t('language')}</Text>
             </CardItem>
-            <CardItem header bordered style={{ backgroundColor: Color.CONTAINER_BG }}>
+            <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>{I18n.t('about')}</Text>
             </CardItem>
-            <View style={CommonStyle.divider} />
+            <View style={CommonStyle.divider}/>
             <CardItem
               bordered
               button
@@ -364,21 +374,21 @@ class SettingsPage extends Component {
             >
               <Text>{I18n.t('clearData')}</Text>
             </CardItem>
-            <View style={CommonStyle.divider} />
+            <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('appVersion')}</Text>
               <Right>
                 <Text>{this.state.appVersion}</Text>
               </Right>
             </CardItem>
-            <View style={CommonStyle.divider} />
+            <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('cosVersion')}</Text>
               <Right>
                 <Text>{this.state.cosVersion}</Text>
               </Right>
             </CardItem>
-            <View style={CommonStyle.divider} />
+            <View style={CommonStyle.divider}/>
             <CardItem bordered button onPress={() => this._checkVersion()}>
               <Text>{I18n.t('checkVersion')}</Text>
             </CardItem>
@@ -390,7 +400,7 @@ class SettingsPage extends Component {
           visible={this.state.legalCurrencyDialogVisible}
           width={0}
           height={0}
-          onTouchOutside={() => this.setState({ legalCurrencyDialogVisible: false })}>
+          onTouchOutside={() => this.setState({legalCurrencyDialogVisible: false})}>
           <SinglePickerMaterialDialog
             title={I18n.t('legalCurrency')}
             items={Object.values(D.unit.legal).map((row, index) => ({
@@ -406,7 +416,7 @@ class SettingsPage extends Component {
               label: this.state.legalCurrencyLabel
             }}
             onCancel={() => {
-              this.setState({ legalCurrencyDialogVisible: false })
+              this.setState({legalCurrencyDialogVisible: false})
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -424,14 +434,14 @@ class SettingsPage extends Component {
 
         {/* BTC Unit Dialog */}
         <Dialog
-          onTouchOutside={() => this.setState({ btcDialogVisible: false })}
+          onTouchOutside={() => this.setState({btcDialogVisible: false})}
           width={0}
           height={0}
           visible={this.state.btcDialogVisible}
         >
           <SinglePickerMaterialDialog
             title={I18n.t('btc')}
-            items={btcUnit.map((row, index) => ({ value: index, label: row }))}
+            items={btcUnit.map((row, index) => ({value: index, label: row}))}
             colorAccent={Color.ACCENT}
             okLabel={I18n.t('confirm')}
             cancelLabel={I18n.t('cancel')}
@@ -441,7 +451,7 @@ class SettingsPage extends Component {
               label: this.state.btcLabel
             }}
             onCancel={() => {
-              this.setState({ btcDialogVisible: false })
+              this.setState({btcDialogVisible: false})
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -459,13 +469,13 @@ class SettingsPage extends Component {
 
         {/* ETH Unit Dialog */}
         <Dialog
-          onTouchOutside={() => this.setState({ ethDialogVisible: false })}
+          onTouchOutside={() => this.setState({ethDialogVisible: false})}
           visible={this.state.ethDialogVisible}
           width={0}
           height={0}>
           <SinglePickerMaterialDialog
             title={I18n.t('eth')}
-            items={ethUnit.map((row, index) => ({ value: index, label: row }))}
+            items={ethUnit.map((row, index) => ({value: index, label: row}))}
             colorAccent={Color.ACCENT}
             okLabel={I18n.t('confirm')}
             cancelLabel={I18n.t('cancel')}
@@ -475,7 +485,7 @@ class SettingsPage extends Component {
               label: this.state.ethLabel
             }}
             onCancel={() => {
-              this.setState({ ethDialogVisible: false })
+              this.setState({ethDialogVisible: false})
             }}
             onOk={result => {
               let label = result.selectedItem.label
@@ -493,7 +503,7 @@ class SettingsPage extends Component {
 
         {/* Language Dialog */}
         <Dialog
-          onTouchOutside={() => this.setState({ changeLanguageDialogVisible: false })}
+          onTouchOutside={() => this.setState({changeLanguageDialogVisible: false})}
           visible={this.state.changeLanguageDialogVisible}
           width={0}
           height={0}>
@@ -512,7 +522,7 @@ class SettingsPage extends Component {
             }}
             visible={this.state.changeLanguageDialogVisible}
             onCancel={() => {
-              this.setState({ changeLanguageDialogVisible: false })
+              this.setState({changeLanguageDialogVisible: false})
             }}
             onOk={result => {
               let index = result.selectedItem.value
@@ -520,15 +530,15 @@ class SettingsPage extends Component {
                 case 0:
                   I18n.locale = 'en'
                   PreferenceUtil.updateLanguagePrefrence('en', 0)
-                  this.setState({ changeLanguageIndex: 0, changeLanguageLabel: 'en' })
+                  this.setState({changeLanguageIndex: 0, changeLanguageLabel: 'en'})
                   break
                 case 1:
                   I18n.locale = 'zh-Hans'
                   PreferenceUtil.updateLanguagePrefrence('zh-Hans', 1)
-                  this.setState({ changeLanguageIndex: 1, changeLanguageLabel: 'zh-Hans' })
+                  this.setState({changeLanguageIndex: 1, changeLanguageLabel: 'zh-Hans'})
                   break
               }
-              this.setState({ changeLanguageDialogVisible: false })
+              this.setState({changeLanguageDialogVisible: false})
               this.forceUpdate()
             }}
           />
@@ -539,18 +549,18 @@ class SettingsPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')} />}
+          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
           actions={[
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
-              textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key="update_version_cancel"
               text={I18n.t('cancel')}
               onPress={this._checkForceUpdate.bind(this)}
             />,
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
-              textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key="update_version_confirm"
               text={I18n.t('confirm')}
               onPress={() => this._gotoBrowser()}
@@ -566,18 +576,18 @@ class SettingsPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.clearDataDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('clearData')} />}
+          dialogTitle={<DialogTitle title={I18n.t('clearData')}/>}
           actions={[
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
-              textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               key="clear_data_cancel"
               text={I18n.t('cancel')}
               onPress={() => this.setState({clearDataDialogVisible: false})}
             />,
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
-              textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key="clear_data_confirm"
               text={I18n.t('confirm')}
               onPress={() => this.clearData()}
@@ -593,7 +603,8 @@ class SettingsPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.clearDataWaitingDialogVisible}
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
@@ -606,21 +617,21 @@ class SettingsPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.disConnectDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('disconnect')} />}
+          dialogTitle={<DialogTitle title={I18n.t('disconnect')}/>}
           actions={[
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
               key="disconnect_cancel"
-              textStyle={{ color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT }}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
               text={I18n.t('cancel')}
               onPress={() => {
-                this.setState({ disConnectDialogVisible: false })
+                this.setState({disConnectDialogVisible: false})
               }}
             />,
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
               key="disconnect_confirm"
-              textStyle={{ color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT }}
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               text={I18n.t('confirm')}
               onPress={() => this._disConnect()}
             />
@@ -635,7 +646,8 @@ class SettingsPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.bluetoothConnectDialogVisible}
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>

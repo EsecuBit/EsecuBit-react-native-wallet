@@ -180,7 +180,6 @@ export default {
   valueIsNotDecimal: 'value is not decimal',
   invalidParams: 'invalid params',
   permissionNotFound: 'permission not found',
-  permissionNoNeedToConfirmed: 'permission no need to confirmed'
-
-
+  permissionNoNeedToConfirmed: 'permission no need to confirmed',
+  initData: "Initializing..."
 }

@@ -181,5 +181,6 @@ export default {
   valueIsNotDecimal: '无效数据，非十进制',
   invalidParams: '无效参数',
   permissionNotFound: '权限未找到',
-  permissionNoNeedToConfirmed: '权限无需确认'
+  permissionNoNeedToConfirmed: '权限无需确认',
+  initData: "正在初始化数据.."
 }

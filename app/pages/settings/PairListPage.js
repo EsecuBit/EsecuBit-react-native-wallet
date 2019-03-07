@@ -64,9 +64,6 @@ export default class PairListPage extends Component {
           }
         }
         if (status === D.status.authFinish) {
-          console.log('wallet authFinish')
-        }
-        if (status === D.status.syncing) {
           console.log('wallet syncing')
           this.setState({
             authenticateDialogVisible: false,

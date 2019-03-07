@@ -76,6 +76,7 @@ class AccountDetailPage extends Component {
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       this._getTxInfos()
+      this._listenWallet()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
   }
@@ -119,7 +120,7 @@ class AccountDetailPage extends Component {
               this.timers.push(this.navigateTimer)
               break
           }
-
+          this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
         }
         else if(status === BtTransmitter.disconnected){
           this.transmitter.stopScan()
@@ -146,6 +147,9 @@ class AccountDetailPage extends Component {
         ToastUtil.showLong(I18n.t('deviceChange'))
         this.transmitter.disconnect()
         this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      }
+      if (status === D.status.syncFinish || status === D.status.syncing) {
+        this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
       }
     })
   }

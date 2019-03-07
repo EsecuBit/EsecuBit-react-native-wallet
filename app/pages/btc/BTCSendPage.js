@@ -227,11 +227,7 @@ class BTCSendPage extends Component {
         this.props.navigation.pop()
       })
       .catch(error => {
-        // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
-        // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
-        InteractionManager.runAfterInteractions(() => {
-          this._isMounted && this.setState({transactionConfirmDialogVisible: false })
-        })
+        this._isMounted && this.setState({transactionConfirmDialogVisible: false })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
       })

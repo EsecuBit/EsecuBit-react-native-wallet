@@ -65,9 +65,10 @@ class HomePage extends Component {
 
 
   _onFocus() {
-    this.props.navigation.addListener('didFocus', () => {
+    this.props.navigation.addListener('willFocus', () => {
       this._updateUI()
       this._initListener()
+      this._listenWallet()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
       NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
@@ -106,15 +107,24 @@ class HomePage extends Component {
       this._checkVersion()
     }, 3000)
     this.timers.push(timer)
+    this._isMounted = true
 
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
+      console.log('home wallet status', error, status)
       if (status === D.status.deviceChange) {
         ToastUtil.showLong(I18n.t('deviceChange'))
         this.transmitter.disconnect()
         this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      }
+      if (status === D.status.syncFinish || status === D.status.syncing) {
+        this.setState({bluetoothConnectDialogVisible: false})
       }
     })
   }
@@ -192,7 +202,8 @@ class HomePage extends Component {
         this.setState({ deviceConnected: false, showDeviceConnectCard: true })
       }
       if (status === BtTransmitter.connected) {
-        this.setState({ deviceConnected: true, showDeviceConnectCard: false, bluetoothConnectDialogVisible: false })
+        this.setState({ deviceConnected: true, showDeviceConnectCard: false })
+        this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
       }
       if (status === BtTransmitter.connecting) {
         this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
@@ -204,6 +215,7 @@ class HomePage extends Component {
       }
       if (state === BtTransmitter.connected) {
         this.setState({ deviceConnected: true, showDeviceConnectCard: false })
+        this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
       }
     })
   }
