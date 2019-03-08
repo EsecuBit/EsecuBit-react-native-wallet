@@ -29,6 +29,7 @@ export default class SplashPage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
+      this._isMounted && this.setState({syncDialogVisible: false})
       NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
       this.wallet.listenStatus(() => {} )
     })

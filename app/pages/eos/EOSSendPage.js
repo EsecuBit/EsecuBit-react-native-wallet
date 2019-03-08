@@ -67,10 +67,10 @@ class EOSSendPage extends Component {
   }
 
   _handleSendValueItemClick(value) {
-    let sendValue = Number(this.props.account.balance * value).toLocaleString('en')
-    this.setState({sendValue: sendValue})
+    let sendValue;
     if (value !== '1') {
-      this.valueInput.updateValue((sendValue * value).toString())
+      sendValue = StringUtil.toFixNum((Number(this.props.account.balance) * Number(value)), 4)
+      this.valueInput.updateValue(sendValue)
     } else {
       this._maxAmount()
     }
@@ -204,7 +204,7 @@ class EOSSendPage extends Component {
             <Text style={{ fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT }}>
               {`${I18n.t('send')} `}
               <Text style={{ color: Color.DANGER }}>{`${this.state.sendValue} EOS`}</Text>
-              <Text>{`${I18n.t('to1')} `}</Text>
+              <Text>{` ${I18n.t('to1')} `}</Text>
               <Text style={{ color: Color.ACCENT }}>{this.state.accountName}</Text>
             </Text>
           </DialogContent>

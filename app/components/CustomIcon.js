@@ -34,7 +34,7 @@ export default class CustomIcon extends Component {
         return (
           <Image
             source={require('../imgs/eos.png')}
-            style={{ width: 28, height: 28, color: Color.ETH }}
+            style={{ width: 28, height: 28}}
           />
         )
     }

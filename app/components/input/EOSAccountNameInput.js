@@ -8,7 +8,9 @@ export default class EOSAccountNameInput extends PureComponent {
 
   static defaultProps = {
     value: '',
-    placeHolder: ''
+    placeHolder: '',
+    label: 'Account Name',
+    onChangeText: () => {}
   }
   
   constructor() {
@@ -62,7 +64,7 @@ export default class EOSAccountNameInput extends PureComponent {
       <CardItem>
         <InputGroup iconRight success={this.state.checkAccountNameSuccess} error={this.state.checkAccountNameError}>
           <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>
-            Account Name
+            {this.props.label}
           </Text>
           <Input
             selectionColor={Color.ACCENT}

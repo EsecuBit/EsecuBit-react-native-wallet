@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -56,9 +57,13 @@ public class BtScanHelper {
 
     @SuppressLint("NewApi")
     private void scanBluetooth() {
-        BluetoothManager bluetoothManager = (BluetoothManager) mContext.getApplicationContext()
-                .getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+          BluetoothManager bluetoothManager = (BluetoothManager) mContext.getApplicationContext()
+                  .getSystemService(Context.BLUETOOTH_SERVICE);
+          mBluetoothAdapter = bluetoothManager.getAdapter();
+      }else {
+          mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+      }
         if (!mBluetoothAdapter.isEnabled()) {
             // Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             // startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -110,7 +115,10 @@ public class BtScanHelper {
             if(mBluetoothAdapter != null) {
                 mBluetoothAdapter.cancelDiscovery();
             }
-            mContext.unregisterReceiver(deviceReceiver);
+           if (mContext != null) {
+               LocalBroadcastManager.getInstance(mContext).unregisterReceiver(deviceReceiver);
+
+           }
         }
     }
 

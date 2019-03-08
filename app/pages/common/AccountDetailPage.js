@@ -67,10 +67,6 @@ class AccountDetailPage extends Component {
       this._getTxInfos()
 
     })
-    this.account.getPermissions()
-        .then(result => {
-          console.log("permission", result)
-        })
   }
 
   _onFocus() {

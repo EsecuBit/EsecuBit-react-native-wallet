@@ -1,15 +1,14 @@
 import React, {Component} from 'react'
-import {View, Dimensions} from 'react-native'
+import {View, Dimensions, BackHandler, Text} from 'react-native'
 import {Container, Content} from 'native-base'
 import BaseToolbar from "../../components/bar/BaseToolbar"
 import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
 import {withNavigation} from 'react-navigation'
-import FooterButton from "../../components/FooterButton"
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import EOSBPVotePage from "./EOSBPVotePage";
 import EOSProxyVotePage from "./EOSProxyVotePage";
-import {Color, Dimen} from "../../common/Styles";
+import {Color} from "../../common/Styles";
 
 
 class EOSVotePage extends Component {
@@ -23,6 +22,29 @@ class EOSVotePage extends Component {
       ],
     };
   }
+
+  componentDidMount(): void {
+    this._onBlur()
+    this._onFocus()
+  }
+
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('didBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  }
+
 
 
   render() {
@@ -46,6 +68,7 @@ class EOSVotePage extends Component {
           onIndexChange={index => this.setState({index})}
           initialLayout={{width: Dimensions.get('window').width}}
         />
+
       </Container>
     )
   }

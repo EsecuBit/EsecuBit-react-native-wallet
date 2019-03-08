@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, Clipboard } from 'react-native'
+import {StyleSheet, Text, Clipboard, BackHandler} from 'react-native'
 import { View, Container, Textarea, Icon } from 'native-base'
 import BaseToolbar from '../../components/bar/BaseToolbar'
 import { Color, Dimen } from '../../common/Styles'
@@ -28,13 +28,38 @@ class EOSKeyDetailPage extends Component {
 
   componentDidMount() {
     this.getPermission()
+    this._onBlur()
+    this._onFocus()
   }
 
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('didBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  onBackPress = () => {
+    this.props.navigation.pop()
+    return true;
+  }
   async getPermission() {
     let keyDetail = await this.props.account.getPermissions()
     console.log('keyDetail', keyDetail);
-    let activeKey = keyDetail.active.keys[0].publicKey
-    let ownerKey = keyDetail.owner.keys[0].publicKey
+    let activeKey = '';
+    let ownerKey = '';
+    if (keyDetail[0].type === 'active') {
+      activeKey = keyDetail[0].publicKey
+      ownerKey = keyDetail[1].publicKey
+    }else {
+      activeKey = keyDetail[1].publicKey
+      ownerKey = keyDetail[0].publicKey
+    }
     this.setState({activeKey: activeKey, ownerKey: ownerKey})
   }
   

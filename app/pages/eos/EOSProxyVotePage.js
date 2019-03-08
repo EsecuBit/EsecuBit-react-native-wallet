@@ -8,6 +8,7 @@ import EOSAccountNameInput from "../../components/input/EOSAccountNameInput";
 import { connect } from 'react-redux'
 import ToastUtil from "../../utils/ToastUtil";
 import { withNavigation } from 'react-navigation'
+import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 
 class EOSProxyVotePage extends React.PureComponent {
 
@@ -15,10 +16,19 @@ class EOSProxyVotePage extends React.PureComponent {
     super()
     this.state = {
       proxyAccountName: '',
-      footerBtnDisable: true
+      footerBtnDisable: true,
+      transactionConfirmDialogVisible: false
     }
     // prevent duplicate send
     this.lockSend = false
+  }
+
+  componentWillUnmount(): void {
+    this._isMounted = false
+  }
+
+  componentDidMount(): void {
+    this._isMounted = true
   }
 
   _handleAccountNameInput(text) {
@@ -39,6 +49,14 @@ class EOSProxyVotePage extends React.PureComponent {
     }
   }
 
+  _showTransactionConfirmDialog() {
+    this._isMounted && this.setState({
+      transactionConfirmDialogVisible: true
+    })
+    this._proxyVote()
+  }
+
+
   _proxyVote() {
     this.lockSend = true
     let formData = this._buildProxyVoteForm()
@@ -53,12 +71,14 @@ class EOSProxyVotePage extends React.PureComponent {
       })
       .then(() => {
         console.log('proxy vote send successful')
+        this._isMounted && this.setState({transactionConfirmDialogVisible: false})
         ToastUtil.showLong(I18n.t('success'))
         this.props.navigation.pop()
         this.lockSend = false
       })
       .catch(err => {
         console.log('proxy vote error', err)
+        this._isMounted && this.setState({transactionConfirmDialogVisible: false})
         ToastUtil.showErrorMsgShort(err)
         this.lockSend = false
       })
@@ -74,7 +94,16 @@ class EOSProxyVotePage extends React.PureComponent {
             onChangeText={text => this._handleAccountNameInput(text)}
           />
         </Content>
-        <FooterButton title={I18n.t('vote')} disabled={this.state.footerBtnDisable} onPress={() => this._proxyVote()}/>
+        <Dialog
+          onTouchOutside={() => {}}
+          width={0.8}
+          visible={this.state.transactionConfirmDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}>
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text>{I18n.t('pleaseInputPassword')}</Text>
+          </DialogContent>
+        </Dialog>
+        <FooterButton title={I18n.t('vote')} disabled={this.state.footerBtnDisable} onPress={() => this._showTransactionConfirmDialog()}/>
       </Container>
     );
   }

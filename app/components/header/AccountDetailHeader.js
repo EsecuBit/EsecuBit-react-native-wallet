@@ -141,7 +141,7 @@ class AccountDetailHeader extends PureComponent {
                     </Button>
                   }>
                   {D.isEos(this.account.coinType) ? (
-                    <MenuItem onPress={() => this._hideMenu('perimssionManage')}>
+                    <MenuItem onPress={() => this._hideMenu('permissionManage')}>
                       {I18n.t('permissionManage')}
                     </MenuItem>
                   ) : null}

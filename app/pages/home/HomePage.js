@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {
   NetInfo,
   View,
@@ -10,7 +10,7 @@ import {
   Linking, BackHandler,
   StyleSheet, ActivityIndicator
 } from 'react-native'
-import { isIphoneX, CommonStyle, Dimen, Color } from '../../common/Styles'
+import {isIphoneX, CommonStyle, Dimen, Color} from '../../common/Styles'
 import {
   Container,
   Button,
@@ -21,17 +21,17 @@ import {
   Text
 } from 'native-base'
 import I18n from '../../lang/i18n'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import { Api } from '../../common/Constants'
+import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {Api} from '../../common/Constants'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AppUtil from '../../utils/AppUtil'
-import { setAccount } from '../../actions/AccountAction'
-import { connect } from 'react-redux'
+import {setAccount} from '../../actions/AccountAction'
+import {connect} from 'react-redux'
 import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
-import Dialog, { DialogButton, DialogTitle, DialogContent } from 'react-native-popup-dialog'
+import Dialog, {DialogButton, DialogTitle, DialogContent} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
 
 const platform = Platform.OS
@@ -90,9 +90,9 @@ class HomePage extends Component {
     let ns = status.toUpperCase()
     if (ns === 'WIFI' || ns === 'CELL') {
       console.log('networkChange', ns)
-      this.setState({ networkConnected: true })
+      this.setState({networkConnected: true})
     } else {
-      this.setState({ networkConnected: false })
+      this.setState({networkConnected: false})
     }
   }
 
@@ -130,6 +130,9 @@ class HomePage extends Component {
   }
 
   _checkVersion() {
+    if (!this.state.deviceConnected) {
+      return
+    }
     AppUtil.checkUpdate()
       .then(info => {
         console.log('checkVersion', info)
@@ -171,7 +174,7 @@ class HomePage extends Component {
     // if search device no response after 10s, toast tip to notify user no device found
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.btTransmitter.getState()
-      if(state === BtTransmitter.disconnected) {
+      if (state === BtTransmitter.disconnected) {
         this.setState({bluetoothConnectDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.btTransmitter.stopScan()
@@ -181,7 +184,7 @@ class HomePage extends Component {
   }
 
   _checkForceUpdate() {
-    this.setState({ updateVersionDialogVisible: false })
+    this.setState({updateVersionDialogVisible: false})
     if (this.info !== undefined && this.info.data.isForceUpdate) {
       AppUtil.exitApp()
     }
@@ -191,7 +194,7 @@ class HomePage extends Component {
     if (this.info.data !== null) {
       Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
-    this.setState({ updateVersionDialogVisible: false })
+    this.setState({updateVersionDialogVisible: false})
   }
 
   _initListener() {
@@ -199,7 +202,7 @@ class HomePage extends Component {
     this.btTransmitter.listenStatus((error, status) => {
       if (status === BtTransmitter.disconnected) {
         console.log('status device disconnected', status)
-        this.setState({ deviceConnected: false, showDeviceConnectCard: true })
+        this.setState({deviceConnected: false, showDeviceConnectCard: true})
       }
       if (status === BtTransmitter.connected) {
         this.setState({ deviceConnected: true, showDeviceConnectCard: false })
@@ -211,7 +214,7 @@ class HomePage extends Component {
     })
     this.btTransmitter.getState().then(state => {
       if (state === BtTransmitter.disconnected) {
-        this.setState({ deviceConnected: false, showDeviceConnectCard: true })
+        this.setState({deviceConnected: false, showDeviceConnectCard: true})
       }
       if (state === BtTransmitter.connected) {
         this.setState({ deviceConnected: true, showDeviceConnectCard: false })
@@ -226,7 +229,7 @@ class HomePage extends Component {
   }
 
   async _refreshAccounts() {
-    await this.setState({ accounts: [] })
+    await this.setState({accounts: []})
     await this._getAccounts()
   }
 
@@ -238,7 +241,7 @@ class HomePage extends Component {
     try {
       let accounts = await this.wallet.getAccounts()
       console.log('accounts', accounts)
-      await this.setState({ accounts: accounts })
+      await this.setState({accounts: accounts})
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -289,10 +292,10 @@ class HomePage extends Component {
       height = 88
     }
     return (
-      <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
-        <View style={{ height: 205 }}>
-          <Image style={{ height: 205 }} source={require('../../imgs/bg_home.png')}>
-            <View style={{ height: height }}>
+      <Container style={{backgroundColor: Color.CONTAINER_BG}}>
+        <View style={{height: 205}}>
+          <Image style={{height: 205}} source={require('../../imgs/bg_home.png')}>
+            <View style={{height: height}}>
               <View
                 style={{
                   flex: 1,
@@ -316,7 +319,7 @@ class HomePage extends Component {
                   <Button transparent onPress={() => _that.props.navigation.navigate('Settings')}>
                     <Image
                       source={require('../../imgs/ic_menu.png')}
-                      style={{ width: 20, height: 20 }}
+                      style={{width: 20, height: 20}}
                     />
                   </Button>
                 </View>
@@ -342,7 +345,7 @@ class HomePage extends Component {
                       marginLeft: Dimen.MARGIN_HORIZONTAL
                     }}
                     onPress={() => _that.props.navigation.navigate('NewAccount')}>
-                    <Image source={require('../../imgs/ic_add.png')} />
+                    <Image source={require('../../imgs/ic_add.png')}/>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -400,17 +403,17 @@ class HomePage extends Component {
           <CardItem
             button
             style={[
-              {
+              CommonStyle.cardStyle, {
                 marginTop: Dimen.SPACE,
                 marginBottom: Dimen.MARGIN_VERTICAL,
-                flexDirection: 'column'
-              },
-              CommonStyle.cardStyle
+                flexDirection: 'column',
+                height: 96
+              }
             ]}>
-            <View style={{ flexDirection: 'column' }}>
+            <View style={{flexDirection: 'column'}}>
               <Text style={[CommonStyle.secondaryText]}>{I18n.t('pleaseConnectDeviceToSync')}</Text>
             </View>
-            <View style={{ flexDirection: 'row', marginBottom: Dimen.SPACE }}>
+            <View style={{flexDirection: 'row', marginBottom: Dimen.SPACE}}>
               <Left>
                 <Button
                   transparent
@@ -420,20 +423,20 @@ class HomePage extends Component {
                       offlineMode: true
                     })
                   }>
-                  <Text style={{ color: Color.ACCENT }}>{I18n.t('cancel')}</Text>
+                  <Text style={{color: Color.ACCENT}}>{I18n.t('cancel')}</Text>
                 </Button>
               </Left>
               <Right>
                 <Button
                   transparent
                   onPress={() => this._connectDevice()}>
-                  <Text style={{ color: Color.ACCENT }}>{I18n.t('confirm')}</Text>
+                  <Text style={{color: Color.ACCENT}}>{I18n.t('confirm')}</Text>
                 </Button>
               </Right>
             </View>
           </CardItem>
         ) : null}
-        <List dataArray={_that.state.accounts} renderRow={_that._renderRow.bind(this)} />
+        <List dataArray={_that.state.accounts} renderRow={_that._renderRow.bind(this)}/>
         <Dialog
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
@@ -462,7 +465,7 @@ class HomePage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.hideAccountDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('tips')} />}
+          dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
           actions={[
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
@@ -487,7 +490,8 @@ class HomePage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.bluetoothConnectDialogVisible}
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>

@@ -1,13 +1,13 @@
-import React, { PureComponent } from "react"
-import { View, StyleSheet, TouchableWithoutFeedback, Clipboard, BackHandler } from "react-native"
-import { Text, CheckBox, Left, Body, Right } from "native-base"
+import React, {PureComponent} from "react"
+import {View, StyleSheet, TouchableWithoutFeedback, Clipboard, BackHandler} from "react-native"
+import {Text, CheckBox, Left, Body, Right} from "native-base"
 import Dialog from "react-native-popup-dialog"
-import { D, EsWallet } from "esecubit-wallet-sdk"
+import {D, EsWallet} from "esecubit-wallet-sdk"
 import QrCode from "react-native-qrcode"
 import I18n from "../../lang/i18n"
-import { CommonStyle, Dimen, Color } from "../../common/Styles"
+import {CommonStyle, Dimen, Color} from "../../common/Styles"
 import ToastUtil from "../../utils/ToastUtil"
-import { connect } from "react-redux"
+import {connect} from "react-redux"
 
 class AddressDetailPage extends PureComponent {
   constructor(props) {
@@ -28,7 +28,7 @@ class AddressDetailPage extends PureComponent {
     this._onBlur()
     if (D.isEos(this.coinType)) {
       this._getAccountName()
-    }else {
+    } else {
       this._getAddress(this.state.storeAddress)
     }
   }
@@ -37,7 +37,6 @@ class AddressDetailPage extends PureComponent {
   componentWillUnmount() {
     this._isMounted = false
   }
-
 
 
   _onFocus() {
@@ -63,7 +62,7 @@ class AddressDetailPage extends PureComponent {
   }
 
   async _handleStoreAddress() {
-    this._isMounted && await this.setState({ storeAddress: !this.state.storeAddress })
+    this._isMounted && await this.setState({storeAddress: !this.state.storeAddress})
     if (this.state.storeAddress === true) {
       this._getAddress(this.state.storeAddress)
     }
@@ -73,7 +72,7 @@ class AddressDetailPage extends PureComponent {
     try {
       this._isMounted && await this.setState({dialogVisible: true})
       let address = await this.account.getAddress(storeAddress)
-      this._isMounted && this.setState({ address: address.address })
+      this._isMounted && this.setState({address: address.address})
     } catch (error) {
       console.warn("getAddress", error)
       ToastUtil.showLong(I18n.t("getAddressError"))
@@ -82,7 +81,7 @@ class AddressDetailPage extends PureComponent {
 
   async _getAccountName() {
     this._isMounted && await this.setState({dialogVisible: true})
-    this._isMounted && this.setState({ address: this.account.label })
+    this._isMounted && this.setState({address: this.account.label})
   }
 
   _setClipboardContent(addr) {
@@ -98,7 +97,7 @@ class AddressDetailPage extends PureComponent {
     return (
       <Dialog
         width={0.8}
-        height={D.isBtc(this.coinType) ? 465 : 425}
+        height={465}
         visible={this.state.dialogVisible}
         rounded
         onTouchOutside={() => this._hideDialog()}
@@ -109,24 +108,22 @@ class AddressDetailPage extends PureComponent {
             onLongPress={() => this._setClipboardContent(this.state.address)}
           >
             <View style={styles.qrCodeView}>
-              <QrCode value={this.state.address} size={240} bgColor="black" fgColor="white" />
+              <QrCode value={this.state.address} size={240} bgColor="black" fgColor="white"/>
             </View>
           </TouchableWithoutFeedback>
-          {D.isBtc(this.coinType) ? (
-            <View style={styles.checkboxWrpper}>
-              <Left>
-                <CheckBox
-                  style={{ justifyContent: "center" }}
-                  checked={this.state.storeAddress}
-                  onPress={() => this._handleStoreAddress()}
-                />
-              </Left>
-              <Body style={{ flex: 3 }}>
-                <Text style={CommonStyle.privateText}>{I18n.t("saveAddress")}</Text>
-              </Body>
-              <Right />
-            </View>
-          ) : null}
+          <View style={styles.checkboxWrpper}>
+            <Left>
+              <CheckBox
+                style={{justifyContent: "center"}}
+                checked={this.state.storeAddress}
+                onPress={() => this._handleStoreAddress()}
+              />
+            </Left>
+            <Body style={{flex: 3}}>
+            <Text style={CommonStyle.privateText}>{I18n.t("saveAddress")}</Text>
+            </Body>
+            <Right/>
+          </View>
           <Text style={[CommonStyle.privateText, styles.addressText]}>{this.state.address}</Text>
           <Text style={styles.remindText}>{I18n.t("copyRemind")}</Text>
         </View>

@@ -2,17 +2,12 @@ import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, Dimensions, ViewPropTypes } from 'react-native'
 import ProgressBar from './ProgressBar'
 import { Dimen, Color } from '../../common/Styles'
-import { Card } from 'native-base'
+import { CardItem, Card } from 'native-base'
 
 const deviceW = Dimensions.get('window').width
 
 const styles = StyleSheet.create({
-  card: {
-    margin: Dimen.SPACE
-  },
   container: {
-    marginTop: Dimen.MARGIN_VERTICAL,
-    marginHorizontal: Dimen.MARGIN_HORIZONTAL,
     height: 80
   },
   title: {
@@ -36,7 +31,9 @@ type Props = {
   style: ViewPropTypes.style,
   unit: string,
   total: string,
-  used: string
+  used: string,
+  onPress: Function,
+  enablePress: Boolean
 }
 
 type State = {
@@ -53,16 +50,17 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
     staked: '',
     style: styles,
     total: '0',
-    used: '0'
+    used: '0',
+    onPress: () => {},
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
-      total: this.props.total,
-      used: this.props.used,
-      totalUnit: this.props.unit,
-      usedUnit: this.props.unit
+      total: props.total,
+      used: props.used,
+      totalUnit: props.unit,
+      usedUnit: props.unit
     }
   }
 
@@ -141,7 +139,8 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
       this.state.totalUnit
     let stakedAssets = staked === '' ? staked : ' ( ' + staked + ' )'
     return (
-      <Card style={style.card}>
+      <Card>
+      <CardItem button={this.props.enablePress} onPress={this.props.onPress} >
         <View style={style.container}>
           <Text style={style.title}>{title}</Text>
           <Text style={style.desc}>{res + stakedAssets}</Text>
@@ -162,10 +161,11 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
                 marginLeft: Dimen.SPACE,
                 width: 50
               }}>
-              {Number(this.props.used / this.props.total).toFixed(2) * 100 + '%'}
+              {(this.props.used * 100 / this.props.total).toFixed(1) + '%'}
             </Text>
           </View>
         </View>
+      </CardItem>
       </Card>
     )
   }

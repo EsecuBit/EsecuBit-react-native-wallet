@@ -11,7 +11,9 @@ export default class ValueInput extends PureComponent {
   static defaultProps = {
     placeholder: '',
     value: '',
-    enablePercentageBar: true
+    enablePercentageBar: true,
+    label: I18n.t('value'),
+    onChangeText: () => {}
   }
 
   constructor(props) {
@@ -22,6 +24,7 @@ export default class ValueInput extends PureComponent {
       sendValue: ''
     }
   }
+
 
   // @flow
   async _handleSendValueInput(text: string) {
@@ -72,7 +75,7 @@ export default class ValueInput extends PureComponent {
           iconRight
           error={this.state.sendValueError}
           success={this.state.sendValueStatus}>
-          <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>{I18n.t('value')}</Text>
+          <Text style={[CommonStyle.secondaryText, { marginRight: Dimen.SPACE }]}>{this.props.label}</Text>
           <Input
             selectionColor={Color.ACCENT}
             placeholder={placeholder}

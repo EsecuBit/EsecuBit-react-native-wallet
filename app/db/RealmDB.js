@@ -219,6 +219,10 @@ class RealmDB extends IDatabase {
     })
   }
 
+  async getTokens() {
+    return []
+  }
+
   saveOrUpdateSettings(key, value) {
     let settings = {key, value}
     return Realm.open(this._config).then(realm => realm.write(() => { realm.create('Settings', settings, true) }))

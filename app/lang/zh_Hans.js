@@ -149,8 +149,6 @@ export default {
   permissionManageTip: '注意:\n  - Owner Key: 拥有当前EOS账号的所有权限。\n\
   - Active Key: 默认情况下，可以完成除更改Owner Key以外的所有交易。\n\
   - 为了您的资产安全，建议使用Active Key导入钱包日常使用，并妥善保管Owner Key',
-  stake: '抵押',
-  unstake: '赎回',
   vote: '投票',
   ramTransaction: '售买内存',
   buy: '购买',
@@ -182,5 +180,16 @@ export default {
   invalidParams: '无效参数',
   permissionNotFound: '权限未找到',
   permissionNoNeedToConfirmed: '权限无需确认',
-  initData: "正在初始化数据.."
+  initData: "正在初始化数据..",
+  amountOfRamToSell: '卖出的RAM总量',
+  delegate: "抵押",
+  undelegate: '赎回',
+  eosAccountNotRegister: '账户还未注册，请先去注册',
+  register: '注册',
+  receiver: '接收者',
+  status: '状态',
+  executed: '不可逆',
+  waiting: '等待中',
+  registered: '已注册',
+  notRegister: '未注册'
 }

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {
   View,
   StyleSheet,
@@ -10,22 +10,23 @@ import {
   ActivityIndicator
 } from 'react-native'
 import I18n from '../../lang/i18n'
-import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
+import {Container, Icon, List, ListItem, Content, CardItem, Text} from 'native-base'
 import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
-import { CommonStyle, Dimen, Color } from '../../common/Styles'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
+import {CommonStyle, Dimen, Color} from '../../common/Styles'
+import {EsWallet, D} from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import AccountOperateBottomBar from '../../components/bar/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/header/AccountDetailHeader'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import PreferenceUtil from '../../utils/PreferenceUtil'
+import StringUtil from "../../utils/StringUtil";
+import {Dropdown} from "react-native-material-dropdown";
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS
 
-const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 434
-const ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT = 520
+const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 354
 
 class EOSAccountDetailPage extends Component {
   constructor(props) {
@@ -39,16 +40,26 @@ class EOSAccountDetailPage extends Component {
       refreshing: false,
       isShowBottomBar: true,
       dMemo: '',
-      renameDialogVisible: false,
       transactionDetailDialogVisible: false,
       bluetoothConnectDialogVisible: false,
-      bluetoothConnectDialogDesc: ''
+      bluetoothConnectDialogDesc: '',
+      filterTip: [{
+        value: 'All',
+      }, {
+        value: 'Transfer',
+      }, {
+        value: 'Delegate',
+      }, {
+        value: 'Vote'
+      }, {
+        value: 'Others'
+      }],
+      selectedFilter: "All",
+      showRegisterDialogVisible: false
     }
-    this.cryptoCurrencyUnit = props.accountCurrentUnit
     this.transmitter = new BtTransmitter()
     this.timers = []
     this.transmitter = new BtTransmitter()
-    // prevent duplicate click
   }
 
   componentDidMount() {
@@ -61,17 +72,24 @@ class EOSAccountDetailPage extends Component {
     this.wallet.listenTxInfo(() => {
       console.log('listen TxInfo')
       this._getTxInfos()
-
     })
-    this.account.getPermissions()
-      .then(result => {
-        console.log("permission", result)
+    if (!this.account.isRegistered()) {
+      this._isMounted && this.setState({showRegisterDialogVisible: true})
+    }
+  }
+
+  _checkNewPermission() {
+    if (!this.account.isRegistered()) {
+      this.account.checkAccountPermissions((error, status, permissions) => {
+        console.log('check account permission', error, status, permissions)
       })
+    }
   }
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       this._getTxInfos()
+      this._checkNewPermission()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
   }
@@ -94,24 +112,17 @@ class EOSAccountDetailPage extends Component {
         if (status === BtTransmitter.connecting) {
           this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
           this.transmitter.stopScan()
-        } else if(status === BtTransmitter.connected) {
-          switch(this._goToPage) {
+        } else if (status === BtTransmitter.connected) {
+          switch (this._goToPage) {
             case 'send':
               this.navigateTimer = setTimeout(() => {
                 this._gotoSendPage()
               }, 3000)
               this.timers.push(this.navigateTimer)
               break
-            case 'address':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoAddressDetailPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
           }
 
-        }
-        else if(status === BtTransmitter.disconnected){
+        } else if (status === BtTransmitter.disconnected) {
           this.transmitter.stopScan()
           // if device has changed, app will auto disconnect. no need to toast
           if (!this._isDeviceChange) {
@@ -119,15 +130,13 @@ class EOSAccountDetailPage extends Component {
           }
           this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
         }
-      }else {
+      } else {
         this.transmitter.stopScan()
         ToastUtil.showShort(I18n.t('connectFailed'))
         this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
       }
     })
   }
-
-
 
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
@@ -151,24 +160,28 @@ class EOSAccountDetailPage extends Component {
 
   async _showBluetoothConnectDialog() {
     if (this._isDeviceChange) return
+    if (!this.account.isRegistered()) {
+      ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
+      return
+    }
     let deviceState = await this.transmitter.getState()
     //soft wallet no need to connect hardware
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       this._findAndConnectDevice()
-    }else {
-      switch(this._goToPage) {
+    } else {
+      switch (this._goToPage) {
         case 'send':
           this._gotoSendPage()
-          break
-        case 'address':
-          this._gotoAddressDetailPage()
           break
       }
     }
   }
 
   async _findAndConnectDevice() {
-    this._isMounted && this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
+    this._isMounted && this.setState({
+      bluetoothConnectDialogVisible: true,
+      bluetoothConnectDialogDesc: I18n.t('searchingDevice')
+    })
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo.sn === info.sn) {
@@ -178,7 +191,7 @@ class EOSAccountDetailPage extends Component {
     // if search device no response after 10s, toast tip to notify user no device found
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
-      if(state === BtTransmitter.disconnected) {
+      if (state === BtTransmitter.disconnected) {
         this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
@@ -193,25 +206,28 @@ class EOSAccountDetailPage extends Component {
   }
 
   _gotoAddressDetailPage() {
-    this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
-    this.props.navigation.navigate('AddressDetail')
-
+    if (this.account.isRegistered()) {
+      this.props.navigation.navigate('AddressDetail')
+    } else {
+      ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
+    }
   }
 
   async _onRefresh() {
     let state = await this.transmitter.getState()
-    this._isMounted && this.setState({ refreshing: true })
+    this._isMounted && this.setState({refreshing: true})
     this.account
       .sync(null, false, state === BtTransmitter.disconnected)
       .then(() => {
         console.log('sync _getTxInfos')
         this._getTxInfos()
-        this._isMounted && this.setState({ refreshing: false })
+        this._isMounted && this.setState({refreshing: false})
       })
       .catch(error => {
         console.warn('_onRefresh', error)
-        this._isMounted && this.setState({ refreshing: false })
+        this._isMounted && this.setState({refreshing: false})
         ToastUtil.showErrorMsgShort(error)
+
       })
   }
 
@@ -219,274 +235,165 @@ class EOSAccountDetailPage extends Component {
    * Render a row
    * @param {object} rowData
    */
-  _renderRowView(rowData) {
+  _renderRowView(action) {
+    let title = ''
+    let date = StringUtil.formatTimeStamp(action.time)
+    let price = ''
+    let price1 = ''
+    let symbol = ''
+    let priceColor = Color.ACCENT
+    let rowHeight = 0
+    let confirmStr = ''
+    let confirmColor = Color.ACCENT
+    let memo = action.comment
+
+    if (action.name === 'transfer') {
+      price = action.data.quantity
+      if (action.data.to === this.props.account.label) {
+        title = 'From:' + action.data.from
+        symbol = '+'
+        priceColor = Color.INCREASE
+      } else {
+        title = 'To:' + action.data.to
+        symbol = '-'
+        priceColor = Color.REDUCED
+      }
+    } else if (action.name === 'undelegatebw') {
+      title = I18n.t('undelegate')
+      price = `CPU: ${action.data.unstake_cpu_quantity}`
+      price1 = `Net: ${action.data.unstake_net_quantity}`
+    } else if (action.name === 'delegatebw') {
+      title = I18n.t('delegate')
+      price = `CPU: ${action.data.stake_cpu_quantity}`
+      price1 = `Net: ${action.data.stake_net_quantity}`
+    } else if (action.name.startsWith('vote')) {
+      title = I18n.t('vote')
+    } else {
+      title = `${action.account} :: ${action.name}`
+    }
+
+    if (action.confirmations === -1) {
+      confirmStr = I18n.t('pending')
+    } else if (action.confirmations === -2) {
+      confirmStr = I18n.t('invalid')
+    }
+
+    if (memo) {
+      title = memo
+    }
+    if (platform === 'ios') {
+      rowHeight = 85
+    } else {
+      rowHeight = 100
+    }
+
     return (
-      <View></View>
+      <CardItem
+        button
+        style={{backgroundColor: Color.CONTAINER_BG}}
+        onPress={() => {
+          this._showTransactionDetailDialog(action)
+        }}>
+        <View
+          style={{
+            height: rowHeight,
+            width: deviceW - 2 * Dimen.MARGIN_HORIZONTAL,
+            backgroundColor: Color.TEXT_ICONS,
+            borderRadius: 10,
+            elevation: 3
+          }}>
+          <View style={styles.itemContainer}>
+            <View
+              style={{
+                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
+                marginTop: 10,
+                marginLeft: 10
+              }}>
+              <Text style={styles.leftText} numberOfLines={2} ellipsizeMode="tail">
+                {title}
+              </Text>
+            </View>
+            <View
+              style={{
+                height: 85,
+                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
+                alignItems: 'flex-end',
+                marginTop: 10,
+                marginRight: 10
+              }}>
+              <Text style={[styles.rightText, {color: priceColor}]} numberOfLines={5}>
+                {symbol + ' ' + StringUtil.formatCryptoCurrency(price)}
+              </Text>
+              <Text style={[styles.rightText, {color: priceColor}]} numberOfLines={5}>
+                {StringUtil.formatCryptoCurrency(price1)}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.itemContainer}>
+            <View
+              style={{
+                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
+                justifyContent: 'flex-end',
+                marginBottom: 15,
+                marginLeft: 10
+              }}>
+              <Text style={styles.leftText}>{date}</Text>
+            </View>
+            <View
+              style={{
+                width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
+                alignItems: 'flex-end',
+                justifyContent: 'flex-end',
+                marginBottom: 15,
+                marginRight: 10
+              }}>
+              <Text style={{fontSize: Dimen.SECONDARY_TEXT, color: confirmColor}}>
+                {confirmStr}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </CardItem>
     )
-    // let title = ''
-    // let date = StringUtil.formatTimeStamp(rowData.time)
-    // let price = '0'
-    // let temp = ''
-    // let symbol = ''
-    // let priceColor = Color.ACCENT
-    // let isToSelf = false
-    // let rowHeight = 0
-    // let memo = rowData.comment
-    // let confirmStr = ''
-    // let confirmColor = Color.ACCENT
-    //
-    // rowData.showAddresses.forEach((item, index) => {
-    //   let addr = ''
-    //   if (item.toUpperCase() === 'SELF') {
-    //     addr = item
-    //     isToSelf = true
-    //   } else {
-    //     addr = item.substr(0, 16) + '*****'
-    //   }
-    //   if (index !== rowData.showAddresses.length - 1) {
-    //     temp = temp + addr + ','
-    //   } else {
-    //     temp = temp + addr
-    //   }
-    // })
-    //
-    // if (rowData.direction === D.tx.direction.in) {
-    //   title = 'From:' + temp
-    //   symbol = '+'
-    //   priceColor = Color.INCREASE
-    // } else {
-    //   title = 'To:' + temp
-    //   symbol = '-'
-    //   priceColor = Color.REDUCED
-    // }
-    //
-    // if (D.isBtc(rowData.coinType)) {
-    //   price = this._getBTCPrice(rowData, isToSelf)
-    // } else {
-    //   price = this._getETHPrice(rowData, isToSelf)
-    // }
-    //
-    // if (price < 0) {
-    //   price = -price
-    // }
-    //
-    // if (rowData.confirmations === -1) {
-    //   confirmStr = I18n.t('pending')
-    // } else if (rowData.confirmations === -2) {
-    //   confirmStr = I18n.t('invalid')
-    // } else if (rowData.confirmations >= 6) {
-    //   confirmStr = ''
-    // } else if (0 <= rowData.confirmations && rowData.confirmations < 6) {
-    //   confirmStr = I18n.t('confirming')
-    // }
-    //
-    // if (memo) {
-    //   title = memo
-    // }
-    //
-    // if (platform === 'ios') {
-    //   rowHeight = 85
-    // } else {
-    //   rowHeight = 100
-    // }
-    //
-    // return (
-    //   <CardItem
-    //     button
-    //     style={{ backgroundColor: Color.CONTAINER_BG }}
-    //     onPress={() => {
-    //       this._showTransactionDetailDialog(rowData)
-    //     }}>
-    //     <View
-    //       style={{
-    //         height: rowHeight,
-    //         width: deviceW - 2 * Dimen.MARGIN_HORIZONTAL,
-    //         backgroundColor: Color.TEXT_ICONS,
-    //         borderRadius: 10,
-    //         elevation: 3
-    //       }}>
-    //       <View style={styles.itemContainer}>
-    //         <View
-    //           style={{
-    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
-    //             marginTop: 15,
-    //             marginLeft: 10
-    //           }}>
-    //           <Text style={styles.leftText} numberOfLines={2} ellipsizeMode="tail">
-    //             {title}
-    //           </Text>
-    //         </View>
-    //         <View
-    //           style={{
-    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
-    //             alignItems: 'flex-end',
-    //             marginTop: 15,
-    //             marginRight: 10
-    //           }}>
-    //           <Text style={[styles.rightText, { color: priceColor }]}>
-    //             {symbol + ' ' + StringUtil.formatCryptoCurrency(price)}
-    //           </Text>
-    //         </View>
-    //       </View>
-    //       <View style={styles.itemContainer}>
-    //         <View
-    //           style={{
-    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 3) / 5 - 10,
-    //             justifyContent: 'flex-end',
-    //             marginBottom: 15,
-    //             marginLeft: 10
-    //           }}>
-    //           <Text style={styles.leftText}>{date}</Text>
-    //         </View>
-    //         <View
-    //           style={{
-    //             width: ((deviceW - 2 * Dimen.MARGIN_HORIZONTAL) * 2) / 5 - 10,
-    //             alignItems: 'flex-end',
-    //             justifyContent: 'flex-end',
-    //             marginBottom: 15,
-    //             marginRight: 10
-    //           }}>
-    //           <Text style={{ fontSize: Dimen.SECONDARY_TEXT, color: confirmColor }}>
-    //             {confirmStr}
-    //           </Text>
-    //         </View>
-    //       </View>
-    //     </View>
-    //   </CardItem>
-    // )CardItem
   }
 
 
+  async _showTransactionDetailDialog(action) {
+    this.dTxInfo = action
 
-  // async _showTransactionDetailDialog(rowData) {
-  //   this.dTxInfo = rowData
-  //   let price = '0'
-  //   let unit = this.cryptoCurrencyUnit
-  //   let isToSelf = false
-  //   let total = '0'
-  //   let addr = ''
-  //   this.rowData = rowData
-  //
-  //   rowData.showAddresses.forEach(function(item, index) {
-  //     if (item === 'self' || item === 'Self' || item === 'SELF') {
-  //       isToSelf = true
-  //       addr = item
-  //     } else {
-  //       if (index !== rowData.showAddresses.length - 1) {
-  //         addr = addr + item + ','
-  //       } else {
-  //         addr = addr + item
-  //       }
-  //     }
-  //   })
-  //
-  //   this.dAddr = addr
-  //
-  //   if (D.isBtc(rowData.coinType)) {
-  //     if (rowData.direction === D.tx.direction.in) {
-  //       price = '0'
-  //     } else {
-  //       let value = rowData.value
-  //       if (value.startsWith('-')) {
-  //         value = value.slice(1, value.length)
-  //       }
-  //       price = this.wallet.convertValue(
-  //         this.account.coinType,
-  //         value,
-  //         D.unit.btc.satoshi,
-  //         this.cryptoCurrencyUnit
-  //       )
-  //       if (isToSelf) {
-  //         price = this.wallet.convertValue(
-  //           this.account.coinType,
-  //           rowData.fee,
-  //           D.unit.btc.satoshi,
-  //           this.cryptoCurrencyUnit
-  //         )
-  //       }
-  //     }
-  //     total = price
-  //   } else {
-  //     if (rowData.direction === D.tx.direction.in) {
-  //       price = '0'
-  //     } else {
-  //       if (!isToSelf) {
-  //         let value = rowData.value
-  //         if (value.startsWith('-')) {
-  //           value = value.slice(1, value.length)
-  //         }
-  //         price = new BigInteger(rowData.fee).add(new BigInteger(value)).toString(10)
-  //         price = this.wallet.convertValue(
-  //           this.account.coinType,
-  //           price,
-  //           D.unit.eth.Wei,
-  //           this.cryptoCurrencyUnit
-  //         )
-  //       } else {
-  //         price = this.wallet.convertValue(
-  //           this.account.coinType,
-  //           rowData.fee,
-  //           D.unit.eth.Wei,
-  //           this.cryptoCurrencyUnit
-  //         )
-  //       }
-  //     }
-  //     total = price
-  //   }
-  //
-  //   if (rowData.direction === D.tx.direction.in) {
-  //     this.dTitle = I18n.t('income')
-  //     this.dAmountColor = Color.INCREASE
-  //   } else {
-  //     this.dTitle = I18n.t('expenditure')
-  //     this.dAmountColor = Color.REDUCED
-  //   }
-  //
-  //   if (D.isEth(rowData.coinType)) {
-  //     this.dAmount = this._getETHPrice(rowData, isToSelf) + ' ' + unit
-  //   } else {
-  //     this.dAmount = this._getBTCPrice(rowData, isToSelf) + ' ' + unit
-  //   }
-  //
-  //   this.dDate = StringUtil.formatTimeStamp(rowData.time)
-  //
-  //   if (rowData.confirmations >= 6) {
-  //     this.dConfirmStr = I18n.t('complete')
-  //   } else {
-  //     this.dConfirmStr = I18n.t('unfinished')
-  //   }
-  //
-  //   if (total < 0) {
-  //     total = -total
-  //   }
-  //   this.dTotal = total + ' ' + unit
-  //   this.dConfirmNum = rowData.confirmations
-  //   this.dTxId = rowData.txId
-  //   this.resendableText = rowData.canResend ? I18n.t('yes') : I18n.t('no')
-  //   this.canResend = rowData.canResend
-  //   if (rowData.shouldResend) {
-  //     this.resendableText = I18n.t('adviceToResend')
-  //   }
-  //   if (rowData.comment) {
-  //     this.setState({ dMemo: rowData.comment })
-  //   } else {
-  //     this.setState({ dMemo: '' })
-  //   }
-  //
-  //   if (rowData.data) {
-  //     this.dSmartContract = rowData.data
-  //   } else {
-  //     this.dSmartContract = 'none'
-  //   }
-  //   this._isMounted && this.setState({transactionDetailDialogVisible: true})
-  // }
+    this.dAmountColor = Color.REDUCED
+    this.dAmount = action.data.quantity
+    if (action.data.to === this.props.account.label) {
+      this.dTitle = I18n.t('income')
+      this.dAddr = action.data.from
+    } else {
+      this.dTitle = I18n.t('expenditure')
+      this.dAddr = action.data.to
+    }
+    this.dDate = StringUtil.formatTimeStamp(action.time)
+    if (action.confirmations === D.tx.confirmation.waiting) {
+      this.dStatusStr = I18n.t('waiting')
+    } else if (action.confirmations === D.tx.confirmation.executed) {
+      this.dStatusStr = I18n.t('executed')
+    }
+    this.dTxId = action.txId
+    if (action.comment) {
+      this.setState({dMemo: action.comment})
+    } else {
+      this.setState({dMemo: ''})
+    }
+    this._isMounted && action.name === 'transfer' && this.setState({transactionDetailDialogVisible: true})
+  }
 
   _getTxInfos() {
     this.account
       .getTxInfos()
       .then(txInfos => {
         console.log('txInfo', txInfos)
-        this._isMounted && this.setState({ data: txInfos.txInfos })
+        let actions = this._convertActionsToRowData(txInfos.txInfos)
+        console.log('actions', actions)
+        this._isMounted && this.setState({data: []})
+        this._isMounted && this.setState({data: actions})
       })
       .catch(error => {
         console.log('txInfo error', error)
@@ -495,6 +402,35 @@ class EOSAccountDetailPage extends Component {
     this.accountHeader && this.accountHeader.updateBalance()
   }
 
+
+  _convertActionsToRowData(txInfos) {
+    let actions = []
+    txInfos.map(txInfo => {
+      txInfo.actions.map(action => {
+        action['comment'] = txInfo.comment
+        action['time'] = txInfo.time
+        action['confirmations'] = txInfo.confirmations
+        action['txId'] = txInfo.txId
+        action['accountId'] = txInfo.accountId
+        actions.push(action)
+      })
+    })
+    console.log('???', this.state.selectedFilter)
+    if ('ALL' === this.state.selectedFilter.toUpperCase()) {
+      return actions
+    } else if ('TRANSFER' === this.state.selectedFilter.toUpperCase()) {
+
+      let temp = actions.filter(it => it.name === 'transfer')
+      return temp
+    } else if (this.state.selectedFilter.toUpperCase().startsWith('VOTE')) {
+      let temp = actions.filter(it => it.name.startsWith('vote'))
+      return temp
+    } else if ('DELEGATE' === this.state.selectedFilter.toUpperCase() || 'UNDELEGATE' === this.state.selectedFilter.toUpperCase()) {
+      return actions.filter(it => it.name === 'delegatebw' || it.name === 'undelegatebw')
+    } else {
+      return actions.filter(it => !(['transfer', 'delegatebw', 'undelegatebw'].includes(it.name)) && !it.name.startsWith('vote'))
+    }
+  }
 
 
   _handleTransactionDetailDismiss() {
@@ -515,86 +451,74 @@ class EOSAccountDetailPage extends Component {
 
   /**
    * Handle Menu Item Click
-   * @param type: [accountAssets, permissionManage, renameAccount]
+   * @param type: [accountAssets, permissionManage]
    */
   _handleMenuItemClick(type) {
     switch (type) {
       case 'accountAssets':
-        this.props.navigation.navigate('EOSAssets')
+        if (this.account.isRegistered()) {
+          this.props.navigation.navigate('EOSAssets')
+        } else {
+          ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
+        }
         break
       case 'permissionManage':
         this.props.navigation.navigate('EOSKeyDetail')
         break
       case 'vote':
-        this.props.navigation.navigate('EOSVote')
+        if (this.account.isRegistered()) {
+          this.props.navigation.navigate('EOSVote')
+        } else {
+          ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
+        }
         break
       default:
         break
     }
   }
 
+  _handleFilterSelected(index) {
+    this._isMounted && this.setState({selectedFilter: this.state.filterTip[index].value.toString()}, () => {
+      this._getTxInfos()
+    })
+  }
+
 
   render() {
     return (
-      <Container style={[CommonStyle.safeAreaBottom, { backgroundColor: Color.CONTAINER_BG }]}>
+      <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
         <AccountDetailHeader
           ref={refs => this.accountHeader = refs && refs.getWrappedInstance()}
           onHideMenu={type => this._handleMenuItemClick(type)}
           navigation={this.props.navigation}
         />
-        <Dialog
-          visible={this.state.renameDialogVisible}
-          onTouchOutside={() => {
-            this._isMounted && this.setState({renameDialogVisible: false})
-          }}
-          width={0.8}
-          dialogTitle={<DialogTitle  title={I18n.t('renameAccount')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='rename_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => {
-                this._isMounted && this.setState({ renameDialogVisible: false })
-              }} />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='rename_account_confirm'
-              text={I18n.t('confirm')} onPress={() => {
-              this._isMounted && this.setState({ renameDialogVisible: false })
-              this._renameAccount()}} />
-          ]}
-        >
-          <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
-            <Text style={[CommonStyle.verticalDialogText, {marginTop: Dimen.MARGIN_VERTICAL}]}>{I18n.t('renameAccountHint')}</Text>
-            <TextInput
-              style={Platform.OS === 'ios' ? CommonStyle.iosTextInput : CommonStyle.androidTextInput}
-              selectionColor={Color.ACCENT}
-              underlineColorAndroid={Color.ACCENT}
-              maxLength={7}
-              onChangeText={text => this.renameAccountname = text}
-              returnKeyType="done"
-            />
-          </View>
-        </Dialog>
         <View
           style={{
-            height: 40,
+            height: 60,
             width: deviceW,
+            flexDirection: 'row',
             backgroundColor: Color.CONTAINER_BG
           }}>
           <Text style={styles.listTitleText}>
-            {I18n.t('transactionRecord') +
-            '( ' +
-            I18n.t('value') +
-            ': ' +
-            this.props.accountCurrentUnit +
-            ' )'}
+            {I18n.t('transactionRecord')}
           </Text>
+          <View style={styles.filterWrapper}>
+            <Dropdown
+              containerStyle={{
+                width: 100,
+              }}
+              label={''}
+              data={this.state.filterTip}
+              fontSize={14}
+              value={this.state.selectedFilter}
+              itemTextStyle={{color: Color.PRIMARY_TEXT, textAlign: 'center', flex: 0}}
+              onChangeText={(value, index) => {
+                this._handleFilterSelected(index)
+              }}
+            />
+          </View>
         </View>
-        <View style={{ height: 1 }} />
+        <View style={{height: 1}}/>
         <View style={styles.listView}>
           <List
             refreshControl={
@@ -616,19 +540,17 @@ class EOSAccountDetailPage extends Component {
           visible={this.state.transactionDetailDialogVisible}
           width={0.9}
           height={
-            D.isBtc(this.account.coinType)
-              ? BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT
-              : ETH_TRANSACTION_DETAIL_DIALOG_HEIGHT
+            BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT
           }
           onTouchOutside={() => {
             this._isMounted && this.setState({transactionDetailDialogVisible: false})
             this._handleTransactionDetailDismiss()
           }}
           onShown={() => {
-            this._isMounted && this.setState({ isShowBottomBar: false })
+            this._isMounted && this.setState({isShowBottomBar: false})
           }}>
           <Content>
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <View
                 style={{
                   width: deviceW * 0.9,
@@ -637,11 +559,11 @@ class EOSAccountDetailPage extends Component {
                   flexDirection: 'row',
                   justifyContent: 'space-between'
                 }}>
-                <View style={{ width: 40, height: 30 }} />
+                <View style={{width: 40, height: 30}}/>
                 <View>
-                  <Text style={{ fontSize: 18 }}>{this.dTitle}</Text>
+                  <Text style={{fontSize: 18}}>{this.dTitle}</Text>
                 </View>
-                <View style={{ marginTop: -10, marginRight: 10 }}>
+                <View style={{marginTop: -10, marginRight: 10}}>
                   <Icon
                     name="close"
                     type="MaterialCommunityIcons"
@@ -660,28 +582,28 @@ class EOSAccountDetailPage extends Component {
                   alignItems: 'center'
                 }}>
                 <View>
-                  <Text style={{ fontSize: 22, color: this.dAmountColor }}>{this.dAmount}</Text>
+                  <Text style={{fontSize: 22, color: this.dAmountColor}}>{this.dAmount}</Text>
                 </View>
               </View>
-              <View style={[styles.detailLine, { marginTop: 15 }]} />
+              <View style={[styles.detailLine, {marginTop: 15}]}/>
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>{this.dConfirmStr}</Text>
+                <Text style={styles.detailCellLeftText}>{this.dStatusStr}</Text>
                 <Text style={styles.detailCellRightText}>{this.dDate}</Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('through')}</Text>
                 <Text
                   style={[
                     styles.detailCellRightText,
-                    { width: deviceW * 0.7 * 0.8, marginLeft: 10 }
+                    {width: deviceW * 0.7 * 0.8, marginLeft: 10}
                   ]}
                   ellipsizeMode="middle"
                   numberOfLines={1}>
                   {this.dAddr}
                 </Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
 
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('memo')}</Text>
@@ -692,7 +614,7 @@ class EOSAccountDetailPage extends Component {
                   returnKeyType="done"
                   underlineColorAndroid="transparent"
                   onChangeText={text => {
-                    this.setState({ dMemo: text })
+                    this.setState({dMemo: text})
                   }}
                   value={this.state.dMemo}
                   ref={textInput => {
@@ -700,69 +622,26 @@ class EOSAccountDetailPage extends Component {
                   }}
                 />
               </View>
-              <View style={styles.detailLine} />
-
+              <View style={styles.detailLine}/>
+              <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>{I18n.t('totalCost')}</Text>
-                <Text style={styles.detailCellRightText}>{this.dTotal}</Text>
-              </View>
-              <View style={styles.detailLine} />
-              <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>{I18n.t('confirmNum')}</Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('status')}</Text>
                 <Text style={styles.detailCellRightText}>{this.dConfirmNum}</Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('tradingID')}</Text>
                 <Text
                   style={[
                     styles.detailCellRightText,
-                    { width: deviceW * 0.9 * 0.7, marginLeft: 10 }
+                    {width: deviceW * 0.9 * 0.7, marginLeft: 10}
                   ]}
                   ellipsizeMode="middle"
                   numberOfLines={1}>
                   {this.dTxId}
                 </Text>
               </View>
-              <View style={styles.detailLine} />
-              {D.isBtc(this.account.coinType) ? null : (
-                <View
-                  style={{
-                    width: deviceW * 0.9,
-                    height: 75,
-                    flexDirection: 'row',
-                    paddingHorizontal: 10,
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                  <View>
-                    <Text style={styles.detailCellLeftText}>Data</Text>
-                  </View>
-                  <View style={styles.dataView}>
-                    <Content>
-                      <Text style={styles.dataText} numberOfLines={0}>
-                        {this.dSmartContract}
-                      </Text>
-                    </Content>
-                  </View>
-                </View>
-              )}
-              {D.isBtc(this.account.coinType) ? null : <View style={styles.detailLine} />}
-              <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>{I18n.t('canResend')}</Text>
-                <Text style={styles.detailCellRightText}>{this.resendableText}</Text>
-              </View>
             </View>
-            {this.canResend ? (
-              <View style={styles.resendBtnWrapper}>
-                <Button style={styles.resendButton} onPress={() => {
-                  this._showBluetoothConnectDialog()
-                  this._goToPage = 'resend'
-                }}>
-                  <Text style={{ textAlign: 'center' }}>{I18n.t('resend')}</Text>
-                </Button>
-              </View>
-            ) : null}
           </Content>
         </Dialog>
         <AccountOperateBottomBar
@@ -771,19 +650,48 @@ class EOSAccountDetailPage extends Component {
             this._goToPage = 'send'
           }}
           rightOnPress={() => {
-            this._showBluetoothConnectDialog()
-            this._goToPage = 'address'
+            this._gotoAddressDetailPage()
           }}
           visible={this.state.isShowBottomBar}
         />
         <Dialog
           width={0.8}
           visible={this.state.bluetoothConnectDialogVisible}
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
             <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothConnectDialogDesc}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.showRegisterDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
+          actions={[
+            <DialogButton
+              style={{backgroundColor: Color.WHITE}}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              key='show_register_cancel'
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({showRegisterDialogVisible: false})}
+            />,
+            <DialogButton
+              style={{backgroundColor: Color.WHITE}}
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              key='show_register_confirm'
+              text={I18n.t('register').toUpperCase()}
+              onPress={() => {
+                this._isMounted && this.setState({showRegisterDialogVisible: false}, () => {
+                  this.props.navigation.navigate('EOSKeyDetail')
+                })
+              }}
+            />
+          ]}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <Text style={styles.dialogDesc}>{I18n.t('eosAccountNotRegister')}</Text>
           </DialogContent>
         </Dialog>
       </Container>
@@ -808,7 +716,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flex: 1,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   leftText: {
     color: Color.PRIMARY_TEXT,
@@ -824,6 +732,7 @@ const styles = StyleSheet.create({
   listTitleText: {
     marginLeft: 25,
     marginTop: 15,
+    textAlignVertical: 'center',
     color: Color.SECONDARY_TEXT,
     fontSize: Dimen.SECONDARY_TEXT
   },
@@ -863,25 +772,11 @@ const styles = StyleSheet.create({
     paddingRight: 5,
     height: platform === 'ios' ? 36 : 48
   },
-  dataView: {
-    width: deviceW * 0.9 * 0.7,
-    height: 60
-  },
-  dataText: {
-    fontSize: Dimen.PRIMARY_TEXT,
-    textAlign: 'left'
-  },
-  resendBtnWrapper: {
-    height: 50,
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: Dimen.SPACE
-  },
-  resendButton: {
-    backgroundColor: Color.ACCENT,
+  filterWrapper: {
+    alignItems: 'flex-end',
     flex: 1,
+    marginRight: Dimen.MARGIN_VERTICAL,
+    paddingBottom: Dimen.SPACE,
     justifyContent: 'center'
   }
 })

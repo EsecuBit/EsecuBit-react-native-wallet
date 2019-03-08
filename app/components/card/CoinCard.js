@@ -11,6 +11,7 @@ import { withNavigation } from "react-navigation"
 import CustomIcon from "../CustomIcon"
 import { Coin } from "../../common/Constants"
 import { D } from 'esecubit-wallet-sdk'
+import I18n from '../../lang/i18n'
 
 class CoinCard extends PureComponent{
   constructor() {
@@ -74,14 +75,18 @@ class CoinCard extends PureComponent{
       fromUnit,
       this.props.legalCurrencyUnit
     )
+
+    let registerText = ''
     if (D.isEos(data.coinType)) {
-      data.checkAccountPermissions(() => {})
+      if (!data.isRegistered()) {
+        registerText = '('+ I18n.t('notRegister')+ ')'
+      }
     }
     return (
       <CardItem button style={CommonStyle.cardStyle} onPress={() => this._gotoDetailPage(data)} onLongPress={this.props.onLongPress}>
         <Left style={{ flexDirection: "row" }}>
           <CustomIcon coinType={this.props.data.coinType} />
-          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>{data.label}</Title>
+          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>{`${data.label} ${registerText}`}</Title>
         </Left>
         <View>
           <Subtitle

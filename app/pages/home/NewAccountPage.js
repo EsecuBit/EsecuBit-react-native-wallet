@@ -7,7 +7,8 @@ import {
   BackHandler,
   InteractionManager,
   ActivityIndicator,
-  View
+  View,
+  Image
 } from 'react-native'
 import { Container, Left, Icon, CardItem, Title, Right } from 'native-base'
 import I18n from '../../lang/i18n'
@@ -75,13 +76,13 @@ export default class NewAccountPage extends Component {
       ToastUtil.showLong(I18n.t('notSupportCoinType'))
       return
     }
-
-    let state = await this.btTransmitter.getState()
-    if (state === BtTransmitter.disconnected) {
-      ToastUtil.showLong(I18n.t('pleaseConnectDevice'))
-      return
+    if (!D.test.jsWallet) {
+      let state = await this.btTransmitter.getState()
+      if (state === BtTransmitter.disconnected) {
+        ToastUtil.showLong(I18n.t('pleaseConnectDevice'))
+        return
+      }
     }
-
     if (platform === 'ios') {
       this.isNeedDialog = true
       //all account
@@ -217,12 +218,51 @@ export default class NewAccountPage extends Component {
     ) : null
   }
 
+  _renderEOSAccount() {
+    let _that = this
+    let coinType = ''
+    let isSupportEOS = false
+    this.supportCoinType.map(it => {
+      if (it.startsWith('eos')) {
+        isSupportEOS = true
+        coinType = it
+      }
+    })
+    return isSupportEOS ? (
+      <CardItem
+        button
+        style={CommonStyle.cardStyle}
+        onPress={() => {
+          _that.setState({ newAccountDialogVisible: true })
+          this.newAccountType = coinType
+        }}>
+        <Left style={{ flexDirection: 'row' }}>
+          <Image
+            source={require('../../imgs/eos.png')}
+            style={{ width: 28, height: 28, color: Color.ETH }}
+          />
+          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>EOS</Title>
+        </Left>
+        <Right>
+          <TouchableOpacity
+            onPress={() => {
+              _that.setState({ newAccountDialogVisible: true })
+              this.newAccountType = coinType
+            }}>
+            <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}} />
+          </TouchableOpacity>
+        </Right>
+      </CardItem>
+    ) : null
+  }
+
   render() {
     return (
       <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
         <BaseToolbar title={I18n.t('newAccount')} />
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
+        {this._renderEOSAccount()}
         <Dialog
           style={{backgroundColor: 'white'}}
           visible={this.state.newAccountDialogVisible}

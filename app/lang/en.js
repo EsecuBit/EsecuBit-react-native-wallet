@@ -148,8 +148,6 @@ export default {
   permissionManageTip: 'Note: \n  - Owner Key: Has all permissions for the current EOS account. \n  \
   - Active Key: By default, all transactions except the Owner Key can be changed. \n \
   - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.',
-  stake: 'Stake',
-  unstake: 'UnStake',
   vote: 'Vote',
   ramTransaction: 'Buy/Sell RAM',
   buy: 'Buy',
@@ -181,5 +179,16 @@ export default {
   invalidParams: 'invalid params',
   permissionNotFound: 'permission not found',
   permissionNoNeedToConfirmed: 'permission no need to confirmed',
-  initData: "Initializing..."
+  initData: "Initializing...",
+  amountOfRamToSell: 'Amount of RAM to Sell',
+  delegate: "Delegate",
+  undelegate: 'UnDelegate',
+  eosAccountNotRegister: 'EOS account has not been register',
+  register: 'Register',
+  receiver: 'Receiver',
+  status: 'Status',
+  executed: 'Executed',
+  waiting: 'Waiting',
+  registered: 'registered',
+  notRegister: 'Not Register'
 }
