@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Platform, BackHandler, Text, InteractionManager } from 'react-native'
+import { Platform, BackHandler, Text, InteractionManager, Keyboard } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { CommonStyle, Color, Dimen } from '../../common/Styles'
@@ -206,6 +206,7 @@ class BTCSendPage extends Component {
   }
 
   _send() {
+    Keyboard.dismiss()
     let formData = this._buildBTCSendForm()
     this._showConfirmTransactionDialog()
     this.lockSend = true

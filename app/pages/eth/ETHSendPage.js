@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Platform, BackHandler, InteractionManager, Text } from 'react-native'
+import {Platform, BackHandler, InteractionManager, Text, Keyboard} from 'react-native'
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
@@ -193,10 +193,10 @@ class ETHSendPage extends Component {
     }
     this.setState({sendValue: this.valueInput.getValue(), address: this.addressInput.getAddress()})
     this._isMounted && this.setState({ transactionConfirmDialogVisible: true })
-
   }
 
   _send() {
+    Keyboard.dismiss()
     let formData = this._buildETHSendForm()
     // iOS render is too fast
     this._showConfirmTransactionDialog()

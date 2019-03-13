@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, Container, Content, Card } from 'native-base'
-import {BackHandler, InteractionManager, StyleSheet } from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, Keyboard } from 'react-native'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import FooterButton from '../../components/FooterButton'
 import ValueInput from '../../components/input/ValueInput'
@@ -90,7 +90,11 @@ class EOSSendPage extends Component {
       .prepareTransfer(formData)
       .then(result => {
         console.log('_maxAmount result', result)
-        this.valueInput.updateValue(result.actions[0].data.quantity)
+        let quantity = result.actions[0].data.quantity
+        // the quantity value includes eos unit, eg: 4.3913 EOS, so we need to remove it
+        let index = quantity.indexOf(' ')
+        quantity = quantity.slice(0, index)
+        this.valueInput.updateValue(quantity)
       })
       .catch(err => {
         console.log('_maxAmount error', err)
@@ -103,12 +107,7 @@ class EOSSendPage extends Component {
       sendAll: true,
       token: 'EOS',
       type: 'tokenTransfer',
-      comment: this.memoInput.getMemo(),
-      outputs: [{
-        account: this.accountNameInput.getAccountName(),
-        value: '0'
-      }
-      ]
+      comment: this.memoInput.getMemo()
     }
   }
 
@@ -138,6 +137,7 @@ class EOSSendPage extends Component {
 
 
   _send() {
+    Keyboard.dismiss()
     let formData = this._buildEOSSendForm()
     this._showConfirmTransactionDialog()
     this.lockSend = true
