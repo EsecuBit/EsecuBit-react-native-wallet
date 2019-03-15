@@ -1,7 +1,10 @@
+import {Text} from "react-native";
+import React from "react";
+
 export default {
   //splash
   syncing: 'Syncing...',
-  welcome: 'It may be take several minutes',
+  welcome: 'It may take several minutes',
   //settings
   settings: 'Settings',
   appVersion: 'App Version',
@@ -102,6 +105,7 @@ export default {
   coinNotSupported:'This currency is not supported',
   syncError: 'Network error, cannot sync data until the network is available',
   showAddressTip: 'Tips: Please check if the address below matches the address on the device',
+  showEOSAccountTip: 'Tips: Please check if the account below matches the account on the device',
   networkGasTooLow: 'Gas limit is too low',
   networkGasPriceTooLow: 'Gas price is too low',
   qrCodeHintText: 'Put the QR code into the box',
@@ -128,6 +132,7 @@ export default {
   transactionFee: 'Transaction Fee',
   newAccountSuccess: 'New account successfully',
   copyRemind:'Long press the QR code to copy the address',
+  copyEOSRemind:'Long press the QR code to copy the account',
   pleaseInputPassword: 'Please enter your password on the device and confirm transaction info',
   tips: 'Tips',
   deviceLimitTips: 'Due to device limitations, the transaction message cannot be more than 2k (about 45 utxo) when signed. The maximum amount that can be sent is: ',
@@ -149,7 +154,7 @@ export default {
   - Active Key: By default, all transactions except the Owner Key can be changed. \n \
   - For your asset security, it is recommended to use the Active Key to import the wallet for daily use and keep the Owner Key in a safe place.',
   vote: 'Vote',
-  ramTransaction: 'Buy/Sell RAM',
+  ramManage: 'RAM Manage',
   buy: 'Buy',
   sell: 'Sell',
   language: 'Language',
@@ -183,12 +188,29 @@ export default {
   amountOfRamToSell: 'Amount of RAM to Sell',
   delegate: "Delegate",
   undelegate: 'UnDelegate',
-  eosAccountNotRegister: 'EOS account has not been register',
+  eosAccountNotRegister: 'EOS account has not been register，if had registered, please refresh the current account',
   register: 'Register',
   receiver: 'Receiver',
   status: 'Status',
   executed: 'Executed',
   waiting: 'Waiting',
   registered: 'registered',
-  notRegister: 'Not Register'
+  notRegister: 'Not Register',
+  confirmNewPermissionHint: "Please confirm to add the following permissions on the device",
+  hasBeenConfirm: "Has been confirm",
+  checkingPermission: "Checking Permission...",
+  confirmPermissionTip: 'Confirm Permission',
+  bandwidthManage: 'BandWidth Manage',
+  date: 'Date',
+  amount: 'Amount',
+  byInEosOrBytes: 'By in EOS or Bytes?',
+  blockProducers: 'Block Producers',
+  proxy: 'Proxy',
+  all: 'All',
+  transfer: 'Transfer',
+  delegateOrUndelegate: 'Delegate/UnDelegate',
+  others: 'Others',
+  loading: 'Loading...'
+
+
 }

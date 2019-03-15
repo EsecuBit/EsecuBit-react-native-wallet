@@ -90,6 +90,7 @@ class EOSProxyVotePage extends React.PureComponent {
         <Content padder>
           <Text style={styles.hintText}>{I18n.t('proxyVoteTextHint')}</Text>
           <EOSAccountNameInput
+            label={I18n.t('accountName')}
             ref={ref => (this.accountNameInput = ref)}
             onChangeText={text => this._handleAccountNameInput(text)}
           />

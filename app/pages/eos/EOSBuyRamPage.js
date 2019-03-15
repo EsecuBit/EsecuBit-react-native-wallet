@@ -111,7 +111,7 @@ class EOSBuyRamPage extends React.PureComponent {
                 })
               }}
             />
-            <Text style={styles.unitHintText}>By in EOS or Bytes?</Text>
+            <Text style={styles.unitHintText}>{I18n.t('byInEosOrBytes')}</Text>
             <View style={{flexDirection: 'row', marginLeft: Dimen.SPACE, marginTop: Dimen.SPACE}}>
               <View style={styles.checkboxWrapper}>
                 <CheckBox checked={this.state.checkEOSUnit} color={Color.ACCENT} onPress={() => this._handlerCheckEOSUnit()}/>
@@ -125,7 +125,7 @@ class EOSBuyRamPage extends React.PureComponent {
             <ValueInput
               ref={refs => this.valueInput = refs}
               enablePercentageBar={false}
-              label="Amount"
+              label={I18n.t('amount')}
               onChangeText={text => {
                 this.setState({ramValue: text}, () => {
                   this._checkForm()

@@ -14,8 +14,8 @@ class EOSRamManagePage extends React.PureComponent {
     this.state = {
       index: 0,
       routes: [
-        {key: 'Buy', title: 'Buy RAM'},
-        {key: 'Sell', title: 'Sell RAM'},
+        {key: 'Buy', title: I18n.t('buy')},
+        {key: 'Sell', title: I18n.t('sell')},
       ],
     };
   }
@@ -45,7 +45,7 @@ class EOSRamManagePage extends React.PureComponent {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('ramTransaction')}/>
+        <BaseToolbar title={I18n.t('ramManage')}/>
         <TabView
           navigationState={this.state}
           renderScene={SceneMap({

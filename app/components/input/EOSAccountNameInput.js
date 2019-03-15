@@ -3,13 +3,14 @@ import {Platform, DeviceEventEmitter } from 'react-native'
 import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
 import { D } from 'esecubit-wallet-sdk'
+import I18n from '../../lang/i18n'
 
 export default class EOSAccountNameInput extends PureComponent {
 
   static defaultProps = {
     value: '',
     placeHolder: '',
-    label: 'Account Name',
+    label: I18n.t('accountName'),
     onChangeText: () => {}
   }
   
@@ -32,7 +33,7 @@ export default class EOSAccountNameInput extends PureComponent {
   async _handleAccountNameInput(accountName: string) {
     try {
       D.address.checkEosAddress(accountName)
-      let result = !!accountName && accountName.length === 12
+      let result = !!accountName
       await this.setState({ accountName: accountName, checkAccountNameSuccess: result, checkAccountNameError: !result})
       this.props.onChangeText(accountName)
     }catch (e) {

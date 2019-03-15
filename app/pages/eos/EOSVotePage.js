@@ -17,8 +17,8 @@ class EOSVotePage extends Component {
     this.state = {
       index: 0,
       routes: [
-        {key: 'BP', title: 'Block Producers'},
-        {key: 'Proxy', title: 'Proxy'},
+        {key: 'BP', title: I18n.t('blockProducers')},
+        {key: 'Proxy', title: I18n.t('proxy')},
       ],
     };
   }
@@ -68,7 +68,6 @@ class EOSVotePage extends Component {
           onIndexChange={index => this.setState({index})}
           initialLayout={{width: Dimensions.get('window').width}}
         />
-
       </Container>
     )
   }

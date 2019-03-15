@@ -83,6 +83,7 @@ class EOSBPVotePage extends React.PureComponent {
       <Container>
         <View style={{flex: 1}}>
           <EOSAccountNameInput
+            label={I18n.t('accountName')}
             ref={refs => this.accountInput = refs}
             onChangeText={text => this._checkForm()}
           />

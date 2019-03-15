@@ -86,7 +86,7 @@ class EOSSellRamPage extends React.PureComponent {
            <Text style={styles.hintText}>{I18n.t('amountOfRamToSell')}</Text>
            <ValueInput
              enablePercentageBar={false}
-             label="Amount"
+             label={I18n.t('amount')}
              ref={refs => this.valueInput = refs}
              onChangeText={text => {
                this.setState({ramValue: text})
