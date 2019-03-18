@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import {Container, Content, View, Card, Text, Body} from 'native-base'
-import {StyleSheet, TouchableOpacity, Image, BackHandler} from 'react-native'
+import {Container, Content, View, Card, Body} from 'native-base'
+import {StyleSheet, TouchableOpacity, Image, BackHandler, Text} from 'react-native'
 import BaseToolbar from '../../components/bar/BaseToolbar'
 import {Color, Dimen} from '../../common/Styles'
 import AssetsProgressBar from '../../components/bar/AssetsProgresBar'
@@ -8,6 +8,7 @@ import {connect} from 'react-redux'
 import I18n from '../../lang/i18n'
 import {withNavigation} from 'react-navigation'
 import BtTransmitter from '../../device/BtTransmitter'
+import StringUtil from "../../utils/StringUtil";
 
 class EOSResourcesDetailPage extends Component {
 
@@ -25,11 +26,11 @@ class EOSResourcesDetailPage extends Component {
     this._isMounted = true
     this._onFocus()
     this._onBlur()
+
   }
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
-      console.log('resource')
       this._getTotalStaked()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
@@ -51,9 +52,12 @@ class EOSResourcesDetailPage extends Component {
     this.props.account
       .sync((null, false, state === BtTransmitter.disconnected))
       .then(() => {
-        let cpuStaked = this.props.account.resources.stake.total.cpu
-        let netStaked = this.props.account.resources.stake.total.net
-        let totalStaked = parseFloat(cpuStaked) + parseFloat(netStaked)
+        let cpuStaked = this.props.account.resources.stake.cpu.total
+        let netStaked = this.props.account.resources.stake.net.total
+        cpuStaked = cpuStaked.slice(0, cpuStaked.indexOf(' '))
+        netStaked = netStaked.slice(0, netStaked.indexOf(' '))
+        let totalStaked =  parseFloat(cpuStaked) + parseFloat(netStaked)
+        totalStaked = StringUtil.toFixNum(totalStaked, 4)
         this.setState({totalStaked: totalStaked.toString(), cpuStaked: cpuStaked, netStaked: netStaked})
       })
   }
@@ -61,7 +65,7 @@ class EOSResourcesDetailPage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title="Account Assets"/>
+        <BaseToolbar title={I18n.t('accountAssets')}/>
         <View style={{flex: 1}}>
           <View padder style={{flexDirection: 'row', alignItems: 'stretch', height: 220}}>
             <Card style={styles.cardItem} borderRadius={5}>
@@ -130,7 +134,9 @@ const styles = StyleSheet.create({
   cardItem: {
     flex: 1,
     height: 200,
-    alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    backgroundColor: 'transparent',
     justifyContent: 'center'
   },
   cardItemTitle: {

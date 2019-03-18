@@ -68,10 +68,10 @@ export default class NewAccountPage extends Component {
    */
   async _newAccount() {
     let coinType = this.newAccountType
-    if (!this.newAccountName) {
-      ToastUtil.showLong(I18n.t('emptyAccountNameError'))
-      return
-    }
+   if (!D.isEos(coinType) && !this.newAccountName) {
+       ToastUtil.showLong(I18n.t('emptyAccountNameError'))
+       return
+   }
     if (!this._canNewAccount(coinType)) {
       ToastUtil.showLong(I18n.t('notSupportCoinType'))
       return
@@ -111,7 +111,9 @@ export default class NewAccountPage extends Component {
 
     try {
       let account = await this.wallet.newAccount(coinType)
-      await account.rename(this.newAccountName)
+     if (!D.isEos(account.coinType)) {
+       await account.rename(this.newAccountName)
+     }
       this.newAccountName = ''
       this._isMounted && await this.setState({ newAccountWaitDialog: false })
       let msg = I18n.t('newAccountSuccess')
@@ -233,8 +235,8 @@ export default class NewAccountPage extends Component {
         button
         style={CommonStyle.cardStyle}
         onPress={() => {
-          _that.setState({ newAccountDialogVisible: true })
           this.newAccountType = coinType
+          this._newAccount()
         }}>
         <Left style={{ flexDirection: 'row' }}>
           <Image
@@ -246,8 +248,8 @@ export default class NewAccountPage extends Component {
         <Right>
           <TouchableOpacity
             onPress={() => {
-              _that.setState({ newAccountDialogVisible: true })
               this.newAccountType = coinType
+              this._newAccount()
             }}>
             <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}} />
           </TouchableOpacity>

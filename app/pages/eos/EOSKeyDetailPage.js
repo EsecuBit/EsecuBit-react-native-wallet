@@ -49,24 +49,28 @@ class EOSKeyDetailPage extends Component {
     return true;
   }
   async getPermission() {
-    let keyDetail = await this.props.account.getPermissions()
-    console.log('keyDetail', keyDetail);
-    let activeKey = '';
-    let ownerKey = '';
-    if (keyDetail[0].type === 'active') {
-      activeKey = keyDetail[0].publicKey
-      ownerKey = keyDetail[1].publicKey
-    }else {
-      activeKey = keyDetail[1].publicKey
-      ownerKey = keyDetail[0].publicKey
+    try {
+      let keyDetail = await this.props.account.getPermissions()
+      console.log('keyDetail', keyDetail);
+      let activeKey = '';
+      let ownerKey = '';
+      if (keyDetail[0].type === 'active') {
+        activeKey = keyDetail[0].publicKey
+        ownerKey = keyDetail[1].publicKey
+      }else {
+        activeKey = keyDetail[1].publicKey
+        ownerKey = keyDetail[0].publicKey
+      }
+      this.setState({activeKey: activeKey, ownerKey: ownerKey})
+    }catch (e) {
+      ToastUtil.showErrorMsgShort(e)
     }
-    this.setState({activeKey: activeKey, ownerKey: ownerKey})
   }
   
   render() {
     return (
       <Container>
-        <BaseToolbar title='EOS Key' />
+        <BaseToolbar title={I18n.t('permissionManage')} />
         <View style={{padding: Dimen.MARGIN_HORIZONTAL}}>
           <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
             <Text style={styles.keyTitle}>Owner Key</Text>

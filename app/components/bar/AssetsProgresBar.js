@@ -137,10 +137,10 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
       this.state.total +
       ' ' +
       this.state.totalUnit
-    let stakedAssets = staked === '' ? staked : ' ( ' + staked + ' )'
+    let stakedAssets = staked === '' ? staked : ' ( ' + staked + ' EOS) '
     return (
       <Card>
-      <CardItem button={this.props.enablePress} onPress={this.props.onPress} >
+      <CardItem button={this.props.enablePress} onPress={this.props.onPress}>
         <View style={style.container}>
           <Text style={style.title}>{title}</Text>
           <Text style={style.desc}>{res + stakedAssets}</Text>

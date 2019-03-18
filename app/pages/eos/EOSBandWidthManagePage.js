@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {Text, StyleSheet, BackHandler} from 'react-native'
 import {
   View,
@@ -16,8 +16,8 @@ import BaseToolbar from '../../components/bar/BaseToolbar'
 import FooterButton from '../../components/FooterButton'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
-import { connect } from 'react-redux'
-import { withNavigation }from 'react-navigation'
+import {connect} from 'react-redux'
+import {withNavigation} from 'react-navigation'
 import ToastUtil from "../../utils/ToastUtil"
 import I18n from '../../lang/i18n'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
@@ -32,15 +32,16 @@ class EOSBandWidthManagePage extends Component {
       netError: false,
       cpuError: false,
       // false is invalid input and input text is empty
-      netStatus: false,
-      cpuStatus: false,
+      netStatus: true,
+      cpuStatus: true,
       // stake or unstake value
       cpuValue: '',
       netValue: '',
       transactionConfirmDialogVisible: false,
-      receiver: ''
+      receiver: '',
+      footBtnText: I18n.t('delegate')
     }
-    const { params } = props.navigation.state
+    const {params} = props.navigation.state
     this.type = params.type
   }
 
@@ -48,11 +49,15 @@ class EOSBandWidthManagePage extends Component {
     this._isMounted = true
     this._onFocus()
     this._onBlur()
+    if (this.type === 'undelegate') {
+      this.setState({footBtnText: I18n.t('undelegate')})
+    }
   }
 
   componentWillUnmount(): void {
     this._isMounted = false
   }
+
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
@@ -71,27 +76,55 @@ class EOSBandWidthManagePage extends Component {
   }
 
   async _handleCpuInput(text) {
-    await this.setState({ cpuValue: text })
-    let cpuResult = StringUtil.isInvalidValue(text)
-    await this.setState({ cpuError: cpuResult, cpuStatus: !cpuResult && text !== '' })
+    await this.setState({cpuValue: text})
+    let cpuTextInvalid = StringUtil.isInvalidValue(text)
+    if (text.indexOf('.') !== -1) {
+      let digit = text.length - text.indexOf('.') - 1
+      if (digit > 4) {
+        ToastUtil.showShort(I18n.t('invalidValue'))
+        cpuTextInvalid = true
+      }
+    }
+    await this.setState({cpuError: cpuTextInvalid, cpuStatus: !cpuTextInvalid && text !== ''})
     this._checkFormData()
   }
 
   async _handleNetInput(text) {
-    await this.setState({ netValue: text })
-    let netResult = StringUtil.isInvalidValue(text)
-    await this.setState({ netError: netResult, netStatus: !netResult && text !== '' })
+    await this.setState({netValue: text})
+    let netTextInvalid = StringUtil.isInvalidValue(text)
+    if (text.indexOf('.') !== -1) {
+      let digit = text.length - text.indexOf('.') - 1
+      if (digit > 4) {
+        ToastUtil.showShort(I18n.t('invalidValue'))
+        netTextInvalid = true
+      }
+    }
+    await this.setState({netError: netTextInvalid, netStatus: !netTextInvalid && text !== ''})
     this._checkFormData()
   }
 
   _checkFormData() {
     let result = this.state.cpuStatus && this.state.netStatus
     result = result && this.accountNameInput.isValidInput()
-    this.setState({ disableFooterBtn: !result })
+    if (parseFloat(this.state.cpuValue) === 0 && parseFloat(this.state.netValue) === 0) {
+      result = false
+    }
+    if (isNaN(parseFloat(this.state.cpuValue)) && isNaN(parseFloat(this.state.netValue))) {
+      result = false
+    }
+    this.setState({disableFooterBtn: !result})
   }
 
-  _stake() {
+  async _stake() {
     let formData = this._buildStakeFormData()
+    console.log('hello', this.state.cpuValue)
+    if (!this.state.cpuValue) {
+      console.log('hello 1', this.state.cpuValue)
+      await this.setState({cpuValue: '0.0000'})
+    }
+    if (!this.state.netValue) {
+      await this.setState({netValue: '0.0000'})
+    }
     console.log('stake formData', formData)
     this.props.account.prepareDelegate(formData)
       .then(result => {
@@ -117,9 +150,9 @@ class EOSBandWidthManagePage extends Component {
 
   _buildStakeFormData() {
     return {
-      delegate: this.type === 'stake',
-      network: this.state.netValue,
-      cpu: this.state.cpuValue,
+      delegate: this.type === 'delegate',
+      network: this.state.netValue ? this.state.netValue : '0.0000',
+      cpu: this.state.cpuValue ? this.state.cpuValue : '0.0000',
       receiver: this.accountNameInput.getAccountName()
     }
   }
@@ -131,26 +164,25 @@ class EOSBandWidthManagePage extends Component {
     this._stake()
   }
 
-  _handleAccountNameInput(text) {
-    this.setState({receiver: text}, () => {
-      this._checkFormData()
-    })
+  async _handleAccountNameInput(text) {
+    await this.setState({receiver: text})
+    this._checkFormData()
   }
 
   render() {
     return (
       <Container>
-        <BaseToolbar title="Manage BandWidth" />
-        <Content contentContainerStyle={{ flex: 1 }} padder>
+        <BaseToolbar title={I18n.t('bandwidthManage')}/>
+        <Content contentContainerStyle={{flex: 1}} padder>
           <Card padder>
             <EOSAccountNameInput
               label={I18n.t('receiver')}
               ref={refs => this.accountNameInput = refs}
               onChangeText={text => this._handleAccountNameInput(text)}
             />
-            <CardItem style={{ flexDirection: 'column', alignItems: 'flex-start' }} padder>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                <Text style={styles.title}>{'CPU: '+ this.props.account.resources.stake.total.cpu}</Text>
+            <CardItem style={{flexDirection: 'column', alignItems: 'flex-start'}} padder>
+              <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                <Text style={styles.title}>{'CPU: ' + this.props.account.resources.stake.cpu.total}</Text>
               </View>
               <Item stackedLabel>
                 <Label>CPU</Label>
@@ -164,20 +196,20 @@ class EOSBandWidthManagePage extends Component {
                   {this.state.cpuError ? (
                     <Icon
                       name="close-circle"
-                      style={{ color: Color.DANGER }}
-                      onPress={() => this.setState({ cpuValue: '' })}
+                      style={{color: Color.DANGER}}
+                      onPress={() => this.setState({cpuValue: ''})}
                     />
                   ) : null}
                 </InputGroup>
               </Item>
             </CardItem>
-            <CardItem style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+            <CardItem style={{flexDirection: 'column', alignItems: 'flex-start'}}>
               <View
                 style={{
                   flexDirection: 'row',
                   flexWrap: 'wrap'
                 }}>
-                <Text style={styles.title}>{'Network: '+ this.props.account.resources.stake.total.net}</Text>
+                <Text style={styles.title}>{'Network: ' + this.props.account.resources.stake.net.total}</Text>
               </View>
               <Item stackedLabel last>
                 <Label>Network</Label>
@@ -191,8 +223,8 @@ class EOSBandWidthManagePage extends Component {
                   {this.state.netError ? (
                     <Icon
                       name="close-circle"
-                      style={{ color: Color.DANGER }}
-                      onPress={() => this.setState({ netValue: '' })}
+                      style={{color: Color.DANGER}}
+                      onPress={() => this.setState({netValue: ''})}
                     />
                   ) : null}
                 </InputGroup>
@@ -201,21 +233,23 @@ class EOSBandWidthManagePage extends Component {
           </Card>
         </Content>
         <Dialog
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
           width={0.8}
           visible={this.state.transactionConfirmDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}>
+          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')}/>}>
           <DialogContent style={CommonStyle.verticalDialogContent}>
             <Text>{I18n.t('pleaseInputPassword')}</Text>
-            <Text style={{ fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT }}>
+            <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
               {`${I18n.t(this.type)} `}
-              <Text style={{ color: Color.DANGER }}>{`CPU: ${this.state.cpuValue} EOS `}</Text>
-              <Text style={{ color: Color.DANGER }}>{`Net: ${this.state.netValue} EOS`}</Text>
+              <Text style={{color: Color.DANGER}}>{`CPU: ${this.state.cpuValue} EOS `}</Text>
+              <Text style={{color: Color.DANGER}}>{`Net: ${this.state.netValue} EOS`}</Text>
               <Text>{`\n${I18n.t('to1')} ${this.state.receiver}`}</Text>
             </Text>
           </DialogContent>
         </Dialog>
-        <FooterButton title={this.type} disabled={this.state.disableFooterBtn} onPress={() => this._showTransactionConfirmDialog()}/>
+        <FooterButton title={this.state.footBtnText} disabled={this.state.disableFooterBtn}
+                      onPress={() => this._showTransactionConfirmDialog()}/>
       </Container>
     )
   }

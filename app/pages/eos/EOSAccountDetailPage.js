@@ -41,32 +41,38 @@ class EOSAccountDetailPage extends Component {
       isShowBottomBar: true,
       dMemo: '',
       transactionDetailDialogVisible: false,
-      bluetoothConnectDialogVisible: false,
-      bluetoothConnectDialogDesc: '',
+      progressDialogVisible: false,
+      progressDialogDesc: '',
       filterTip: [{
-        value: 'All',
+        value: I18n.t('all'),
       }, {
-        value: 'Transfer',
+        value: I18n.t('transfer'),
       }, {
-        value: 'Delegate',
+        value: I18n.t('vote'),
       }, {
-        value: 'Vote'
+        value: I18n.t('delegateOrUndelegate')
       }, {
-        value: 'Others'
+        value: I18n.t('others')
       }],
-      selectedFilter: "All",
-      showRegisterDialogVisible: false
+      selectedFilter: I18n.t('transfer'),
+      showRegisterDialogVisible: false,
+      checkAddPermissionDialogVisible: false,
+      checkAddPermissionText: '',
     }
+    // default filter transfer
+    this.filterIndex = 1
     this.transmitter = new BtTransmitter()
     this.timers = []
     this.transmitter = new BtTransmitter()
+    // confirm eos permission counter
+    this.confirmEosPermisiionCounter = 0;
+    this.needToConfirmAmount = 0;
   }
 
   componentDidMount() {
     this._isMounted = true
     this._onFocus()
     this._onBlur()
-    this._getTxInfos()
     this._listenTransmitter()
     this._listenWallet()
     this.wallet.listenTxInfo(() => {
@@ -74,22 +80,71 @@ class EOSAccountDetailPage extends Component {
       this._getTxInfos()
     })
     if (!this.account.isRegistered()) {
-      this._isMounted && this.setState({showRegisterDialogVisible: true})
+      this._checkNewPermission()
     }
   }
 
-  _checkNewPermission() {
-    if (!this.account.isRegistered()) {
-      this.account.checkAccountPermissions((error, status, permissions) => {
-        console.log('check account permission', error, status, permissions)
+  async _checkNewPermission() {
+    this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('checkingPermission')})
+    try {
+      let result = await this.account.checkAccountPermissions((error, status, permissions) => {
+        if (error === D.error.succeed) {
+          if (status === D.status.newEosPermissions) {
+            this._isMounted && this.setState({progressDialogVisible: false})
+            this.needToConfirmAmount = permissions.addToDevice.length
+            let content = ''
+            permissions.addToDevice.map(it => {
+              content = content + `${it.type} : ${it.publicKey} \n`
+            })
+            this.setState({checkAddPermissionText: `${I18n.t('confirmNewPermissionHint')} \n ${content}`})
+          } else if (status === D.status.confirmedEosPermission) {
+            this.confirmEosPermisiionCounter += 1
+            this.setState({checkAddPermissionText: `${I18n.t('hasBeenConfirm')} \n ${permissions.type} : ${permissions.publicKey}`})
+          }
+          this._isMounted && this.setState({showRegisterDialogVisible: false}, () => {
+            this.setState({checkAddPermissionDialogVisible: true})
+          })
+          if (this.needToConfirmAmount === this.confirmEosPermisiionCounter) {
+            this._isMounted && this.setState({checkAddPermissionDialogVisible: false}, () => {
+              this._showRegisterDialog()
+            })
+          }
+          console.log('check account permission', error, status, permissions)
+        } else {
+          ToastUtil.showErrorMsgShort(error)
+          this._isMounted && this.setState({checkAddPermissionDialogVisible: false})
+        }
+        // no new permission to add
+        if (permissions === undefined) {
+          this._isMounted && this.setState({progressDialogVisible: false}, () => {
+            this._showRegisterDialog()
+          })
+        }
       })
+      if (!result) {
+        this._showRegisterDialog()
+        this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
+      } else {
+        this._getTxInfos()
+      }
+    } catch (e) {
+      ToastUtil.showErrorMsgShort(e)
+      this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
+    }
+
+  }
+
+  _showRegisterDialog() {
+    if (!this.account.isRegistered()) {
+      this._isMounted && this.setState({showRegisterDialogVisible: true})
+    } else {
+      // this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('syncing')})
     }
   }
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       this._getTxInfos()
-      this._checkNewPermission()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
   }
@@ -97,12 +152,21 @@ class EOSAccountDetailPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+      this._isMounted && this.setState({
+        progressDialogVisible: false,
+        showRegisterDialogVisible: false,
+        checkAddPermissionDialogVisible: false
+      })
     })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
+    this._isMounted && this.setState({
+      progressDialogVisible: false,
+      showRegisterDialogVisible: false,
+      checkAddPermissionDialogVisible: false
+    })
     return true;
   }
 
@@ -110,7 +174,7 @@ class EOSAccountDetailPage extends Component {
     this.transmitter.listenStatus((error, status) => {
       if (error === D.error.succeed) {
         if (status === BtTransmitter.connecting) {
-          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
+          this.setState({progressDialogDesc: I18n.t('connecting')})
           this.transmitter.stopScan()
         } else if (status === BtTransmitter.connected) {
           switch (this._goToPage) {
@@ -128,23 +192,26 @@ class EOSAccountDetailPage extends Component {
           if (!this._isDeviceChange) {
             ToastUtil.showShort(I18n.t('disconnected'))
           }
-          this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+          this._isMounted && this.setState({progressDialogVisible: false})
         }
       } else {
         this.transmitter.stopScan()
         ToastUtil.showShort(I18n.t('connectFailed'))
-        this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+        this._isMounted && this.setState({progressDialogVisible: false})
       }
     })
   }
 
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
-      if (status === D.status.deviceChange) {
-        this._isDeviceChange = true
-        ToastUtil.showLong(I18n.t('deviceChange'))
-        this.transmitter.disconnect()
-        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+      console.log('eos account wallet status', error, status)
+      if (error === D.error.succeed) {
+        if (status === D.status.deviceChange) {
+          this._isDeviceChange = true
+          ToastUtil.showLong(I18n.t('deviceChange'))
+          this.transmitter.disconnect()
+          this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+        }
       }
     })
   }
@@ -179,8 +246,8 @@ class EOSAccountDetailPage extends Component {
 
   async _findAndConnectDevice() {
     this._isMounted && this.setState({
-      bluetoothConnectDialogVisible: true,
-      bluetoothConnectDialogDesc: I18n.t('searchingDevice')
+      progressDialogVisible: true,
+      progressDialogDesc: I18n.t('searchingDevice')
     })
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
@@ -192,7 +259,7 @@ class EOSAccountDetailPage extends Component {
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
       if (state === BtTransmitter.disconnected) {
-        this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+        this._isMounted && this.setState({progressDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
       }
@@ -201,7 +268,7 @@ class EOSAccountDetailPage extends Component {
   }
 
   _gotoSendPage() {
-    this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+    this._isMounted && this.setState({progressDialogVisible: false})
     this.props.navigation.navigate('EOSSend')
   }
 
@@ -389,7 +456,6 @@ class EOSAccountDetailPage extends Component {
     this.account
       .getTxInfos()
       .then(txInfos => {
-        console.log('txInfo', txInfos)
         let actions = this._convertActionsToRowData(txInfos.txInfos)
         console.log('actions', actions)
         this._isMounted && this.setState({data: []})
@@ -415,20 +481,19 @@ class EOSAccountDetailPage extends Component {
         actions.push(action)
       })
     })
-    console.log('???', this.state.selectedFilter)
-    if ('ALL' === this.state.selectedFilter.toUpperCase()) {
-      return actions
-    } else if ('TRANSFER' === this.state.selectedFilter.toUpperCase()) {
-
-      let temp = actions.filter(it => it.name === 'transfer')
-      return temp
-    } else if (this.state.selectedFilter.toUpperCase().startsWith('VOTE')) {
-      let temp = actions.filter(it => it.name.startsWith('vote'))
-      return temp
-    } else if ('DELEGATE' === this.state.selectedFilter.toUpperCase() || 'UNDELEGATE' === this.state.selectedFilter.toUpperCase()) {
-      return actions.filter(it => it.name === 'delegatebw' || it.name === 'undelegatebw')
-    } else {
-      return actions.filter(it => !(['transfer', 'delegatebw', 'undelegatebw'].includes(it.name)) && !it.name.startsWith('vote'))
+    switch (this.filterIndex) {
+      case 0:
+        return actions
+      case 1:
+        return actions.filter(it => it.name === 'transfer')
+      case 2:
+        return actions.filter(it => it.name.startsWith('vote'))
+      case 3:
+        return actions.filter(it => it.name === 'delegatebw' || it.name === 'undelegatebw')
+      case 4:
+        return actions.filter(it => !(['transfer', 'delegatebw', 'undelegatebw'].includes(it.name)) && !it.name.startsWith('vote'))
+      default:
+        return actions
     }
   }
 
@@ -497,6 +562,7 @@ class EOSAccountDetailPage extends Component {
             height: 60,
             width: deviceW,
             flexDirection: 'row',
+            alignItems: 'center',
             backgroundColor: Color.CONTAINER_BG
           }}>
           <Text style={styles.listTitleText}>
@@ -513,6 +579,7 @@ class EOSAccountDetailPage extends Component {
               value={this.state.selectedFilter}
               itemTextStyle={{color: Color.PRIMARY_TEXT, textAlign: 'center', flex: 0}}
               onChangeText={(value, index) => {
+                this.filterIndex = index
                 this._handleFilterSelected(index)
               }}
             />
@@ -523,6 +590,7 @@ class EOSAccountDetailPage extends Component {
           <List
             refreshControl={
               <RefreshControl
+                title={I18n.t('loading')}
                 refreshing={this.state.refreshing}
                 onRefresh={() => this._onRefresh()}
               />
@@ -587,7 +655,7 @@ class EOSAccountDetailPage extends Component {
               </View>
               <View style={[styles.detailLine, {marginTop: 15}]}/>
               <View style={styles.detailCell}>
-                <Text style={styles.detailCellLeftText}>{this.dStatusStr}</Text>
+                <Text style={styles.detailCellLeftText}>{I18n.t('date')}</Text>
                 <Text style={styles.detailCellRightText}>{this.dDate}</Text>
               </View>
               <View style={styles.detailLine}/>
@@ -626,7 +694,7 @@ class EOSAccountDetailPage extends Component {
               <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('status')}</Text>
-                <Text style={styles.detailCellRightText}>{this.dConfirmNum}</Text>
+                <Text style={styles.detailCellRightText}>{this.dStatusStr}</Text>
               </View>
               <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
@@ -656,13 +724,13 @@ class EOSAccountDetailPage extends Component {
         />
         <Dialog
           width={0.8}
-          visible={this.state.bluetoothConnectDialogVisible}
+          visible={this.state.progressDialogVisible}
           onTouchOutside={() => {
           }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
-            <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothConnectDialogDesc}</Text>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.progressDialogDesc}</Text>
           </DialogContent>
         </Dialog>
         <Dialog
@@ -692,6 +760,15 @@ class EOSAccountDetailPage extends Component {
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <Text style={styles.dialogDesc}>{I18n.t('eosAccountNotRegister')}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.checkAddPermissionDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('confirmPermissionTip')}/>}
+        >
+          <DialogContent>
+            <Text style={{marginTop: Dimen.MARGIN_VERTICAL}}>{this.state.checkAddPermissionText}</Text>
           </DialogContent>
         </Dialog>
       </Container>
@@ -776,7 +853,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     flex: 1,
     marginRight: Dimen.MARGIN_VERTICAL,
-    paddingBottom: Dimen.SPACE,
     justifyContent: 'center'
   }
 })

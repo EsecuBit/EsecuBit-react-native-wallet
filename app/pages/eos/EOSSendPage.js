@@ -79,6 +79,16 @@ class EOSSendPage extends Component {
 
   _checkFormData() {
     let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
+    let sendValue = this.valueInput.getValue()
+    if (sendValue.indexOf('.') !== -1) {
+      let digit = sendValue.length - sendValue.indexOf('.') - 1
+      if (digit > 4) {
+        ToastUtil.showShort(I18n.t('invalidValue'))
+        this.valueInput.clear()
+        this.valueInput.setError()
+        result = false
+      }
+    }
     this.setState({ disableFooterBtn: !result })
   }
 
@@ -179,12 +189,14 @@ class EOSSendPage extends Component {
           <BalanceHeader value={this.props.account.balance} unit='EOS'/>
           <Card>
             <EOSAccountNameInput
+              label={I18n.t('accountName')}
               ref={ref => (this.accountNameInput = ref)}
               onChangeText={text => this._handleAccountNameInput(text)}
             />
             <ValueInput
               ref={ref => (this.valueInput = ref)}
               placeholder="EOS"
+              label={I18n.t('value')}
               onChangeText={text => this._handleSendValueInput(text)}
               onItemClick={text => this._handleSendValueItemClick(text)}
             />
