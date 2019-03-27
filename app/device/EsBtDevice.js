@@ -58,8 +58,12 @@ class EsBtDevice {
         console.debug('transmitter got response', response.toString('hex'))
         return {result: 0x9000, response: response}
       }).catch((e) => {
-        console.warn('sendApdu got error', e)
         let sw1sw2 = parseInt(e.code, 16)
+        if ((sw1sw2 & 0x6100) == 0x6100) {
+          console.debug('got 61XX', sw1sw2);
+        } else {
+          console.warn('sendApdu got error', e)
+        }
         return {result: sw1sw2, response: Buffer.alloc(0)}
       })
   }
