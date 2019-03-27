@@ -57,12 +57,13 @@ class RealmDB extends IDatabase {
 
   deleteAccount(account, addressInfos) {
     account = wrapper.account.wrap(account)
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
     return Realm.open(this._config).then(realm => realm.write(() => {
       account = realm.objects('Account').filtered(`accountId = "${account.accountId}"`)
       realm.delete(account)
       let realmObjs = realm.objects('AddressInfo')
       addressInfos.forEach(addressInfo => {
-        let objs = realmObjs.filtered(`address = "${addressInfo.address}"`)
+        let objs = realmObjs.filtered(`accountId_path = "${addressInfo.accountId_path}"`)
         realm.delete(objs)
       })
     }))
@@ -126,6 +127,17 @@ class RealmDB extends IDatabase {
         addressInfos.forEach(addressInfo => {
           realm.create('AddressInfo', addressInfo, true)
         })
+      })
+    })
+  }
+
+  deleteAddressInfos(addressInfos) {
+    addressInfos = wrapper.addressInfo.wraps(addressInfos)
+    return Realm.open(this._config).then(realm => {
+      let realmObjs = realm.objects('AddressInfo')
+      addressInfos.forEach(addressInfo => {
+        let objs = realmObjs.filtered(`accountId_path = "${addressInfo.accountId_path}"`)
+        realm.delete(objs)
       })
     })
   }
