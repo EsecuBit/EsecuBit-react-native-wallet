@@ -195,7 +195,7 @@ export default {
   waiting: '等待中',
   registered: '已注册',
   notRegister: '未注册',
-  confirmNewPermissionHint: "请在设备上确认添加以下权限",
+  confirmNewPermissionHint: "请在设备上确认添加权限",
   hasBeenConfirm: '已被确认：',
   checkingPermission: "正在检查是否有新权限",
   confirmPermissionTip: '确认权限',
@@ -209,5 +209,10 @@ export default {
   transfer: '转账',
   delegateOrUndelegate: '抵押/赎回',
   others: '其他',
-  loading: '加载中...'
+  loading: '加载中...',
+  importKey: '导入私钥',
+  importHint: '导入',
+  invalidPrivateKey: '非法私钥', // for eos
+  multipleAccounts: '多账户', // for eos
+  keyNotMatch: '不匹配的Key', // for eos
 }

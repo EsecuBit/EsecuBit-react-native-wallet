@@ -10,7 +10,7 @@ import {
   ActivityIndicator
 } from 'react-native'
 import I18n from '../../lang/i18n'
-import {Container, Icon, List, ListItem, Content, CardItem, Text} from 'native-base'
+import {Container, Icon, List, ListItem, Content, CardItem, Text, Input} from 'native-base'
 import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import {CommonStyle, Dimen, Color} from '../../common/Styles'
 import {EsWallet, D} from 'esecubit-wallet-sdk'
@@ -58,12 +58,16 @@ class EOSAccountDetailPage extends Component {
       showRegisterDialogVisible: false,
       checkAddPermissionDialogVisible: false,
       checkAddPermissionText: '',
+      importKeyDialogVisible: false,
+      importNameText: '',
+      importActiveKeyText: '',
+      importOwnerKeyText: ''
+
     }
     // default filter transfer
     this.filterIndex = 1
     this.transmitter = new BtTransmitter()
     this.timers = []
-    this.transmitter = new BtTransmitter()
     // confirm eos permission counter
     this.confirmEosPermisiionCounter = 0;
     this.needToConfirmAmount = 0;
@@ -85,6 +89,10 @@ class EOSAccountDetailPage extends Component {
   }
 
   async _checkNewPermission() {
+    let state = await this.transmitter.getState()
+    if (state === BtTransmitter.disconnected) {
+      return
+    }
     this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('checkingPermission')})
     try {
       let result = await this.account.checkAccountPermissions((error, status, permissions) => {
@@ -520,6 +528,9 @@ class EOSAccountDetailPage extends Component {
    */
   _handleMenuItemClick(type) {
     switch (type) {
+      case 'importKey':
+        this._isMounted && this.setState({importKeyDialogVisible: true})
+        break
       case 'accountAssets':
         if (this.account.isRegistered()) {
           this.props.navigation.navigate('EOSAssets')
@@ -548,6 +559,18 @@ class EOSAccountDetailPage extends Component {
     })
   }
 
+
+  async _importAccountByKeys() {
+    try {
+      this._isMounted && this.setState({checkAddPermissionDialogVisible: true, checkAddPermissionText: I18n.t('confirmNewPermissionHint')})
+      await this.account.importAccountByKeys(this.state.importNameText, this.state.importOwnerKeyText, this.state.importActiveKeyText)
+      ToastUtil.showShort(I18n.t('success'))
+    } catch (e) {
+      ToastUtil.showErrorMsgShort(e)
+    }finally {
+      this._isMounted && this.setState({checkAddPermissionDialogVisible: false})
+    }
+  }
 
   render() {
     return (
@@ -769,6 +792,88 @@ class EOSAccountDetailPage extends Component {
         >
           <DialogContent>
             <Text style={{marginTop: Dimen.MARGIN_VERTICAL}}>{this.state.checkAddPermissionText}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.9}
+          visible={this.state.importKeyDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('importKey')}/>}
+          actions={[
+            <DialogButton
+              style={{backgroundColor: Color.WHITE}}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              key='import_key_cancel'
+              text={I18n.t('cancel')}
+              onPress={() => this.setState({importKeyDialogVisible: false})}
+            />,
+            <DialogButton
+              style={{backgroundColor: Color.WHITE}}
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              key='import_key_confirm'
+              text={I18n.t('importHint').toUpperCase()}
+              onPress={() => {
+                this._isMounted && this.setState({importKeyDialogVisible: false}, () => {
+                  this._importAccountByKeys()
+                })
+              }}
+            />
+          ]}
+        >
+          <DialogContent style={{flexDirection: 'column'}}>
+            <View>
+              <TextInput
+                underlineColorAndroid={Color.ACCENT}
+                selectionColor={Color.ACCENT}
+                style={[
+                  Platform.OS === 'android'
+                    ? CommonStyle.multilineInputAndroid
+                    : CommonStyle.multilineInputIOS,
+                  {marginTop: Dimen.SPACE}]
+                }
+                placeholder={"Name"}
+                autoFocus
+                multiline={true}
+                keyboardType="email-address"
+                returnKeyType="done"
+                blurOnSubmit={true}
+                value={this.state.importNameText}
+                onChangeText={text => this.setState({importNameText: text})}
+              />
+              <TextInput
+                underlineColorAndroid={Color.ACCENT}
+                selectionColor={Color.ACCENT}
+                style={[
+                  Platform.OS === 'android'
+                    ? CommonStyle.multilineInputAndroid
+                    : CommonStyle.multilineInputIOS,
+                  {marginTop: Dimen.SPACE}]
+                }
+                placeholder={"Owner Key"}
+                multiline={true}
+                keyboardType="email-address"
+                returnKeyType="done"
+                blurOnSubmit={true}
+                value={this.state.importOwnerKeyText}
+                onChangeText={text => this.setState({importOwnerKeyText: text})}
+              />
+              <TextInput
+                underlineColorAndroid={Color.ACCENT}
+                selectionColor={Color.ACCENT}
+                style={[
+                  Platform.OS === 'android'
+                    ? CommonStyle.multilineInputAndroid
+                    : CommonStyle.multilineInputIOS,
+                  {marginTop: Dimen.SPACE}]
+                }
+                placeholder={"Active Key"}
+                multiline={true}
+                keyboardType="email-address"
+                returnKeyType="done"
+                blurOnSubmit={true}
+                value={this.state.importActiveKeyText}
+                onChangeText={text => this.setState({importActiveKeyText: text})}
+              />
+            </View>
           </DialogContent>
         </Dialog>
       </Container>

@@ -2,7 +2,7 @@ import I18n from '../lang/i18n'
 class ErrorUtil {
   static getErrorMsg(errCode: number) {
     if (errorMap[errCode] === undefined) {
-      console.log('getErrorMsg,undefined', errCode)
+      console.warn('getErrorMsg,undefined', errCode)
       return I18n.t(errorMap[10001])
     }
     return I18n.t(errorMap[errCode])
@@ -43,8 +43,11 @@ const errorMap = {
   605: 'invalidDataNotHex',
   606:'valueIsNotDecimal',
   607: 'invalidParams',
-  608: 'permissionNotFound',
-  609: 'permissionNoNeedToConfirmed',
+  608: 'permissionNotFound', // for eos
+  609: 'permissionNoNeedToConfirmed', // for eos
+  610: 'invalidPrivateKey', // for eos
+  611: 'multipleAccounts', // for eos
+  612: 'keyNotMatch', // for eos
   10000: 'notImplemented',
   10001: 'unknown',
   10002: 'coinNotSupported'

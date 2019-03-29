@@ -196,7 +196,7 @@ export default {
   waiting: 'Waiting',
   registered: 'registered',
   notRegister: 'Not Register',
-  confirmNewPermissionHint: "Please confirm to add the following permissions on the device",
+  confirmNewPermissionHint: "Please confirm to add permissions on the device",
   hasBeenConfirm: "Has been confirm",
   checkingPermission: "Checking Permission...",
   confirmPermissionTip: 'Confirm Permission',
@@ -210,7 +210,11 @@ export default {
   transfer: 'Transfer',
   delegateOrUndelegate: 'Delegate/UnDelegate',
   others: 'Others',
-  loading: 'Loading...'
-
-
+  loading: 'Loading...',
+  importKey: 'Import Private Key',
+  importHint: 'Import',
+  invalidPrivateKey: 'Invalid private key', // for eos
+  multipleAccounts: 'Multiple accounts', // for eos
+  keyNotMatch: 'Key not match', // for eos
+  
 }

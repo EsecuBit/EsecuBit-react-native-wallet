@@ -529,12 +529,12 @@ class SettingsPage extends Component {
               switch (index) {
                 case 0:
                   I18n.locale = 'en'
-                  PreferenceUtil.updateLanguagePrefrence('en', 0)
+                  PreferenceUtil.updateLanguagePreference('en', 0)
                   this.setState({changeLanguageIndex: 0, changeLanguageLabel: 'en'})
                   break
                 case 1:
                   I18n.locale = 'zh-Hans'
-                  PreferenceUtil.updateLanguagePrefrence('zh-Hans', 1)
+                  PreferenceUtil.updateLanguagePreference('zh-Hans', 1)
                   this.setState({changeLanguageIndex: 1, changeLanguageLabel: 'zh-Hans'})
                   break
               }

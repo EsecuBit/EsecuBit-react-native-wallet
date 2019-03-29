@@ -120,7 +120,7 @@ class HomePage extends Component {
       console.log('home wallet status', error, status)
       if (status === D.status.deviceChange) {
         ToastUtil.showLong(I18n.t('deviceChange'))
-        this.transmitter.disconnect()
+        this.btTransmitter.disconnect()
         this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
       }
       if (status === D.status.syncFinish || status === D.status.syncing) {
@@ -129,29 +129,30 @@ class HomePage extends Component {
     })
   }
 
-  _checkVersion() {
-    if (!this.state.deviceConnected) {
+  async _checkVersion() {
+    let state = await this.btTransmitter.getState()
+    // device is disconnected, app is no need to check update
+    if (state === BtTransmitter.disconnected) {
       return
     }
-    AppUtil.checkUpdate()
-      .then(info => {
-        console.log('checkVersion', info)
-        this.info = info
-        if (info && info.errorCode === Api.success) {
-          if (info.data !== null) {
-            this.setState({
-              updateDesc: info.data.description,
-              updateVersionDialogVisible: true
-            })
-          }
+    try {
+      let info = await AppUtil.checkUpdate()
+      console.log('checkVersion', info)
+      this.info = info
+      if (info && info.errorCode === Api.success) {
+        if (info.data !== null) {
+          this.setState({
+            updateDesc: info.data.description,
+            updateVersionDialogVisible: true
+          })
         }
-      })
-      .catch(e => {
-        console.log('checkVersion error', e)
-        if (D.error.deviceNotConnected !== e) {
-          ToastUtil.showErrorMsgShort(e)
-        }
-      })
+      }
+    }catch (e) {
+      console.log('checkVersion error', e)
+      if (D.error.deviceNotConnected !== e) {
+        ToastUtil.showErrorMsgShort(e)
+      }
+    }
   }
 
   async _connectDevice() {
