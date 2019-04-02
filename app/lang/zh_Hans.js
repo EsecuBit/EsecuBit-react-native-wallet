@@ -217,5 +217,11 @@ export default {
   keyNotMatch: '不匹配的Key', // for eos
   limitValue: '限制EOS发送金额',
   pleaseImportPrivateKey: '请先导入私钥',
-  successful: '操作成功'
+  successful: '操作成功',
+  deviceNeedReauthenticate: '设备需要重新认证',
+  deviceConditionNotSatisfied: '设备条件不满足',
+  networkEosTokenNotFound: '该EOS Token在网络中未找到',
+  networkEosTxExpired: '该交易广播已超时',
+  networkEosUnsatisfiedAuth: '未知错误',
+  tooManyOutputs: '交易过大',
 }

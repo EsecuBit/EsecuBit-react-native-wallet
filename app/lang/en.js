@@ -218,6 +218,13 @@ export default {
   keyNotMatch: 'Key not match', // for eos
   limitValue: 'Limit EOS Value',
   pleaseImportPrivateKey: 'Please Import Private Key',
-  successful: 'Operation successful'
+  successful: 'Operation successful',
+  deviceNeedReauthenticate: 'Device need to re-authenticate',
+  deviceConditionNotSatisfied: 'Device condition not satisfied',
+  networkEosTokenNotFound: 'Network eos token not found',
+  networkEosTxExpired: 'Network eos tx expired',
+  networkEosUnsatisfiedAuth: 'Network eos unsatisfied auth',
+  tooManyOutputs: 'Too many outputs',
+
   
 }

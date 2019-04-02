@@ -22,6 +22,8 @@ const errorMap = {
   110: 'operationTimeout',
   111: 'deviceNotInit',
   114: 'deviceNotConnected',
+  115: 'deviceNeedReauthenticate',
+  116: 'deviceConditionNotSatisfied',
   201: 'databaseOpenFailed',
   202: 'databaseExecFailed',
   301: 'lastAccountNoTransaction',
@@ -35,7 +37,11 @@ const errorMap = {
   407: 'networkValueTooSmall',
   408: 'networkGasTooLow',
   409: 'networkGasPriceTooLow',
+  450: 'networkEosTokenNotFound',
+  451: 'networkEosTxExpired',
+  452: 'networkEosUnsatisfiedAuth',
   501: 'balanceNotEnough',
+  502: 'tooManyOutputs',
   601: 'invalidAddress',
   602: 'noAddressCheckSum',
   603: 'invalidAddressChecksum',
@@ -47,7 +53,9 @@ const errorMap = {
   609: 'permissionNoNeedToConfirmed', // for eos
   610: 'invalidPrivateKey', // for eos
   611: 'multipleAccounts', // for eos
-  612: 'keyNotMatch', // for eos
+  612: 'keyNotMatch', // for eos,
+  701: 'offlineModeNotAllowed',
+  702: 'offlineModeUnnecessary',
   10000: 'notImplemented',
   10001: 'unknown',
   10002: 'coinNotSupported'
