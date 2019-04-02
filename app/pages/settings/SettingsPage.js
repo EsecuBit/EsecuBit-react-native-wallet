@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator} from 'react-native'
+import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator, TextInput, Platform} from 'react-native'
 import {Container, Icon, Right, Card, CardItem, Text, Content} from 'native-base'
 import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
@@ -47,7 +47,9 @@ class SettingsPage extends Component {
       clearDataDialogVisible: false,
       clearDataWaitingDialogVisible: false,
       bluetoothConnectDialogVisible: false,
-      bluetoothConnectDialogDesc: ''
+      bluetoothConnectDialogDesc: '',
+      limitValueDialogVisible: false,
+      limitValue: ''
     }
     this.coinTypes = D.supportedCoinTypes()
     this.wallet = new EsWallet()
@@ -95,7 +97,7 @@ class SettingsPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-      this._isMounted && this.setState({clearDataWaitingDialogVisible: false})
+      this._isMounted && this.setState({clearDataWaitingDialogVisible: false, limitValueDialogVisible: false})
     })
   }
 
@@ -270,6 +272,16 @@ class SettingsPage extends Component {
     this.timers.push(this.findDeviceTimer)
   }
 
+  async limitValue() {
+    try {
+      await this.wallet.setEosAmountLimit(this.state.limitValue)
+      this._isMounted && this.setState({limitValueDialogVisible: false})
+      ToastUtil.showShort(I18n.t('successful'))
+    }catch (e) {
+      ToastUtil.showErrorMsgShort(e)
+    }
+  }
+
   render() {
     return (
       <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
@@ -362,6 +374,12 @@ class SettingsPage extends Component {
               button
               onPress={() => this.setState({changeLanguageDialogVisible: true})}>
               <Text>{I18n.t('language')}</Text>
+            </CardItem>
+            <CardItem
+              bordered
+              button
+              onPress={() => this.setState({limitValueDialogVisible: true})}>
+              <Text>{I18n.t('limitValue')}</Text>
             </CardItem>
             <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>{I18n.t('about')}</Text>
@@ -544,6 +562,48 @@ class SettingsPage extends Component {
           />
         </Dialog>
         {/* Language Dialog */}
+        <Dialog
+          visible={this.state.limitValueDialogVisible}
+          width={0.8}
+          dialogTitle={<DialogTitle title={I18n.t('limitValue')}/>}
+          actions={[
+            <DialogButton
+              key="limit_value_cancel"
+              style={{backgroundColor: Color.WHITE}}
+              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+              text={I18n.t('cancel')}
+              onPress={() => this._isMounted && this.setState({limitValueDialogVisible: false})}
+            />,
+            <DialogButton
+              key="limit_value_confirm"
+              style={{backgroundColor: Color.WHITE}}
+              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+              text={I18n.t('confirm')}
+              onPress={this.limitValue.bind(this)}
+            />
+          ]}
+        >
+          <DialogContent>
+            <TextInput
+              underlineColorAndroid={Color.ACCENT}
+              selectionColor={Color.ACCENT}
+              style={[
+                Platform.OS === 'android'
+                  ? CommonStyle.multilineInputAndroid
+                  : CommonStyle.multilineInputIOS,
+                {marginTop: Dimen.SPACE}]
+              }
+              placeholder={I18n.t('value')}
+              autoFocus
+              multiline={true}
+              keyboardType="email-address"
+              returnKeyType="done"
+              blurOnSubmit={true}
+              value={this.state.limitValue}
+              onChangeText={text => this.setState({limitValue: text})}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Update Version Dialog */}
         <Dialog
@@ -552,9 +612,9 @@ class SettingsPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
           actions={[
             <DialogButton
+              key="update_version_cancel"
               style={{backgroundColor: Color.WHITE}}
               textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key="update_version_cancel"
               text={I18n.t('cancel')}
               onPress={this._checkForceUpdate.bind(this)}
             />,

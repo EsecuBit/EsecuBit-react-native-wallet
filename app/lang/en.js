@@ -216,5 +216,8 @@ export default {
   invalidPrivateKey: 'Invalid private key', // for eos
   multipleAccounts: 'Multiple accounts', // for eos
   keyNotMatch: 'Key not match', // for eos
+  limitValue: 'Limit EOS Value',
+  pleaseImportPrivateKey: 'Please Import Private Key',
+  successful: 'Operation successful'
   
 }

@@ -130,7 +130,7 @@ class EOSAccountDetailPage extends Component {
         }
       })
       if (!result) {
-        this._showRegisterDialog()
+        ToastUtil.showShort(I18n.t('pleaseImportPrivateKey'))
         this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
       } else {
         this._getTxInfos()
@@ -564,7 +564,7 @@ class EOSAccountDetailPage extends Component {
     try {
       this._isMounted && this.setState({checkAddPermissionDialogVisible: true, checkAddPermissionText: I18n.t('confirmNewPermissionHint')})
       await this.account.importAccountByKeys(this.state.importNameText, this.state.importOwnerKeyText, this.state.importActiveKeyText)
-      ToastUtil.showShort(I18n.t('success'))
+      ToastUtil.showShort(I18n.t('successful'))
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
     }finally {
@@ -830,6 +830,7 @@ class EOSAccountDetailPage extends Component {
                     : CommonStyle.multilineInputIOS,
                   {marginTop: Dimen.SPACE}]
                 }
+                maxLength={12}
                 placeholder={"Name"}
                 autoFocus
                 multiline={true}

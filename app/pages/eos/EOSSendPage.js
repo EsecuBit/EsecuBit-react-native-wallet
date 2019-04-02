@@ -13,6 +13,7 @@ import I18n from '../../lang/i18n'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import BalanceHeader from "../../components/header/BalanceHeader";
 import StringUtil from "../../utils/StringUtil";
+import { D } from 'esecubit-wallet-sdk'
 
 class EOSSendPage extends Component {
   constructor(props) {
@@ -88,6 +89,12 @@ class EOSSendPage extends Component {
         this.valueInput.setError()
         result = false
       }
+    }
+    if (sendValue > this.account.balance) {
+      ToastUtil.showErrorMsgShort(D.error.balanceNotEnough)
+      this.valueInput.clear()
+      this.valueInput.setError()
+      result = false
     }
     this.setState({ disableFooterBtn: !result })
   }

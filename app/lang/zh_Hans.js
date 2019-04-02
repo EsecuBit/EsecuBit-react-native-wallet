@@ -215,4 +215,7 @@ export default {
   invalidPrivateKey: '非法私钥', // for eos
   multipleAccounts: '多账户', // for eos
   keyNotMatch: '不匹配的Key', // for eos
+  limitValue: '限制EOS发送金额',
+  pleaseImportPrivateKey: '请先导入私钥',
+  successful: '操作成功'
 }
