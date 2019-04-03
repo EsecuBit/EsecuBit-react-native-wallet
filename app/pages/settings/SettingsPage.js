@@ -17,6 +17,7 @@ import CoinUtil from '../../utils/CoinUtil'
 import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-popup-dialog'
 import {withNavigation, NavigationActions} from 'react-navigation'
+import ValueInput from "../../components/input/ValueInput";
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
@@ -274,9 +275,13 @@ class SettingsPage extends Component {
 
   async limitValue() {
     try {
-      await this.wallet.setEosAmountLimit(this.state.limitValue)
-      this._isMounted && this.setState({limitValueDialogVisible: false})
-      ToastUtil.showShort(I18n.t('successful'))
+      if (this.valueInput.isValidInput()) {
+        await this.wallet.setEosAmountLimit(this.state.limitValue)
+        this._isMounted && this.setState({limitValueDialogVisible: false})
+        ToastUtil.showShort(I18n.t('successful'))
+      }else {
+        ToastUtil.showErrorMsgShort(D.error.invalidParams)
+      }
     }catch (e) {
       ToastUtil.showErrorMsgShort(e)
     }
@@ -584,22 +589,11 @@ class SettingsPage extends Component {
           ]}
         >
           <DialogContent>
-            <TextInput
-              underlineColorAndroid={Color.ACCENT}
-              selectionColor={Color.ACCENT}
-              style={[
-                Platform.OS === 'android'
-                  ? CommonStyle.multilineInputAndroid
-                  : CommonStyle.multilineInputIOS,
-                {marginTop: Dimen.SPACE}]
-              }
+            <ValueInput
+              ref={ref => this.valueInput = ref}
+              label={''}
+              enablePercentageBar={false}
               placeholder={I18n.t('value')}
-              autoFocus
-              multiline={true}
-              keyboardType="email-address"
-              returnKeyType="done"
-              blurOnSubmit={true}
-              value={this.state.limitValue}
               onChangeText={text => this.setState({limitValue: text})}
             />
           </DialogContent>

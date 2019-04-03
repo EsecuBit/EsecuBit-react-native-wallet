@@ -1,17 +1,17 @@
-import React, { Component } from 'react'
-import { Container, Content, Accordion, Text, CardItem } from "native-base"
+import React, {Component} from 'react'
+import {Container, Content, Accordion, Text, CardItem} from "native-base"
 import I18n from '../../lang/i18n'
 import BaseToolbar from "../../components/bar/BaseToolbar"
-import { EsWallet, D } from 'esecubit-wallet-sdk'
+import {EsWallet, D} from 'esecubit-wallet-sdk'
 import CoinUtil from "../../utils/CoinUtil"
-import { View } from 'react-native'
+import {View} from 'react-native'
 import CustomIcon from "../../components/CustomIcon"
-import { StyleSheet, BackHandler } from 'react-native'
+import {StyleSheet, BackHandler} from 'react-native'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import Dialog, {DialogButton, DialogContent, DialogTitle} from "react-native-popup-dialog"
-import { withNavigation } from 'react-navigation'
-import { setAccount } from "../../actions/AccountAction"
-import { connect } from 'react-redux'
+import {withNavigation} from 'react-navigation'
+import {setAccount} from "../../actions/AccountAction"
+import {connect} from 'react-redux'
 
 class AccountManagePage extends Component {
 
@@ -69,15 +69,15 @@ class AccountManagePage extends Component {
         if (!data.title) {
           data.title = coinType
           data.content.push(account)
-        }else {
+        } else {
           // the account coinType has been changed
           if (data.title !== coinType) {
             dataArray.push(data)
             // reset object
-            data = { title: '', content: []}
+            data = {title: '', content: []}
             data.title = coinType
             data.content.push(account)
-          }else {
+          } else {
             data.content.push(account)
           }
         }
@@ -90,7 +90,17 @@ class AccountManagePage extends Component {
     return dataArray
   }
 
-
+  gotoPage(it) {
+    this.props.setAccount(it)
+    console.log('it', it)
+    if (!D.isEos(it.coinType)) {
+      console.log('asdasd', 'asdasd')
+      this.props.navigation.navigate('Detail')
+    } else {
+      console.log('1', 'asdasd')
+      this.props.navigation.navigate('EOSAccountDetail')
+    }
+  }
 
 
   _renderContent(item) {
@@ -101,16 +111,13 @@ class AccountManagePage extends Component {
         {item.content.map(it => {
           return (
             <View>
-              <CardItem button onPress={() => {
-                _that.props.setAccount(it)
-                _that.props.navigation.navigate('Detail')
-              }} onLongPress={() => {
+              <CardItem button onPress={() => this.gotoPage(it)} onLongPress={() => {
                 console.log('onLongPress', it)
                 _that.setState({showAccountDialogVisible: true})
                 _that.currentAccount = it
                 console.log('_that', this)
               }}>
-                <CustomIcon  coinType={it.coinType}/>
+                <CustomIcon coinType={it.coinType}/>
                 <Text style={styles.cardText}>{it.label}</Text>
               </CardItem>
               <View style={CommonStyle.divider}/>
@@ -130,11 +137,12 @@ class AccountManagePage extends Component {
     this.setState({dataArray: []})
     this.setState({dataArray: accounts})
   }
+
   render() {
     return (
       <Container>
         <BaseToolbar title={I18n.t('accountManage')}/>
-        <Content padder contentContainerStyle={{flex: 1 ,backgroundColor: Color.CONTAINER_BG}}>
+        <Content padder contentContainerStyle={{flex: 1, backgroundColor: Color.CONTAINER_BG}}>
           {
             this.state.dataArray.length !== 0 ? (
               <Accordion
@@ -142,7 +150,7 @@ class AccountManagePage extends Component {
                 dataArray={this.state.dataArray}
                 renderContent={this._renderContent.bind(this)}
               />
-            ): (
+            ) : (
               <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                 <Text>{I18n.t('noAccountToShow')}</Text>
               </View>
@@ -187,7 +195,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   setAccount
 }
-
 
 
 const styles = StyleSheet.create({

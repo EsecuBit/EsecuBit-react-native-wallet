@@ -14,6 +14,8 @@ import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import BalanceHeader from "../../components/header/BalanceHeader";
 import StringUtil from "../../utils/StringUtil";
 import { D } from 'esecubit-wallet-sdk'
+import {BigDecimal} from 'bigdecimal'
+
 
 class EOSSendPage extends Component {
   constructor(props) {
@@ -68,14 +70,16 @@ class EOSSendPage extends Component {
   }
 
   _handleSendValueItemClick(value) {
+    console.log('hello', value)
     let sendValue;
     if (value !== '1') {
+      console.log('hello', this.props.account.balance, (Number(this.props.account.balance) * Number(value)))
       sendValue = StringUtil.toFixNum((Number(this.props.account.balance) * Number(value)), 4)
       this.valueInput.updateValue(sendValue)
     } else {
       this._maxAmount()
     }
-    this._checkFormData()
+    // this._checkFormData()
   }
 
   _checkFormData() {
@@ -90,14 +94,24 @@ class EOSSendPage extends Component {
         result = false
       }
     }
-    if (sendValue > this.account.balance) {
+    let value = new BigDecimal(sendValue)
+    let balance = new BigDecimal(this.props.account.balance)
+    // console.log('value', value, balance, value.compareTo(this.props.account.balance) > 0, value.subtract(this.props.account.balance).toPlainString())
+    if (value.compareTo(balance) > 0) {
       ToastUtil.showErrorMsgShort(D.error.balanceNotEnough)
+      this.valueInput.setError()
       this.valueInput.clear()
+      result = false
+    }
+    // not allow to send 0 value, eos specification
+    if (Number(sendValue) === 0) {
+      ToastUtil.showShort(I18n.t('notAllowToSend'))
       this.valueInput.setError()
       result = false
     }
     this.setState({ disableFooterBtn: !result })
   }
+
 
 
   _maxAmount() {
@@ -156,9 +170,9 @@ class EOSSendPage extends Component {
   _send() {
     Keyboard.dismiss()
     let formData = this._buildEOSSendForm()
+    console.log('_send formData', formData)
     this._showConfirmTransactionDialog()
     this.lockSend = true
-    console.log('_send formData', formData)
     this.props.account
       .prepareTx(formData)
       .then(result => {
@@ -180,11 +194,7 @@ class EOSSendPage extends Component {
         this.lockSend = false
         console.warn('EOS send error', err)
         ToastUtil.showErrorMsgShort(err)
-        // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
-        // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
-        InteractionManager.runAfterInteractions(() => {
-          this._isMounted && this.setState({transactionConfirmDialogVisible: false })
-        })
+        this._isMounted && this.setState({transactionConfirmDialogVisible: false })
       })
   }
 
@@ -204,6 +214,7 @@ class EOSSendPage extends Component {
               ref={ref => (this.valueInput = ref)}
               placeholder="EOS"
               label={I18n.t('value')}
+              onEndEditing={() => this._checkFormData()}
               onChangeText={text => this._handleSendValueInput(text)}
               onItemClick={text => this._handleSendValueItemClick(text)}
             />

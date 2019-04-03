@@ -71,6 +71,7 @@ class EOSAccountDetailPage extends Component {
     // confirm eos permission counter
     this.confirmEosPermisiionCounter = 0;
     this.needToConfirmAmount = 0;
+    this.syncResult = true
   }
 
   componentDidMount() {
@@ -83,7 +84,7 @@ class EOSAccountDetailPage extends Component {
       console.log('listen TxInfo')
       this._getTxInfos()
     })
-    if (!this.account.isRegistered()) {
+    if (this.account && !this.account.isRegistered()) {
       this._checkNewPermission()
     }
   }
@@ -95,6 +96,8 @@ class EOSAccountDetailPage extends Component {
     }
     this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('checkingPermission')})
     try {
+      console.log('fuck', '????')
+      this.syncResult = false
       let result = await this.account.checkAccountPermissions((error, status, permissions) => {
         if (error === D.error.succeed) {
           if (status === D.status.newEosPermissions) {
@@ -129,8 +132,9 @@ class EOSAccountDetailPage extends Component {
           })
         }
       })
+      console.log('fuck 111', '????')
       if (!result) {
-        ToastUtil.showShort(I18n.t('pleaseImportPrivateKey'))
+        ToastUtil.showShort(I18n.t('noPermissionToUpdate'))
         this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
       } else {
         this._getTxInfos()
@@ -138,6 +142,8 @@ class EOSAccountDetailPage extends Component {
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
       this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
+    }finally {
+      this.syncResult = true
     }
 
   }
@@ -461,7 +467,7 @@ class EOSAccountDetailPage extends Component {
   }
 
   _getTxInfos() {
-    this.account
+    this.props.account && this.props.account
       .getTxInfos()
       .then(txInfos => {
         let actions = this._convertActionsToRowData(txInfos.txInfos)
@@ -533,7 +539,11 @@ class EOSAccountDetailPage extends Component {
         break
       case 'accountAssets':
         if (this.account.isRegistered()) {
-          this.props.navigation.navigate('EOSAssets')
+          if (this.syncResult) {
+            this.props.navigation.navigate('EOSAssets')
+          }else {
+            ToastUtil.showShort(I18n.t('pleaseAwaitSyncFinish'))
+          }
         } else {
           ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
         }

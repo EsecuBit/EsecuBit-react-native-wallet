@@ -225,6 +225,8 @@ export default {
   networkEosTxExpired: 'Network eos tx expired',
   networkEosUnsatisfiedAuth: 'Network eos unsatisfied auth',
   tooManyOutputs: 'Too many outputs',
-
+  noPermissionToUpdate: 'No permission to update',
+  pleaseAwaitSyncFinish: 'Please await account sync finish',
+  notAllowToSend: 'Value is 0, not allow'
   
 }

@@ -56,7 +56,7 @@ class EOSResourcesDetailPage extends Component {
         let netStaked = this.props.account.resources.stake.net.total
         cpuStaked = cpuStaked.slice(0, cpuStaked.indexOf(' '))
         netStaked = netStaked.slice(0, netStaked.indexOf(' '))
-        let totalStaked =  parseFloat(cpuStaked) + parseFloat(netStaked)
+        let totalStaked = parseFloat(cpuStaked) + parseFloat(netStaked)
         totalStaked = StringUtil.toFixNum(totalStaked, 4)
         this.setState({totalStaked: totalStaked.toString(), cpuStaked: cpuStaked, netStaked: netStaked})
       })
@@ -71,30 +71,32 @@ class EOSResourcesDetailPage extends Component {
             <Card style={styles.cardItem} borderRadius={5}>
               <Image source={require('../../imgs/staked_bg.png')} style={styles.cardItem}>
                 <Body>
-                <Text style={styles.cardItemTitle}>{I18n.t('balance')}</Text>
-                <Text style={styles.cardItemBody}>{this.props.account.balance}</Text>
-                <Text style={styles.cardItemHint}>EOS</Text>
-                <TouchableOpacity style={styles.cardItemButton}
-                                    onPress={() => this.props.navigation.navigate('EOSBandWidthManage', {type: 'delegate'})}>
-                  <View>
-                    <Text style={styles.cardItemButtonText}>{I18n.t('delegate')}</Text>
-                  </View>
-                </TouchableOpacity>
+                  <Text style={styles.cardItemTitle}>{I18n.t('balance')}</Text>
+                  <Text style={styles.cardItemBody}>{this.props.account.balance}</Text>
+                  <Text style={styles.cardItemHint}>EOS</Text>
+                  <TouchableOpacity
+                    style={styles.cardItemButton}
+                    onPress={() => this.props.navigation.navigate('EOSBandWidthManage', {type: 'delegate'})}>
+                    <View>
+                      <Text style={styles.cardItemButtonText}>{I18n.t('delegate')}</Text>
+                    </View>
+                  </TouchableOpacity>
                 </Body>
               </Image>
             </Card>
             <Card borderRadius={5} style={styles.cardItem}>
               <Image source={require('../../imgs/unstaked_bg.png')} style={styles.cardItem}>
                 <Body>
-                <Text style={styles.cardItemTitle}>{I18n.t('delegate')}</Text>
-                <Text style={styles.cardItemBody}>{this.state.totalStaked}</Text>
-                <Text style={styles.cardItemHint}>EOS</Text>
-                <TouchableOpacity style={styles.cardItemButton}
-                                    onPress={() => this.props.navigation.navigate('EOSBandWidthManage', {type: 'undelegate'})}>
-                  <View>
-                    <Text style={styles.cardItemButtonText}>{I18n.t('undelegate')}</Text>
-                  </View>
-                </TouchableOpacity>
+                  <Text style={styles.cardItemTitle}>{I18n.t('delegate')}</Text>
+                  <Text style={styles.cardItemBody}>{this.state.totalStaked}</Text>
+                  <Text style={styles.cardItemHint}>EOS</Text>
+                  <TouchableOpacity
+                    style={styles.cardItemButton}
+                    onPress={() => this.props.navigation.navigate('EOSBandWidthManage', {type: 'undelegate'})}>
+                    <View>
+                      <Text style={styles.cardItemButtonText}>{I18n.t('undelegate')}</Text>
+                    </View>
+                  </TouchableOpacity>
                 </Body>
               </Image>
             </Card>
@@ -103,23 +105,22 @@ class EOSResourcesDetailPage extends Component {
             title={'CPU'}
             unit='us'
             staked={this.state.cpuStaked}
-            used={this.props.account.resources.cpu.used}
-            total={this.props.account.resources.cpu.max}/>
+            used={this.props.account.resources ? this.props.account.resources.cpu.used : '0'}
+            total={this.props.account.resources ? this.props.account.resources.cpu.max : '0'}/>
           <AssetsProgressBar
             title={'Network'}
             unit='bytes'
             staked={this.state.netStaked}
-            used={this.props.account.resources.net.used}
-            total={this.props.account.resources.net.max}/>
+            used={this.props.account.resources ? this.props.account.resources.net.used : '0'}
+            total={this.props.account.resources ? this.props.account.resources.net.max : '0'}/>
           <AssetsProgressBar
             enablePress
             onPress={() => {
-              console.log('asdasd')
               this.props.navigation.navigate('EOSRamManage')
             }}
             title={'RAM'} unit='bytes'
-            used={this.props.account.resources.ram.used}
-            total={this.props.account.resources.ram.total}/>
+            used={this.props.account.resources ? this.props.account.resources.ram.used : '0'}
+            total={this.props.account.resources ? this.props.account.resources.ram.total : '0'}/>
         </View>
       </Container>
     )

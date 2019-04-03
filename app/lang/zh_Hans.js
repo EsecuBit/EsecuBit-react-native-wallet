@@ -224,4 +224,7 @@ export default {
   networkEosTxExpired: '该交易广播已超时',
   networkEosUnsatisfiedAuth: '未知错误',
   tooManyOutputs: '交易过大',
+  noPermissionToUpdate: '没有新权限变化',
+  pleaseAwaitSyncFinish: '请先等待账户同步完成',
+  notAllowToSend: '不允许发送金额为0的交易'
 }

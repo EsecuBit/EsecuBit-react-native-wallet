@@ -173,7 +173,7 @@ class EOSBandWidthManagePage extends Component {
     return (
       <Container>
         <BaseToolbar title={I18n.t('bandwidthManage')}/>
-        <Content contentContainerStyle={{flex: 1}} padder>
+        <Content padder>
           <Card padder>
             <EOSAccountNameInput
               label={I18n.t('receiver')}
@@ -248,8 +248,9 @@ class EOSBandWidthManagePage extends Component {
             </Text>
           </DialogContent>
         </Dialog>
-        <FooterButton title={this.state.footBtnText} disabled={this.state.disableFooterBtn}
-                      onPress={() => this._showTransactionConfirmDialog()}/>
+        <FooterButton
+          title={this.state.footBtnText} disabled={this.state.disableFooterBtn}
+          onPress={() => this._showTransactionConfirmDialog()}/>
       </Container>
     )
   }

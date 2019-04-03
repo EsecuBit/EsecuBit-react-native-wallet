@@ -331,24 +331,24 @@ class HomePage extends Component {
                     alignItems: 'center'
                   }}
                 />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  <TouchableOpacity
-                    style={{
-                      justifyContent: 'center',
-                      width: 48,
-                      height: height,
-                      marginLeft: Dimen.MARGIN_HORIZONTAL
-                    }}
-                    onPress={() => _that.props.navigation.navigate('NewAccount')}>
-                    <Image source={require('../../imgs/ic_add.png')}/>
-                  </TouchableOpacity>
-                </View>
+                {/*<View*/}
+                {/*  style={{*/}
+                {/*    justifyContent: 'center',*/}
+                {/*    width: 48,*/}
+                {/*    height: height,*/}
+                {/*    marginTop: isIphoneX ? 20 : 0*/}
+                {/*  }}>*/}
+                {/*  <TouchableOpacity*/}
+                {/*    style={{*/}
+                {/*      justifyContent: 'center',*/}
+                {/*      width: 48,*/}
+                {/*      height: height,*/}
+                {/*      marginLeft: Dimen.MARGIN_HORIZONTAL*/}
+                {/*    }}*/}
+                {/*    onPress={() => _that.props.navigation.navigate('NewAccount')}>*/}
+                {/*    <Image source={require('../../imgs/ic_add.png')}/>*/}
+                {/*  </TouchableOpacity>*/}
+                {/*</View>*/}
               </View>
             </View>
             <View

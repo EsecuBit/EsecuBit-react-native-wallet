@@ -14,7 +14,7 @@ export default class EsecuBitApp extends React.Component {
   constructor(props) {
     super(props)
     // test net
-    D.test.coin = true
+    D.test.coin = false
     // enable hardware wallet, default software wallet
     D.test.jsWallet = false
     Provider.DB = RealmDB
@@ -23,7 +23,14 @@ export default class EsecuBitApp extends React.Component {
     this.wallet = new EsWallet()
     //黄色Warnings框开关
     console.disableYellowBox = true
+
+    D.supportedCoinTypes = () => {
+      return D.test.coin
+        ? [D.coin.test.eosJungle]
+        : [D.coin.main.eos]
+    }
   }
+
 
 
   render() {
