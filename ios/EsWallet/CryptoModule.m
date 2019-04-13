@@ -12,6 +12,7 @@
 #import "BTCAddress.h"
 #import "BTCKeychain.h"
 #import "BTCKey.h"
+#import "BTCBase58.h"
 
 @interface CryptoModule()
 @property (nonatomic, strong) DDRSAWrapper *wrapper;
@@ -115,6 +116,7 @@ RCT_EXPORT_METHOD(deriveAddresses:(NSInteger)version
     } else {
       [extend appendData: [NSData fromHex:@"043587CF"]];
     }
+    [extend appendData: [NSData fromHex:@"000000000000000000"]];
     [extend appendData: [NSData fromHex:chainCodeHex]];
     [extend appendData: [NSData fromHex:publicKeyHex]];
     
@@ -124,9 +126,16 @@ RCT_EXPORT_METHOD(deriveAddresses:(NSInteger)version
     
     for (NSInteger i = fromIndex; i < toIndex; i++) {
       BTCKeychain *addressKey = [typeKey derivedKeychainAtIndex:(int) i];
-      BTCKey *key = addressKey.key;
-      [dict setValue:[key.compressedPublicKey toHex] forKey:[[NSString alloc] initWithFormat:@"%ld", i]];
+      BTCAddress *address;
+      addressKey.key.publicKeyCompressed = true;
+      if (version == 0) {
+        address = addressKey.key.address;
+      } else {
+        address = addressKey.key.addressTestnet;
+      }
+      [dict setValue:address.string forKey:[[NSString alloc] initWithFormat:@"%ld", i]];
     }
+    resolve(dict);
   });
 }
 
