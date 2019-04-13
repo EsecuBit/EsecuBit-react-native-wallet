@@ -9,6 +9,9 @@
 #import "CryptoModule.h"
 #import "DDRSAWrapper.h"
 #import "NSData+Hex.h"
+#import "BTCAddress.h"
+#import "BTCKeychain.h"
+#import "BTCKey.h"
 
 @interface CryptoModule()
 @property (nonatomic, strong) DDRSAWrapper *wrapper;
@@ -93,6 +96,36 @@ RCT_EXPORT_METHOD(rsaDecrypt:(NSString *)privateKey
       resolve([plainData toHex]);
     } else {
       reject([[NSString alloc] initWithFormat:@"%x", 0x6f00], @"rsaDecrypt error", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(deriveAddresses:(NSInteger)version
+                  publicKeyHex:(NSString *)publicKeyHex
+                  chainCodeHex:(NSString *)chainCodeHex
+                  type:(NSInteger)type
+                  fromIndex:(NSInteger)fromIndex
+                  toIndex:(NSInteger)toIndex
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    NSMutableData *extend = [[NSMutableData alloc] initWithCapacity:78];
+    if (version == 0) {
+      [extend appendData: [NSData fromHex:@"0488B21E"]];
+    } else {
+      [extend appendData: [NSData fromHex:@"043587CF"]];
+    }
+    [extend appendData: [NSData fromHex:chainCodeHex]];
+    [extend appendData: [NSData fromHex:publicKeyHex]];
+    
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    BTCKeychain *accountKey = [[BTCKeychain alloc] initWithExtendedKeyData:extend];
+    BTCKeychain *typeKey = [accountKey derivedKeychainAtIndex:(int) type];
+    
+    for (NSInteger i = fromIndex; i < toIndex; i++) {
+      BTCKeychain *addressKey = [typeKey derivedKeychainAtIndex:(int) i];
+      BTCKey *key = addressKey.key;
+      [dict setValue:[key.compressedPublicKey toHex] forKey:[[NSString alloc] initWithFormat:@"%ld", i]];
     }
   });
 }

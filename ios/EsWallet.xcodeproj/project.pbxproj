@@ -51,6 +51,8 @@
 		69654938C1BF480AA088DF47 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E6E778E670AD4A6F9DAB8B8D /* Feather.ttf */; };
 		7260E7C569D744E1B06938E8 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41BB6FD1070940BE9F77CC8F /* Foundation.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		873F3E4B2261CD820006F068 /* libCoreBitcoin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 873F3E4A2261CD820006F068 /* libCoreBitcoin.a */; };
+		873F3EC92261CDD70006F068 /* openssl in Resources */ = {isa = PBXBuildFile; fileRef = 873F3EB22261CDD60006F068 /* openssl */; };
 		87737D2C21B7F0D80088013B /* DDRSAWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 87737D0A21B7F0D80088013B /* DDRSAWrapper.m */; };
 		87737D2F21B7F44D0088013B /* CryptoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 87737D2E21B7F44D0088013B /* CryptoModule.m */; };
 		899C1DF371ED4289938A517C /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6B88FEE5FF5498F81D3ABB6 /* libRNCamera.a */; };
@@ -369,6 +371,30 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		85702D7DFAB04E5989D5D108 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		86602FE62B5743DE8612AC6E /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		873F3E4A2261CD820006F068 /* libCoreBitcoin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCoreBitcoin.a; path = EsWallet/CoreBitcoin/libCoreBitcoin.a; sourceTree = "<group>"; };
+		873F3EB22261CDD60006F068 /* openssl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openssl; path = EsWallet/CoreBitcoin/include/openssl; sourceTree = "<group>"; };
+		873F3EB32261CDD60006F068 /* BTCScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCScript.h; path = EsWallet/CoreBitcoin/include/BTCScript.h; sourceTree = "<group>"; };
+		873F3EB42261CDD60006F068 /* BTCAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCAddress.h; path = EsWallet/CoreBitcoin/include/BTCAddress.h; sourceTree = "<group>"; };
+		873F3EB52261CDD60006F068 /* BTCErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCErrors.h; path = EsWallet/CoreBitcoin/include/BTCErrors.h; sourceTree = "<group>"; };
+		873F3EB62261CDD60006F068 /* BTCBlockchainInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCBlockchainInfo.h; path = EsWallet/CoreBitcoin/include/BTCBlockchainInfo.h; sourceTree = "<group>"; };
+		873F3EB72261CDD60006F068 /* BTCTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCTransaction.h; path = EsWallet/CoreBitcoin/include/BTCTransaction.h; sourceTree = "<group>"; };
+		873F3EB82261CDD60006F068 /* BTCScriptMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCScriptMachine.h; path = EsWallet/CoreBitcoin/include/BTCScriptMachine.h; sourceTree = "<group>"; };
+		873F3EB92261CDD70006F068 /* BTCUnitsAndLimits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCUnitsAndLimits.h; path = EsWallet/CoreBitcoin/include/BTCUnitsAndLimits.h; sourceTree = "<group>"; };
+		873F3EBA2261CDD70006F068 /* BTCKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCKey.h; path = EsWallet/CoreBitcoin/include/BTCKey.h; sourceTree = "<group>"; };
+		873F3EBB2261CDD70006F068 /* BTCCurvePoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCCurvePoint.h; path = EsWallet/CoreBitcoin/include/BTCCurvePoint.h; sourceTree = "<group>"; };
+		873F3EBC2261CDD70006F068 /* BTCBigNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCBigNumber.h; path = EsWallet/CoreBitcoin/include/BTCBigNumber.h; sourceTree = "<group>"; };
+		873F3EBD2261CDD70006F068 /* BTCKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCKeychain.h; path = EsWallet/CoreBitcoin/include/BTCKeychain.h; sourceTree = "<group>"; };
+		873F3EBE2261CDD70006F068 /* BTCData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCData.h; path = EsWallet/CoreBitcoin/include/BTCData.h; sourceTree = "<group>"; };
+		873F3EBF2261CDD70006F068 /* BTCSignatureHashType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCSignatureHashType.h; path = EsWallet/CoreBitcoin/include/BTCSignatureHashType.h; sourceTree = "<group>"; };
+		873F3EC02261CDD70006F068 /* CoreBitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreBitcoin.h; path = EsWallet/CoreBitcoin/include/CoreBitcoin.h; sourceTree = "<group>"; };
+		873F3EC12261CDD70006F068 /* NS+BTCBase58.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NS+BTCBase58.h"; path = "EsWallet/CoreBitcoin/include/NS+BTCBase58.h"; sourceTree = "<group>"; };
+		873F3EC22261CDD70006F068 /* BTCOpcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCOpcode.h; path = EsWallet/CoreBitcoin/include/BTCOpcode.h; sourceTree = "<group>"; };
+		873F3EC32261CDD70006F068 /* BTCBase58.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCBase58.h; path = EsWallet/CoreBitcoin/include/BTCBase58.h; sourceTree = "<group>"; };
+		873F3EC42261CDD70006F068 /* BTCTransactionOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCTransactionOutput.h; path = EsWallet/CoreBitcoin/include/BTCTransactionOutput.h; sourceTree = "<group>"; };
+		873F3EC52261CDD70006F068 /* BTCTransactionInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCTransactionInput.h; path = EsWallet/CoreBitcoin/include/BTCTransactionInput.h; sourceTree = "<group>"; };
+		873F3EC62261CDD70006F068 /* CoreBitcoin+Categories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CoreBitcoin+Categories.h"; path = "EsWallet/CoreBitcoin/include/CoreBitcoin+Categories.h"; sourceTree = "<group>"; };
+		873F3EC72261CDD70006F068 /* BTCProtocolSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTCProtocolSerialization.h; path = EsWallet/CoreBitcoin/include/BTCProtocolSerialization.h; sourceTree = "<group>"; };
+		873F3EC82261CDD70006F068 /* NSData+BTCData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+BTCData.h"; path = "EsWallet/CoreBitcoin/include/NSData+BTCData.h"; sourceTree = "<group>"; };
 		87737D0A21B7F0D80088013B /* DDRSAWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDRSAWrapper.m; path = EsWallet/DDRSAWrapper.m; sourceTree = "<group>"; };
 		87737D2B21B7F0D80088013B /* DDRSAWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDRSAWrapper.h; path = EsWallet/DDRSAWrapper.h; sourceTree = "<group>"; };
 		87737D2D21B7F44D0088013B /* CryptoModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CryptoModule.h; path = EsWallet/CryptoModule.h; sourceTree = "<group>"; };
@@ -434,6 +460,7 @@
 				ECC2005160FE462EB6027B9B /* libRealmReact.a in Frameworks */,
 				61221D3BFEE7444DAE1AEE68 /* libc++.tbd in Frameworks */,
 				3B8F6B4738B04C4292F63829 /* libz.tbd in Frameworks */,
+				873F3E4B2261CD820006F068 /* libCoreBitcoin.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,6 +559,7 @@
 		13B07FAE1A68108700A75B9A /* EsWallet */ = {
 			isa = PBXGroup;
 			children = (
+				873F3EB12261CDCB0006F068 /* CoreBitcoin */,
 				9B325E6421AC1A0D0026627F /* bundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -661,6 +689,7 @@
 				00E356EF1AD99517003FC87E /* EsWalletTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				54B789C358A64165ACDBB1A2 /* Frameworks */,
+				873F3E4A2261CD820006F068 /* libCoreBitcoin.a */,
 				9B5E6A7C20F343AE00A5C026 /* Recovered References */,
 				AD899FFA0FC14FBF96495B00 /* Resources */,
 			);
@@ -677,6 +706,36 @@
 				2D02E4901E0B4A5D006451C7 /* EsWallet-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		873F3EB12261CDCB0006F068 /* CoreBitcoin */ = {
+			isa = PBXGroup;
+			children = (
+				873F3EB42261CDD60006F068 /* BTCAddress.h */,
+				873F3EC32261CDD70006F068 /* BTCBase58.h */,
+				873F3EBC2261CDD70006F068 /* BTCBigNumber.h */,
+				873F3EB62261CDD60006F068 /* BTCBlockchainInfo.h */,
+				873F3EBB2261CDD70006F068 /* BTCCurvePoint.h */,
+				873F3EBE2261CDD70006F068 /* BTCData.h */,
+				873F3EB52261CDD60006F068 /* BTCErrors.h */,
+				873F3EBA2261CDD70006F068 /* BTCKey.h */,
+				873F3EBD2261CDD70006F068 /* BTCKeychain.h */,
+				873F3EC22261CDD70006F068 /* BTCOpcode.h */,
+				873F3EC72261CDD70006F068 /* BTCProtocolSerialization.h */,
+				873F3EB32261CDD60006F068 /* BTCScript.h */,
+				873F3EB82261CDD60006F068 /* BTCScriptMachine.h */,
+				873F3EBF2261CDD70006F068 /* BTCSignatureHashType.h */,
+				873F3EB72261CDD60006F068 /* BTCTransaction.h */,
+				873F3EC52261CDD70006F068 /* BTCTransactionInput.h */,
+				873F3EC42261CDD70006F068 /* BTCTransactionOutput.h */,
+				873F3EB92261CDD70006F068 /* BTCUnitsAndLimits.h */,
+				873F3EC02261CDD70006F068 /* CoreBitcoin.h */,
+				873F3EC62261CDD70006F068 /* CoreBitcoin+Categories.h */,
+				873F3EC12261CDD70006F068 /* NS+BTCBase58.h */,
+				873F3EC82261CDD70006F068 /* NSData+BTCData.h */,
+				873F3EB22261CDD60006F068 /* openssl */,
+			);
+			name = CoreBitcoin;
 			sourceTree = "<group>";
 		};
 		9B5E6A7C20F343AE00A5C026 /* Recovered References */ = {
@@ -868,6 +927,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				"zh-Hans",
@@ -1206,6 +1266,7 @@
 				63A150D0B87B4B279A5EDDAF /* Roboto_medium.ttf in Resources */,
 				14B690B2C4C944EF85DD7DB2 /* Roboto.ttf in Resources */,
 				CA781EC9FE8E4D99B6D3281E /* rubicon-icon-font.ttf in Resources */,
+				873F3EC92261CDD70006F068 /* openssl in Resources */,
 				E2C82433C0C4442ABF3D9857 /* SimpleLineIcons.ttf in Resources */,
 				4C419950539842E2A8A92B5E /* Zocial.ttf in Resources */,
 			);
@@ -1426,6 +1487,10 @@
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5QZKZTWHM6;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..",
@@ -1444,6 +1509,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/EsWallet/libs",
+					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -1470,6 +1536,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V9QZ497YV9;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..",
@@ -1488,6 +1558,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/EsWallet/libs",
+					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
