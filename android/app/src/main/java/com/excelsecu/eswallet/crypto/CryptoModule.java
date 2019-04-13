@@ -9,6 +9,10 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 
+import org.bitcoinj.core.Base58;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -89,6 +93,34 @@ public class CryptoModule extends ReactContextBaseJavaModule {
             }
 
             promise.resolve(Hex.encodeHex(b, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.w(e.getLocalizedMessage());
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void deriveAddresses(int version, String publicKeyHex, String chainCodeHex, int type, int from, int to, Promise promise) {
+        try {
+            LogUtil.w("" + version);
+            LogUtil.w(publicKeyHex);
+            LogUtil.w(chainCodeHex);
+            LogUtil.w("" + type);
+            LogUtil.w("" + from);
+            LogUtil.w("" + to);
+            DeterministicKey accountKey = HDKeyDerivation.createMasterPubKeyFromBytes(
+                    Hex.decodeHex(publicKeyHex), Hex.decodeHex(chainCodeHex));
+            DeterministicKey typeKey = HDKeyDerivation.deriveChildKey(accountKey, type);
+
+            WritableMap addresses = Arguments.createMap();
+            for (int i = from; i < to; i++) {
+                DeterministicKey childKey = HDKeyDerivation.deriveChildKey(typeKey, i);
+                String address = Base58.encodeChecked(version, childKey.getPubKeyHash());
+                addresses.putString(Integer.toString(i), address);
+            }
+
+            promise.resolve(addresses);
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.w(e.getLocalizedMessage());
