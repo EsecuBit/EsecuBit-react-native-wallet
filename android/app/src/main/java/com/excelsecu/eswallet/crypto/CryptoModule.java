@@ -103,12 +103,6 @@ public class CryptoModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void deriveAddresses(int version, String publicKeyHex, String chainCodeHex, int type, int from, int to, Promise promise) {
         try {
-            LogUtil.w("" + version);
-            LogUtil.w(publicKeyHex);
-            LogUtil.w(chainCodeHex);
-            LogUtil.w("" + type);
-            LogUtil.w("" + from);
-            LogUtil.w("" + to);
             DeterministicKey accountKey = HDKeyDerivation.createMasterPubKeyFromBytes(
                     Hex.decodeHex(publicKeyHex), Hex.decodeHex(chainCodeHex));
             DeterministicKey typeKey = HDKeyDerivation.deriveChildKey(accountKey, type);
