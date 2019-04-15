@@ -14,6 +14,8 @@ export default {
     // EOS
     queryOffset: 'int?',
     tokens: 'string?', // json
+
+    // EOS, BTC
     resources: 'string?' // json
   }
 }
