@@ -20,9 +20,9 @@ class EOSKeyDetailPage extends Component {
   _setClipboardContent(key) {
     try {
       Clipboard.setString(key)
-      ToastUtil.showShort('Copy Success')
+      ToastUtil.showShort(I18n.t('copySuccess'))
     } catch (error) {
-      ToastUtil.showShort('Copy Failed')
+      ToastUtil.showShort(I18n.t('copyFailed'))
     }
   }
 

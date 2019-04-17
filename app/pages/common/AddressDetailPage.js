@@ -86,7 +86,7 @@ class AddressDetailPage extends PureComponent {
   async _getAccountName() {
     let state = await this.btTransmitter.getState()
     if (state === BtTransmitter.connected) {
-      this._getAddress(false)
+      this._getAddress(this.state.storeAddress)
     } else {
       this._isMounted && await this.setState({dialogVisible: true})
       this._isMounted && this.setState({address: this.account.label})
@@ -121,8 +121,6 @@ class AddressDetailPage extends PureComponent {
               <QrCode value={this.state.address} size={240} bgColor="black" fgColor="white"/>
             </View>
           </TouchableWithoutFeedback>
-          {
-            !D.isEos(this.coinType) &&
             <View style={styles.checkboxWrpper}>
               <Left>
                 <CheckBox
@@ -136,7 +134,6 @@ class AddressDetailPage extends PureComponent {
               </Body>
               <Right/>
             </View>
-          }
           <Text style={[CommonStyle.privateText, styles.addressText]}>{this.state.address}</Text>
           <Text
             style={styles.remindText}>{D.isEos(this.account.coinType) ? I18n.t("copyEOSRemind") : I18n.t("copyRemind")}</Text>

@@ -578,7 +578,7 @@ class EOSAccountDetailPage extends Component {
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
     }finally {
-      this._isMounted && this.setState({checkAddPermissionDialogVisible: false})
+      this._isMounted && this.setState({checkAddPermissionDialogVisible: false, importNameText: "", importOwnerKeyText: "", importActiveKeyText: ""})
     }
   }
 
