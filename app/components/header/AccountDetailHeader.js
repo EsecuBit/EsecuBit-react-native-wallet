@@ -8,6 +8,8 @@ import I18n from '../../lang/i18n'
 import { connect } from 'react-redux'
 import { EsWallet, D } from 'esecubit-wallet-sdk'
 import CoinUtil from '../../utils/CoinUtil'
+import {Coin} from "../../common/Constants";
+import config from "../../../config";
 
 
 class AccountDetailHeader extends PureComponent {
@@ -35,14 +37,20 @@ class AccountDetailHeader extends PureComponent {
   // @flow
   _updateBalance(balance: string) {
     let fromUnit = ''
-    let toUnit = ''
-    if (D.isBtc(this.account.coinType)) {
-      fromUnit = D.unit.btc.satoshi
-      toUnit = this.props.btcUnit
-    } else {
-      fromUnit = D.unit.eth.Wei
-      toUnit = this.props.ethUnit
+    let toUnit = this.props.accountCurrentUnit
+    let coinType = CoinUtil.getRealCoinType(this.props.account.coinType)
+    switch (coinType) {
+      case Coin.btc:
+        fromUnit = D.unit.btc.satoshi
+        break
+      case Coin.eth:
+        fromUnit = D.unit.eth.Wei
+        break
+      case Coin.eos:
+        fromUnit = D.unit.eos.EOS
+        break
     }
+
     let cryptoCurrencyBalance = this.wallet.convertValue(
       this.account.coinType,
       balance,
@@ -140,11 +148,13 @@ class AccountDetailHeader extends PureComponent {
                       <Icon name="ios-more" style={{ color: Color.TEXT_ICONS }} />
                     </Button>
                   }>
-                  {D.isEos(this.account.coinType) ? (
-                    <MenuItem onPress={() => this._hideMenu('importKey')}>
-                      {I18n.t('importKey')}
-                    </MenuItem>
-                  ) : null}
+                  {
+                    config.productVersion === 'tp' && (
+                      <MenuItem onPress={() => this._hideMenu('importKey')}>
+                        {I18n.t('importKey')}
+                      </MenuItem>
+                    )
+                  }
                   {D.isEos(this.account.coinType) ? (
                     <MenuItem onPress={() => this._hideMenu('permissionManage')}>
                       {I18n.t('permissionManage')}

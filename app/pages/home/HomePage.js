@@ -33,6 +33,7 @@ import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, {DialogButton, DialogTitle, DialogContent} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
+import config from "../../../config";
 
 const platform = Platform.OS
 
@@ -147,7 +148,7 @@ class HomePage extends Component {
           })
         }
       }
-    }catch (e) {
+    } catch (e) {
       console.log('checkVersion error', e)
       if (D.error.deviceNotConnected !== e) {
         ToastUtil.showErrorMsgShort(e)
@@ -206,7 +207,7 @@ class HomePage extends Component {
         this.setState({deviceConnected: false, showDeviceConnectCard: true})
       }
       if (status === BtTransmitter.connected) {
-        this.setState({ deviceConnected: true, showDeviceConnectCard: false })
+        this.setState({deviceConnected: true, showDeviceConnectCard: false})
         this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
       }
       if (status === BtTransmitter.connecting) {
@@ -218,7 +219,7 @@ class HomePage extends Component {
         this.setState({deviceConnected: false, showDeviceConnectCard: true})
       }
       if (state === BtTransmitter.connected) {
-        this.setState({ deviceConnected: true, showDeviceConnectCard: false })
+        this.setState({deviceConnected: true, showDeviceConnectCard: false})
         this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
       }
     })
@@ -331,24 +332,28 @@ class HomePage extends Component {
                     alignItems: 'center'
                   }}
                 />
-                {/*<View*/}
-                {/*  style={{*/}
-                {/*    justifyContent: 'center',*/}
-                {/*    width: 48,*/}
-                {/*    height: height,*/}
-                {/*    marginTop: isIphoneX ? 20 : 0*/}
-                {/*  }}>*/}
-                {/*  <TouchableOpacity*/}
-                {/*    style={{*/}
-                {/*      justifyContent: 'center',*/}
-                {/*      width: 48,*/}
-                {/*      height: height,*/}
-                {/*      marginLeft: Dimen.MARGIN_HORIZONTAL*/}
-                {/*    }}*/}
-                {/*    onPress={() => _that.props.navigation.navigate('NewAccount')}>*/}
-                {/*    <Image source={require('../../imgs/ic_add.png')}/>*/}
-                {/*  </TouchableOpacity>*/}
-                {/*</View>*/}
+                {
+                  config.productVersion === 'std' && (
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        width: 48,
+                        height: height,
+                        marginTop: isIphoneX ? 20 : 0
+                      }}>
+                      <TouchableOpacity
+                        style={{
+                          justifyContent: 'center',
+                          width: 48,
+                          height: height,
+                          marginLeft: Dimen.MARGIN_HORIZONTAL
+                        }}
+                        onPress={() => _that.props.navigation.navigate('NewAccount')}>
+                        <Image source={require('../../imgs/ic_add.png')}/>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                }
               </View>
             </View>
             <View

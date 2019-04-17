@@ -18,6 +18,7 @@ import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-popup-dialog'
 import {withNavigation, NavigationActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
+import config from "../../../config";
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
@@ -380,12 +381,16 @@ class SettingsPage extends Component {
               onPress={() => this.setState({changeLanguageDialogVisible: true})}>
               <Text>{I18n.t('language')}</Text>
             </CardItem>
-            <CardItem
-              bordered
-              button
-              onPress={() => this.setState({limitValueDialogVisible: true})}>
-              <Text>{I18n.t('limitValue')}</Text>
-            </CardItem>
+            {
+              config.productVersion === 'tp' && (
+                  <CardItem
+                      bordered
+                      button
+                      onPress={() => this.setState({limitValueDialogVisible: true})}>
+                    <Text>{I18n.t('limitValue')}</Text>
+                  </CardItem>
+              )
+            }
             <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
               <Text style={styles.headerText}>{I18n.t('about')}</Text>
             </CardItem>
