@@ -226,5 +226,6 @@ export default {
   tooManyOutputs: '交易过大',
   noPermissionToUpdate: '没有新权限变化',
   pleaseAwaitSyncFinish: '请先等待账户同步完成',
-  notAllowToSend: '不允许发送金额为0的交易'
+  notAllowToSend: '不允许发送金额为0的交易',
+  notSupportNewEOSAccount: '已有注册EOS账户，暂时不支持再添加账户'
 }

@@ -320,6 +320,7 @@ class BTCSendPage extends Component {
             />
             <ValueInput
               ref={refs => (this.valueInput = refs)}
+              label={I18n.t('value')}
               placeHolder={this.cryptoCurrencyUnit}
               onItemClick={text => this._handleSendValueItemClick(text)}
               onChangeText={text => this._handleValueInput()}

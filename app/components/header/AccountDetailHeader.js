@@ -150,7 +150,7 @@ class AccountDetailHeader extends PureComponent {
                   }>
                   {
                     config.productVersion === 'tp' && (
-                      <MenuItem onPress={() => this._hideMenu('importKey')}>
+                      D.isEos(this.account.coinType) && !this.account.isRegistered() &&   <MenuItem onPress={() => this._hideMenu('importKey')}>
                         {I18n.t('importKey')}
                       </MenuItem>
                     )

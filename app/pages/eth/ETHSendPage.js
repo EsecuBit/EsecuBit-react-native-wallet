@@ -324,6 +324,7 @@ class ETHSendPage extends Component {
             <ValueInput
               ref={refs => this.valueInput = refs}
               placeHolder={this.cryptoCurrencyUnit}
+              label={I18n.t('value')}
               onItemClick={text => this._handleSendValueItemClick(text)}
               onChangeText={text => this._handleValueInput()}
             />

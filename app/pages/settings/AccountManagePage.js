@@ -10,8 +10,9 @@ import {StyleSheet, BackHandler} from 'react-native'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import Dialog, {DialogButton, DialogContent, DialogTitle} from "react-native-popup-dialog"
 import {withNavigation} from 'react-navigation'
-import {setAccount} from "../../actions/AccountAction"
+import {setAccount, setAccountCryptoCurrencyUnit} from "../../actions/AccountAction"
 import {connect} from 'react-redux'
+import {Coin} from "../../common/Constants";
 
 class AccountManagePage extends Component {
 
@@ -92,12 +93,10 @@ class AccountManagePage extends Component {
 
   gotoPage(it) {
     this.props.setAccount(it)
-    console.log('it', it)
+    this._setAccountCurrencyUnit(it.coinType)
     if (!D.isEos(it.coinType)) {
-      console.log('asdasd', 'asdasd')
       this.props.navigation.navigate('Detail')
     } else {
-      console.log('1', 'asdasd')
       this.props.navigation.navigate('EOSAccountDetail')
     }
   }
@@ -127,6 +126,22 @@ class AccountManagePage extends Component {
         }
       </View>
     )
+  }
+
+  // @flow
+  _setAccountCurrencyUnit(coinType: string) {
+    coinType = CoinUtil.getRealCoinType(coinType)
+    switch (coinType) {
+      case Coin.btc:
+        this.props.setAccountCryptoCurrencyUnit(this.props.btcUnit)
+        break
+      case Coin.eth:
+        this.props.setAccountCryptoCurrencyUnit(this.props.ethUnit)
+        break
+      case Coin.eos:
+        this.props.setAccountCryptoCurrencyUnit(this.props.eosUnit)
+        break
+    }
   }
 
   async _showAccount() {
@@ -189,11 +204,15 @@ class AccountManagePage extends Component {
 }
 
 const mapStateToProps = state => ({
-  account: state.AccountReducer.account
+  account: state.AccountReducer.account,
+  btcUnit: state.SettingsReducer.btcUnit,
+  ethUnit: state.SettingsReducer.ethUnit,
+  eosUnit: state.SettingsReducer.eosUnit,
 })
 
 const mapDispatchToProps = {
-  setAccount
+  setAccount,
+  setAccountCryptoCurrencyUnit
 }
 
 

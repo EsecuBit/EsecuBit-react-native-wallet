@@ -7,10 +7,10 @@ import {
   Platform,
   TextInput,
   BackHandler,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native'
 import I18n from '../../lang/i18n'
-import {Container, Icon, List, ListItem, Content, CardItem, Text, Input} from 'native-base'
+import {Container, Icon, List, ListItem, Content, CardItem, Input, CheckBox, Body, Text} from 'native-base'
 import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import {CommonStyle, Dimen, Color} from '../../common/Styles'
 import {EsWallet, D} from 'esecubit-wallet-sdk'
@@ -61,7 +61,8 @@ class EOSAccountDetailPage extends Component {
       importKeyDialogVisible: false,
       importNameText: '',
       importActiveKeyText: '',
-      importOwnerKeyText: ''
+      importOwnerKeyText: '',
+      newPermissionList: [],
 
     }
     // default filter transfer
@@ -96,30 +97,33 @@ class EOSAccountDetailPage extends Component {
     }
     this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('checkingPermission')})
     try {
-      console.log('fuck', '????')
       this.syncResult = false
       let result = await this.account.checkAccountPermissions((error, status, permissions) => {
         if (error === D.error.succeed) {
           if (status === D.status.newEosPermissions) {
             this._isMounted && this.setState({progressDialogVisible: false})
+            this.setState({checkAddPermissionDialogVisible: true})
             this.needToConfirmAmount = permissions.addToDevice.length
-            let content = ''
-            permissions.addToDevice.map(it => {
-              content = content + `${it.type} : ${it.publicKey} \n`
-            })
-            this.setState({checkAddPermissionText: `${I18n.t('confirmNewPermissionHint')} \n ${content}`})
           } else if (status === D.status.confirmedEosPermission) {
-            this.confirmEosPermisiionCounter += 1
-            this.setState({checkAddPermissionText: `${I18n.t('hasBeenConfirm')} \n ${permissions.type} : ${permissions.publicKey}`})
+            let permissionObj = {'type': permissions.type, 'isConfirm': true}
+            this.state.newPermissionList.push(permissionObj)
+            ++this.confirmEosPermisiionCounter
+            this.setState({newPermissionList: this.state.newPermissionList})
+          } else if (status === D.status.canceledEosPermission) {
+            ++this.confirmEosPermisiionCounter
+            let permissionObj = {'type': permissions.type, 'isConfirm': false}
+            this.state.newPermissionList.push(permissionObj)
+            this.setState({newPermissionList: this.state.newPermissionList})
+          }
+          if (this.needToConfirmAmount === this.confirmEosPermisiionCounter) {
+            let timer = setTimeout(() => {
+              this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
+            }, 2000)
+            this.timers.push(timer)
           }
           this._isMounted && this.setState({showRegisterDialogVisible: false}, () => {
             this.setState({checkAddPermissionDialogVisible: true})
           })
-          if (this.needToConfirmAmount === this.confirmEosPermisiionCounter) {
-            this._isMounted && this.setState({checkAddPermissionDialogVisible: false}, () => {
-              this._showRegisterDialog()
-            })
-          }
           console.log('check account permission', error, status, permissions)
         } else {
           ToastUtil.showErrorMsgShort(error)
@@ -127,23 +131,24 @@ class EOSAccountDetailPage extends Component {
         }
         // no new permission to add
         if (permissions === undefined) {
-          this._isMounted && this.setState({progressDialogVisible: false}, () => {
+          this._isMounted && this.setState({
+            progressDialogVisible: false,
+            checkAddPermissionDialogVisible: false
+          }, () => {
             this._showRegisterDialog()
           })
         }
       })
-      console.log('fuck 111', '????')
       if (!result) {
         ToastUtil.showShort(I18n.t('noPermissionToUpdate'))
-        this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
       } else {
-        this._getTxInfos()
+       this._getTxInfos()
       }
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
-      this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
-    }finally {
+    } finally {
       this.syncResult = true
+      this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
     }
 
   }
@@ -541,7 +546,7 @@ class EOSAccountDetailPage extends Component {
         if (this.account.isRegistered()) {
           if (this.syncResult) {
             this.props.navigation.navigate('EOSAssets')
-          }else {
+          } else {
             ToastUtil.showShort(I18n.t('pleaseAwaitSyncFinish'))
           }
         } else {
@@ -572,13 +577,21 @@ class EOSAccountDetailPage extends Component {
 
   async _importAccountByKeys() {
     try {
-      this._isMounted && this.setState({checkAddPermissionDialogVisible: true, checkAddPermissionText: I18n.t('confirmNewPermissionHint')})
+      this._isMounted && this.setState({
+        checkAddPermissionDialogVisible: true,
+        checkAddPermissionText: I18n.t('confirmNewPermissionHint')
+      })
       await this.account.importAccountByKeys(this.state.importNameText, this.state.importOwnerKeyText, this.state.importActiveKeyText)
       ToastUtil.showShort(I18n.t('successful'))
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
-    }finally {
-      this._isMounted && this.setState({checkAddPermissionDialogVisible: false, importNameText: "", importOwnerKeyText: "", importActiveKeyText: ""})
+    } finally {
+      this._isMounted && this.setState({
+        checkAddPermissionDialogVisible: false,
+        importNameText: "",
+        importOwnerKeyText: "",
+        importActiveKeyText: ""
+      })
     }
   }
 
@@ -801,7 +814,17 @@ class EOSAccountDetailPage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('confirmPermissionTip')}/>}
         >
           <DialogContent>
-            <Text style={{marginTop: Dimen.MARGIN_VERTICAL}}>{this.state.checkAddPermissionText}</Text>
+            <Text>{I18n.t('confirmNewPermissionHint')}</Text>
+            {
+              this.state.newPermissionList.map(it => {
+                return (
+                  <View style={{marginTop: Dimen.SPACE, flexDirection: 'row'}}>
+                    <CheckBox checked={it.isConfirm} color={Color.ACCENT}/>
+                    <Text style={{marginLeft: Dimen.MARGIN_HORIZONTAL + Dimen.SPACE}}>{it.type}</Text>
+                  </View>
+                )
+              })
+            }
           </DialogContent>
         </Dialog>
         <Dialog

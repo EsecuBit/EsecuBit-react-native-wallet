@@ -66,6 +66,22 @@ export default class NewAccountPage extends Component {
   /**
    * only support new BTC account and ETH account
    */
+
+  async checkCanNewEOSAccount() {
+    let accounts = await this.wallet.getAccounts()
+    let coinAccount = []
+    accounts.map(it => {
+      if (it.coinType.startsWith('eos')) {
+        coinAccount.push(it)
+      }
+    })
+    console.log('??', coinAccount)
+    if (coinAccount && coinAccount.length !== 0 && coinAccount[0].isRegistered()) {
+      return false
+    }
+    return true
+  }
+
   async _newAccount() {
     let coinType = this.newAccountType
    if (!D.isEos(coinType) && !this.newAccountName) {
@@ -74,6 +90,11 @@ export default class NewAccountPage extends Component {
    }
     if (!this._canNewAccount(coinType)) {
       ToastUtil.showLong(I18n.t('notSupportCoinType'))
+      return
+    }
+    let result = await this.checkCanNewEOSAccount()
+    if (!result && D.isEos(coinType)) {
+      ToastUtil.show(I18n.t('notSupportNewEOSAccount'))
       return
     }
     if (!D.test.jsWallet) {
@@ -136,6 +157,7 @@ export default class NewAccountPage extends Component {
    * @param {string} coinType
    */
   async _canNewAccount(coinType) {
+
     let coinTypes = await this.wallet.availableNewAccountCoinTypes()
     return coinTypes.includes(coinType)
   }
