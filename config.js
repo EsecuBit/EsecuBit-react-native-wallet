@@ -5,7 +5,7 @@ import CryptoNative from "./app/device/CryptoNative";
 
 export default {
     // product version: [std, tp]
-    productVersion: "std",
+    productVersion: "tp",
 
     initApp() {
         // test net
@@ -16,14 +16,5 @@ export default {
         Provider.DB = RealmDB
         Provider.Transmitters.push(BtTransmitter)
         Provider.Crypto = CryptoNative
-        this.wallet = new EsWallet()
-        if (this.productVersion === 'tp') {
-            // tp is only support eos coin type currently
-            D.supportedCoinTypes = () => {
-                return D.test.coin
-                    ? [D.coin.test.eosJungle]
-                    : [D.coin.main.eos]
-            }
-        }
     }
 }

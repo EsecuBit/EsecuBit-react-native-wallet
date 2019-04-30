@@ -101,15 +101,18 @@ class EOSAccountDetailPage extends Component {
       let result = await this.account.checkAccountPermissions((error, status, permissions) => {
         if (error === D.error.succeed) {
           if (status === D.status.newEosPermissions) {
+            console.log("newEosPermissions")
             this._isMounted && this.setState({progressDialogVisible: false})
             this.setState({checkAddPermissionDialogVisible: true})
             this.needToConfirmAmount = permissions.addToDevice.length
           } else if (status === D.status.confirmedEosPermission) {
+            console.log("confirmedEosPermission")
             let permissionObj = {'type': permissions.type, 'isConfirm': true}
             this.state.newPermissionList.push(permissionObj)
             ++this.confirmEosPermisiionCounter
             this.setState({newPermissionList: this.state.newPermissionList})
           } else if (status === D.status.canceledEosPermission) {
+            console.log("canceledEosPermission")
             ++this.confirmEosPermisiionCounter
             let permissionObj = {'type': permissions.type, 'isConfirm': false}
             this.state.newPermissionList.push(permissionObj)
@@ -117,7 +120,11 @@ class EOSAccountDetailPage extends Component {
           }
           if (this.needToConfirmAmount === this.confirmEosPermisiionCounter) {
             let timer = setTimeout(() => {
-              this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
+              this._isMounted && this.setState({
+                progressDialogVisible: false,
+                checkAddPermissionDialogVisible: false,
+                newPermissionList: []
+              })
             }, 2000)
             this.timers.push(timer)
           }
@@ -127,28 +134,39 @@ class EOSAccountDetailPage extends Component {
           console.log('check account permission', error, status, permissions)
         } else {
           ToastUtil.showErrorMsgShort(error)
-          this._isMounted && this.setState({checkAddPermissionDialogVisible: false})
+          this._isMounted && this.setState({checkAddPermissionDialogVisible: false, newPermissionList: []})
         }
         // no new permission to add
         if (permissions === undefined) {
           this._isMounted && this.setState({
             progressDialogVisible: false,
-            checkAddPermissionDialogVisible: false
+            checkAddPermissionDialogVisible: false,
+            newPermissionList: []
           }, () => {
             this._showRegisterDialog()
           })
         }
       })
+      this._isMounted && this.setState({
+        progressDialogVisible: false,
+        checkAddPermissionDialogVisible: false,
+        newPermissionList: []
+      })
       if (!result) {
         ToastUtil.showShort(I18n.t('noPermissionToUpdate'))
       } else {
-       this._getTxInfos()
+        this._isMounted && this.setState({refreshing: true})
+        this._getTxInfos()
       }
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
     } finally {
       this.syncResult = true
-      this._isMounted && this.setState({progressDialogVisible: false, checkAddPermissionDialogVisible: false})
+      this._isMounted && this.setState({
+        progressDialogVisible: false,
+        checkAddPermissionDialogVisible: false,
+        newPermissionList: []
+      })
     }
 
   }
@@ -174,7 +192,8 @@ class EOSAccountDetailPage extends Component {
       this._isMounted && this.setState({
         progressDialogVisible: false,
         showRegisterDialogVisible: false,
-        checkAddPermissionDialogVisible: false
+        checkAddPermissionDialogVisible: false,
+        newPermissionList: []
       })
     })
   }
@@ -184,7 +203,8 @@ class EOSAccountDetailPage extends Component {
     this._isMounted && this.setState({
       progressDialogVisible: false,
       showRegisterDialogVisible: false,
-      checkAddPermissionDialogVisible: false
+      checkAddPermissionDialogVisible: false,
+      newPermissionList: []
     })
     return true;
   }
@@ -480,6 +500,9 @@ class EOSAccountDetailPage extends Component {
         this._isMounted && this.setState({data: []})
         this._isMounted && this.setState({data: actions})
       })
+      .then(() => {
+        this._isMounted && this.setState({refreshing: false})
+      })
       .catch(error => {
         console.log('txInfo error', error)
         ToastUtil.showErrorMsgLong(error)
@@ -581,6 +604,10 @@ class EOSAccountDetailPage extends Component {
         checkAddPermissionDialogVisible: true,
         checkAddPermissionText: I18n.t('confirmNewPermissionHint')
       })
+      if (this.state.importOwnerKeyText && this.state.importActiveKeyText) {
+        ToastUtil.showShort(I18n.t("importMultipleKeyError"))
+        return
+      }
       await this.account.importAccountByKeys(this.state.importNameText, this.state.importOwnerKeyText, this.state.importActiveKeyText)
       ToastUtil.showShort(I18n.t('successful'))
     } catch (e) {

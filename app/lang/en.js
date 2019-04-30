@@ -228,6 +228,7 @@ export default {
   noPermissionToUpdate: 'No permission to update',
   pleaseAwaitSyncFinish: 'Please await account sync finish',
   notAllowToSend: 'Value is 0, not allow',
-  notSupportNewEOSAccount: 'Already registered EOS account, temporarily does not support adding an account'
+  notSupportNewEOSAccount: 'Already registered EOS account, temporarily does not support adding an account',
+  importMultipleKeyError: 'Please import a private key at a time'
 
 }
