@@ -1,7 +1,7 @@
 import {D, EsWallet, Provider} from 'esecubit-wallet-sdk'
-import RealmDB from "./app/db/RealmDB";
-import BtTransmitter from "./app/device/BtTransmitter";
-import CryptoNative from "./app/device/CryptoNative";
+import RealmDB from "./db/RealmDB";
+import BtTransmitter from "./device/BtTransmitter";
+import CryptoNative from "./device/CryptoNative";
 
 export default {
     // product version: [std, tp]

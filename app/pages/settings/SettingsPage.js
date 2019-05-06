@@ -18,7 +18,7 @@ import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-popup-dialog'
 import {withNavigation, NavigationActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
-import config from "../../../config";
+import config from "../../config";
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']

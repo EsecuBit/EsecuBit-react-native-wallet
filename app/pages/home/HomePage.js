@@ -33,7 +33,7 @@ import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, {DialogButton, DialogTitle, DialogContent} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
-import config from "../../../config";
+import config from "../../config";
 
 const platform = Platform.OS
 
