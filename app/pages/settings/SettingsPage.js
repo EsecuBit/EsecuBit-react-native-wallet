@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator, TextInput, Platform} from 'react-native'
-import {Container, Icon, Right, Card, CardItem, Text, Content} from 'native-base'
+import {Container, Icon, Right, Card, CardItem, Text, Content, Button} from 'native-base'
 import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
 import {EsWallet, D} from 'esecubit-wallet-sdk'
@@ -19,9 +19,11 @@ import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-pop
 import {withNavigation, NavigationActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
 import config from "../../config";
+import * as Progress from 'react-native-progress';
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
+const deviceW = Dimensions.get('window').width
 
 class SettingsPage extends Component {
   constructor(props) {
@@ -42,17 +44,20 @@ class SettingsPage extends Component {
       ethDialogVisible: false,
       disConnectDialogVisible: false,
       updateVersionDialogVisible: false,
+      updateAppletInfos: [],
       updateDesc: '',
+      updateAppletDialogVisible: false,
       changeLanguageIndex: 0,
       changeLanguageLabel: 'English',
       changeLanguageDialogVisible: false,
       clearDataDialogVisible: false,
       clearDataWaitingDialogVisible: false,
-      bluetoothConnectDialogVisible: false,
-      bluetoothConnectDialogDesc: '',
+      progressDialogVisible: false,
+      progressDialogDesc: '',
       limitValueDialogVisible: false,
       limitValue: ''
     }
+    this.lockUpgradeApplet = false
     this.coinTypes = D.supportedCoinTypes()
     this.wallet = new EsWallet()
     this.transmitter = new BtTransmitter()
@@ -73,7 +78,7 @@ class SettingsPage extends Component {
 
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
-      console.log('settings wallet status',error, status)
+      console.log('settings wallet status', error, status)
       if (error === D.error.succeed) {
         if (status === D.status.deviceChange) {
           ToastUtil.showLong(I18n.t('deviceChange'))
@@ -81,7 +86,7 @@ class SettingsPage extends Component {
           this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
         }
         if (status === D.status.syncFinish || status === D.status.syncing) {
-          this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+          this._isMounted && this.setState({progressDialogVisible: false})
         }
       }
     })
@@ -99,7 +104,11 @@ class SettingsPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-      this._isMounted && this.setState({clearDataWaitingDialogVisible: false, limitValueDialogVisible: false})
+      this._isMounted && this.setState({
+        clearDataWaitingDialogVisible: false,
+        limitValueDialogVisible: false,
+        updateVersionDialogVisible: false
+      })
     })
   }
 
@@ -135,12 +144,12 @@ class SettingsPage extends Component {
     this.transmitter.listenStatus((error, status) => {
       if (error === D.error.succeed) {
         if (status === BtTransmitter.connecting) {
-          this.setState({bluetoothConnectDialogDesc: I18n.t('connecting'), cosVersion: cosVersion})
+          this.setState({progressDialogDesc: I18n.t('connecting'), cosVersion: cosVersion})
         } else if (status === BtTransmitter.disconnected) {
-          this.setState({bluetoothConnectDialogVisible: false, cosVersion: 'unknown'})
+          this.setState({progressDialogVisible: false, cosVersion: 'unknown'})
         } else if (status === BtTransmitter.connected) {
           this.transmitter.stopScan()
-          this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
+          this._isMounted && this.setState({progressDialogDesc: I18n.t('initData')})
         }
       }
     })
@@ -255,7 +264,7 @@ class SettingsPage extends Component {
   }
 
   async _findAndConnectDevice() {
-    this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
+    this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo.sn === info.sn) {
@@ -266,7 +275,7 @@ class SettingsPage extends Component {
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
       if (state === BtTransmitter.disconnected) {
-        this.setState({bluetoothConnectDialogVisible: false})
+        this.setState({progressDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
       }
@@ -280,15 +289,75 @@ class SettingsPage extends Component {
         await this.wallet.setEosAmountLimit(this.state.limitValue)
         this._isMounted && this.setState({limitValueDialogVisible: false})
         ToastUtil.showShort(I18n.t('successful'))
-      }else {
+      } else {
         ToastUtil.showErrorMsgShort(D.error.invalidParams)
       }
-    }catch (e) {
+    } catch (e) {
+      ToastUtil.showErrorMsgShort(e)
+    }
+  }
+
+  async _checkAppletVersion() {
+    try {
+      this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('getVersion')})
+      let appletInfos = await this.wallet.getUpdateManager().getAppletList()
+      console.log('applet infos 1', appletInfos)
+      this._isMounted && this.setState({progressDialogVisible: false, progressDialogDesc: ''})
+      appletInfos = this.convertAppletInfos(appletInfos)
+      if (appletInfos.length === 0) {
+        ToastUtil.showShort(I18n.t('noNewApp'))
+        return
+      }
+      console.log('applet infos 2', appletInfos)
+      this._isMounted && this.setState({updateAppletDialogVisible: true, updateAppletInfos: appletInfos})
+    } catch (e) {
+      console.warn(e)
+      this._isMounted && this.setState({progressDialogVisible: false, progressDialogDesc: ''})
+      ToastUtil.showErrorMsgShort(e)
+    }
+  }
+
+  convertAppletInfos(appletInfos) {
+    for (let index in appletInfos) {
+      index = Number(index)
+      appletInfos[index]["showProgress"] = false
+      appletInfos[index]["progress"] = 0.0
+      appletInfos[index]["index"] = index
+    }
+
+    appletInfos = appletInfos.filter(it => it.upgradable)
+    // As long as there is one that needs to be updated, it will be displayed
+    return appletInfos
+  }
+
+  async _updateApplet(appletInfo) {
+    try {
+      if (this.lockUpgradeApplet) {
+        ToastUtil.showShort(I18n.t('waitUpgradeFinish'))
+        return
+      }
+      let appletInfos = this.state.updateAppletInfos
+      appletInfos = this.convertAppletInfos(appletInfos)
+      console.log('applet infos', appletInfos)
+      this.lockUpgradeApplet = true
+      await this.wallet.getUpdateManager().installUpgrade(appletInfo, (progressText, progress) => {
+        console.log('update applet progress', progress)
+        appletInfos[appletInfo.index].showProgress = true
+        appletInfos[appletInfo.index].progress = progress / 100
+        if (progress === 100) {
+          appletInfos[appletInfo.index].showProgress = false
+        }
+        this.setState({updateAppletInfos: appletInfos})
+      })
+      this.lockUpgradeApplet = false
+    } catch (e) {
+      this.lockUpgradeApplet = false
       ToastUtil.showErrorMsgShort(e)
     }
   }
 
   render() {
+    let that = this
     return (
       <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
         <BaseToolbar title={I18n.t('settings')}/>
@@ -383,12 +452,12 @@ class SettingsPage extends Component {
             </CardItem>
             {
               config.productVersion === 'tp' && (
-                  <CardItem
-                      bordered
-                      button
-                      onPress={() => this.setState({limitValueDialogVisible: true})}>
-                    <Text>{I18n.t('limitValue')}</Text>
-                  </CardItem>
+                <CardItem
+                  bordered
+                  button
+                  onPress={() => this.setState({limitValueDialogVisible: true})}>
+                  <Text>{I18n.t('limitValue')}</Text>
+                </CardItem>
               )
             }
             <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
@@ -418,7 +487,11 @@ class SettingsPage extends Component {
             </CardItem>
             <View style={CommonStyle.divider}/>
             <CardItem bordered button onPress={() => this._checkVersion()}>
-              <Text>{I18n.t('checkVersion')}</Text>
+              <Text>{I18n.t('checkAppVersion')}</Text>
+            </CardItem>
+            <View style={CommonStyle.divider}/>
+            <CardItem bordered button onPress={() => this._checkAppletVersion()}>
+              <Text>{I18n.t('checkAppletVersion')}</Text>
             </CardItem>
           </Card>
         </Content>
@@ -704,13 +777,52 @@ class SettingsPage extends Component {
         {/*Bluetooth Connect Dialog*/}
         <Dialog
           width={0.8}
-          visible={this.state.bluetoothConnectDialogVisible}
+          visible={this.state.progressDialogVisible}
           onTouchOutside={() => {
           }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
-            <Text style={CommonStyle.horizontalDialogText}>{this.state.bluetoothConnectDialogDesc}</Text>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.progressDialogDesc}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.updateAppletDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
+          onTouchOutside={() => !this.lockUpgradeApplet && this.setState({updateAppletDialogVisible: false})}
+        >
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            {
+              that.state.updateAppletInfos.map(it => {
+                return (
+                  <View style={{marginBottom: Dimen.SPACE}}>
+                    <View style={styles.updateAppletWrapper}>
+                      <Text>{it.name}</Text>
+                      <Text style={styles.versionText}>{it.version}</Text>
+                      <Text> -></Text>
+                      <Text style={styles.latestVersionText}>{it.latestVersion}</Text>
+                      <Button
+                        small
+                        transparent
+                        rounded
+                        bordered
+                        style={{borderColor: Color.ACCENT}}
+                        onPress={() => this._updateApplet(it)}
+                      >
+                        <Text
+                          style={styles.updateAppletText}>{I18n.t('upgrade')}</Text>
+                      </Button>
+                    </View>
+                    <View>
+                      {it.showProgress &&
+                      <Progress.Bar progress={it.progress} width={deviceW * 0.8 - 16 * 2.5}
+                                    color={Color.SECONDARY_TEXT}/>}
+                    </View>
+                  </View>
+                )
+              })
+            }
           </DialogContent>
         </Dialog>
         {/*Bluetooth Connect Dialog*/}
@@ -728,6 +840,24 @@ const styles = StyleSheet.create({
     fontSize: Dimen.PRIMARY_TEXT,
     color: Color.PRIMARY_TEXT,
     marginTop: Dimen.SPACE
+  },
+  updateAppletWrapper: {
+    flexDirection: 'row',
+    marginBottom: Dimen.SPACE,
+    alignItems: 'center'
+  },
+  updateAppletText: {
+    fontSize: Dimen.SECONDARY_TEXT,
+    color: Color.ACCENT
+  },
+  versionText: {
+    marginLeft: Dimen.SPACE,
+    color: Color.DANGER
+  },
+  latestVersionText: {
+    marginLeft: Dimen.SPACE,
+    marginRight: Dimen.MARGIN_HORIZONTAL,
+    color: Color.SUCCESS
   }
 })
 
