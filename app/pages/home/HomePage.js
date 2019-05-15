@@ -104,10 +104,10 @@ class HomePage extends Component {
     this._listenWallet()
     this._updateUI()
     // delay to check app version
-    let timer = setTimeout(() => {
-      this._checkVersion()
-    }, 3000)
-    this.timers.push(timer)
+    // let timer = setTimeout(() => {
+    //   this._checkVersion()
+    // }, 3000)
+    // this.timers.push(timer)
     this._isMounted = true
 
   }

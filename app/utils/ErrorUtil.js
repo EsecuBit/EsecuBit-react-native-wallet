@@ -24,6 +24,7 @@ const errorMap = {
   114: 'deviceNotConnected',
   115: 'deviceNeedReauthenticate',
   116: 'deviceConditionNotSatisfied',
+  117: 'pinIsLocked',
   201: 'databaseOpenFailed',
   202: 'databaseExecFailed',
   301: 'lastAccountNoTransaction',

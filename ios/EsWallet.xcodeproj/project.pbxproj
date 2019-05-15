@@ -21,6 +21,7 @@
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		14B690B2C4C944EF85DD7DB2 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E1D93F80AC044EF39FF32B24 /* Roboto.ttf */; };
 		1B354E23A75047BEAA36CFB1 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04B6BA54A08C4FA095DB754D /* EvilIcons.ttf */; };
+		1F1FE2D8CB0F4487941C2015 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3B5238DD6B46A0BEE40F2D /* FontAwesome5_Regular.ttf */; };
 		210FCA96210D73BE00F6981B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FCA95210D73BE00F6981B /* AudioToolbox.framework */; };
 		210FCA98210D73C900F6981B /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FCA97210D73C900F6981B /* MediaPlayer.framework */; };
 		210FCA9C210D73E000F6981B /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FCA9B210D73E000F6981B /* OpenAL.framework */; };
@@ -64,9 +65,13 @@
 		9BA72AEF216DA047007E215C /* BackIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA72AEE216DA047007E215C /* BackIOS.m */; };
 		9BBE256547B84A218CD45363 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7A69D490A6854312A9C2672B /* Octicons.ttf */; };
 		A0DA747E0C6F4BADB251B1C6 /* libRNI18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D615EF93173248719DF93C5C /* libRNI18n.a */; };
+		A170A26B804745A99F9D2889 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5351FDFA944544618ECB727C /* FontAwesome5_Brands.ttf */; };
+		A2667E21A48042FABEDDD1A5 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 740E7453FFE04A99BEAC111B /* FontAwesome5_Solid.ttf */; };
+		B2115D683064429CA08EA9DE /* libRNBluetoothManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 74EEF87DAF114F97BD59C85E /* libRNBluetoothManager.a */; };
 		C891630A207E48909DB7EC06 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 667300D33A5E40D4AB02F4E1 /* MaterialIcons.ttf */; };
 		CA1D619C921941A5836D2F4F /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 85702D7DFAB04E5989D5D108 /* Entypo.ttf */; };
 		CA781EC9FE8E4D99B6D3281E /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABA9FC9D6B9A42C1AC3BCB81 /* rubicon-icon-font.ttf */; };
+		CFBDCA9CC0154DEBA1EC5C05 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D878723BE5034293B1814E58 /* AntDesign.ttf */; };
 		E1EEB4AB4AA34E5AAB0EC4FF /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1E559E5AD134D9883EEAE55 /* Ionicons.ttf */; };
 		E2C82433C0C4442ABF3D9857 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B8EF0E69187440C81E07F66 /* SimpleLineIcons.ttf */; };
 		ECC2005160FE462EB6027B9B /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */; };
@@ -312,6 +317,13 @@
 			remoteGlobalIDString = 6476C4051EEAA69700B10F51;
 			remoteInfo = "RNI18n-tvOS";
 		};
+		E2A8664D228437DC0074EF03 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33C7F37E51734F87918596BC /* RNBluetoothManager.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNBluetoothManager;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -354,16 +366,21 @@
 		2D02E47B1E0B4A5D006451C7 /* EsWallet-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EsWallet-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* EsWallet-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EsWallet-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRealmReact.a; sourceTree = "<group>"; };
+		33C7F37E51734F87918596BC /* RNBluetoothManager.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBluetoothManager.xcodeproj; path = "../node_modules/react-native-bluetooth-status/ios/RNBluetoothManager.xcodeproj"; sourceTree = "<group>"; };
 		41BB6FD1070940BE9F77CC8F /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		4737A89765474DE8B959F275 /* RNI18n.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNI18n.xcodeproj; path = "../node_modules/react-native-i18n/ios/RNI18n.xcodeproj"; sourceTree = "<group>"; };
 		49248DF3C7CB4E5A8E161654 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		49E783D7F8B54ABE82C65927 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		4B8EF0E69187440C81E07F66 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		5351FDFA944544618ECB727C /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		5644ADB3ED514C0D8FFF7F0B /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
 		5716BAC47B134E3BBB15D411 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		5C0C004E651F4BA39286017E /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		667300D33A5E40D4AB02F4E1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		6B3B5238DD6B46A0BEE40F2D /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
+		740E7453FFE04A99BEAC111B /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
+		74EEF87DAF114F97BD59C85E /* libRNBluetoothManager.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNBluetoothManager.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7A29C032BDE84BD18FECC953 /* libRCTCamera.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTCamera.a; sourceTree = "<group>"; };
 		7A69D490A6854312A9C2672B /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -416,6 +433,7 @@
 		CE8C7FC0B62C4E2AB35EC6F3 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		D615EF93173248719DF93C5C /* libRNI18n.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNI18n.a; sourceTree = "<group>"; };
 		D85E1CB502DD4555A266884B /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		D878723BE5034293B1814E58 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/native-base/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		E1D93F80AC044EF39FF32B24 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		E3CB3A5D45CE46659041E4AA /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		E6E778E670AD4A6F9DAB8B8D /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
@@ -461,6 +479,7 @@
 				61221D3BFEE7444DAE1AEE68 /* libc++.tbd in Frameworks */,
 				3B8F6B4738B04C4292F63829 /* libz.tbd in Frameworks */,
 				873F3E4B2261CD820006F068 /* libCoreBitcoin.a in Frameworks */,
+				B2115D683064429CA08EA9DE /* libRNBluetoothManager.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -668,6 +687,7 @@
 				210B494C2160DBB500A41EE9 /* RCTWebSocket.xcodeproj */,
 				CE8C7FC0B62C4E2AB35EC6F3 /* RNCamera.xcodeproj */,
 				A6359C97ACFA4483972FC5DF /* RealmReact.xcodeproj */,
+				33C7F37E51734F87918596BC /* RNBluetoothManager.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -747,6 +767,7 @@
 				7A29C032BDE84BD18FECC953 /* libRCTCamera.a */,
 				B6B88FEE5FF5498F81D3ABB6 /* libRNCamera.a */,
 				2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */,
+				74EEF87DAF114F97BD59C85E /* libRNBluetoothManager.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -813,8 +834,20 @@
 				ABA9FC9D6B9A42C1AC3BCB81 /* rubicon-icon-font.ttf */,
 				4B8EF0E69187440C81E07F66 /* SimpleLineIcons.ttf */,
 				49248DF3C7CB4E5A8E161654 /* Zocial.ttf */,
+				D878723BE5034293B1814E58 /* AntDesign.ttf */,
+				5351FDFA944544618ECB727C /* FontAwesome5_Brands.ttf */,
+				6B3B5238DD6B46A0BEE40F2D /* FontAwesome5_Regular.ttf */,
+				740E7453FFE04A99BEAC111B /* FontAwesome5_Solid.ttf */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		E2A8664A228437DB0074EF03 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E2A8664E228437DC0074EF03 /* libRNBluetoothManager.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -985,16 +1018,20 @@
 					ProjectRef = A6359C97ACFA4483972FC5DF /* RealmReact.xcodeproj */;
 				},
 				{
+					ProductGroup = E2A8664A228437DB0074EF03 /* Products */;
+					ProjectRef = 33C7F37E51734F87918596BC /* RNBluetoothManager.xcodeproj */;
+				},
+				{
 					ProductGroup = 210B49022160CF7800A41EE9 /* Products */;
 					ProjectRef = CE8C7FC0B62C4E2AB35EC6F3 /* RNCamera.xcodeproj */;
 				},
 				{
-					ProductGroup = 9BF2CEE720F4ACC7007AF0BB /* Products */;
-					ProjectRef = 4737A89765474DE8B959F275 /* RNI18n.xcodeproj */;
-				},
-				{
 					ProductGroup = 9B98BE2E2101E90200F1DDF9 /* Products */;
 					ProjectRef = 068D5E373724495989AB852C /* RNI18n.xcodeproj */;
+				},
+				{
+					ProductGroup = 9BF2CEE720F4ACC7007AF0BB /* Products */;
+					ProjectRef = 4737A89765474DE8B959F275 /* RNI18n.xcodeproj */;
 				},
 				{
 					ProductGroup = 9B5E6AC320F3586400A5C026 /* Products */;
@@ -1236,6 +1273,13 @@
 			remoteRef = 9BF2CEED20F4ACC9007AF0BB /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		E2A8664E228437DC0074EF03 /* libRNBluetoothManager.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNBluetoothManager.a;
+			remoteRef = E2A8664D228437DC0074EF03 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1269,6 +1313,10 @@
 				873F3EC92261CDD70006F068 /* openssl in Resources */,
 				E2C82433C0C4442ABF3D9857 /* SimpleLineIcons.ttf in Resources */,
 				4C419950539842E2A8A92B5E /* Zocial.ttf in Resources */,
+				CFBDCA9CC0154DEBA1EC5C05 /* AntDesign.ttf in Resources */,
+				A170A26B804745A99F9D2889 /* FontAwesome5_Brands.ttf in Resources */,
+				1F1FE2D8CB0F4487941C2015 /* FontAwesome5_Regular.ttf in Resources */,
+				A2667E21A48042FABEDDD1A5 /* FontAwesome5_Solid.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1421,12 +1469,14 @@
 					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-status/ios",
 				);
 				INFOPLIST_FILE = EsWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1459,12 +1509,14 @@
 					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-status/ios",
 				);
 				INFOPLIST_FILE = EsWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1502,6 +1554,7 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"/Users/dev12/Library/Developer/Xcode/DerivedData/EsWallet-godhgosmzeuaeifdltmhhvkhxzuj/Build/Products/Staging-iphoneos/include",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-status/ios",
 				);
 				INFOPLIST_FILE = EsWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
@@ -1551,6 +1604,7 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
 					"/Users/dev12/Library/Developer/Xcode/DerivedData/EsWallet-godhgosmzeuaeifdltmhhvkhxzuj/Build/Products/Staging-iphoneos/include",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-status/ios",
 				);
 				INFOPLIST_FILE = EsWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
@@ -1567,8 +1621,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.excelsecu.wallet.EsWallet;
 				PRODUCT_NAME = ESECUBIT;
-				PROVISIONING_PROFILE = "9a635a40-3be3-4319-9be5-c3a1b57278bd";
-				PROVISIONING_PROFILE_SPECIFIER = es_inhouse_sz;
+				PROVISIONING_PROFILE = "8219a7fe-b21c-47c4-80c5-192047afe511";
+				PROVISIONING_PROFILE_SPECIFIER = enterprize_sz_2020;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -1597,11 +1651,13 @@
 					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-status/ios",
 				);
 				INFOPLIST_FILE = "EsWallet-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1640,11 +1696,13 @@
 					"$(SRCROOT)/../node_modules/react-native-device-info/ios/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-status/ios",
 				);
 				INFOPLIST_FILE = "EsWallet-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1675,6 +1733,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.EsWallet-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1699,6 +1758,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.EsWallet-tvOSTests";
