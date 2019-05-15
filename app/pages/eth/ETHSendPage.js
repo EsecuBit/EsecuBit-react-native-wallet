@@ -20,6 +20,7 @@ import TransactionFeeCard from "../../components/card/TransactionFeeCard"
 import TransactionTotalCostCard from "../../components/card/TransactionTotalCostCard"
 import MemoInput from "../../components/input/MemoInput"
 import ETHDataInput from "../../components/input/ETHDataInput"
+import BtTransmitter from "../../device/BtTransmitter";
 
 class ETHSendPage extends Component {
   constructor(props) {
@@ -40,6 +41,7 @@ class ETHSendPage extends Component {
 
     // prevent duplicate send
     this.lockSend = false
+    this.transmitter = new BtTransmitter()
   }
 
   _fillResendData() {
@@ -223,6 +225,9 @@ class ETHSendPage extends Component {
         this._isMounted && this.setState({transactionConfirmDialogVisible: false })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
+        if (error === D.error.pinLocked) {
+          this.transmitter.disconnect()
+        }
       })
   }
 

@@ -125,6 +125,7 @@ export default {
   getAddressError: 'Get address failed',
   hasConnected: 'The device is connected',
   saveAddress: 'Save address onto the device',
+  saveAccount: 'Save account onto the device',
   totalValue: 'Total Value',
   newWallet: 'New Wallet',
   add: 'ADD',
@@ -144,7 +145,8 @@ export default {
   pending: 'Pending',
   invalid: 'Invalid',
   confirming: 'Confirming',
-  checkVersion: 'Check For Updates',
+  checkAppVersion: 'Check For App Updates',
+  checkAppletVersion: 'Check For Applet Updates',
   versionUpdate: 'Version Update',
   connectDeviceToGetCOSVersion: 'Please connect device to get cos version',
   accountName: 'Account Name',
@@ -229,6 +231,15 @@ export default {
   pleaseAwaitSyncFinish: 'Please await account sync finish',
   notAllowToSend: 'Value is 0, not allow',
   notSupportNewEOSAccount: 'Already registered EOS account, temporarily does not support adding an account',
-  importMultipleKeyError: 'Please import a private key at a time'
+  importMultipleKeyError: 'Please import a private key at a time',
+  pinIsLocked: 'Pin is locked',
+  upgrade: 'Upgrade',
+  get_script: 'Getting script...',
+  handle_data: 'Processing data...',
+  install: 'Installing...',
+  init: 'Initializing...',
+  initFinish: 'Init finish',
+  waitUpgradeFinish: "Please wait for the previous task to complete",
+  getVersion: 'Getting version...'
 
 }

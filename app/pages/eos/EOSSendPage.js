@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, Container, Content, Card } from 'native-base'
-import {BackHandler, InteractionManager, StyleSheet, Keyboard } from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, Keyboard, Platform } from 'react-native'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import FooterButton from '../../components/FooterButton'
 import ValueInput from '../../components/input/ValueInput'
@@ -15,6 +15,7 @@ import BalanceHeader from "../../components/header/BalanceHeader";
 import StringUtil from "../../utils/StringUtil";
 import { D } from 'esecubit-wallet-sdk'
 import {BigDecimal} from 'bigdecimal'
+import BtTransmitter from "../../device/BtTransmitter";
 
 
 class EOSSendPage extends Component {
@@ -28,6 +29,7 @@ class EOSSendPage extends Component {
       disableFooterBtn: true,
       transactionConfirmDialogVisible: false
     }
+    this.transmitter = new BtTransmitter()
   }
 
   componentDidMount() {
@@ -195,6 +197,9 @@ class EOSSendPage extends Component {
         console.warn('EOS send error', err)
         ToastUtil.showErrorMsgShort(err)
         this._isMounted && this.setState({transactionConfirmDialogVisible: false })
+        if (err === D.error.pinLocked) {
+          this.transmitter.disconnect()
+        }
       })
   }
 

@@ -17,6 +17,7 @@ import TransactionFeeCard from '../../components/card/TransactionFeeCard'
 import BalanceHeader from '../../components/header/BalanceHeader'
 import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
 import StringUtil from "../../utils/StringUtil";
+import BtTransmitter from "../../device/BtTransmitter";
 
 class BTCSendPage extends Component {
   constructor(props) {
@@ -37,6 +38,7 @@ class BTCSendPage extends Component {
     this.minimumUnit = D.unit.btc.satoshi
     //prevent duplicate send
     this.lockSend = false
+    this.transmitter = new BtTransmitter()
   }
 
 
@@ -231,6 +233,9 @@ class BTCSendPage extends Component {
         this._isMounted && this.setState({transactionConfirmDialogVisible: false })
         ToastUtil.showErrorMsgShort(error)
         this.lockSend = false
+        if (error === D.error.pinLocked) {
+          this.transmitter.disconnect()
+        }
       })
   }
 
