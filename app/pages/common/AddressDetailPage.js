@@ -121,19 +121,19 @@ class AddressDetailPage extends PureComponent {
               <QrCode value={this.state.address} size={240} bgColor="black" fgColor="white"/>
             </View>
           </TouchableWithoutFeedback>
-            <View style={styles.checkboxWrpper}>
-              <Left>
-                <CheckBox
-                  style={{justifyContent: "center"}}
-                  checked={this.state.storeAddress}
-                  onPress={() => this._handleStoreAddress()}
-                />
-              </Left>
-              <Body style={{flex: 3}}>
-              <Text style={CommonStyle.privateText}>{I18n.t("saveAddress")}</Text>
-              </Body>
-              <Right/>
-            </View>
+          <View style={styles.checkboxWrpper}>
+            <Left>
+              <CheckBox
+                style={{justifyContent: "center"}}
+                checked={this.state.storeAddress}
+                onPress={() => this._handleStoreAddress()}
+              />
+            </Left>
+            <Body style={{flex: 3}}>
+              <Text style={CommonStyle.privateText}>{D.isEos(this.account.coinType) ? I18n.t('saveAccount') : I18n.t("saveAddress")}</Text>
+            </Body>
+            <Right/>
+          </View>
           <Text style={[CommonStyle.privateText, styles.addressText]}>{this.state.address}</Text>
           <Text
             style={styles.remindText}>{D.isEos(this.account.coinType) ? I18n.t("copyEOSRemind") : I18n.t("copyRemind")}</Text>

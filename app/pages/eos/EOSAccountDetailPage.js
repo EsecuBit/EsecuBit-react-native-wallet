@@ -79,16 +79,15 @@ class EOSAccountDetailPage extends Component {
     this._isMounted = true
     this._onFocus()
     this._onBlur()
-    this._listenTransmitter()
     this._listenWallet()
     this.wallet.listenTxInfo(() => {
-      console.log('listen TxInfo')
       this._getTxInfos()
     })
     if (this.account && !this.account.isRegistered()) {
       this._checkNewPermission()
     }
   }
+
 
   async _checkNewPermission() {
     let state = await this.transmitter.getState()
@@ -193,7 +192,8 @@ class EOSAccountDetailPage extends Component {
         progressDialogVisible: false,
         showRegisterDialogVisible: false,
         checkAddPermissionDialogVisible: false,
-        newPermissionList: []
+        newPermissionList: [],
+        transactionDetailDialogVisible: false
       })
     })
   }
@@ -204,6 +204,7 @@ class EOSAccountDetailPage extends Component {
       progressDialogVisible: false,
       showRegisterDialogVisible: false,
       checkAddPermissionDialogVisible: false,
+      transactionDetailDialogVisible: false,
       newPermissionList: []
     })
     return true;
@@ -216,14 +217,7 @@ class EOSAccountDetailPage extends Component {
           this.setState({progressDialogDesc: I18n.t('connecting')})
           this.transmitter.stopScan()
         } else if (status === BtTransmitter.connected) {
-          switch (this._goToPage) {
-            case 'send':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoSendPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
-          }
+          this._isMounted && this.setState({progressDialogDesc: I18n.t('initData')})
 
         } else if (status === BtTransmitter.disconnected) {
           this.transmitter.stopScan()
@@ -251,6 +245,13 @@ class EOSAccountDetailPage extends Component {
           this.transmitter.disconnect()
           this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
         }
+        if (status === D.status.syncing || status === D.status.syncFinish) {
+          this._isMounted && this.setState({progressDialogVisible: false})
+          if (!this._lock) {
+            this._goToPage()
+            this._lock = true
+          }
+        }
       }
     })
   }
@@ -266,6 +267,9 @@ class EOSAccountDetailPage extends Component {
 
   async _showBluetoothConnectDialog() {
     if (this._isDeviceChange) return
+    // prevent duplicate to go to same page
+    this._lock = false
+    this._listenTransmitter()
     if (!this.account.isRegistered()) {
       ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
       return
@@ -275,11 +279,7 @@ class EOSAccountDetailPage extends Component {
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       this._findAndConnectDevice()
     } else {
-      switch (this._goToPage) {
-        case 'send':
-          this._gotoSendPage()
-          break
-      }
+      this._goToPage()
     }
   }
 
@@ -306,6 +306,18 @@ class EOSAccountDetailPage extends Component {
     this.timers.push(this.findDeviceTimer)
   }
 
+
+  _goToPage() {
+    switch (this._page) {
+      case 'send':
+        this._gotoSendPage()
+        break
+      case 'address':
+        this._gotoAddressDetailPage()
+        break
+    }
+  }
+
   _gotoSendPage() {
     this._isMounted && this.setState({progressDialogVisible: false})
     this.props.navigation.navigate('EOSSend')
@@ -318,6 +330,7 @@ class EOSAccountDetailPage extends Component {
       ToastUtil.showShort(I18n.t('eosAccountNotRegister'))
     }
   }
+
 
   async _onRefresh() {
     let state = await this.transmitter.getState()
@@ -496,7 +509,6 @@ class EOSAccountDetailPage extends Component {
       .getTxInfos()
       .then(txInfos => {
         let actions = this._convertActionsToRowData(txInfos.txInfos)
-        console.log('actions', actions)
         this._isMounted && this.setState({data: []})
         this._isMounted && this.setState({data: actions})
       })
@@ -788,10 +800,11 @@ class EOSAccountDetailPage extends Component {
         <AccountOperateBottomBar
           leftOnPress={() => {
             this._showBluetoothConnectDialog()
-            this._goToPage = 'send'
+            this._page = 'send'
           }}
           rightOnPress={() => {
-            this._gotoAddressDetailPage()
+            this._showBluetoothConnectDialog()
+            this._page = 'address'
           }}
           visible={this.state.isShowBottomBar}
         />

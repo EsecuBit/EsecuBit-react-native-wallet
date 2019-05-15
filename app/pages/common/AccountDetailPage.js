@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {
   View,
   StyleSheet,
@@ -7,22 +7,22 @@ import {
   Platform,
   TextInput,
   BackHandler,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native'
 import I18n from '../../lang/i18n'
-import { Button, Container, Icon, List, ListItem, Content, CardItem, Text } from 'native-base'
+import {Button, Container, Icon, List, ListItem, Content, CardItem, Text} from 'native-base'
 import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
-import { CommonStyle, Dimen, Color } from '../../common/Styles'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
+import {CommonStyle, Dimen, Color} from '../../common/Styles'
+import {EsWallet, D} from 'esecubit-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AccountOperateBottomBar from '../../components/bar/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/header/AccountDetailHeader'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
-import { Coin } from '../../common/Constants'
+import {Coin} from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 
 const deviceW = Dimensions.get('window').width
@@ -52,7 +52,6 @@ class AccountDetailPage extends Component {
     this.transmitter = new BtTransmitter()
     this.timers = []
     this.transmitter = new BtTransmitter()
-    // prevent duplicate click
   }
 
   componentDidMount() {
@@ -60,19 +59,17 @@ class AccountDetailPage extends Component {
     this._onFocus()
     this._onBlur()
     this._getTxInfos()
-    this._listenTransmitter()
     this._listenWallet()
     this.wallet.listenTxInfo(() => {
-      console.log('listen TxInfo')
       this._getTxInfos()
 
     })
+    this._listenWallet()
   }
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
       this._getTxInfos()
-      this._listenWallet()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
   }
@@ -80,12 +77,19 @@ class AccountDetailPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+      this._isMounted && this.setState({
+        bluetoothConnectDialogVisible: false,
+        transactionDetailDialogVisible: false,
+        renameDialogVisible: false
+      })
     })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
+    this._isMounted && this.setState({
+      bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false, renameDialogVisible: false
+    })
     return true;
   }
 
@@ -95,30 +99,9 @@ class AccountDetailPage extends Component {
         if (status === BtTransmitter.connecting) {
           this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
           this.transmitter.stopScan()
-        } else if(status === BtTransmitter.connected) {
-          switch(this._goToPage) {
-            case 'send':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoSendPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
-            case 'address':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoAddressDetailPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
-            case 'resend':
-              this.navigateTimer = setTimeout(() => {
-                this._gotoResendPage()
-              }, 3000)
-              this.timers.push(this.navigateTimer)
-              break
-          }
+        } else if (status === BtTransmitter.connected) {
           this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
-        }
-        else if(status === BtTransmitter.disconnected){
+        } else if (status === BtTransmitter.disconnected) {
           this.transmitter.stopScan()
           // if device has changed, app will auto disconnect. no need to toast
           if (!this._isDeviceChange) {
@@ -126,7 +109,7 @@ class AccountDetailPage extends Component {
           }
           this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
         }
-      }else {
+      } else {
         this.transmitter.stopScan()
         ToastUtil.showShort(I18n.t('connectFailed'))
         this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
@@ -135,18 +118,23 @@ class AccountDetailPage extends Component {
   }
 
 
-
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
+      console.log('account detail wallet status', error, status)
       if (status === D.status.deviceChange) {
         this._isDeviceChange = true
         ToastUtil.showLong(I18n.t('deviceChange'))
         this.transmitter.disconnect()
         this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
       }
-      if (status === D.status.syncFinish || status === D.status.syncing) {
+      if (status === D.status.syncing || status === D.status.syncFinish) {
         this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+        if (!this._lock) {
+          this._gotoPage()
+          this._lock = true
+        }
       }
+
     })
   }
 
@@ -161,27 +149,37 @@ class AccountDetailPage extends Component {
 
   async _showBluetoothConnectDialog() {
     if (this._isDeviceChange) return
+    this._listenTransmitter()
+    // prevent duplicate to go to same page
+    this._lock = false
     let deviceState = await this.transmitter.getState()
     //soft wallet no need to connect hardware
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       this._findAndConnectDevice()
-    }else {
-      switch(this._goToPage) {
-        case 'send':
-          this._gotoSendPage()
-          break
-        case 'address':
-          this._gotoAddressDetailPage()
-          break
-        case 'resend':
-          this._gotoResendPage()
-          break
-      }
+    } else {
+      this._gotoPage()
+    }
+  }
+
+  _gotoPage() {
+    switch (this._page) {
+      case 'send':
+        this._gotoSendPage()
+        break
+      case 'address':
+        this._gotoAddressDetailPage()
+        break
+      case 'resend':
+        this._gotoResendPage()
+        break
     }
   }
 
   async _findAndConnectDevice() {
-    this._isMounted && this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
+    this._isMounted && this.setState({
+      bluetoothConnectDialogVisible: true,
+      bluetoothConnectDialogDesc: I18n.t('searchingDevice')
+    })
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo.sn === info.sn) {
@@ -191,7 +189,7 @@ class AccountDetailPage extends Component {
     // if search device no response after 10s, toast tip to notify user no device found
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
-      if(state === BtTransmitter.disconnected) {
+      if (state === BtTransmitter.disconnected) {
         this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
@@ -226,17 +224,17 @@ class AccountDetailPage extends Component {
 
   async _onRefresh() {
     let state = await this.transmitter.getState()
-    this._isMounted && this.setState({ refreshing: true })
+    this._isMounted && this.setState({refreshing: true})
     this.account
       .sync(null, false, state === BtTransmitter.disconnected)
       .then(() => {
         console.log('sync _getTxInfos')
         this._getTxInfos()
-        this._isMounted && this.setState({ refreshing: false })
+        this._isMounted && this.setState({refreshing: false})
       })
       .catch(error => {
         console.warn('_onRefresh', error)
-        this._isMounted && this.setState({ refreshing: false })
+        this._isMounted && this.setState({refreshing: false})
         ToastUtil.showErrorMsgShort(error)
       })
   }
@@ -316,7 +314,7 @@ class AccountDetailPage extends Component {
     return (
       <CardItem
         button
-        style={{ backgroundColor: Color.CONTAINER_BG }}
+        style={{backgroundColor: Color.CONTAINER_BG}}
         onPress={() => {
           this._showTransactionDetailDialog(rowData)
         }}>
@@ -346,7 +344,7 @@ class AccountDetailPage extends Component {
                 marginTop: 15,
                 marginRight: 10
               }}>
-              <Text style={[styles.rightText, { color: priceColor }]}>
+              <Text style={[styles.rightText, {color: priceColor}]}>
                 {symbol + ' ' + StringUtil.formatCryptoCurrency(price)}
               </Text>
             </View>
@@ -369,7 +367,7 @@ class AccountDetailPage extends Component {
                 marginBottom: 15,
                 marginRight: 10
               }}>
-              <Text style={{ fontSize: Dimen.SECONDARY_TEXT, color: confirmColor }}>
+              <Text style={{fontSize: Dimen.SECONDARY_TEXT, color: confirmColor}}>
                 {confirmStr}
               </Text>
             </View>
@@ -448,7 +446,7 @@ class AccountDetailPage extends Component {
     let addr = ''
     this.rowData = rowData
 
-    rowData.showAddresses.forEach(function(item, index) {
+    rowData.showAddresses.forEach(function (item, index) {
       if (item === 'self' || item === 'Self' || item === 'SELF') {
         isToSelf = true
         addr = item
@@ -549,9 +547,9 @@ class AccountDetailPage extends Component {
       this.resendableText = I18n.t('adviceToResend')
     }
     if (rowData.comment) {
-      this.setState({ dMemo: rowData.comment })
+      this.setState({dMemo: rowData.comment})
     } else {
-      this.setState({ dMemo: '' })
+      this.setState({dMemo: ''})
     }
 
     if (rowData.data) {
@@ -566,8 +564,7 @@ class AccountDetailPage extends Component {
     this.account
       .getTxInfos()
       .then(txInfos => {
-        console.log('txInfo', txInfos)
-        this._isMounted && this.setState({ data: txInfos.txInfos })
+        this._isMounted && this.setState({data: txInfos.txInfos})
       })
       .catch(error => {
         console.log('txInfo error', error)
@@ -577,6 +574,10 @@ class AccountDetailPage extends Component {
   }
 
   _renameAccount() {
+    if (!this.renameAccountname || this.renameAccountname.replace(/(^\s*)|(\s*$)/g, "").length === 0) {
+      ToastUtil.showShort(I18n.t('emptyAccountNameError'))
+      return
+    }
     this.account
       .rename(this.renameAccountname)
       .then(() => {
@@ -605,7 +606,7 @@ class AccountDetailPage extends Component {
   }
 
   _gotoResendPage() {
-    let param = { txInfo: this.rowData }
+    let param = {txInfo: this.rowData}
     switch (true) {
       case D.isBtc(this.account.coinType):
         this.props.navigation.navigate('BTCSend', param)
@@ -618,6 +619,7 @@ class AccountDetailPage extends Component {
     }
     this._isMounted && this.setState({bluetoothConnectDialogVisible: false, transactionDetailDialogVisible: false})
   }
+
   /**
    * Handle Menu Item Click
    * @param type: [accountAssets, permissionManage, renameAccount]
@@ -643,20 +645,20 @@ class AccountDetailPage extends Component {
 
   _showRenameDialog() {
     let _that = this
-    if(platform === 'ios') {
+    if (platform === 'ios') {
       // iOS render is too fast
       this.iOSTimer = setTimeout(() => {
         _that._isMounted && _that.setState({renameDialogVisible: true})
       }, 400)
       this.timers.push(this.iOSTimer)
-    }else {
+    } else {
       _that._isMounted && _that.setState({renameDialogVisible: true})
     }
   }
 
   render() {
     return (
-      <Container style={[CommonStyle.safeAreaBottom, { backgroundColor: Color.CONTAINER_BG }]}>
+      <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
         <AccountDetailHeader
           ref={refs => this.accountHeader = refs && refs.getWrappedInstance()}
           onHideMenu={type => this._handleMenuItemClick(type)}
@@ -668,7 +670,7 @@ class AccountDetailPage extends Component {
             this._isMounted && this.setState({renameDialogVisible: false})
           }}
           width={0.8}
-          dialogTitle={<DialogTitle  title={I18n.t('renameAccount')}/>}
+          dialogTitle={<DialogTitle title={I18n.t('renameAccount')}/>}
           actions={[
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
@@ -676,19 +678,21 @@ class AccountDetailPage extends Component {
               key='rename_account_cancel'
               text={I18n.t('cancel')}
               onPress={() => {
-                this._isMounted && this.setState({ renameDialogVisible: false })
-              }} />,
+                this._isMounted && this.setState({renameDialogVisible: false})
+              }}/>,
             <DialogButton
               style={{backgroundColor: Color.WHITE}}
               textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
               key='rename_account_confirm'
               text={I18n.t('confirm')} onPress={() => {
-                this._isMounted && this.setState({ renameDialogVisible: false })
-                this._renameAccount()}} />
+              this._isMounted && this.setState({renameDialogVisible: false})
+              this._renameAccount()
+            }}/>
           ]}
         >
           <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
-            <Text style={[CommonStyle.verticalDialogText, {marginTop: Dimen.MARGIN_VERTICAL}]}>{I18n.t('renameAccountHint')}</Text>
+            <Text
+              style={[CommonStyle.verticalDialogText, {marginTop: Dimen.MARGIN_VERTICAL}]}>{I18n.t('renameAccountHint')}</Text>
             <TextInput
               style={Platform.OS === 'ios' ? CommonStyle.iosTextInput : CommonStyle.androidTextInput}
               selectionColor={Color.ACCENT}
@@ -707,14 +711,14 @@ class AccountDetailPage extends Component {
           }}>
           <Text style={styles.listTitleText}>
             {I18n.t('transactionRecord') +
-              '( ' +
-              I18n.t('value') +
-              ': ' +
-              this.props.accountCurrentUnit +
-              ' )'}
+            '( ' +
+            I18n.t('value') +
+            ': ' +
+            this.props.accountCurrentUnit +
+            ' )'}
           </Text>
         </View>
-        <View style={{ height: 1 }} />
+        <View style={{height: 1}}/>
         <View style={styles.listView}>
           <List
             refreshControl={
@@ -745,10 +749,10 @@ class AccountDetailPage extends Component {
             this._handleTransactionDetailDismiss()
           }}
           onShown={() => {
-            this._isMounted && this.setState({ isShowBottomBar: false })
+            this._isMounted && this.setState({isShowBottomBar: false})
           }}>
           <Content>
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <View
                 style={{
                   width: deviceW * 0.9,
@@ -757,11 +761,11 @@ class AccountDetailPage extends Component {
                   flexDirection: 'row',
                   justifyContent: 'space-between'
                 }}>
-                <View style={{ width: 40, height: 30 }} />
+                <View style={{width: 40, height: 30}}/>
                 <View>
-                  <Text style={{ fontSize: 18 }}>{this.dTitle}</Text>
+                  <Text style={{fontSize: 18}}>{this.dTitle}</Text>
                 </View>
-                <View style={{ marginTop: -10, marginRight: 10 }}>
+                <View style={{marginTop: -10, marginRight: 10}}>
                   <Icon
                     name="close"
                     type="MaterialCommunityIcons"
@@ -780,28 +784,28 @@ class AccountDetailPage extends Component {
                   alignItems: 'center'
                 }}>
                 <View>
-                  <Text style={{ fontSize: 22, color: this.dAmountColor }}>{this.dAmount}</Text>
+                  <Text style={{fontSize: 22, color: this.dAmountColor}}>{this.dAmount}</Text>
                 </View>
               </View>
-              <View style={[styles.detailLine, { marginTop: 15 }]} />
+              <View style={[styles.detailLine, {marginTop: 15}]}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{this.dConfirmStr}</Text>
                 <Text style={styles.detailCellRightText}>{this.dDate}</Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('through')}</Text>
                 <Text
                   style={[
                     styles.detailCellRightText,
-                    { width: deviceW * 0.7 * 0.8, marginLeft: 10 }
+                    {width: deviceW * 0.7 * 0.8, marginLeft: 10}
                   ]}
                   ellipsizeMode="middle"
                   numberOfLines={1}>
                   {this.dAddr}
                 </Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
 
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('memo')}</Text>
@@ -812,7 +816,7 @@ class AccountDetailPage extends Component {
                   returnKeyType="done"
                   underlineColorAndroid="transparent"
                   onChangeText={text => {
-                    this.setState({ dMemo: text })
+                    this.setState({dMemo: text})
                   }}
                   value={this.state.dMemo}
                   ref={textInput => {
@@ -820,31 +824,31 @@ class AccountDetailPage extends Component {
                   }}
                 />
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
 
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('totalCost')}</Text>
                 <Text style={styles.detailCellRightText}>{this.dTotal}</Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('confirmNum')}</Text>
                 <Text style={styles.detailCellRightText}>{this.dConfirmNum}</Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('tradingID')}</Text>
                 <Text
                   style={[
                     styles.detailCellRightText,
-                    { width: deviceW * 0.9 * 0.7, marginLeft: 10 }
+                    {width: deviceW * 0.9 * 0.7, marginLeft: 10}
                   ]}
                   ellipsizeMode="middle"
                   numberOfLines={1}>
                   {this.dTxId}
                 </Text>
               </View>
-              <View style={styles.detailLine} />
+              <View style={styles.detailLine}/>
               {D.isBtc(this.account.coinType) ? null : (
                 <View
                   style={{
@@ -867,7 +871,7 @@ class AccountDetailPage extends Component {
                   </View>
                 </View>
               )}
-              {D.isBtc(this.account.coinType) ? null : <View style={styles.detailLine} />}
+              {D.isBtc(this.account.coinType) ? null : <View style={styles.detailLine}/>}
               <View style={styles.detailCell}>
                 <Text style={styles.detailCellLeftText}>{I18n.t('canResend')}</Text>
                 <Text style={styles.detailCellRightText}>{this.resendableText}</Text>
@@ -877,9 +881,9 @@ class AccountDetailPage extends Component {
               <View style={styles.resendBtnWrapper}>
                 <Button style={styles.resendButton} onPress={() => {
                   this._showBluetoothConnectDialog()
-                  this._goToPage = 'resend'
+                  this._page = 'resend'
                 }}>
-                  <Text style={{ textAlign: 'center' }}>{I18n.t('resend')}</Text>
+                  <Text style={{textAlign: 'center'}}>{I18n.t('resend')}</Text>
                 </Button>
               </View>
             ) : null}
@@ -888,18 +892,19 @@ class AccountDetailPage extends Component {
         <AccountOperateBottomBar
           leftOnPress={() => {
             this._showBluetoothConnectDialog()
-            this._goToPage = 'send'
+            this._page = 'send'
           }}
           rightOnPress={() => {
             this._showBluetoothConnectDialog()
-            this._goToPage = 'address'
+            this._page = 'address'
           }}
           visible={this.state.isShowBottomBar}
         />
         <Dialog
           width={0.8}
           visible={this.state.bluetoothConnectDialogVisible}
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
