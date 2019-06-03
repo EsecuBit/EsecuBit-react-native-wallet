@@ -346,6 +346,7 @@ class SettingsPage extends Component {
         appletInfos[appletInfo.index].progress = progress / 100
         if (progress === 100) {
           appletInfos[appletInfo.index].showProgress = false
+          appletInfos.splice(appletInfo.index, 1)
         }
         this.setState({updateAppletInfos: appletInfos})
       })

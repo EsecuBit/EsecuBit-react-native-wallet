@@ -72,7 +72,7 @@ class EOSAccountDetailPage extends Component {
     // confirm eos permission counter
     this.confirmEosPermisiionCounter = 0;
     this.needToConfirmAmount = 0;
-    this.syncResult = true
+    this.syncResult = false
   }
 
   componentDidMount() {
@@ -96,7 +96,6 @@ class EOSAccountDetailPage extends Component {
     }
     this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('checkingPermission')})
     try {
-      this.syncResult = false
       let result = await this.account.checkAccountPermissions((error, status, permissions) => {
         if (error === D.error.succeed) {
           if (status === D.status.newEosPermissions) {
@@ -160,7 +159,6 @@ class EOSAccountDetailPage extends Component {
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
     } finally {
-      this.syncResult = true
       this._isMounted && this.setState({
         progressDialogVisible: false,
         checkAddPermissionDialogVisible: false,
@@ -344,6 +342,7 @@ class EOSAccountDetailPage extends Component {
       })
       .catch(error => {
         console.warn('_onRefresh', error)
+        this.syncResult = false
         this._isMounted && this.setState({refreshing: false})
         ToastUtil.showErrorMsgShort(error)
 
@@ -513,9 +512,11 @@ class EOSAccountDetailPage extends Component {
         this._isMounted && this.setState({data: actions})
       })
       .then(() => {
+        this.syncResult = true
         this._isMounted && this.setState({refreshing: false})
       })
       .catch(error => {
+        this.syncResult = false
         console.log('txInfo error', error)
         ToastUtil.showErrorMsgLong(error)
       })
