@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {
   View,
   Text,
@@ -12,18 +12,21 @@ import {
   BackHandler,
   ActivityIndicator
 } from 'react-native'
-import { Container, List, ListItem, Button, Icon } from 'native-base'
+import {Container, List, ListItem, Button, Icon} from 'native-base'
 import I18n from '../../lang/i18n'
-import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
+import {D, EsWallet, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import PreferenceUtil from '../../utils/PreferenceUtil'
-import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
+import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
-import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
+import {Color, Dimen, isIphoneX, CommonStyle} from '../../common/Styles'
 import AppUtil from "../../utils/AppUtil";
 
 
-
 export default class PairListPage extends Component {
+  static navigationOptions = {
+    header: null
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -55,12 +58,12 @@ export default class PairListPage extends Component {
           authenticateDialogVisible: false,
           connectDialogVisible: false
         })
-      }else{
+      } else {
         if (status === D.status.auth && pairCode) {
           console.log('wallet authenticating')
           if (pairCode) {
             console.log('has receive pairCode', pairCode)
-            this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
+            this.setState({authenticateDialogVisible: true, pairCode: pairCode})
           }
         }
         if (status === D.status.authFinish) {
@@ -96,8 +99,8 @@ export default class PairListPage extends Component {
     // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
     this.props.navigation.addListener('willFocus', async () => {
       this._listenTransmitter()
-      await this.setState({ deviceList: [] })
-      const { params } = this.props.navigation.state
+      await this.setState({deviceList: []})
+      const {params} = this.props.navigation.state
       let autoConnect = true
       if (params) {
         autoConnect = params.autoConnect
@@ -119,11 +122,11 @@ export default class PairListPage extends Component {
       console.log('connect status', error, status)
       if (error !== D.error.succeed) {
         ToastUtil.showShort(I18n.t('connectFailed'))
-        _that.setState({ connectDialogVisible: false })
+        _that.setState({connectDialogVisible: false})
         return
       }
       if (status === BtTransmitter.connecting) {
-        _that.setState({ connectDialogVisible: true })
+        _that.setState({connectDialogVisible: true})
         return
       }
       if (status === BtTransmitter.disconnected) {
@@ -147,7 +150,7 @@ export default class PairListPage extends Component {
     this.transmitter.stopScan()
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-    this.setState({dialogDesc: I18n.t('pleaseWait') })
+    this.setState({dialogDesc: I18n.t('pleaseWait')})
   }
 
   _findDefaultDevice(autoConnect) {
@@ -165,7 +168,7 @@ export default class PairListPage extends Component {
     _that.transmitter.startScan((error, info) => {
       if (info.sn && info.sn.length === 12) {
         // filter device sn
-        if(info.sn.startsWith('ES12') || info.sn.startsWith('2')) {
+        if (info.sn.startsWith('ES12') || info.sn.startsWith('2')) {
           devices.add(info)
         }
       }
@@ -184,7 +187,7 @@ export default class PairListPage extends Component {
       <View
         style={[
           styles.itemContainer,
-          { justifyContent: 'center', marginBottom: Dimen.SPACE }
+          {justifyContent: 'center', marginBottom: Dimen.SPACE}
         ]}>
         <Text
           style={{
@@ -203,7 +206,7 @@ export default class PairListPage extends Component {
     console.log('connect device sn is', rowData)
     this.transmitter.connect(rowData)
     this.connectDeviceInfo = rowData
-    this.setState({ connectDialogVisible: true, dialogDesc: I18n.t('connecting') })
+    this.setState({connectDialogVisible: true, dialogDesc: I18n.t('connecting')})
   }
 
   _onRefresh(autoConnect) {
@@ -224,68 +227,66 @@ export default class PairListPage extends Component {
     }
     return (
       <Container style={CommonStyle.safeAreaBottom}>
-        <View style={{ height: bgHeight, justifyContent: 'center', alignItems: 'center' }}>
-          <ImageBackground
-            source={require('../../imgs/bg_home.png')}
-            resizeMode={'stretch'}
-            style={{ height: bgHeight, alignContent: 'center', alignItems: 'center' }}>
-            <View style={{ height: height }}>
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  flexDirection: 'row'
-                }}
-                translucent={false}>
-                <StatusBar
-                  barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
-                  backgroundColor={Color.DARK_PRIMARY}
-                  hidden={false}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                </View>
-              </View>
-            </View>
+        <ImageBackground
+          source={require('../../imgs/bg_home.png')}
+          resizeMode={'stretch'}
+          style={{height: bgHeight, alignContent: 'center', alignItems: 'center'}}>
+          <View style={{height: height}}>
             <View
               style={{
-                marginTop: Dimen.MARGIN_VERTICAL
-              }}>
-              <Image
-                source={require('../../imgs/bluetooth_bg.png')}
-                style={{ width: 80, height: 80 }}
+                flex: 1,
+                backgroundColor: 'transparent',
+                flexDirection: 'row'
+              }}
+              translucent={false}>
+              <StatusBar
+                barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
+                backgroundColor={Color.DARK_PRIMARY}
+                hidden={false}
               />
-            </View>
-            <View style={{}}>
-              <Text
+              <View
                 style={{
-                  textAlignVertical: 'center',
-                  textAlign: 'center',
-                  color: Color.TEXT_ICONS,
-                  fontSize: 25,
-                  marginTop: 30,
-                  backgroundColor: 'transparent'
+                  justifyContent: 'center',
+                  width: 48,
+                  height: height,
+                  marginTop: isIphoneX ? 20 : 0
                 }}>
-                {I18n.t('pairDevice')}
-              </Text>
-              <Text
-                style={{
-                  textAlignVertical: 'center',
-                  textAlign: 'center',
-                  color: Color.TEXT_ICONS,
-                  marginTop: Dimen.SPACE,
-                  backgroundColor: 'transparent'
-                }}>
-                {I18n.t('pairDeviceTip')}
-              </Text>
+              </View>
             </View>
-          </ImageBackground>
-        </View>
+          </View>
+          <View
+            style={{
+              marginTop: Dimen.MARGIN_VERTICAL
+            }}>
+            <Image
+              source={require('../../imgs/bluetooth_bg.png')}
+              style={{width: 80, height: 80}}
+            />
+          </View>
+          <View style={{}}>
+            <Text
+              style={{
+                textAlignVertical: 'center',
+                textAlign: 'center',
+                color: Color.TEXT_ICONS,
+                fontSize: 25,
+                marginTop: 30,
+                backgroundColor: 'transparent'
+              }}>
+              {I18n.t('pairDevice')}
+            </Text>
+            <Text
+              style={{
+                textAlignVertical: 'center',
+                textAlign: 'center',
+                color: Color.TEXT_ICONS,
+                marginTop: Dimen.SPACE,
+                backgroundColor: 'transparent'
+              }}>
+              {I18n.t('pairDeviceTip')}
+            </Text>
+          </View>
+        </ImageBackground>
 
         <View style={styles.listView}>
           <List
@@ -306,7 +307,8 @@ export default class PairListPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.connectDialogVisible}
-          onTouchOutside={() => {}}
+          onTouchOutside={() => {
+          }}
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <ActivityIndicator color={Color.ACCENT} size={'large'}/>
@@ -316,10 +318,11 @@ export default class PairListPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.authenticateDialogVisible}
-          onTouchOutside={() => {}}
-          dialogTitle={<DialogTitle title={I18n.t('pairCode')} />}
+          onTouchOutside={() => {
+          }}
+          dialogTitle={<DialogTitle title={I18n.t('pairCode')}/>}
         >
-          <DialogContent style={{ alignItems: 'center'}}>
+          <DialogContent style={{alignItems: 'center'}}>
             <Text style={styles.pairCodeText}>{this.state.pairCode}</Text>
           </DialogContent>
         </Dialog>

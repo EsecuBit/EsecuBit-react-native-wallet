@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Platform, BackHandler, Text, InteractionManager, Keyboard } from 'react-native'
+import { BackHandler, Text, Keyboard } from 'react-native'
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { CommonStyle, Color, Dimen } from '../../common/Styles'
@@ -15,7 +15,7 @@ import MemoInput from '../../components/input/MemoInput'
 import TransactionTotalCostCard from '../../components/card/TransactionTotalCostCard'
 import TransactionFeeCard from '../../components/card/TransactionFeeCard'
 import BalanceHeader from '../../components/header/BalanceHeader'
-import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
+import Dialog, { DialogContent, DialogTitle, DialogButton, DialogFooter } from 'react-native-popup-dialog'
 import StringUtil from "../../utils/StringUtil";
 
 class BTCSendPage extends Component {
@@ -346,13 +346,15 @@ class BTCSendPage extends Component {
         <Dialog
           width={0.8}
           visible={this.state.deviceLimitDialogVisible}
-          actions={[
-            <DialogButton
-              key="device_limit_confirm"
-              text={I18n.t('confirm')}
-              onPress={() => this.setState({ deviceLimitDialogVisible: false })}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                key="device_limit_confirm"
+                text={I18n.t('confirm')}
+                onPress={() => this.setState({ deviceLimitDialogVisible: false })}
+              />
+            </DialogFooter>
+          }
           onTouchOutside={() => this.setState({ deviceLimitDialogVisible: false })}
           dialogTitle={<DialogTitle title={I18n.t('tips')} />}>
           <DialogContent>

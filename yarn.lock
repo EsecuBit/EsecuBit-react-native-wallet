@@ -6898,6 +6898,11 @@ react-native-material-textfield@^0.12.0:
   dependencies:
     prop-types "^15.5.9"
 
+react-native-platform-touchable@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-platform-touchable/-/react-native-platform-touchable-1.1.1.tgz#fde4acc65eea585d28b164d0c3716a42129a68e4"
+  integrity sha1-/eSsxl7qWF0osWTQw3FqQhKaaOQ=
+
 react-native-popup-dialog@^0.18.2:
   version "0.18.2"
   resolved "https://registry.yarnpkg.com/react-native-popup-dialog/-/react-native-popup-dialog-0.18.2.tgz#f36474974e3838ac670f03e006dbc75d5d224b38"
@@ -7035,6 +7040,13 @@ react-navigation-drawer@~1.2.1:
   integrity sha512-T2kaBjY2c4/3I6noWFnaf/c18ntNH5DsST38i+pdc2NPxn5Yi5lkK+ZZTeKuHSFD4a7G0jWY9OGf1iRkHWLMAQ==
   dependencies:
     react-native-tab-view "^1.2.0"
+
+react-navigation-header-buttons@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/react-navigation-header-buttons/-/react-navigation-header-buttons-2.3.1.tgz#f5465ee4d3e6e9d17656221809e16e6eae39067d"
+  integrity sha512-LSc4DSmhnw4gCPim35cr5/40JDAk+oSoAW/Uy7zULz9l/dQckxk9v3zaIAhTVTCK1clwaHktZKFUjggkIlt1IQ==
+  dependencies:
+    react-native-platform-touchable "^1.1.1"
 
 react-navigation-redux-helpers@^3.0.2:
   version "3.0.2"

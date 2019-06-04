@@ -31,7 +31,7 @@ import {setAccount} from '../../actions/AccountAction'
 import {connect} from 'react-redux'
 import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
-import Dialog, {DialogButton, DialogTitle, DialogContent} from 'react-native-popup-dialog'
+import Dialog, {DialogButton, DialogTitle, DialogContent, DialogFooter} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
 
 const platform = Platform.OS
@@ -442,22 +442,24 @@ class HomePage extends Component {
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='update_version_cancel'
-              text={I18n.t('cancel')}
-              onPress={this._checkForceUpdate.bind(this)}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='update_version_confirm'
-              text={I18n.t('confirm')}
-              onPress={() => this._gotoBrowser()}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='update_version_cancel'
+                text={I18n.t('cancel')}
+                onPress={this._checkForceUpdate.bind(this)}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='update_version_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => this._gotoBrowser()}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent>
             <Text style={styles.dialogDesc}>{this.state.updateDesc}</Text>
@@ -467,22 +469,24 @@ class HomePage extends Component {
           width={0.8}
           visible={this.state.hideAccountDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='hide_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({hideAccountDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='hide_account_confirm'
-              text={I18n.t('confirm')}
-              onPress={() => this._hideAccount()}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='hide_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({hideAccountDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='hide_account_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => this._hideAccount()}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <Text style={styles.dialogDesc}>{I18n.t('hideAccountDesc')}</Text>

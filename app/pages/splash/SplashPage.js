@@ -9,6 +9,10 @@ import { NetInfo, Platform, ActivityIndicator, Text } from 'react-native'
 import CoinUtil from "../../utils/CoinUtil";
 
 export default class SplashPage extends Component {
+
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
@@ -35,10 +39,10 @@ export default class SplashPage extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this._listenWalletStatus()
     this._onFocus()
     this._onBlur()
-    this._isMounted = true
   }
 
   componentWillUnmount() {
@@ -89,6 +93,7 @@ export default class SplashPage extends Component {
           this.setState({syncDesc: `${I18n.t('checking')} ${coinType.toUpperCase()} ${account.label}`})
         }
         if (status === D.status.syncFinish) {
+          this.setState({syncDialogVisible: false})
           _that._gotoHomePage(false)
         }
         if (status === D.status.deviceChange) {

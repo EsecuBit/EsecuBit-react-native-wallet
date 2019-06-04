@@ -8,7 +8,7 @@ import {View} from 'react-native'
 import CustomIcon from "../../components/CustomIcon"
 import {StyleSheet, BackHandler} from 'react-native'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
-import Dialog, {DialogButton, DialogContent, DialogTitle} from "react-native-popup-dialog"
+import Dialog, {DialogButton, DialogContent, DialogTitle, DialogFooter} from "react-native-popup-dialog"
 import {withNavigation} from 'react-navigation'
 import {setAccount, setAccountCryptoCurrencyUnit} from "../../actions/AccountAction"
 import {connect} from 'react-redux'
@@ -176,22 +176,24 @@ class AccountManagePage extends Component {
           width={0.8}
           visible={this.state.showAccountDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: '#fff'}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='show_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({showAccountDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: '#fff'}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='show_account_confirm'
-              text={I18n.t('confirm')}
-              onPress={() => this._showAccount()}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='show_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({showAccountDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='show_account_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => this._showAccount()}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent>
             <Text style={styles.desc}>{I18n.t('showAccountDesc')}</Text>

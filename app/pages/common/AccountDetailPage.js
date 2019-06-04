@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import I18n from '../../lang/i18n'
 import {Button, Container, Icon, List, ListItem, Content, CardItem, Text} from 'native-base'
-import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
+import Dialog, {DialogButton, DialogContent, DialogTitle, DialogFooter} from 'react-native-popup-dialog'
 import BigInteger from 'bigi'
 import {CommonStyle, Dimen, Color} from '../../common/Styles'
 import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
@@ -670,24 +670,27 @@ class AccountDetailPage extends Component {
           }}
           width={0.8}
           dialogTitle={<DialogTitle title={I18n.t('renameAccount')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='rename_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => {
-                this._isMounted && this.setState({renameDialogVisible: false})
-              }}/>,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='rename_account_confirm'
-              text={I18n.t('confirm')} onPress={() => {
-              this._isMounted && this.setState({renameDialogVisible: false})
-              this._renameAccount()
-            }}/>
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='rename_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => {
+                  this._isMounted && this.setState({renameDialogVisible: false})
+                }}/>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='rename_account_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => {
+                  this._isMounted && this.setState({renameDialogVisible: false})
+                  this._renameAccount()
+                }}/>
+            </DialogFooter>
+          }
         >
           <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
             <Text

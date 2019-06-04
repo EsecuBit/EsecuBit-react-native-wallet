@@ -1,6 +1,6 @@
 import { version, versionCode, cosVersion } from '../../package.json'
 import { EsWallet } from 'esecubit-react-native-wallet-sdk'
-import { Platform, BackAndroid, NativeModules } from 'react-native'
+import { Platform, BackHandler, NativeModules } from 'react-native'
 import StringUtil from './StringUtil'
 import { D } from 'esecubit-react-native-wallet-sdk'
 import { Api } from '../common/Constants'
@@ -52,7 +52,7 @@ export default class AppUtil {
   }
   static exitApp() {
     if (Platform.OS === 'android') {
-      BackAndroid.exitApp()
+      BackHandler.exitApp()
     } else {
       BackIOS.exitApp()
     }

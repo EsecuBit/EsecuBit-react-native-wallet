@@ -25,6 +25,11 @@ const ethUnit = ['ETH', 'GWei']
 const deviceW = Dimensions.get('window').width
 
 class SettingsPage extends Component {
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    return {
+      title: 'Settings'
+    };
+  };
   constructor(props) {
     super(props)
     this.state = {
@@ -360,7 +365,6 @@ class SettingsPage extends Component {
     let that = this
     return (
       <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
-        <BaseToolbar title={I18n.t('settings')}/>
         <Content style={{backgroundColor: Color.CONTAINER_BG}}>
           <Card style={{flex: 1}}>
             <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>

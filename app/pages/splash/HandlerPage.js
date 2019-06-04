@@ -10,6 +10,9 @@ import CoinUtil from '../../utils/CoinUtil'
 import I18n from '../../lang/i18n'
 
 class HandlerPage extends Component {
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.esWallet = new EsWallet()
