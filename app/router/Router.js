@@ -1,15 +1,14 @@
 import RouterConfig from "./RouterConfig"
-import { StackNavigator } from "react-navigation"
-import CardStackStyleInterpolator from "react-navigation/src/views/CardStack/CardStackStyleInterpolator"
+import { createStackNavigator} from "react-navigation"
 import { Easing, Animated } from "react-native"
 
-const EsecuBitNavigator = StackNavigator(RouterConfig, {
+const EsecuBitNavigator = createStackNavigator(RouterConfig, {
   navigationOptions: {
     header: null
   },
   transitionConfig: () => {
     return {
-      screenInterpolator: CardStackStyleInterpolator.forHorizontal,
+      // screenInterpolator: CardStackStyleInterpolator.forHorizontal,
       transitionSpec: {
         duration: 350,
         easing: Easing.out(Easing.poly(4)),

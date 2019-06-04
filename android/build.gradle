@@ -6,7 +6,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
+        classpath 'com.android.tools.build:gradle:3.4.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -23,14 +23,14 @@ allprojects {
             url "$rootDir/../node_modules/react-native/android"
         }
         maven {
-            // Local Maven repo containing AARs with JSC library built for Android
-            url "$rootDir/../node_modules/jsc-android/android"
+            url "$rootDir/../node_modules/jsc-android/dist"
         }
     }
 }
 ext {
-    compileSdkVersion = 27
-    buildToolsVersion = '27.0.3'
+    compileSdkVersion = 28
+    buildToolsVersion = '28.0.3'
     minSdkVersion = 16
     targetSdkVersion = 22
+    supportLibVersion = '28.0.0'
 }

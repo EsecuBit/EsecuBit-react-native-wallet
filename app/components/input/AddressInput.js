@@ -3,7 +3,7 @@ import { Platform, DeviceEventEmitter } from 'react-native'
 import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
 import I18n from '../../lang/i18n'
-import { D } from 'esecubit-wallet-sdk'
+import { D } from 'esecubit-react-native-wallet-sdk'
 import { connect } from 'react-redux'
 
 class AddressInput extends PureComponent {

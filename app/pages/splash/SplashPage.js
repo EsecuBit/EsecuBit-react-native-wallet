@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import I18n from '../../lang/i18n'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
-import BtTransmitter from '../../device/BtTransmitter'
 import {Color, CommonStyle} from '../../common/Styles'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
 import { NetInfo, Platform, ActivityIndicator, Text } from 'react-native'
 import CoinUtil from "../../utils/CoinUtil";
 
@@ -29,7 +28,7 @@ export default class SplashPage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
-      this._isMounted && this.setState({syncDialogVisible: false})
+      this.setState({syncDialogVisible: false})
       NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
       this.wallet.listenStatus(() => {} )
     })
@@ -106,7 +105,7 @@ export default class SplashPage extends Component {
   _gotoHomePage(offlineMode) {
     if (this._isMounted) {
       this.setState({ syncDialogVisible: false }, () => {
-        const resetAction = NavigationActions.reset({
+        const resetAction = StackActions.reset({
           index: 0,
           actions: [
             NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: offlineMode } })

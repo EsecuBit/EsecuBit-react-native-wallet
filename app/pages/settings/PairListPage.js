@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   RefreshControl,
+  ImageBackground,
   Image,
   StatusBar,
   Dimensions,
@@ -13,8 +14,7 @@ import {
 } from 'react-native'
 import { Container, List, ListItem, Button, Icon } from 'native-base'
 import I18n from '../../lang/i18n'
-import BtTransmitter from '../../device/BtTransmitter'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
@@ -225,7 +225,7 @@ export default class PairListPage extends Component {
     return (
       <Container style={CommonStyle.safeAreaBottom}>
         <View style={{ height: bgHeight, justifyContent: 'center', alignItems: 'center' }}>
-          <Image
+          <ImageBackground
             source={require('../../imgs/bg_home.png')}
             resizeMode={'stretch'}
             style={{ height: bgHeight, alignContent: 'center', alignItems: 'center' }}>
@@ -284,7 +284,7 @@ export default class PairListPage extends Component {
                 {I18n.t('pairDeviceTip')}
               </Text>
             </View>
-          </Image>
+          </ImageBackground>
         </View>
 
         <View style={styles.listView}>

@@ -4,7 +4,7 @@ import {Color, CommonStyle, Dimen} from "../../common/Styles"
 import I18n from "../../lang/i18n";
 import { Dropdown } from 'react-native-material-dropdown'
 import { TouchableOpacity, Platform } from "react-native"
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import { D, EsWallet } from 'esecubit-react-native-wallet-sdk'
 import CoinUtil from "../../utils/CoinUtil"
 import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'

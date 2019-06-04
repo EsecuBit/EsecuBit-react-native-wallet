@@ -26,7 +26,7 @@
    // debug
   NSInteger port = 8081;
    // replace your pc ip
-  NSString *host = @"192.168.11.93";
+  NSString *host = @"192.168.11.52";
   NSString  *url = [NSString stringWithFormat: @"http://%@:%zd/index.ios.bundle?platform=ios&dev=true", host, port];
   jsCodeLocation = [NSURL URLWithString:url];
 #else

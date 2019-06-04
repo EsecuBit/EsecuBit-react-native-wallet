@@ -7,7 +7,7 @@ import AssetsProgressBar from '../../components/bar/AssetsProgresBar'
 import {connect} from 'react-redux'
 import I18n from '../../lang/i18n'
 import {withNavigation} from 'react-navigation'
-import BtTransmitter from '../../device/BtTransmitter'
+import { BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import StringUtil from "../../utils/StringUtil";
 
 class EOSResourcesDetailPage extends Component {

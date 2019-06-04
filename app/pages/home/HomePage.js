@@ -4,6 +4,7 @@ import {
   View,
   Platform,
   Image,
+  ImageBackground,
   Dimensions,
   StatusBar,
   TouchableOpacity,
@@ -21,10 +22,9 @@ import {
   Text
 } from 'native-base'
 import I18n from '../../lang/i18n'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import {Api} from '../../common/Constants'
 import ToastUtil from '../../utils/ToastUtil'
-import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AppUtil from '../../utils/AppUtil'
 import {setAccount} from '../../actions/AccountAction'
@@ -33,7 +33,6 @@ import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, {DialogButton, DialogTitle, DialogContent} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
-import config from "../../config";
 
 const platform = Platform.OS
 
@@ -296,7 +295,7 @@ class HomePage extends Component {
     return (
       <Container style={{backgroundColor: Color.CONTAINER_BG}}>
         <View style={{height: 205}}>
-          <Image style={{height: 205}} source={require('../../imgs/bg_home.png')}>
+          <ImageBackground style={{height: 205}} source={require('../../imgs/bg_home.png')}>
             <View style={{height: height}}>
               <View
                 style={{
@@ -398,7 +397,7 @@ class HomePage extends Component {
                 </Text>
               </View>
             </View>
-          </Image>
+          </ImageBackground>
         </View>
         {_that.state.networkConnected ? null : ToastUtil.showShort(I18n.t('networkNotAvailable'))}
         {!_that.state.deviceConnected && _that.state.showDeviceConnectCard ? (

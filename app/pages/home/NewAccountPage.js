@@ -14,8 +14,7 @@ import {Container, Left, Icon, CardItem, Title, Right} from 'native-base'
 import I18n from '../../lang/i18n'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
-import BtTransmitter from '../../device/BtTransmitter'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, {DialogTitle, DialogContent, DialogButton} from "react-native-popup-dialog"
 

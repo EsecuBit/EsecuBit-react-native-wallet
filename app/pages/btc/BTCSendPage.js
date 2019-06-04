@@ -3,7 +3,7 @@ import { Platform, BackHandler, Text, InteractionManager, Keyboard } from 'react
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { CommonStyle, Color, Dimen } from '../../common/Styles'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/bar/SendToolbar'
 import FooterButton from '../../components/FooterButton'
@@ -17,7 +17,6 @@ import TransactionFeeCard from '../../components/card/TransactionFeeCard'
 import BalanceHeader from '../../components/header/BalanceHeader'
 import Dialog, { DialogContent, DialogTitle, DialogButton } from 'react-native-popup-dialog'
 import StringUtil from "../../utils/StringUtil";
-import BtTransmitter from "../../device/BtTransmitter";
 
 class BTCSendPage extends Component {
   constructor(props) {

@@ -1,6 +1,5 @@
-import RealmDB from '../db/RealmDB'
 import { Coin } from '../common/Constants'
-import { D } from 'esecubit-wallet-sdk'
+import { D, RealmDB } from 'esecubit-react-native-wallet-sdk'
 import CoinUtil from './CoinUtil'
 
 const realmDB = new RealmDB('default')

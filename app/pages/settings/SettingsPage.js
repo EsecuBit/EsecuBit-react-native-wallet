@@ -3,11 +3,10 @@ import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator, T
 import {Container, Icon, Right, Card, CardItem, Text, Content, Button} from 'native-base'
 import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import {version, cosVersion} from '../../../package.json'
 import {Api, Coin} from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
-import BtTransmitter from '../../device/BtTransmitter'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, CommonStyle} from '../../common/Styles'
 import AppUtil from '../../utils/AppUtil'
@@ -15,8 +14,8 @@ import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/Setting
 import {connect} from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import BaseToolbar from '../../components/bar/BaseToolbar'
-import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-popup-dialog'
-import {withNavigation, NavigationActions} from 'react-navigation'
+import Dialog, {DialogContent, DialogTitle, DialogButton, DialogFooter} from 'react-native-popup-dialog'
+import {withNavigation, NavigationActions, StackActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
 import config from "../../config";
 import * as Progress from 'react-native-progress';
@@ -233,7 +232,7 @@ class SettingsPage extends Component {
       this.transmitter.disconnect()
       await this.wallet.reset()
       setTimeout(() => {
-        const resetAction = NavigationActions.reset({
+        const resetAction = StackActions.reset({
           index: 0,
           actions: [
             NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
@@ -650,22 +649,24 @@ class SettingsPage extends Component {
           visible={this.state.limitValueDialogVisible}
           width={0.8}
           dialogTitle={<DialogTitle title={I18n.t('limitValue')}/>}
-          actions={[
-            <DialogButton
-              key="limit_value_cancel"
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={() => this._isMounted && this.setState({limitValueDialogVisible: false})}
-            />,
-            <DialogButton
-              key="limit_value_confirm"
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('confirm')}
-              onPress={this.limitValue.bind(this)}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                key="limit_value_cancel"
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('cancel')}
+                onPress={() => this._isMounted && this.setState({limitValueDialogVisible: false})}
+              />
+              <DialogButton
+                key="limit_value_confirm"
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('confirm')}
+                onPress={this.limitValue.bind(this)}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent>
             <ValueInput
@@ -683,22 +684,24 @@ class SettingsPage extends Component {
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
-          actions={[
-            <DialogButton
-              key="update_version_cancel"
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={this._checkForceUpdate.bind(this)}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key="update_version_confirm"
-              text={I18n.t('confirm')}
-              onPress={() => this._gotoBrowser()}
-            />
-          ]}>
+          footer={
+            <DialogFooter>
+              <DialogButton
+                key="update_version_cancel"
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('cancel')}
+                onPress={this._checkForceUpdate.bind(this)}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key="update_version_confirm"
+                text={I18n.t('confirm')}
+                onPress={() => this._gotoBrowser()}
+              />
+            </DialogFooter>
+          }>
           <DialogContent>
             <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
           </DialogContent>
@@ -710,22 +713,24 @@ class SettingsPage extends Component {
           width={0.8}
           visible={this.state.clearDataDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('clearData')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key="clear_data_cancel"
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({clearDataDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key="clear_data_confirm"
-              text={I18n.t('confirm')}
-              onPress={() => this.clearData()}
-            />
-          ]}>
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key="clear_data_cancel"
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({clearDataDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key="clear_data_confirm"
+                text={I18n.t('confirm')}
+                onPress={() => this.clearData()}
+              />
+            </DialogFooter>
+          }>
           <DialogContent>
             <Text style={styles.updateDesc}>{I18n.t('clearDataDesc')}</Text>
           </DialogContent>
@@ -751,24 +756,26 @@ class SettingsPage extends Component {
           width={0.8}
           visible={this.state.disConnectDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('disconnect')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              key="disconnect_cancel"
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={() => {
-                this.setState({disConnectDialogVisible: false})
-              }}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              key="disconnect_confirm"
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('confirm')}
-              onPress={() => this._disConnect()}
-            />
-          ]}>
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                key="disconnect_cancel"
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('cancel')}
+                onPress={() => {
+                  this.setState({disConnectDialogVisible: false})
+                }}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                key="disconnect_confirm"
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('confirm')}
+                onPress={() => this._disConnect()}
+              />
+            </DialogFooter>
+          }>
           <DialogContent style={CommonStyle.verticalDialogContent}>
             <Text>{I18n.t('disconnectTip')}</Text>
           </DialogContent>

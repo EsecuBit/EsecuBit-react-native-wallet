@@ -13,9 +13,8 @@ import I18n from '../../lang/i18n'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import BalanceHeader from "../../components/header/BalanceHeader";
 import StringUtil from "../../utils/StringUtil";
-import { D } from 'esecubit-wallet-sdk'
+import { D, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import {BigDecimal} from 'bigdecimal'
-import BtTransmitter from "../../device/BtTransmitter";
 
 
 class EOSSendPage extends Component {

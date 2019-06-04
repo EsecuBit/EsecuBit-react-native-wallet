@@ -3,7 +3,7 @@ import {Platform, BackHandler, InteractionManager, Text, Keyboard} from 'react-n
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
 import SendToolbar from '../../components/bar/SendToolbar'
 import { CommonStyle } from '../../common/Styles'
@@ -20,7 +20,6 @@ import TransactionFeeCard from "../../components/card/TransactionFeeCard"
 import TransactionTotalCostCard from "../../components/card/TransactionTotalCostCard"
 import MemoInput from "../../components/input/MemoInput"
 import ETHDataInput from "../../components/input/ETHDataInput"
-import BtTransmitter from "../../device/BtTransmitter";
 
 class ETHSendPage extends Component {
   constructor(props) {
