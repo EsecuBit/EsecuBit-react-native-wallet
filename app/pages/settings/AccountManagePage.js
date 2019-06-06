@@ -16,6 +16,7 @@ import {Coin} from "../../common/Constants";
 
 class AccountManagePage extends Component {
 
+
   constructor(props) {
     super(props)
     this.state = {
@@ -156,7 +157,6 @@ class AccountManagePage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('accountManage')}/>
         <Content padder contentContainerStyle={{flex: 1, backgroundColor: Color.CONTAINER_BG}}>
           {
             this.state.dataArray.length !== 0 ? (

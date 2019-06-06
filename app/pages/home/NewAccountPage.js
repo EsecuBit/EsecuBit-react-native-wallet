@@ -21,6 +21,12 @@ import Dialog, {DialogTitle, DialogContent, DialogButton, DialogFooter} from "re
 const platform = Platform.OS
 
 export default class NewAccountPage extends Component {
+
+  static navigationOptions = {
+    headerTitle: I18n.t('newAccount'),
+    headerTintColor: Color.ACCENT,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -235,7 +241,6 @@ export default class NewAccountPage extends Component {
   render() {
     return (
       <Container style={{backgroundColor: Color.CONTAINER_BG}}>
-        <BaseToolbar title={I18n.t('newAccount')}/>
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
         {this._renderEOSAccount()}

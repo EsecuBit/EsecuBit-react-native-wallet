@@ -37,6 +37,9 @@ import PreferenceUtil from "../../utils/PreferenceUtil";
 const platform = Platform.OS
 
 class HomePage extends Component {
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     //offlineMode

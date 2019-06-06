@@ -27,7 +27,7 @@ const deviceW = Dimensions.get('window').width
 class SettingsPage extends Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     return {
-      title: 'Settings'
+      title: I18n.t('settings')
     };
   };
   constructor(props) {
