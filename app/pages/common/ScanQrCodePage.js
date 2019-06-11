@@ -7,6 +7,10 @@ import I18n from '../../lang/i18n'
 import {Color, Dimen} from '../../common/Styles'
 
 class ScanQrCodePage extends Component {
+
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.hadReceiveResult = false

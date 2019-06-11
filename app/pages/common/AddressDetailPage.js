@@ -10,6 +10,10 @@ import ToastUtil from "../../utils/ToastUtil"
 import {connect} from "react-redux"
 
 class AddressDetailPage extends PureComponent {
+
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super()
     this.state = {

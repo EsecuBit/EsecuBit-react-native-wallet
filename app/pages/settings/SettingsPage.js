@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator, TextInput, Platform} from 'react-native'
-import {Container, Icon, Right, Card, CardItem, Text, Content, Button} from 'native-base'
+import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator} from 'react-native'
+import {Container, Icon, Right, Card, CardItem, Text, Content, Button, Body} from 'native-base'
 import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
 import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
@@ -13,23 +13,30 @@ import AppUtil from '../../utils/AppUtil'
 import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
 import {connect} from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
-import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, {DialogContent, DialogTitle, DialogButton, DialogFooter} from 'react-native-popup-dialog'
 import {withNavigation, NavigationActions, StackActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
 import config from "../../config";
 import * as Progress from 'react-native-progress';
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 const deviceW = Dimensions.get('window').width
 
 class SettingsPage extends Component {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+  static navigationOptions = ({navigation, navigationOptions}) => {
     return {
-      title: I18n.t('settings')
+      title: I18n.t('settings'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
     };
   };
+
   constructor(props) {
     super(props)
     this.state = {
@@ -138,7 +145,6 @@ class SettingsPage extends Component {
       this.setState({ethIndex: ethPref.index, ethLabel: ethPref.label})
     }
     let legalPref = await PreferenceUtil.getCurrencyUnit(Coin.legal)
-    console.log('legalPref', legalPref)
     if (legalPref) {
       this.setState({legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index})
     }
@@ -375,6 +381,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this._connectDevice()}>
               <Text>{I18n.t('connectDevice')}</Text>
+              <Body />
               <Right>
                 <Icon name="ios-arrow-forward"/>
               </Right>
@@ -385,6 +392,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this._showDisconnectDialog()}>
               <Text>{I18n.t('disconnect')}</Text>
+              <Body />
               <Right>
                 <Icon name="ios-arrow-forward"/>
               </Right>
@@ -397,6 +405,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this.setState({legalCurrencyDialogVisible: true})}>
               <Text>{I18n.t('legalCurrency')}</Text>
+              <Body />
               <Right>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -409,6 +418,7 @@ class SettingsPage extends Component {
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
               <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
                 <Text>{I18n.t('btc')}</Text>
+                <Body />
                 <Right>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -424,6 +434,7 @@ class SettingsPage extends Component {
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
               <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
                 <Text>{I18n.t('eth')}</Text>
+                <Body />
                 <Right>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -478,6 +489,7 @@ class SettingsPage extends Component {
             <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('appVersion')}</Text>
+              <Body />
               <Right>
                 <Text>{this.state.appVersion}</Text>
               </Right>
@@ -485,6 +497,7 @@ class SettingsPage extends Component {
             <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('cosVersion')}</Text>
+              <Body />
               <Right>
                 <Text>{this.state.cosVersion}</Text>
               </Right>

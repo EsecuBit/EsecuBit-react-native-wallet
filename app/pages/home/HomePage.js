@@ -2,16 +2,12 @@ import React, {Component} from 'react'
 import {
   NetInfo,
   View,
-  Platform,
-  Image,
   ImageBackground,
   Dimensions,
-  StatusBar,
-  TouchableOpacity,
   Linking, BackHandler,
   StyleSheet, ActivityIndicator
 } from 'react-native'
-import {isIphoneX, CommonStyle, Dimen, Color} from '../../common/Styles'
+import {CommonStyle, Dimen, Color} from '../../common/Styles'
 import {
   Container,
   Button,
@@ -33,13 +29,30 @@ import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, {DialogButton, DialogTitle, DialogContent, DialogFooter} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
-const platform = Platform.OS
 
 class HomePage extends Component {
-  static navigationOptions = {
-    header: null
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      headerTransparent: true,
+      headerStyle: {
+        borderBottomWidth: 0
+      },
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-menu" onPress={() => navigation.navigate('Settings')}/>
+        </HeaderButtons>
+      ),
+      headerRight: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="add" iconName="md-add" onPress={() => navigation.navigate('NewAccount')}/>
+        </HeaderButtons>
+      )
+    }
   }
+
   constructor(props) {
     super(props)
     //offlineMode
@@ -291,117 +304,51 @@ class HomePage extends Component {
 
   render() {
     let _that = this
-    let height = platform === 'ios' ? 64 : 56
-    if (isIphoneX) {
-      height = 88
-    }
     return (
-      <Container style={{backgroundColor: Color.CONTAINER_BG}}>
-        <View style={{height: 205}}>
-          <ImageBackground style={{height: 205}} source={require('../../imgs/bg_home.png')}>
-            <View style={{height: height}}>
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  flexDirection: 'row'
-                }}
-                translucent={false}>
-                <StatusBar
-                  barStyle={platform === 'ios' ? 'light-content' : 'default'}
-                  backgroundColor="#1D1D1D"
-                  hidden={false}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginLeft: Dimen.MARGIN_HORIZONTAL,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  <Button transparent onPress={() => _that.props.navigation.navigate('Settings')}>
-                    <Image
-                      source={require('../../imgs/ic_menu.png')}
-                      style={{width: 20, height: 20}}
-                    />
-                  </Button>
-                </View>
-                <View
-                  style={{
-                    width: this.deviceW - 48 - 48 - 16,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  <TouchableOpacity
-                    style={{
-                      justifyContent: 'center',
-                      width: 48,
-                      height: height,
-                      marginLeft: Dimen.MARGIN_HORIZONTAL
-                    }}
-                    onPress={() => _that.props.navigation.navigate('NewAccount')}>
-                    <Image source={require('../../imgs/ic_add.png')}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-            <View
+      <Container>
+        <ImageBackground style={{height: 230, justifyContent: 'center'}} source={require('../../imgs/bg_home.png')}>
+          <View
+            style={{
+              width: this.deviceW,
+              flexDirection: 'row',
+              justifyContent: 'center',
+
+            }}>
+            <Text
               style={{
-                flexDirection: 'column',
-                backgroundColor: 'transparent'
+                color: Color.ACCENT,
+                marginTop: Dimen.MARGIN_VERTICAL
               }}>
-              <View
-                style={{
-                  width: this.deviceW,
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}>
-                <Text
-                  style={{
-                    color: Color.ACCENT,
-                    marginTop: Dimen.MARGIN_VERTICAL
-                  }}>
-                  {'— ' + I18n.t('totalValue') + '  —'}
-                </Text>
-              </View>
-              <View
-                style={{
-                  width: this.deviceW,
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}>
-                <Text
-                  style={{
-                    color: Color.TEXT_ICONS,
-                    fontSize: 27,
-                    marginTop: Dimen.SPACE,
-                    textAlign: 'center'
-                  }}>
-                  {_that.state.totalLegalCurrencyBalance}
-                </Text>
-                <Text
-                  style={{
-                    color: Color.ACCENT,
-                    alignSelf: 'auto',
-                    fontSize: 13,
-                    marginTop: Dimen.SPACE,
-                    marginLeft: Dimen.SPACE
-                  }}>
-                  {_that.props.legalCurrencyUnit}
-                </Text>
-              </View>
-            </View>
-          </ImageBackground>
-        </View>
+              {'— ' + I18n.t('totalValue') + '  —'}
+            </Text>
+          </View>
+          <View
+            style={{
+              width: this.deviceW,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}>
+            <Text
+              style={{
+                color: Color.TEXT_ICONS,
+                fontSize: 27,
+                marginTop: Dimen.SPACE,
+                textAlign: 'center'
+              }}>
+              {_that.state.totalLegalCurrencyBalance}
+            </Text>
+            <Text
+              style={{
+                color: Color.ACCENT,
+                alignSelf: 'auto',
+                fontSize: 13,
+                marginTop: Dimen.SPACE,
+                marginLeft: Dimen.SPACE
+              }}>
+              {_that.props.legalCurrencyUnit}
+            </Text>
+          </View>
+        </ImageBackground>
         {_that.state.networkConnected ? null : ToastUtil.showShort(I18n.t('networkNotAvailable'))}
         {!_that.state.deviceConnected && _that.state.showDeviceConnectCard ? (
           <CardItem

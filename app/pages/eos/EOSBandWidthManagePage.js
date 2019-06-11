@@ -12,7 +12,6 @@ import {
   InputGroup,
   Icon
 } from 'native-base'
-import BaseToolbar from '../../components/bar/BaseToolbar'
 import FooterButton from '../../components/FooterButton'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
@@ -22,8 +21,21 @@ import ToastUtil from "../../utils/ToastUtil"
 import I18n from '../../lang/i18n'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import EOSAccountNameInput from "../../components/input/EOSAccountNameInput";
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class EOSBandWidthManagePage extends Component {
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('bandwidthManage'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
   constructor(props) {
     super(props)
     this.state = {
@@ -172,7 +184,6 @@ class EOSBandWidthManagePage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('bandwidthManage')}/>
         <Content padder>
           <Card padder>
             <EOSAccountNameInput

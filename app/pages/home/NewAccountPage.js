@@ -15,16 +15,21 @@ import I18n from '../../lang/i18n'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
-import BaseToolbar from '../../components/bar/BaseToolbar'
 import Dialog, {DialogTitle, DialogContent, DialogButton, DialogFooter} from "react-native-popup-dialog"
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
-const platform = Platform.OS
 
 export default class NewAccountPage extends Component {
-
-  static navigationOptions = {
-    headerTitle: I18n.t('newAccount'),
-    headerTintColor: Color.ACCENT,
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('newAccount'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
   }
 
   constructor(props) {

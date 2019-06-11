@@ -5,7 +5,6 @@ import { Container, Content, Card } from 'native-base'
 import { CommonStyle, Color, Dimen } from '../../common/Styles'
 import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import SendToolbar from '../../components/bar/SendToolbar'
 import FooterButton from '../../components/FooterButton'
 import { connect } from 'react-redux'
 import AddressInput from '../../components/input/AddressInput'
@@ -17,8 +16,27 @@ import TransactionFeeCard from '../../components/card/TransactionFeeCard'
 import BalanceHeader from '../../components/header/BalanceHeader'
 import Dialog, { DialogContent, DialogTitle, DialogButton, DialogFooter } from 'react-native-popup-dialog'
 import StringUtil from "../../utils/StringUtil";
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class BTCSendPage extends Component {
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('send') + " BTC",
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+      headerRight: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="add" iconName="ios-qr-scanner" onPress={() => navigation.navigate('Scan')}/>
+        </HeaderButtons>
+      )
+    }
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -314,7 +332,6 @@ class BTCSendPage extends Component {
   render() {
     return (
       <Container>
-        <SendToolbar title="BTC" />
         <Content padder>
           <BalanceHeader value={this.state.balance} unit={this.cryptoCurrencyUnit} />
           <Card>

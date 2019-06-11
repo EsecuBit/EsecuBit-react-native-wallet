@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
-import {Container, Content, Accordion, Text, CardItem} from "native-base"
+import {Container, Content, Accordion, Text, CardItem, Item} from "native-base"
 import I18n from '../../lang/i18n'
-import BaseToolbar from "../../components/bar/BaseToolbar"
 import {EsWallet, D} from 'esecubit-react-native-wallet-sdk'
 import CoinUtil from "../../utils/CoinUtil"
 import {View} from 'react-native'
@@ -13,9 +12,20 @@ import {withNavigation} from 'react-navigation'
 import {setAccount, setAccountCryptoCurrencyUnit} from "../../actions/AccountAction"
 import {connect} from 'react-redux'
 import {Coin} from "../../common/Constants";
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class AccountManagePage extends Component {
-
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('accountManage'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
 
   constructor(props) {
     super(props)

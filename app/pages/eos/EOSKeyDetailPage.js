@@ -1,13 +1,25 @@
 import React, {Component} from 'react'
 import {StyleSheet, Text, Clipboard, BackHandler} from 'react-native'
-import {View, Container, Textarea, Icon} from 'native-base'
-import BaseToolbar from '../../components/bar/BaseToolbar'
+import {View, Container, Textarea, Icon, Item} from 'native-base'
 import {Color, Dimen} from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class EOSKeyDetailPage extends Component {
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('permissionManage'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
 
   constructor() {
     super()
@@ -71,7 +83,6 @@ class EOSKeyDetailPage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('permissionManage')}/>
         <View style={{padding: Dimen.MARGIN_HORIZONTAL}}>
           <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
             <Text style={styles.keyTitle}>Owner Key</Text>

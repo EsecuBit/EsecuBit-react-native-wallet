@@ -6852,9 +6852,10 @@ react-native-material-buttons@^0.5.0:
     prop-types "^15.5.9"
     react-native-material-ripple "^0.7.0"
 
-"react-native-material-dialog@git+https://github.com/sekfung/react-native-material-dialog.git":
-  version "0.7.4"
-  resolved "git+https://github.com/sekfung/react-native-material-dialog.git#5ed349cdfa28ef327d14648b04b3172846efe88e"
+react-native-material-dialog@^0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/react-native-material-dialog/-/react-native-material-dialog-0.7.6.tgz#1cf0a454bad045987f8d3980f38fdd36b502d55f"
+  integrity sha512-K5lExew1rl6orpuDaXGV92aVXTahdWTv6RsD5OEuMf3h3iH7Sxgocb3tbRdqqZlw2cVrPl7DemwyT/lZS9jOHg==
   dependencies:
     prop-types "^15.5.10"
     react-native-typography "^1.0.3"

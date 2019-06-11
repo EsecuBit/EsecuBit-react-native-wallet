@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {View, Dimensions, BackHandler, Text} from 'react-native'
-import {Container, Content} from 'native-base'
+import {Container, Content, Item} from 'native-base'
 import BaseToolbar from "../../components/bar/BaseToolbar"
 import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
@@ -9,9 +9,22 @@ import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import EOSBPVotePage from "./EOSBPVotePage";
 import EOSProxyVotePage from "./EOSProxyVotePage";
 import {Color} from "../../common/Styles";
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 
 class EOSVotePage extends Component {
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('vote'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
   constructor() {
     super()
     this.state = {
@@ -50,7 +63,6 @@ class EOSVotePage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('vote')}/>
         <TabView
           navigationState={this.state}
           renderScene={SceneMap({

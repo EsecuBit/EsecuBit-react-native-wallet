@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
-import {Container, Content, View, Card, Body} from 'native-base'
+import {Container, Content, View, Card, Body, Item} from 'native-base'
 import {StyleSheet, TouchableOpacity, Image, BackHandler, Text} from 'react-native'
-import BaseToolbar from '../../components/bar/BaseToolbar'
 import {Color, Dimen} from '../../common/Styles'
 import AssetsProgressBar from '../../components/bar/AssetsProgresBar'
 import {connect} from 'react-redux'
@@ -9,9 +8,20 @@ import I18n from '../../lang/i18n'
 import {withNavigation} from 'react-navigation'
 import { BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import StringUtil from "../../utils/StringUtil";
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class EOSResourcesDetailPage extends Component {
-
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('accountAssets'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+    }
+  }
   constructor() {
     super()
     this.state = {
@@ -65,7 +75,6 @@ class EOSResourcesDetailPage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('accountAssets')}/>
         <View style={{flex: 1}}>
           <View padder style={{flexDirection: 'row', alignItems: 'stretch', height: 220}}>
             <Card style={styles.cardItem} borderRadius={5}>

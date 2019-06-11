@@ -28,6 +28,10 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 354
 
 class EOSAccountDetailPage extends Component {
+
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()

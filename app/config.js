@@ -6,9 +6,9 @@ export default {
 
   initApp() {
     // test net
-    D.test.coin = false
+    D.test.coin = true
     // enable hardware wallet, default software wallet
-    D.test.jsWallet = false
+    D.test.jsWallet = true
     console.disableYellowBox = true
     Provider.DB = RealmDB
     Provider.Transmitters.push(BtTransmitter)

@@ -1,18 +1,21 @@
 import RouterConfig from "./RouterConfig"
-import { createStackNavigator} from "react-navigation"
-import { Easing, Animated } from "react-native"
-import {Color} from "../common/Styles";
+import {Easing, Animated} from "react-native"
+import {createStackNavigator} from 'react-navigation'
+import {Color, Dimen} from "../common/Styles";
 
-const EsecuBitNavigator = createStackNavigator(RouterConfig, {
-  defaultNavigationOptions: {
-    headerStyle: {
-      backgroundColor: Color.PRIMARY
-    },
-    headerTintColor: Color.WHITE,
-    headerTitleStyle: {
-      fontWeight: 'bold',
-    }
+
+const options = {
+  headerStyle: {
+    backgroundColor: Color.PRIMARY,
   },
+  headerTintColor: Color.ACCENT,
+  headerTitleStyle: {
+    alignSelf: 'center',
+    fontSize: Dimen.PRIMARY_TEXT,
+  }
+}
+const EsecuBitNavigator = createStackNavigator(RouterConfig, {
+  defaultNavigationOptions: options,
   transitionConfig: () => {
     return {
       // screenInterpolator: CardStackStyleInterpolator.forHorizontal,
