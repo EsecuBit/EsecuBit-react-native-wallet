@@ -113,7 +113,7 @@ class SettingsPage extends Component {
   }
 
   _onBlur() {
-    this.props.navigation.addListener('willBlur', () => {
+    this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
       this._isMounted && this.setState({
         clearDataWaitingDialogVisible: false,
@@ -249,8 +249,9 @@ class SettingsPage extends Component {
             NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
           ]
         })
-        this.props.navigation.dispatch(resetAction)
-        this.setState({clearDataWaitingDialogVisible: false})
+        this.setState({clearDataWaitingDialogVisible: false}, () => {
+          this.props.navigation.dispatch(resetAction)
+        })
       }, 3000)
     } catch (error) {
       ToastUtil.showErrorMsgShort(error)
@@ -812,7 +813,7 @@ class SettingsPage extends Component {
           </DialogContent>
         </Dialog>
         <Dialog
-          width={0.8}
+          width={0.9}
           visible={this.state.updateAppletDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
           onTouchOutside={() => !this.lockUpgradeApplet && this.setState({updateAppletDialogVisible: false})}

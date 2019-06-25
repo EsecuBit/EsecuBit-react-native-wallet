@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import {View, Dimensions, BackHandler, Text} from 'react-native'
 import {Container, Content, Item} from 'native-base'
-import BaseToolbar from "../../components/bar/BaseToolbar"
 import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
 import {withNavigation} from 'react-navigation'

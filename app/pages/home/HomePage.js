@@ -306,7 +306,7 @@ class HomePage extends Component {
     let _that = this
     return (
       <Container>
-        <ImageBackground style={{height: 230, justifyContent: 'center'}} source={require('../../imgs/bg_home.png')}>
+        <ImageBackground style={{height: 225, justifyContent: 'center'}} source={require('../../imgs/bg_home.png')}>
           <View
             style={{
               width: this.deviceW,

@@ -19,7 +19,7 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(exitApp)
 {
- exit(0);
+    exit(0);
 }
 
 @end
