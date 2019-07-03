@@ -20,6 +20,7 @@ import config from "../../config";
 import * as Progress from 'react-native-progress';
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import RealmDB from "esecubit-react-native-wallet-sdk/db/RealmDB";
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
@@ -238,26 +239,32 @@ class SettingsPage extends Component {
   async clearData() {
     this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
     try {
+      // cancel the wallet listener to avoid repeated state，thus the ui will not be confused
       this.wallet.listenStatus(() => {
       })
       this.transmitter.disconnect()
       await this.wallet.reset()
-      setTimeout(() => {
-        const resetAction = StackActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
-          ]
-        })
-        this.setState({clearDataWaitingDialogVisible: false}, () => {
-          this.props.navigation.dispatch(resetAction)
-        })
-      }, 3000)
+      await new RealmDB('default').deleteAllSettings()
+      this._resetRouter(3000)
     } catch (error) {
       ToastUtil.showErrorMsgShort(error)
       this.setState({clearDataWaitingDialogVisible: false})
     }
 
+  }
+
+  _resetRouter(delayTime = 0) {
+    let timer = setTimeout(() => {
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
+        ]
+      })
+      this.setState({clearDataWaitingDialogVisible: false})
+      this.props.navigation.dispatch(resetAction)
+    }, delayTime)
+    this.timers.push(timer)
   }
 
   async _connectDevice() {
@@ -355,9 +362,18 @@ class SettingsPage extends Component {
         console.log('update applet progress', progress)
         appletInfos[appletInfo.index].showProgress = true
         appletInfos[appletInfo.index].progress = progress / 100
+
         if (progress === 100) {
           appletInfos[appletInfo.index].showProgress = false
           appletInfos.splice(appletInfo.index, 1)
+          if ('HDWALLET' === appletInfo.name.toUpperCase()) {
+            this.transmitter.disconnect()
+            this._resetRouter()
+            this.setState({updateAppletDialogVisible: false})
+          }
+        }
+        if (appletInfos.length === 0) {
+          this.setState({updateAppletDialogVisible: false})
         }
         this.setState({updateAppletInfos: appletInfos})
       })
@@ -382,7 +398,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this._connectDevice()}>
               <Text>{I18n.t('connectDevice')}</Text>
-              <Body />
+              <Body/>
               <Right>
                 <Icon name="ios-arrow-forward"/>
               </Right>
@@ -393,7 +409,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this._showDisconnectDialog()}>
               <Text>{I18n.t('disconnect')}</Text>
-              <Body />
+              <Body/>
               <Right>
                 <Icon name="ios-arrow-forward"/>
               </Right>
@@ -406,7 +422,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this.setState({legalCurrencyDialogVisible: true})}>
               <Text>{I18n.t('legalCurrency')}</Text>
-              <Body />
+              <Body/>
               <Right>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -419,7 +435,7 @@ class SettingsPage extends Component {
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
               <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
                 <Text>{I18n.t('btc')}</Text>
-                <Body />
+                <Body/>
                 <Right>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -435,7 +451,7 @@ class SettingsPage extends Component {
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
               <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
                 <Text>{I18n.t('eth')}</Text>
-                <Body />
+                <Body/>
                 <Right>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -490,7 +506,7 @@ class SettingsPage extends Component {
             <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('appVersion')}</Text>
-              <Body />
+              <Body/>
               <Right>
                 <Text>{this.state.appVersion}</Text>
               </Right>
@@ -498,7 +514,7 @@ class SettingsPage extends Component {
             <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('cosVersion')}</Text>
-              <Body />
+              <Body/>
               <Right>
                 <Text>{this.state.cosVersion}</Text>
               </Right>

@@ -670,6 +670,7 @@ class AccountDetailPage extends Component {
         <Dialog
           visible={this.state.renameDialogVisible}
           onTouchOutside={() => {
+            this.renameAccountname = ''
             this._isMounted && this.setState({renameDialogVisible: false})
           }}
           width={0.8}
@@ -682,6 +683,7 @@ class AccountDetailPage extends Component {
                 key='rename_account_cancel'
                 text={I18n.t('cancel')}
                 onPress={() => {
+                  this.renameAccountname = ''
                   this._isMounted && this.setState({renameDialogVisible: false})
                 }}/>
               <DialogButton

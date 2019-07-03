@@ -1,16 +1,15 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, Icon, Text } from 'native-base'
 import { Color, Dimen } from '../../common/Styles'
 import I18n from '../../lang/i18n'
-import ToastUtil from "../../utils/ToastUtil";
 
 type Props = {
   leftOnPress: () => void,
   rightOnPress: () => void,
 }
 
-export default class AccountOperateBottomBar extends PureComponent<Props> {
+export default class AccountOperateBottomBar extends Component<Props> {
 
   constructor(props) {
     super(props)

@@ -1,5 +1,5 @@
+import React from "react"
 import {StyleSheet, Platform, Dimensions } from 'react-native'
-import React from "react";
 const COLOR_PRIMARY = '#1D1D1D'
 const COLOR_DARK_PRIMARY = '#1D1D1D'
 const COLOR_LIGHT_PRIMARY = '#DED1A4'

@@ -296,17 +296,21 @@ class HomePage extends Component {
     }}/>
   }
 
-  _hideAccount() {
+  async _hideAccount() {
     this.setState({hideAccountDialogVisible: false})
-    this.currentHideAccount.hideAccount()
-    this._updateUI()
+    await this.currentHideAccount.hideAccount()
+    await this._updateUI()
   }
 
   render() {
     let _that = this
     return (
       <Container>
-        <ImageBackground style={{height: 225, justifyContent: 'center'}} source={require('../../imgs/bg_home.png')}>
+        <ImageBackground
+          style={{height: 225, justifyContent: 'center'}}
+          source={require('../../imgs/bg_home.png')}
+          resizeMode= 'stretch'
+        >
           <View
             style={{
               width: this.deviceW,

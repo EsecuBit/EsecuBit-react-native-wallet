@@ -157,8 +157,8 @@ class EOSAccountDetailPage extends Component {
         ToastUtil.showShort(I18n.t('noPermissionToUpdate'))
       } else {
         this._isMounted && this.setState({refreshing: true})
-        this._getTxInfos()
       }
+      this._onRefresh()
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
     } finally {

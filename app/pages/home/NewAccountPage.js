@@ -252,7 +252,10 @@ export default class NewAccountPage extends Component {
         <Dialog
           style={{backgroundColor: 'white'}}
           visible={this.state.newAccountDialogVisible}
-          onTouchOutside={() => this.setState({newAccountDialogVisible: false})}
+          onTouchOutside={() => {
+            this.newAccountName = ''
+            this.setState({newAccountDialogVisible: false})
+          }}
           width={0.8}
           dialogTitle={<DialogTitle title={I18n.t('newAccount')}/>}
           footer={
@@ -261,7 +264,10 @@ export default class NewAccountPage extends Component {
                 style={{backgroundColor: '#fff'}}
                 key='new_account_cancel'
                 text={I18n.t('cancel')}
-                onPress={() => this.setState({newAccountDialogVisible: false})}
+                onPress={() => {
+                  this.newAccountName = ''
+                  this.setState({newAccountDialogVisible: false})
+                }}
                 textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}/>
               <DialogButton
                 style={{backgroundColor: '#fff'}}

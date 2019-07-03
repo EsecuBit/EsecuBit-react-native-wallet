@@ -20,6 +20,7 @@ import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, isIphoneX, CommonStyle} from '../../common/Styles'
 import AppUtil from "../../utils/AppUtil";
+import config from "../../config"
 
 
 export default class PairListPage extends Component {
@@ -139,6 +140,23 @@ export default class PairListPage extends Component {
         return
       }
       if (status === BtTransmitter.connected) {
+        if (config.productVersion === 'tp') {
+          let walletID = await this.wallet.getWalletId()
+          // skip to create wallet, only support tp's eos, the wallet id is 32 bytes of zero
+          if (parseInt(walletID, 16) === 0) {
+            D.supportedCoinTypes = () => {
+              return D.test.coin
+                ? [D.coin.test.eosJungle]
+                : [D.coin.main.eos]
+            }
+          }else {
+            D.supportedCoinTypes = () => {
+              return D.test.coin
+                ? [D.coin.test.btcTestNet3, D.coin.test.ethRinkeby, D.coin.test.eosJungle]
+                : [D.coin.main.btc, D.coin.main.eth, D.coin.main.eos]
+            }
+          }
+        }
         _that._gotoSyncPage()
         _that.transmitter.stopScan()
       }

@@ -68,6 +68,7 @@
 		E223902822C215E8003358F5 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2238FFA22C215E7003358F5 /* JavaScriptCore.framework */; };
 		E223902A22C219E6003358F5 /* BackIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = E223902922C219E5003358F5 /* BackIOS.m */; };
 		E223902B22C21BD3003358F5 /* libRNEsecuBitReactNativeWalletSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E2238FBF22C20614003358F5 /* libRNEsecuBitReactNativeWalletSdk.a */; };
+		E2C022EB22C60A5B00C4250B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E2C022ED22C60A5B00C4250B /* InfoPlist.strings */; };
 		E2C82433C0C4442ABF3D9857 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B8EF0E69187440C81E07F66 /* SimpleLineIcons.ttf */; };
 		ECC2005160FE462EB6027B9B /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */; };
 		F5E346C6EBDC473C8F3DBD94 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3CB3A5D45CE46659041E4AA /* libRNVectorIcons.a */; };
@@ -403,6 +404,13 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNEsecuBitReactNativeWalletSdk;
 		};
+		E223906F22C6091F003358F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA7FEA692A6C4699BED6B893 /* RNVectorIcons.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A39873CE1EA65EE60051E01A;
+			remoteInfo = "RNVectorIcons-tvOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -484,6 +492,8 @@
 		E1D93F80AC044EF39FF32B24 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		E2238FFA22C215E7003358F5 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		E223902922C219E5003358F5 /* BackIOS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BackIOS.m; path = EsWallet/BackIOS.m; sourceTree = "<group>"; };
+		E2C022EC22C60A5B00C4250B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		E2C0231C22C60A6000C4250B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E3CB3A5D45CE46659041E4AA /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		E6E778E670AD4A6F9DAB8B8D /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		EAF3BA3940134A679EF78A9D /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -635,6 +645,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				E2C022ED22C60A5B00C4250B /* InfoPlist.strings */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				210FCBB42110078C00F6981B /* Localizable.strings */,
 			);
@@ -798,6 +809,7 @@
 			isa = PBXGroup;
 			children = (
 				9B5E6AC720F3586400A5C026 /* libRNVectorIcons.a */,
+				E223907022C6091F003358F5 /* libRNVectorIcons-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1399,6 +1411,13 @@
 			remoteRef = E2238FBE22C20614003358F5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		E223907022C6091F003358F5 /* libRNVectorIcons-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRNVectorIcons-tvOS.a";
+			remoteRef = E223906F22C6091F003358F5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1422,6 +1441,7 @@
 				920C5FC27C20421CBFBD42E6 /* FontAwesome.ttf in Resources */,
 				7260E7C569D744E1B06938E8 /* Foundation.ttf in Resources */,
 				E1EEB4AB4AA34E5AAB0EC4FF /* Ionicons.ttf in Resources */,
+				E2C022EB22C60A5B00C4250B /* InfoPlist.strings in Resources */,
 				936D0EE97B9A462EA33B3116 /* MaterialCommunityIcons.ttf in Resources */,
 				9B325E6521AC1A0D0026627F /* bundle in Resources */,
 				C891630A207E48909DB7EC06 /* MaterialIcons.ttf in Resources */,
@@ -1555,6 +1575,15 @@
 			);
 			name = Localizable.strings;
 			path = EsWallet;
+			sourceTree = "<group>";
+		};
+		E2C022ED22C60A5B00C4250B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E2C022EC22C60A5B00C4250B /* zh-Hans */,
+				E2C0231C22C60A6000C4250B /* en */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
