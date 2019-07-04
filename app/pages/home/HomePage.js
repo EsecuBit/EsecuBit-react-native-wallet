@@ -2,15 +2,12 @@ import React, {Component} from 'react'
 import {
   NetInfo,
   View,
-  Platform,
-  Image,
+  ImageBackground,
   Dimensions,
-  StatusBar,
-  TouchableOpacity,
   Linking, BackHandler,
   StyleSheet, ActivityIndicator
 } from 'react-native'
-import {isIphoneX, CommonStyle, Dimen, Color} from '../../common/Styles'
+import {CommonStyle, Dimen, Color} from '../../common/Styles'
 import {
   Container,
   Button,
@@ -21,23 +18,41 @@ import {
   Text
 } from 'native-base'
 import I18n from '../../lang/i18n'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import {Api} from '../../common/Constants'
 import ToastUtil from '../../utils/ToastUtil'
-import BtTransmitter from '../../device/BtTransmitter'
 import StringUtil from '../../utils/StringUtil'
 import AppUtil from '../../utils/AppUtil'
 import {setAccount} from '../../actions/AccountAction'
 import {connect} from 'react-redux'
 import CoinCard from '../../components/card/CoinCard'
 import CoinUtil from '../../utils/CoinUtil'
-import Dialog, {DialogButton, DialogTitle, DialogContent} from 'react-native-popup-dialog'
+import Dialog, {DialogButton, DialogTitle, DialogContent, DialogFooter} from 'react-native-popup-dialog'
 import PreferenceUtil from "../../utils/PreferenceUtil";
-import config from "../../config";
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
-const platform = Platform.OS
 
 class HomePage extends Component {
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      headerTransparent: true,
+      headerStyle: {
+        borderBottomWidth: 0
+      },
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-menu" onPress={() => navigation.navigate('Settings')}/>
+        </HeaderButtons>
+      ),
+      headerRight: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="add" iconName="md-add" onPress={() => navigation.navigate('NewAccount')}/>
+        </HeaderButtons>
+      )
+    }
+  }
+
   constructor(props) {
     super(props)
     //offlineMode
@@ -60,25 +75,21 @@ class HomePage extends Component {
     }
     this.deviceW = Dimensions.get('window').width
     this.timers = []
-    // prevent duplicate click
-    this.throttleFirst = false
   }
 
 
   _onFocus() {
-    this.props.navigation.addListener('willFocus', () => {
+    this.props.navigation.addListener('didFocus', () => {
       this._updateUI()
       this._initListener()
       this._listenWallet()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
-      NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
   }
 
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
   }
 
@@ -169,7 +180,7 @@ class HomePage extends Component {
     this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.btTransmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.btTransmitter.connect(deviceInfo)
       }
     })
@@ -243,7 +254,7 @@ class HomePage extends Component {
     try {
       let accounts = await this.wallet.getAccounts()
       console.log('accounts', accounts)
-      await this.setState({accounts: accounts})
+      this.setState({accounts: accounts})
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -281,125 +292,63 @@ class HomePage extends Component {
     }}/>
   }
 
-  _hideAccount() {
+  async _hideAccount() {
     this.setState({hideAccountDialogVisible: false})
-    this.currentHideAccount.hideAccount()
+    await this.currentHideAccount.hideAccount()
     this._updateUI()
   }
 
   render() {
     let _that = this
-    let height = platform === 'ios' ? 64 : 56
-    if (isIphoneX) {
-      height = 88
-    }
     return (
-      <Container style={{backgroundColor: Color.CONTAINER_BG}}>
-        <View style={{height: 205}}>
-          <Image style={{height: 205}} source={require('../../imgs/bg_home.png')}>
-            <View style={{height: height}}>
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  flexDirection: 'row'
-                }}
-                translucent={false}>
-                <StatusBar
-                  barStyle={platform === 'ios' ? 'light-content' : 'default'}
-                  backgroundColor="#1D1D1D"
-                  hidden={false}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginLeft: Dimen.MARGIN_HORIZONTAL,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  <Button transparent onPress={() => _that.props.navigation.navigate('Settings')}>
-                    <Image
-                      source={require('../../imgs/ic_menu.png')}
-                      style={{width: 20, height: 20}}
-                    />
-                  </Button>
-                </View>
-                <View
-                  style={{
-                    width: this.deviceW - 48 - 48 - 16,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  <TouchableOpacity
-                    style={{
-                      justifyContent: 'center',
-                      width: 48,
-                      height: height,
-                      marginLeft: Dimen.MARGIN_HORIZONTAL
-                    }}
-                    onPress={() => _that.props.navigation.navigate('NewAccount')}>
-                    <Image source={require('../../imgs/ic_add.png')}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-            <View
+      <Container>
+        <ImageBackground
+          style={{height: 225, justifyContent: 'center'}}
+          source={require('../../imgs/bg_home.png')}
+          resizeMode= 'stretch'
+        >
+          <View
+            style={{
+              width: this.deviceW,
+              flexDirection: 'row',
+              justifyContent: 'center',
+
+            }}>
+            <Text
               style={{
-                flexDirection: 'column',
-                backgroundColor: 'transparent'
+                color: Color.ACCENT,
+                marginTop: Dimen.MARGIN_VERTICAL
               }}>
-              <View
-                style={{
-                  width: this.deviceW,
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}>
-                <Text
-                  style={{
-                    color: Color.ACCENT,
-                    marginTop: Dimen.MARGIN_VERTICAL
-                  }}>
-                  {'— ' + I18n.t('totalValue') + '  —'}
-                </Text>
-              </View>
-              <View
-                style={{
-                  width: this.deviceW,
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}>
-                <Text
-                  style={{
-                    color: Color.TEXT_ICONS,
-                    fontSize: 27,
-                    marginTop: Dimen.SPACE,
-                    textAlign: 'center'
-                  }}>
-                  {_that.state.totalLegalCurrencyBalance}
-                </Text>
-                <Text
-                  style={{
-                    color: Color.ACCENT,
-                    alignSelf: 'auto',
-                    fontSize: 13,
-                    marginTop: Dimen.SPACE,
-                    marginLeft: Dimen.SPACE
-                  }}>
-                  {_that.props.legalCurrencyUnit}
-                </Text>
-              </View>
-            </View>
-          </Image>
-        </View>
+              {'— ' + I18n.t('totalValue') + '  —'}
+            </Text>
+          </View>
+          <View
+            style={{
+              width: this.deviceW,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}>
+            <Text
+              style={{
+                color: Color.TEXT_ICONS,
+                fontSize: 27,
+                marginTop: Dimen.SPACE,
+                textAlign: 'center'
+              }}>
+              {_that.state.totalLegalCurrencyBalance}
+            </Text>
+            <Text
+              style={{
+                color: Color.ACCENT,
+                alignSelf: 'auto',
+                fontSize: 13,
+                marginTop: Dimen.SPACE,
+                marginLeft: Dimen.SPACE
+              }}>
+              {_that.props.legalCurrencyUnit}
+            </Text>
+          </View>
+        </ImageBackground>
         {_that.state.networkConnected ? null : ToastUtil.showShort(I18n.t('networkNotAvailable'))}
         {!_that.state.deviceConnected && _that.state.showDeviceConnectCard ? (
           <CardItem
@@ -443,22 +392,24 @@ class HomePage extends Component {
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='update_version_cancel'
-              text={I18n.t('cancel')}
-              onPress={this._checkForceUpdate.bind(this)}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='update_version_confirm'
-              text={I18n.t('confirm')}
-              onPress={() => this._gotoBrowser()}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='update_version_cancel'
+                text={I18n.t('cancel')}
+                onPress={this._checkForceUpdate.bind(this)}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='update_version_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => this._gotoBrowser()}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent>
             <Text style={styles.dialogDesc}>{this.state.updateDesc}</Text>
@@ -468,22 +419,24 @@ class HomePage extends Component {
           width={0.8}
           visible={this.state.hideAccountDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='hide_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({hideAccountDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='hide_account_confirm'
-              text={I18n.t('confirm')}
-              onPress={() => this._hideAccount()}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='hide_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({hideAccountDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='hide_account_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => this._hideAccount()}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <Text style={styles.dialogDesc}>{I18n.t('hideAccountDesc')}</Text>

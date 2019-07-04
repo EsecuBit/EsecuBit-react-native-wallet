@@ -3,7 +3,6 @@ import AppReducer from './reducers/Index'
 import {createReactNavigationReduxMiddleware} from 'react-navigation-redux-helpers'
 import { composeWithDevTools } from 'redux-devtools-extension';
 const middleware = createReactNavigationReduxMiddleware(
-  "root",
   state => state.nav,
 );
 const store = createStore(AppReducer, composeWithDevTools(

@@ -13,12 +13,29 @@ import I18n from '../../lang/i18n'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import BalanceHeader from "../../components/header/BalanceHeader";
 import StringUtil from "../../utils/StringUtil";
-import { D } from 'esecubit-wallet-sdk'
+import { D, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import {BigDecimal} from 'bigdecimal'
-import BtTransmitter from "../../device/BtTransmitter";
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 
 class EOSSendPage extends Component {
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('send') + " EOS",
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+      headerRight: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="add" iconName="ios-qr-scanner" onPress={() => navigation.navigate('Scan')}/>
+        </HeaderButtons>
+      )
+    }
+  }
   constructor(props) {
     super(props)
     this.state = {
@@ -206,7 +223,6 @@ class EOSSendPage extends Component {
   render() {
     return (
       <Container>
-        <SendToolbar title="EOS" />
         <Content padder>
           <BalanceHeader value={this.props.account.balance} unit='EOS'/>
           <Card>

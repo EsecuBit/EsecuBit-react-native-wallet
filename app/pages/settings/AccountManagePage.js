@@ -1,20 +1,31 @@
 import React, {Component} from 'react'
-import {Container, Content, Accordion, Text, CardItem} from "native-base"
+import {Container, Content, Accordion, Text, CardItem, Item} from "native-base"
 import I18n from '../../lang/i18n'
-import BaseToolbar from "../../components/bar/BaseToolbar"
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D} from 'esecubit-react-native-wallet-sdk'
 import CoinUtil from "../../utils/CoinUtil"
 import {View} from 'react-native'
 import CustomIcon from "../../components/CustomIcon"
 import {StyleSheet, BackHandler} from 'react-native'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
-import Dialog, {DialogButton, DialogContent, DialogTitle} from "react-native-popup-dialog"
+import Dialog, {DialogButton, DialogContent, DialogTitle, DialogFooter} from "react-native-popup-dialog"
 import {withNavigation} from 'react-navigation'
 import {setAccount, setAccountCryptoCurrencyUnit} from "../../actions/AccountAction"
 import {connect} from 'react-redux'
 import {Coin} from "../../common/Constants";
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class AccountManagePage extends Component {
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('accountManage'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
 
   constructor(props) {
     super(props)
@@ -114,7 +125,6 @@ class AccountManagePage extends Component {
                 console.log('onLongPress', it)
                 _that.setState({showAccountDialogVisible: true})
                 _that.currentAccount = it
-                console.log('_that', this)
               }}>
                 <CustomIcon coinType={it.coinType}/>
                 <Text style={styles.cardText}>{it.label}</Text>
@@ -156,7 +166,6 @@ class AccountManagePage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('accountManage')}/>
         <Content padder contentContainerStyle={{flex: 1, backgroundColor: Color.CONTAINER_BG}}>
           {
             this.state.dataArray.length !== 0 ? (
@@ -176,22 +185,24 @@ class AccountManagePage extends Component {
           width={0.8}
           visible={this.state.showAccountDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: '#fff'}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='show_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({showAccountDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: '#fff'}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='show_account_confirm'
-              text={I18n.t('confirm')}
-              onPress={() => this._showAccount()}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='show_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({showAccountDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='show_account_confirm'
+                text={I18n.t('confirm')}
+                onPress={() => this._showAccount()}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent>
             <Text style={styles.desc}>{I18n.t('showAccountDesc')}</Text>

@@ -2,15 +2,18 @@ import React, {PureComponent} from "react"
 import {View, StyleSheet, TouchableWithoutFeedback, Clipboard, BackHandler} from "react-native"
 import {Text, CheckBox, Left, Body, Right} from "native-base"
 import Dialog from "react-native-popup-dialog"
-import {D, EsWallet} from "esecubit-wallet-sdk"
+import {D, EsWallet, BtTransmitter} from "esecubit-react-native-wallet-sdk"
 import QrCode from "react-native-qrcode"
 import I18n from "../../lang/i18n"
 import {CommonStyle, Dimen, Color} from "../../common/Styles"
 import ToastUtil from "../../utils/ToastUtil"
 import {connect} from "react-redux"
-import BtTransmitter from '../../device/BtTransmitter'
 
 class AddressDetailPage extends PureComponent {
+
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super()
     this.state = {

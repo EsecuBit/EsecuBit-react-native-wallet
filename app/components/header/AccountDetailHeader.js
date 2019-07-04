@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react'
-import { View, StyleSheet, Image, StatusBar, Platform, Dimensions } from 'react-native'
+import { View, StyleSheet, Image, StatusBar, Platform, Dimensions, ImageBackground } from 'react-native'
 import { isIphoneX, Color, Dimen } from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
 import { Button, Icon, Text } from 'native-base'
 import Menu, { MenuItem } from 'react-native-material-menu'
 import I18n from '../../lang/i18n'
 import { connect } from 'react-redux'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
+import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
 import CoinUtil from '../../utils/CoinUtil'
 import {Coin} from "../../common/Constants";
 import config from "../../config";
@@ -96,7 +96,7 @@ class AccountDetailHeader extends PureComponent {
     const { navigation } = this.props
     return (
       <View style={{ height: 205 }}>
-        <Image style={{ height: 205 }} source={require('../../imgs/bg_detail.png')}>
+        <ImageBackground style={{ height: 205 }} source={require('../../imgs/bg_detail.png')}>
           <View style={{ height: height }}>
             <View
               style={{
@@ -198,7 +198,7 @@ class AccountDetailHeader extends PureComponent {
                 this.props.legalCurrencyUnit}
             </Text>
           </View>
-        </Image>
+        </ImageBackground>
       </View>
     )
   }

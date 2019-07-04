@@ -1,15 +1,19 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import I18n from '../../lang/i18n'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import {D, EsWallet, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog'
-import BtTransmitter from '../../device/BtTransmitter'
+import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import {Color, CommonStyle} from '../../common/Styles'
-import { NavigationActions } from 'react-navigation'
-import { NetInfo, Platform, ActivityIndicator, Text } from 'react-native'
+import {NavigationActions, StackActions} from 'react-navigation'
+import {NetInfo, Platform, ActivityIndicator, Text} from 'react-native'
 import CoinUtil from "../../utils/CoinUtil";
 
 export default class SplashPage extends Component {
+
+  static navigationOptions = {
+    header: null
+  }
+
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
@@ -28,18 +32,19 @@ export default class SplashPage extends Component {
   }
 
   _onBlur() {
-    this.props.navigation.addListener('willBlur', () => {
-      this._isMounted && this.setState({syncDialogVisible: false})
+    this.props.navigation.addListener('didBlur', () => {
+      this.setState({syncDialogVisible: false})
       NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
-      this.wallet.listenStatus(() => {} )
+      this.wallet.listenStatus(() => {
+      })
     })
   }
 
   componentDidMount() {
+    this._isMounted = true
     this._listenWalletStatus()
     this._onFocus()
     this._onBlur()
-    this._isMounted = true
   }
 
   componentWillUnmount() {
@@ -52,7 +57,7 @@ export default class SplashPage extends Component {
 
   _handleConnectivityChange(ns) {
     let _that = this
-    if(Platform.OS === 'ios') {
+    if (Platform.OS === 'ios') {
       if (ns === 'none' || ns === 'unknown') {
         let timer = setTimeout(() => {
           _that._gotoHomePage(true)
@@ -90,6 +95,7 @@ export default class SplashPage extends Component {
           this.setState({syncDesc: `${I18n.t('checking')} ${coinType.toUpperCase()} ${account.label}`})
         }
         if (status === D.status.syncFinish) {
+          this.setState({syncDialogVisible: false})
           _that._gotoHomePage(false)
         }
         if (status === D.status.deviceChange) {
@@ -104,24 +110,22 @@ export default class SplashPage extends Component {
   }
 
   _gotoHomePage(offlineMode) {
-    if (this._isMounted) {
-      this.setState({ syncDialogVisible: false }, () => {
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: offlineMode } })
-          ]
-        })
-        this.props.navigation.dispatch(resetAction)
-      })
-    }
+    this._isMounted && this.setState({syncDialogVisible: false})
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({routeName: 'Home', params: {offlineMode: offlineMode}})
+      ]
+    })
+    this.props.navigation.dispatch(resetAction)
   }
 
   render() {
     return (
       <Dialog
         width={0.8}
-        onTouchOutside={() => {}}
+        onTouchOutside={() => {
+        }}
         visible={this.state.syncDialogVisible}
         dialogTitle={<DialogTitle title={I18n.t('syncing')}/>}
       >

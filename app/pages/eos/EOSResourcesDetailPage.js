@@ -1,17 +1,27 @@
 import React, {Component} from 'react'
-import {Container, Content, View, Card, Body} from 'native-base'
-import {StyleSheet, TouchableOpacity, Image, BackHandler, Text} from 'react-native'
-import BaseToolbar from '../../components/bar/BaseToolbar'
+import {Container, Content, View, Card, Body, Item} from 'native-base'
+import {StyleSheet, TouchableOpacity, ImageBackground, BackHandler, Text} from 'react-native'
 import {Color, Dimen} from '../../common/Styles'
 import AssetsProgressBar from '../../components/bar/AssetsProgresBar'
 import {connect} from 'react-redux'
 import I18n from '../../lang/i18n'
 import {withNavigation} from 'react-navigation'
-import BtTransmitter from '../../device/BtTransmitter'
+import { BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import StringUtil from "../../utils/StringUtil";
+import HeaderButtons from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class EOSResourcesDetailPage extends Component {
-
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('accountAssets'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+    }
+  }
   constructor() {
     super()
     this.state = {
@@ -65,11 +75,10 @@ class EOSResourcesDetailPage extends Component {
   render() {
     return (
       <Container>
-        <BaseToolbar title={I18n.t('accountAssets')}/>
         <View style={{flex: 1}}>
           <View padder style={{flexDirection: 'row', alignItems: 'stretch', height: 220}}>
             <Card style={styles.cardItem} borderRadius={5}>
-              <Image source={require('../../imgs/staked_bg.png')} style={styles.cardItem}>
+              <ImageBackground source={require('../../imgs/staked_bg.png')} style={styles.cardItem}>
                 <Body>
                   <Text style={styles.cardItemTitle}>{I18n.t('balance')}</Text>
                   <Text style={styles.cardItemBody}>{this.props.account.balance}</Text>
@@ -82,10 +91,10 @@ class EOSResourcesDetailPage extends Component {
                     </View>
                   </TouchableOpacity>
                 </Body>
-              </Image>
+              </ImageBackground>
             </Card>
             <Card borderRadius={5} style={styles.cardItem}>
-              <Image source={require('../../imgs/unstaked_bg.png')} style={styles.cardItem}>
+              <ImageBackground source={require('../../imgs/unstaked_bg.jpeg')} style={styles.cardItem}>
                 <Body>
                   <Text style={styles.cardItemTitle}>{I18n.t('delegate')}</Text>
                   <Text style={styles.cardItemBody}>{this.state.totalStaked}</Text>
@@ -98,7 +107,7 @@ class EOSResourcesDetailPage extends Component {
                     </View>
                   </TouchableOpacity>
                 </Body>
-              </Image>
+              </ImageBackground>
             </Card>
           </View>
           <AssetsProgressBar

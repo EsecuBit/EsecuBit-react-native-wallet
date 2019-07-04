@@ -1,31 +1,43 @@
 import React, {Component} from 'react'
-import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator, TextInput, Platform} from 'react-native'
-import {Container, Icon, Right, Card, CardItem, Text, Content, Button} from 'native-base'
+import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator} from 'react-native'
+import {Container, Icon, Right, Card, CardItem, Text, Content, Button, Body} from 'native-base'
 import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import {version, cosVersion} from '../../../package.json'
 import {Api, Coin} from '../../common/Constants'
 import PreferenceUtil from '../../utils/PreferenceUtil'
-import BtTransmitter from '../../device/BtTransmitter'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, CommonStyle} from '../../common/Styles'
 import AppUtil from '../../utils/AppUtil'
 import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
 import {connect} from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
-import BaseToolbar from '../../components/bar/BaseToolbar'
-import Dialog, {DialogContent, DialogTitle, DialogButton} from 'react-native-popup-dialog'
-import {withNavigation, NavigationActions} from 'react-navigation'
+import Dialog, {DialogContent, DialogTitle, DialogButton, DialogFooter} from 'react-native-popup-dialog'
+import {withNavigation, NavigationActions, StackActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
 import config from "../../config";
 import * as Progress from 'react-native-progress';
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import RealmDB from "esecubit-react-native-wallet-sdk/db/RealmDB";
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']
 const deviceW = Dimensions.get('window').width
 
 class SettingsPage extends Component {
+  static navigationOptions = ({navigation, navigationOptions}) => {
+    return {
+      title: I18n.t('settings'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+    };
+  };
+
   constructor(props) {
     super(props)
     this.state = {
@@ -102,7 +114,7 @@ class SettingsPage extends Component {
   }
 
   _onBlur() {
-    this.props.navigation.addListener('willBlur', () => {
+    this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
       this._isMounted && this.setState({
         clearDataWaitingDialogVisible: false,
@@ -134,7 +146,6 @@ class SettingsPage extends Component {
       this.setState({ethIndex: ethPref.index, ethLabel: ethPref.label})
     }
     let legalPref = await PreferenceUtil.getCurrencyUnit(Coin.legal)
-    console.log('legalPref', legalPref)
     if (legalPref) {
       this.setState({legalCurrencyLabel: legalPref.label, legalCurrencyIndex: legalPref.index})
     }
@@ -228,25 +239,32 @@ class SettingsPage extends Component {
   async clearData() {
     this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
     try {
+      // cancel the wallet listener to avoid repeated state，thus the ui will not be confused
       this.wallet.listenStatus(() => {
       })
       this.transmitter.disconnect()
       await this.wallet.reset()
-      setTimeout(() => {
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
-          ]
-        })
-        this.props.navigation.dispatch(resetAction)
-        this.setState({clearDataWaitingDialogVisible: false})
-      }, 3000)
+      await new RealmDB('default').deleteAllSettings()
+      this._resetRouter(3000)
     } catch (error) {
       ToastUtil.showErrorMsgShort(error)
       this.setState({clearDataWaitingDialogVisible: false})
     }
 
+  }
+
+  _resetRouter(delayTime = 0) {
+    let timer = setTimeout(() => {
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({routeName: 'PairList', params: {autoConnect: false}})
+        ]
+      })
+      this.setState({clearDataWaitingDialogVisible: false})
+      this.props.navigation.dispatch(resetAction)
+    }, delayTime)
+    this.timers.push(timer)
   }
 
   async _connectDevice() {
@@ -267,7 +285,7 @@ class SettingsPage extends Component {
     this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.transmitter.connect(deviceInfo)
       }
     })
@@ -344,9 +362,18 @@ class SettingsPage extends Component {
         console.log('update applet progress', progress)
         appletInfos[appletInfo.index].showProgress = true
         appletInfos[appletInfo.index].progress = progress / 100
+
         if (progress === 100) {
           appletInfos[appletInfo.index].showProgress = false
           appletInfos.splice(appletInfo.index, 1)
+          if ('HDWALLET' === appletInfo.name.toUpperCase()) {
+            this.transmitter.disconnect()
+            this._resetRouter()
+            this.setState({updateAppletDialogVisible: false})
+          }
+        }
+        if (appletInfos.length === 0) {
+          this.setState({updateAppletDialogVisible: false})
         }
         this.setState({updateAppletInfos: appletInfos})
       })
@@ -361,7 +388,6 @@ class SettingsPage extends Component {
     let that = this
     return (
       <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
-        <BaseToolbar title={I18n.t('settings')}/>
         <Content style={{backgroundColor: Color.CONTAINER_BG}}>
           <Card style={{flex: 1}}>
             <CardItem header bordered style={{backgroundColor: Color.CONTAINER_BG}}>
@@ -372,6 +398,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this._connectDevice()}>
               <Text>{I18n.t('connectDevice')}</Text>
+              <Body/>
               <Right>
                 <Icon name="ios-arrow-forward"/>
               </Right>
@@ -382,6 +409,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this._showDisconnectDialog()}>
               <Text>{I18n.t('disconnect')}</Text>
+              <Body/>
               <Right>
                 <Icon name="ios-arrow-forward"/>
               </Right>
@@ -394,6 +422,7 @@ class SettingsPage extends Component {
               button
               onPress={() => this.setState({legalCurrencyDialogVisible: true})}>
               <Text>{I18n.t('legalCurrency')}</Text>
+              <Body/>
               <Right>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -406,6 +435,7 @@ class SettingsPage extends Component {
             {CoinUtil.contains(this.coinTypes, 'btc') ? (
               <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
                 <Text>{I18n.t('btc')}</Text>
+                <Body/>
                 <Right>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -421,6 +451,7 @@ class SettingsPage extends Component {
             {CoinUtil.contains(this.coinTypes, 'eth') ? (
               <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
                 <Text>{I18n.t('eth')}</Text>
+                <Body/>
                 <Right>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
@@ -475,6 +506,7 @@ class SettingsPage extends Component {
             <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('appVersion')}</Text>
+              <Body/>
               <Right>
                 <Text>{this.state.appVersion}</Text>
               </Right>
@@ -482,6 +514,7 @@ class SettingsPage extends Component {
             <View style={CommonStyle.divider}/>
             <CardItem bordered>
               <Text>{I18n.t('cosVersion')}</Text>
+              <Body/>
               <Right>
                 <Text>{this.state.cosVersion}</Text>
               </Right>
@@ -650,22 +683,24 @@ class SettingsPage extends Component {
           visible={this.state.limitValueDialogVisible}
           width={0.8}
           dialogTitle={<DialogTitle title={I18n.t('limitValue')}/>}
-          actions={[
-            <DialogButton
-              key="limit_value_cancel"
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={() => this._isMounted && this.setState({limitValueDialogVisible: false})}
-            />,
-            <DialogButton
-              key="limit_value_confirm"
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('confirm')}
-              onPress={this.limitValue.bind(this)}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                key="limit_value_cancel"
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('cancel')}
+                onPress={() => this._isMounted && this.setState({limitValueDialogVisible: false})}
+              />
+              <DialogButton
+                key="limit_value_confirm"
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('confirm')}
+                onPress={this.limitValue.bind(this)}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent>
             <ValueInput
@@ -683,22 +718,24 @@ class SettingsPage extends Component {
           width={0.8}
           visible={this.state.updateVersionDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
-          actions={[
-            <DialogButton
-              key="update_version_cancel"
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={this._checkForceUpdate.bind(this)}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key="update_version_confirm"
-              text={I18n.t('confirm')}
-              onPress={() => this._gotoBrowser()}
-            />
-          ]}>
+          footer={
+            <DialogFooter>
+              <DialogButton
+                key="update_version_cancel"
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('cancel')}
+                onPress={this._checkForceUpdate.bind(this)}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key="update_version_confirm"
+                text={I18n.t('confirm')}
+                onPress={() => this._gotoBrowser()}
+              />
+            </DialogFooter>
+          }>
           <DialogContent>
             <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
           </DialogContent>
@@ -710,22 +747,24 @@ class SettingsPage extends Component {
           width={0.8}
           visible={this.state.clearDataDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('clearData')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key="clear_data_cancel"
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({clearDataDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key="clear_data_confirm"
-              text={I18n.t('confirm')}
-              onPress={() => this.clearData()}
-            />
-          ]}>
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key="clear_data_cancel"
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({clearDataDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key="clear_data_confirm"
+                text={I18n.t('confirm')}
+                onPress={() => this.clearData()}
+              />
+            </DialogFooter>
+          }>
           <DialogContent>
             <Text style={styles.updateDesc}>{I18n.t('clearDataDesc')}</Text>
           </DialogContent>
@@ -751,24 +790,26 @@ class SettingsPage extends Component {
           width={0.8}
           visible={this.state.disConnectDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('disconnect')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              key="disconnect_cancel"
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('cancel')}
-              onPress={() => {
-                this.setState({disConnectDialogVisible: false})
-              }}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              key="disconnect_confirm"
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              text={I18n.t('confirm')}
-              onPress={() => this._disConnect()}
-            />
-          ]}>
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                key="disconnect_cancel"
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('cancel')}
+                onPress={() => {
+                  this.setState({disConnectDialogVisible: false})
+                }}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                key="disconnect_confirm"
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                text={I18n.t('confirm')}
+                onPress={() => this._disConnect()}
+              />
+            </DialogFooter>
+          }>
           <DialogContent style={CommonStyle.verticalDialogContent}>
             <Text>{I18n.t('disconnectTip')}</Text>
           </DialogContent>
@@ -788,7 +829,7 @@ class SettingsPage extends Component {
           </DialogContent>
         </Dialog>
         <Dialog
-          width={0.8}
+          width={0.9}
           visible={this.state.updateAppletDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
           onTouchOutside={() => !this.lockUpgradeApplet && this.setState({updateAppletDialogVisible: false})}

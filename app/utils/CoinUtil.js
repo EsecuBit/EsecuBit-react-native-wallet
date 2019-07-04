@@ -1,6 +1,6 @@
 // @flow
 import { Coin } from '../common/Constants'
-import { D } from 'esecubit-wallet-sdk'
+import { D } from 'esecubit-react-native-wallet-sdk'
 
 export default class CoinUtil {
   static contains(coinTypes: Array<string>, coinType: string) {

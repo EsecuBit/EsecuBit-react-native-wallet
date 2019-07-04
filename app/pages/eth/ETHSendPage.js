@@ -3,9 +3,8 @@ import {Platform, BackHandler, InteractionManager, Text, Keyboard} from 'react-n
 import I18n from '../../lang/i18n'
 import { Container, Content, Card } from 'native-base'
 import { Dimen, Color } from '../../common/Styles'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import { D, EsWallet, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import SendToolbar from '../../components/bar/SendToolbar'
 import { CommonStyle } from '../../common/Styles'
 import StringUtil from '../../utils/StringUtil'
 import Dialog, { DialogTitle, DialogContent } from 'react-native-popup-dialog'
@@ -20,9 +19,26 @@ import TransactionFeeCard from "../../components/card/TransactionFeeCard"
 import TransactionTotalCostCard from "../../components/card/TransactionTotalCostCard"
 import MemoInput from "../../components/input/MemoInput"
 import ETHDataInput from "../../components/input/ETHDataInput"
-import BtTransmitter from "../../device/BtTransmitter";
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
 class ETHSendPage extends Component {
+
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('send') + " ETH",
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+      headerRight: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="add" iconName="ios-qr-scanner" onPress={() => navigation.navigate('Scan')}/>
+        </HeaderButtons>
+      )
+    }
+  }
   constructor(props) {
     super(props)
     this.state = {
@@ -315,7 +331,6 @@ class ETHSendPage extends Component {
   render() {
     return (
       <Container>
-        <SendToolbar title="ETH"  />
         <Content padder>
           <BalanceHeader
             value={this.state.balance}

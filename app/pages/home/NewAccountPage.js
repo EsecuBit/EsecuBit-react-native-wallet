@@ -14,14 +14,24 @@ import {Container, Left, Icon, CardItem, Title, Right} from 'native-base'
 import I18n from '../../lang/i18n'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
-import BtTransmitter from '../../device/BtTransmitter'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
-import BaseToolbar from '../../components/bar/BaseToolbar'
-import Dialog, {DialogTitle, DialogContent, DialogButton} from "react-native-popup-dialog"
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
+import Dialog, {DialogTitle, DialogContent, DialogButton, DialogFooter} from "react-native-popup-dialog"
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
-const platform = Platform.OS
 
 export default class NewAccountPage extends Component {
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('newAccount'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -236,32 +246,39 @@ export default class NewAccountPage extends Component {
   render() {
     return (
       <Container style={{backgroundColor: Color.CONTAINER_BG}}>
-        <BaseToolbar title={I18n.t('newAccount')}/>
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
         {this._renderEOSAccount()}
         <Dialog
           style={{backgroundColor: 'white'}}
           visible={this.state.newAccountDialogVisible}
-          onTouchOutside={() => this.setState({newAccountDialogVisible: false})}
+          onTouchOutside={() => {
+            this.newAccountName = ''
+            this.setState({newAccountDialogVisible: false})
+          }}
           width={0.8}
           dialogTitle={<DialogTitle title={I18n.t('newAccount')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: '#fff'}}
-              key='new_account_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({newAccountDialogVisible: false})}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}/>,
-            <DialogButton
-              style={{backgroundColor: '#fff'}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='new_account_confirm' text={I18n.t('confirm')}
-              onPress={() => {
-                this.setState({newAccountDialogVisible: false})
-                this._newAccount()
-              }}/>
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                key='new_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => {
+                  this.newAccountName = ''
+                  this.setState({newAccountDialogVisible: false})
+                }}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}/>
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='new_account_confirm' text={I18n.t('confirm')}
+                onPress={() => {
+                  this.setState({newAccountDialogVisible: false})
+                  this._newAccount()
+                }}/>
+            </DialogFooter>
+          }
         >
           <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
             <Text

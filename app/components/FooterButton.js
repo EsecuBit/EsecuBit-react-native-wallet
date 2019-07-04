@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, Platform } from 'react-native'
 import { Footer, FooterTab, Button, Text } from 'native-base'
 import { Dimen, Color } from '../common/Styles'
-import { D } from 'esecubit-wallet-sdk'
-import BtTransmitter from '../device/BtTransmitter'
+import { D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from "../utils/ToastUtil";
 import I18n from "../lang/i18n";
 

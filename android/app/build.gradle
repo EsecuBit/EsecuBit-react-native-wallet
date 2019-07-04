@@ -16,7 +16,7 @@ import com.android.build.OutputFile
  *   bundleAssetName: "index.android.bundle",
  *
  *   // the entry file for bundle generation
- *   entryFile: "index.android.js",
+ *   entryFile: "index.js",
  *
  *   // whether to bundle JS and assets in debug mode
  *   bundleInDebug: false,
@@ -65,8 +65,13 @@ import com.android.build.OutputFile
  * ]
  */
 
+project.ext.react = [
+        entryFile: "index.js",
+        bundleInDebug: true,
+]
 
-apply from: "../../node_modules/react-native/react.gradle"
+
+//apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 /**
@@ -93,14 +98,14 @@ android {
             storePassword STORE_PASSWORD
         }
     }
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "com.excelsecu.eswallet"
-        minSdkVersion 16
-        targetSdkVersion 22
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "0.5.22"
+        versionName "0.6.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -113,6 +118,10 @@ android {
             universalApk false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86"
         }
+    }
+    packagingOptions {
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libc++_shared.so'
     }
     buildTypes {
         release {
@@ -135,26 +144,21 @@ android {
         }
     }
 }
-configurations.all {
-    resolutionStrategy {
-        force 'org.webkit:android-jsc:r216113'
-    }
-}
+
 
 dependencies {
-    compile project(':react-native-camera')
-    compile project(':react-native-vector-icons')
-    compile project(':realm')
-    compile project(':react-native-i18n')
-    compile project(':react-native-vector-icons')
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:27.1.0'
-    compile 'com.facebook.react:react-native:+'
-    // From node_modules
+    implementation "org.webkit:android-jsc:r241213"
+    implementation project(':react-native-gesture-handler')
+    implementation project(':esecubit-react-native-wallet-sdk')
+    implementation project(':react-native-camera')
+    implementation project(':react-native-vector-icons')
+    implementation project(':realm')
+    implementation project(':react-native-i18n')
+    implementation project(':react-native-vector-icons')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibVersion"
+    implementation 'com.facebook.react:react-native:+'
 
-    implementation('org.bitcoinj:bitcoinj-core:0.15.1') {
-        exclude group: 'com.squareup.okhttp3'
-    }
     implementation 'com.android.support:multidex:1.0.3'
 }
 

@@ -1,5 +1,5 @@
-import en from './en'
-import zh_Hans from './zh_Hans'
+import en from 'esecubit-wallet-i18n/en'
+import zh_Hans from 'esecubit-wallet-i18n/zh_Hans'
 import I18n from 'react-native-i18n'
 
 I18n.defaultLocale = 'en'

@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import {Platform, DeviceEventEmitter } from 'react-native'
 import { CardItem, Icon, Input, Text, InputGroup } from 'native-base'
 import { Dimen, Color, CommonStyle } from '../../common/Styles'
-import { D } from 'esecubit-wallet-sdk'
+import { D } from 'esecubit-react-native-wallet-sdk'
 import I18n from '../../lang/i18n'
 
 export default class EOSAccountNameInput extends PureComponent {
@@ -13,7 +13,7 @@ export default class EOSAccountNameInput extends PureComponent {
     label: I18n.t('accountName'),
     onChangeText: () => {}
   }
-  
+
   constructor() {
     super()
     this.state = {
@@ -45,7 +45,7 @@ export default class EOSAccountNameInput extends PureComponent {
     }
 
   }
-  
+
   // @flow
   isValidInput(): boolean {
     return this.state.checkAccountNameSuccess && !!this.state.accountName

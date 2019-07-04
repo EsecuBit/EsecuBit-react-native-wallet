@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { View, Image, Dimensions } from 'react-native'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import { NavigationActions } from 'react-navigation'
+import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
+import { NavigationActions, StackActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
 import { Coin } from '../../common/Constants'
@@ -10,6 +10,9 @@ import CoinUtil from '../../utils/CoinUtil'
 import I18n from '../../lang/i18n'
 
 class HandlerPage extends Component {
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.esWallet = new EsWallet()
@@ -80,7 +83,7 @@ class HandlerPage extends Component {
 
   _resetRouter(routeName, params) {
     setTimeout(() => {
-      const resetAction = NavigationActions.reset({
+      const resetAction = StackActions.reset({
         index: 0,
         actions: [
           NavigationActions.navigate({

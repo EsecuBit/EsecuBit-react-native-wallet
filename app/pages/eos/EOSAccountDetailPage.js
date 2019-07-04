@@ -11,11 +11,10 @@ import {
 } from 'react-native'
 import I18n from '../../lang/i18n'
 import {Container, Icon, List, ListItem, Content, CardItem, Input, CheckBox, Body, Text} from 'native-base'
-import Dialog, {DialogButton, DialogContent, DialogTitle} from 'react-native-popup-dialog'
+import Dialog, {DialogButton, DialogContent, DialogTitle, DialogFooter} from 'react-native-popup-dialog'
 import {CommonStyle, Dimen, Color} from '../../common/Styles'
-import {EsWallet, D} from 'esecubit-wallet-sdk'
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import BtTransmitter from '../../device/BtTransmitter'
 import AccountOperateBottomBar from '../../components/bar/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/header/AccountDetailHeader'
 import {connect} from 'react-redux'
@@ -29,6 +28,10 @@ const platform = Platform.OS
 const BTC_TRANSACTION_DETAIL_DIALOG_HEIGHT = 354
 
 class EOSAccountDetailPage extends Component {
+
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
@@ -154,8 +157,8 @@ class EOSAccountDetailPage extends Component {
         ToastUtil.showShort(I18n.t('noPermissionToUpdate'))
       } else {
         this._isMounted && this.setState({refreshing: true})
-        this._getTxInfos()
       }
+      this._onRefresh()
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
     } finally {
@@ -171,8 +174,6 @@ class EOSAccountDetailPage extends Component {
   _showRegisterDialog() {
     if (!this.account.isRegistered()) {
       this._isMounted && this.setState({showRegisterDialogVisible: true})
-    } else {
-      // this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('syncing')})
     }
   }
 
@@ -288,7 +289,7 @@ class EOSAccountDetailPage extends Component {
     })
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.transmitter.connect(deviceInfo)
       }
     })
@@ -824,26 +825,28 @@ class EOSAccountDetailPage extends Component {
           width={0.8}
           visible={this.state.showRegisterDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('tips')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='show_register_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({showRegisterDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='show_register_confirm'
-              text={I18n.t('register').toUpperCase()}
-              onPress={() => {
-                this._isMounted && this.setState({showRegisterDialogVisible: false}, () => {
-                  this.props.navigation.navigate('EOSKeyDetail')
-                })
-              }}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='show_register_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({showRegisterDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='show_register_confirm'
+                text={I18n.t('register').toUpperCase()}
+                onPress={() => {
+                  this._isMounted && this.setState({showRegisterDialogVisible: false}, () => {
+                    this.props.navigation.navigate('EOSKeyDetail')
+                  })
+                }}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent style={CommonStyle.horizontalDialogContent}>
             <Text style={styles.dialogDesc}>{I18n.t('eosAccountNotRegister')}</Text>
@@ -872,26 +875,28 @@ class EOSAccountDetailPage extends Component {
           width={0.9}
           visible={this.state.importKeyDialogVisible}
           dialogTitle={<DialogTitle title={I18n.t('importKey')}/>}
-          actions={[
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-              key='import_key_cancel'
-              text={I18n.t('cancel')}
-              onPress={() => this.setState({importKeyDialogVisible: false})}
-            />,
-            <DialogButton
-              style={{backgroundColor: Color.WHITE}}
-              textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-              key='import_key_confirm'
-              text={I18n.t('importHint').toUpperCase()}
-              onPress={() => {
-                this._isMounted && this.setState({importKeyDialogVisible: false}, () => {
-                  this._importAccountByKeys()
-                })
-              }}
-            />
-          ]}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key='import_key_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => this.setState({importKeyDialogVisible: false})}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='import_key_confirm'
+                text={I18n.t('importHint').toUpperCase()}
+                onPress={() => {
+                  this._isMounted && this.setState({importKeyDialogVisible: false}, () => {
+                    this._importAccountByKeys()
+                  })
+                }}
+              />
+            </DialogFooter>
+          }
         >
           <DialogContent style={{flexDirection: 'column'}}>
             <View>
