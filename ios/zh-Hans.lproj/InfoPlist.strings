@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  EsWallet
+
+  Created by sekfung.lau on 2019/6/28.
+  Copyright © 2019 Facebook. All rights reserved.
+*/
+NSLocationAlwaysUsageDescription = "EsecuBit需要打开你的定位权限";
+NSCameraUsageDescription = "EsecuBit需要您的同意才能访问相机功能，若不允许，您将无法使用二维码扫描功能";
+NSBluetoothPeripheralUsageDescription = "EsecuBit需要您的同意才能访问蓝牙功能，若不允许，您将无法使用蓝牙连接外设功能";

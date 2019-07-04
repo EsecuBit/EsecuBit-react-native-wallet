@@ -1,11 +1,10 @@
 import { version, versionCode, cosVersion } from '../../package.json'
-import { EsWallet } from 'esecubit-wallet-sdk'
-import { Platform, BackAndroid, NativeModules } from 'react-native'
-
+import { EsWallet } from 'esecubit-react-native-wallet-sdk'
+import { Platform, BackHandler, NativeModules } from 'react-native'
 import StringUtil from './StringUtil'
-import { D } from 'esecubit-wallet-sdk'
+import { D } from 'esecubit-react-native-wallet-sdk'
 import { Api } from '../common/Constants'
-import PreferenceUtil from './PreferenceUtil.js';
+import PreferenceUtil from './PreferenceUtil.js'
 
 const BackIOS = NativeModules.BackIOS
 export default class AppUtil {
@@ -39,7 +38,7 @@ export default class AppUtil {
         hardwareVersionCode: cosVersion,
         lang: lang
       }));
-      
+
       respsonse = await respsonse.json()
       return respsonse
     } catch (e) {
@@ -53,7 +52,7 @@ export default class AppUtil {
   }
   static exitApp() {
     if (Platform.OS === 'android') {
-      BackAndroid.exitApp()
+      BackHandler.exitApp()
     } else {
       BackIOS.exitApp()
     }

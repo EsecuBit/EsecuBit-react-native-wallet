@@ -1,21 +1,22 @@
+// @flow
 import { Coin } from '../common/Constants'
-import { D } from 'esecubit-wallet-sdk'
+import { D } from 'esecubit-react-native-wallet-sdk'
 
 export default class CoinUtil {
-  static contains(coinTypes, coinType) {
+  static contains(coinTypes: Array<string>, coinType: string) {
     let isContains = false;
     coinTypes.map(item => {
       if (item.includes(coinType)) {
-        isContains = true;
+        isContains = true
       }
     });
     return isContains;
   }
 
-  static getRealCoinType(coinType) {
+  static getRealCoinType(coinType: string) {
     //slice coinType string, only if coinType is testnet type
     //eg: btc_testnet3 -> btc
-    if (coinType && coinType.indexOf("_") != -1) {
+    if (coinType && coinType.indexOf("_") !== -1) {
       coinType = coinType.slice(0, coinType.indexOf("_"));
     }
     return coinType
@@ -26,7 +27,7 @@ export default class CoinUtil {
    * @param coinType
    * @returns {string}
    */
-  static getMinimumUnit(coinType) {
+  static getMinimumUnit(coinType: string) {
     coinType = this.getRealCoinType(coinType)
     switch (coinType) {
       case Coin.btc:
@@ -40,25 +41,4 @@ export default class CoinUtil {
     }
   }
 
-  /**
-   * Get default unit of user settings
-   * To use this method, you should add CoinUtil.getDefaultUnit.bind(this) in your React.Component constructor
-   * @param coinType
-   */
-  static getDefaultUnit(coinType) {
-    coinType = CoinUtil.getRealCoinType(coinType)
-    let _that = this
-    switch (coinType) {
-      case Coin.btc:
-        return D.unit.btc.BTC
-      case Coin.eth:
-        return D.unit.eth.ETH
-      case Coin.eos:
-        return D.unit.eos.EOS
-      case Coin.legal:
-        return D.unit.legal.USD
-      default:
-        throw D.error.coinNotSupported
-    }
-  }
 }

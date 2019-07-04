@@ -1,22 +1,39 @@
-import React, { Component } from 'react'
-import {StatusBar, View, Text, Dimensions, TouchableOpacity, Platform, BackHandler, InteractionManager} from 'react-native'
-import { Button, Container, Header, Left, Icon, CardItem, Title, Right } from 'native-base'
+import React, {Component} from 'react'
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  BackHandler,
+  InteractionManager,
+  ActivityIndicator,
+  View,
+  Image
+} from 'react-native'
+import {Container, Left, Icon, CardItem, Title, Right} from 'native-base'
 import I18n from '../../lang/i18n'
-import { Color, CommonStyle, Dimen } from '../../common/Styles'
+import {Color, CommonStyle, Dimen} from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
-import BtTransmitter from '../../device/BtTransmitter'
-import Dialog from 'react-native-dialog'
-import ProgressDialog from 'react-native-simple-dialogs/src/ProgressDialog'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import BaseComponent from '../../components/BaseComponent'
-import {NavigationActions} from 'react-navigation'
-import BaseToolbar from '../../components/BaseToolbar'
-const platform = Platform.OS
+import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
+import Dialog, {DialogTitle, DialogContent, DialogButton, DialogFooter} from "react-native-popup-dialog"
+import HeaderButtons, {Item} from "react-navigation-header-buttons";
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 
-export default class NewAccountPage extends BaseComponent {
+
+export default class NewAccountPage extends Component {
+  static navigationOptions = ({navigation, screenProps}) => {
+    return {
+      title: I18n.t('newAccount'),
+      headerLeft: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      )
+    }
+  }
+
   constructor(props) {
     super(props)
-    this.deviceW = Dimensions.get('window').width
     this.state = {
       newAccountDialogVisible: false,
       newAccountWaitDialog: false
@@ -31,24 +48,36 @@ export default class NewAccountPage extends BaseComponent {
   }
 
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+    this._isMounted = true
+    this._onFocus()
+    this._onBlur()
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    this._isMounted = false
+  }
+
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
     return true;
-  };
+  }
 
-  /**
-   * only support new BTC account and ETH account
-   */
+
   async _newAccount() {
     let coinType = this.newAccountType
-    if (!this.newAccountName) {
+    if (!D.isEos(coinType) && (!this.newAccountName || this.newAccountName.replace(/(^\s*)|(\s*$)/g, "").length === 0)) {
       ToastUtil.showLong(I18n.t('emptyAccountNameError'))
       return
     }
@@ -56,56 +85,31 @@ export default class NewAccountPage extends BaseComponent {
       ToastUtil.showLong(I18n.t('notSupportCoinType'))
       return
     }
-
-    let state = await this.btTransmitter.getState()
-    if (state === BtTransmitter.disconnected) {
-      ToastUtil.showLong(I18n.t('pleaseConnectDevice'))
-      return
-    }
-
-    //just for iOS
-    if (platform === 'ios') {
-      let accounts = []
-      let isNeedDialog = true
-
-      //all account
-      accounts = await this.wallet.getAccounts()
-      //accounts of selected coinType
-      let coinAccount = []
-      accounts.map(it => {
-        if (coinType.indexOf(it.coinType) != -1) {
-          coinAccount.push(it)
-        }
-      })
-      coinAccount.map(item => {
-        if (item.txInfos.length === 0) {
-          isNeedDialog = false
-        }
-      })
-
-      if (isNeedDialog) {
-        setTimeout(() => {
-          console.log('setTimeout1=====')
-          this.setState({ newAccountWaitDialog: true })
-        }, 400)
+    if (!D.test.jsWallet) {
+      let state = await this.btTransmitter.getState()
+      if (state === BtTransmitter.disconnected) {
+        ToastUtil.showLong(I18n.t('pleaseConnectDevice'))
+        return
       }
     }
-
+    this._isMounted && this.setState({newAccountWaitDialog: true})
     try {
-      if (platform !== 'ios') {
-        this.setState({ newAccountWaitDialog: true })
-      }
       let account = await this.wallet.newAccount(coinType)
-      await account.rename(this.newAccountName)
+      if (!D.isEos(account.coinType)) {
+        await account.rename(this.newAccountName)
+      }
       this.newAccountName = ''
-      await this.setState({ newAccountWaitDialog: false })
+      this._isMounted && await this.setState({newAccountWaitDialog: false})
       let msg = I18n.t('newAccountSuccess')
       ToastUtil.showShort(msg)
       this.props.navigation.pop()
     } catch (error) {
+      this.isNeedDialog = false
       console.warn('newAccount Error', error)
+      // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
+      // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
       InteractionManager.runAfterInteractions(() => {
-        this.setState({ newAccountWaitDialog: false })
+        this._isMounted && this.setState({newAccountWaitDialog: false})
       })
       ToastUtil.showErrorMsgLong(error)
     }
@@ -116,12 +120,12 @@ export default class NewAccountPage extends BaseComponent {
    * @param {string} coinType
    */
   async _canNewAccount(coinType) {
+
     let coinTypes = await this.wallet.availableNewAccountCoinTypes()
     return coinTypes.includes(coinType)
   }
 
   _renderBTCAddAccount() {
-    let _that = this
     let coinType = ''
     let isSupportBTC = false
     this.supportCoinType.map(it => {
@@ -137,25 +141,25 @@ export default class NewAccountPage extends BaseComponent {
         onPress={() => {
           console.log('new btc account')
 
-          this.setState({ newAccountDialogVisible: true })
+          this.setState({newAccountDialogVisible: true})
           this.newAccountType = coinType
         }}>
-        <Left style={{ flexDirection: 'row' }}>
+        <Left style={{flexDirection: 'row'}}>
           <Icon
             name="bitcoin"
             type="FontAwesome"
-            style={{ width: 28, height: 28, color: Color.BITCOIN }}
+            style={{width: 28, height: 28, color: Color.BITCOIN}}
           />
-          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>BTC</Title>
+          <Title style={[CommonStyle.privateText, {marginLeft: Dimen.SPACE}]}>BTC</Title>
         </Left>
         <Right>
           <TouchableOpacity
             onPress={() => {
               console.log('new eth account')
-              this.setState({ newAccountDialogVisible: true })
+              this.setState({newAccountDialogVisible: true})
               this.newAccountType = coinType
             }}>
-            <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
+            <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}}/>
           </TouchableOpacity>
         </Right>
       </CardItem>
@@ -177,24 +181,62 @@ export default class NewAccountPage extends BaseComponent {
         button
         style={CommonStyle.cardStyle}
         onPress={() => {
-          _that.setState({ newAccountDialogVisible: true })
+          _that.setState({newAccountDialogVisible: true})
           this.newAccountType = coinType
         }}>
-        <Left style={{ flexDirection: 'row' }}>
+        <Left style={{flexDirection: 'row'}}>
           <Icon
             name="ethereum"
             type="MaterialCommunityIcons"
-            style={{ width: 28, height: 28, color: Color.ETH }}
+            style={{width: 28, height: 28, color: Color.ETH}}
           />
-          <Title style={[CommonStyle.privateText, { marginLeft: Dimen.SPACE }]}>ETH</Title>
+          <Title style={[CommonStyle.privateText, {marginLeft: Dimen.SPACE}]}>ETH</Title>
         </Left>
         <Right>
           <TouchableOpacity
             onPress={() => {
-              _that.setState({ newAccountDialogVisible: true })
+              _that.setState({newAccountDialogVisible: true})
               this.newAccountType = coinType
             }}>
-            <Text style={{ fontSize: 15, color: Color.PRIMARY_TEXT }}>{I18n.t('add')}</Text>
+            <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}}/>
+          </TouchableOpacity>
+        </Right>
+      </CardItem>
+    ) : null
+  }
+
+  _renderEOSAccount() {
+    let _that = this
+    let coinType = ''
+    let isSupportEOS = false
+    this.supportCoinType.map(it => {
+      if (it.startsWith('eos')) {
+        isSupportEOS = true
+        coinType = it
+      }
+    })
+    return isSupportEOS ? (
+      <CardItem
+        button
+        style={CommonStyle.cardStyle}
+        onPress={() => {
+          this.newAccountType = coinType
+          this._newAccount()
+        }}>
+        <Left style={{flexDirection: 'row'}}>
+          <Image
+            source={require('../../imgs/eos.png')}
+            style={{width: 28, height: 28}}
+          />
+          <Title style={[CommonStyle.privateText, {marginLeft: Dimen.SPACE}]}>EOS</Title>
+        </Left>
+        <Right>
+          <TouchableOpacity
+            onPress={() => {
+              this.newAccountType = coinType
+              this._newAccount()
+            }}>
+            <Icon name='md-add-circle' style={{color: Color.ACCENT, fontSize: 28}}/>
           </TouchableOpacity>
         </Right>
       </CardItem>
@@ -202,40 +244,66 @@ export default class NewAccountPage extends BaseComponent {
   }
 
   render() {
-    let _that = this
     return (
-      <Container style={{ backgroundColor: Color.CONTAINER_BG }}>
-        <BaseToolbar title={I18n.t('newAccount')} />
+      <Container style={{backgroundColor: Color.CONTAINER_BG}}>
         {this._renderBTCAddAccount()}
         {this._renderETHAddAccount()}
-        <Dialog.Container visible={_that.state.newAccountDialogVisible}>
-          <Dialog.Title>{I18n.t('newAccount')}</Dialog.Title>
-          <Dialog.Description>{I18n.t('newAccountHint')}</Dialog.Description>
-          <Dialog.Input
-            maxLength={7}
-            selectionColor={Color.ACCENT}
-            underlineColorAndroid="#EBBD36"
-            onChangeText={text => (_that.newAccountName = text)}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('cancel')}
-            onPress={() => _that.setState({ newAccountDialogVisible: false })}
-          />
-          <Dialog.Button
-            style={{ color: Color.ACCENT }}
-            label={I18n.t('confirm')}
-            onPress={() => {
-              _that.setState({ newAccountDialogVisible: false })
-              _that._newAccount()
-            }}
-          />
-        </Dialog.Container>
-        <ProgressDialog
-          activityIndicatorColor={Color.ACCENT}
-          visible={_that.state.newAccountWaitDialog}
-          message={I18n.t('addAccount')}
-        />
+        {this._renderEOSAccount()}
+        <Dialog
+          style={{backgroundColor: 'white'}}
+          visible={this.state.newAccountDialogVisible}
+          onTouchOutside={() => {
+            this.newAccountName = ''
+            this.setState({newAccountDialogVisible: false})
+          }}
+          width={0.8}
+          dialogTitle={<DialogTitle title={I18n.t('newAccount')}/>}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                key='new_account_cancel'
+                text={I18n.t('cancel')}
+                onPress={() => {
+                  this.newAccountName = ''
+                  this.setState({newAccountDialogVisible: false})
+                }}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}/>
+              <DialogButton
+                style={{backgroundColor: '#fff'}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key='new_account_confirm' text={I18n.t('confirm')}
+                onPress={() => {
+                  this.setState({newAccountDialogVisible: false})
+                  this._newAccount()
+                }}/>
+            </DialogFooter>
+          }
+        >
+          <View style={{marginHorizontal: Dimen.MARGIN_HORIZONTAL}}>
+            <Text
+              style={[CommonStyle.verticalDialogText, {marginTop: Dimen.MARGIN_VERTICAL}]}>{I18n.t('newAccountHint')}</Text>
+            <TextInput
+              style={Platform.OS === 'ios' ? CommonStyle.iosTextInput : CommonStyle.androidTextInput}
+              selectionColor={Color.ACCENT}
+              underlineColorAndroid={Color.ACCENT}
+              maxLength={7}
+              onChangeText={text => this.newAccountName = text}
+              returnKeyType="done"
+            />
+          </View>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.newAccountWaitDialog}
+          onTouchOutside={() => {
+          }}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{I18n.t('addAccount')}</Text>
+          </DialogContent>
+        </Dialog>
       </Container>
     )
   }

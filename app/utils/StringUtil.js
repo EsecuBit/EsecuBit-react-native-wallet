@@ -7,7 +7,7 @@ export default class StringUtil {
    * @param num
    * @returns {string}
    */
-  static formatLegalCurrency(num) {
+  static formatLegalCurrency(num: number) {
     num = num.toString().replace(/\$|\,/g, '')
     if (isNaN(num)) {
       num = '0'
@@ -19,10 +19,7 @@ export default class StringUtil {
       cents = '0' + cents
     }
     for (let i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++) {
-      num =
-        num.substring(0, num.length - (4 * i + 3)) +
-        ',' +
-        num.substring(num.length - (4 * i + 3))
+      num = num.substring(0, num.length - (4 * i + 3)) + ',' + num.substring(num.length - (4 * i + 3))
     }
     return num + '.' + cents
   }
@@ -104,7 +101,7 @@ export default class StringUtil {
   }
 
   static isInvalidValue(value) {
-    if (isNaN(value) || value.startsWith('-') || value.startsWith('0x')) {
+    if (isNaN(value) || value.startsWith('-') || value.startsWith('0x') || value.indexOf(" ") !== -1 ) {
       ToastUtil.showShort(I18n.t('invalidValue'))
       return true
     }
@@ -140,5 +137,12 @@ export default class StringUtil {
             : key + EQUAL + encodeURIComponent(body[key])
       )
       .join(AMP)
+  }
+
+  static toFixNum(v, e) {
+    var t=1;
+    for(;e>0;t*=10,e--);
+    for(;e<0;t/=10,e++);
+    return (Math.round(v*t)/t).toString();
   }
 }

@@ -1,29 +1,19 @@
 import {} from './global'
 import React from 'react'
-import { D, Provider } from 'esecubit-wallet-sdk'
-import RealmDB from './db/RealmDB'
-import BtTransmitter from './device/BtTransmitter'
-import { EsWallet } from 'esecubit-wallet-sdk'
+import {StatusBar, Platform} from 'react-native'
 import { Provider as StoreProvider } from 'react-redux'
 import store from './store'
 import AppNavigation from './AppNavigation'
 import { Root } from 'native-base'
-import CryptoNative from './device/CryptoNative'
+import config from "./config";
+import {Color} from "./common/Styles";
 
 export default class EsecuBitApp extends React.Component {
   constructor(props) {
     super(props)
-    // test net
-    D.test.coin = true
-    // enable hardware wallet, default software wallet
-    D.test.jsWallet = false
-    Provider.DB = RealmDB
-    Provider.Transmitters.push(BtTransmitter)
-    Provider.Crypto = CryptoNative
-    this.wallet = new EsWallet()
-    //黄色Warnings框开关
-    console.disableYellowBox = true
+    config.initApp()
   }
+
 
 
   render() {
@@ -32,6 +22,11 @@ export default class EsecuBitApp extends React.Component {
         <StoreProvider store={store}>
           <AppNavigation />
         </StoreProvider>
+        <StatusBar
+          barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
+          backgroundColor={Color.DARK_PRIMARY}
+          hidden={false}
+        />
       </Root>
     )
   }

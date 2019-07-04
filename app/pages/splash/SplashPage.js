@@ -1,60 +1,80 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import I18n from '../../lang/i18n'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import {D, EsWallet, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import { ProgressDialog } from 'react-native-simple-dialogs'
-import BtTransmitter from '../../device/BtTransmitter'
-import { Color } from '../../common/Styles'
-import { NavigationActions } from 'react-navigation'
-import { NetInfo, Platform } from 'react-native'
+import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
+import {Color, CommonStyle} from '../../common/Styles'
+import {NavigationActions, StackActions} from 'react-navigation'
+import {NetInfo, Platform, ActivityIndicator, Text} from 'react-native'
+import CoinUtil from "../../utils/CoinUtil";
 
-const platform = Platform.OS
 export default class SplashPage extends Component {
+
+  static navigationOptions = {
+    header: null
+  }
+
   constructor(props) {
     super(props)
     this.wallet = new EsWallet()
     this.state = {
-      syncDialogVisible: true
+      syncDialogVisible: true,
+      syncDesc: I18n.t('welcome'),
     }
     this.btTransmitter = new BtTransmitter()
+    this.timers = []
   }
 
-  componentWillMount() {
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('didBlur', () => {
+      this.setState({syncDialogVisible: false})
+      NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+      this.wallet.listenStatus(() => {
+      })
+    })
+  }
+
+  componentDidMount() {
+    this._isMounted = true
     this._listenWalletStatus()
-    NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
+    this._onFocus()
+    this._onBlur()
   }
 
   componentWillUnmount() {
-    this.setState({ syncDialogVisible: false })
-    NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
+    this._isMounted = false
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
   }
+
 
   _handleConnectivityChange(ns) {
     let _that = this
-    if(platform === 'ios') {
+    if (Platform.OS === 'ios') {
       if (ns === 'none' || ns === 'unknown') {
-        _that.setState({ syncDialogVisible: false })
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-          ]
-        })
-        setTimeout(() => {
-          this.props.navigation.dispatch(resetAction)
-        }, 400)
+        let timer = setTimeout(() => {
+          _that._gotoHomePage(true)
+        }, 2000)
+        this.timers.push(timer)
       }
     }
   }
 
+
   _listenWalletStatus() {
     let _that = this
-    this.wallet.listenStatus(async (error, status) => {
-      console.log('wallet status', error, status)
+    this.wallet.listenStatus(async (error, status, account) => {
+      console.log('wallet status', error, status, account)
       if (error !== D.error.succeed) {
         if (error === D.error.deviceNotInit) {
           console.log('deviceNotInit', error)
-          _that.setState({ syncDialogVisible: false })
           let state = await this.btTransmitter.getState()
           if (state === BtTransmitter.connected) {
             this.btTransmitter.disconnect()
@@ -62,59 +82,58 @@ export default class SplashPage extends Component {
           ToastUtil.showErrorMsgShort(error)
           _that.props.navigation.pop()
         } else {
-          setTimeout(() => {
-            _that.setState({ syncDialogVisible: false })
+          let timer = setTimeout(() => {
             ToastUtil.showErrorMsgLong(error)
-            const resetAction = NavigationActions.reset({
-              index: 0,
-              actions: [
-                NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-              ]
-            })
-            this.props.navigation.dispatch(resetAction)
-          }, 1000)
+            this.btTransmitter.disconnect()
+            _that._gotoHomePage(true)
+          }, 2000)
+          this.timers.push(timer)
         }
       } else {
+        if (status === D.status.syncingNewAccount) {
+          let coinType = CoinUtil.getRealCoinType(account.coinType)
+          this.setState({syncDesc: `${I18n.t('checking')} ${coinType.toUpperCase()} ${account.label}`})
+        }
         if (status === D.status.syncFinish) {
-          _that.setState({ syncDialogVisible: false })
-          const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: false } })
-            ]
-          })
-          this.props.navigation.dispatch(resetAction)
-          // _that.props.navigation.replace('Home', { offlineMode: false})
+          this.setState({syncDialogVisible: false})
+          _that._gotoHomePage(false)
         }
         if (status === D.status.deviceChange) {
           console.log('device change')
         }
         if (status === D.status.plugOut) {
-          _that.setState({ syncDialogVisible: false })
-          const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: 'Home', params: { offlineMode: true } })
-            ],
-            params: {
-              offlineMode: true
-            }
-          })
-          this.props.navigation.dispatch(resetAction)
-          // _that.props.navigation.replace('Home', { offlineMode: true})
+          ToastUtil.showShort(I18n.t('disconnected'))
+          _that._gotoHomePage(true)
         }
       }
     })
   }
 
+  _gotoHomePage(offlineMode) {
+    this._isMounted && this.setState({syncDialogVisible: false})
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({routeName: 'Home', params: {offlineMode: offlineMode}})
+      ]
+    })
+    this.props.navigation.dispatch(resetAction)
+  }
+
   render() {
     return (
-      <ProgressDialog
-        activityIndicatorColor={Color.ACCENT}
+      <Dialog
+        width={0.8}
+        onTouchOutside={() => {
+        }}
         visible={this.state.syncDialogVisible}
-        title={I18n.t('syncing')}
-        message={I18n.t('welcome')}
-      />
+        dialogTitle={<DialogTitle title={I18n.t('syncing')}/>}
+      >
+        <DialogContent style={CommonStyle.horizontalDialogContent}>
+          <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+          <Text style={CommonStyle.horizontalDialogText}>{this.state.syncDesc}</Text>
+        </DialogContent>
+      </Dialog>
     )
   }
 }

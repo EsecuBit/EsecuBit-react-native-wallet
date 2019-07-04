@@ -1,31 +1,33 @@
-import React from 'react'
+import React, {Component} from 'react'
 import {
   View,
-  StyleSheet,
   Text,
+  StyleSheet,
   RefreshControl,
+  ImageBackground,
   Image,
   StatusBar,
   Dimensions,
   Platform,
-  BackHandler
+  BackHandler,
+  ActivityIndicator
 } from 'react-native'
-import { Container, List, ListItem, Button, Icon } from 'native-base'
+import {Container, List, ListItem, Button, Icon} from 'native-base'
 import I18n from '../../lang/i18n'
-import BtTransmitter from '../../device/BtTransmitter'
-import { D, EsWallet } from 'esecubit-wallet-sdk'
+import {D, EsWallet, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import PreferenceUtil from '../../utils/PreferenceUtil'
-import Dialog from 'react-native-dialog'
+import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
-import { ProgressDialog } from 'react-native-simple-dialogs'
-import { NavigationActions } from 'react-navigation'
-import { Color, Dimen, isIphoneX, CommonStyle } from '../../common/Styles'
-import BaseComponent from '../../components/BaseComponent'
-const deviceW = Dimensions.get('window').width
-const deviceH = Dimensions.get('window').height
-const platform = Platform.OS
+import {Color, Dimen, isIphoneX, CommonStyle} from '../../common/Styles'
+import AppUtil from "../../utils/AppUtil";
+import config from "../../config"
 
-export default class PairListPage extends BaseComponent {
+
+export default class PairListPage extends Component {
+  static navigationOptions = {
+    header: null
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -34,73 +36,85 @@ export default class PairListPage extends BaseComponent {
       connectDialogVisible: false,
       authenticateDialogVisible: false,
       refreshing: false,
-      scanText: '',
-      waitingDialogVisible: false
+      dialogDesc: ''
     }
     this.transmitter = new BtTransmitter()
     this.wallet = new EsWallet()
     this.connectDeviceInfo = {}
-    this.hasBackBtn = this.props.navigation.state.params.hasBackBtn
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-    this.setState({
-      waitingDialogVisible: false,
-      authenticateDialogVisible: false,
-      connectDialogVisible: false
-    })
-  }
-
-  onBackPress = () => {
-    this.props.navigation.pop()
-    return true
+    this._renderRowView.bind(this)
+    this.timers = []
   }
 
   componentDidMount() {
-    console.log('xr width', deviceW, isIphoneX)
-    console.log('xr height', deviceH)
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-    let _that = this
-    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
-    this.props.navigation.addListener('willFocus', async () => {
-      _that._listenTransmitter()
-      await _that.setState({ deviceList: [] })
-      _that._findDefaultDevice(true)
-    })
-    this.wallet.listenStatus(async (error, status, pairCode) => {
+    this._onFocus()
+    this._onBlur()
+    this.listenWallet()
+  }
+
+  listenWallet() {
+    this.wallet.listenStatus((error, status, pairCode) => {
       console.log('wallet code', error, status, pairCode)
-      if (error != D.error.succeed) {
+      if (error !== D.error.succeed) {
         this.setState({
-          waitingDialogVisible: false,
           authenticateDialogVisible: false,
           connectDialogVisible: false
         })
-      }else{
+      } else {
         if (status === D.status.auth && pairCode) {
           console.log('wallet authenticating')
           if (pairCode) {
-            console.log('has receive pairCode')
-            this.setState({ waitingDialogVisible: false })
-            this.setState({ authenticateDialogVisible: true, pairCode: pairCode })
+            console.log('has receive pairCode', pairCode)
+            this.setState({authenticateDialogVisible: true, pairCode: pairCode})
           }
         }
-        if (status === D.status.syncing) {
+        if (status === D.status.authFinish) {
+          console.log('wallet syncing')
           this.setState({
-            waitingDialogVisible: false,
             authenticateDialogVisible: false,
             connectDialogVisible: false
           })
           let timeout = 0;
-          if (platform === 'ios') {
+          if (Platform.OS === 'ios') {
             timeout = 400
           }
-          setTimeout(() => {
+          let timer = setTimeout(() => {
             this.props.navigation.navigate('Splash')
           }, timeout)
+          this.timers.push(timer)
         }
       }
     })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+      this.setState({
+        authenticateDialogVisible: false,
+        connectDialogVisible: false
+      })
+    })
+  }
+
+  _onFocus() {
+    // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
+    this.props.navigation.addListener('didFocus', async () => {
+      this._listenTransmitter()
+      await this.setState({deviceList: []})
+      const {params} = this.props.navigation.state
+      let autoConnect = true
+      if (params) {
+        autoConnect = params.autoConnect
+      }
+      this._findDefaultDevice(autoConnect)
+      BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+    })
+  }
+
+  onBackPress = () => {
+    console.log('route', this.props.navigation)
+    AppUtil.exitApp()
+    return true
   }
 
   _listenTransmitter() {
@@ -108,38 +122,54 @@ export default class PairListPage extends BaseComponent {
     _that.transmitter.listenStatus(async (error, status) => {
       console.log('connect status', error, status)
       if (error !== D.error.succeed) {
-        ToastUtil.showLong('connectFailed')
-        _that.setState({ connectDialogVisible: false })
+        ToastUtil.showShort(I18n.t('connectFailed'))
+        _that.setState({connectDialogVisible: false})
         return
       }
       if (status === BtTransmitter.connecting) {
-        _that.setState({ connectDialogVisible: true })
+        _that.setState({connectDialogVisible: true})
         return
       }
       if (status === BtTransmitter.disconnected) {
         _that.setState({
           authenticateDialogVisible: false,
           connectDialogVisible: false,
-          waitingDialogVisible: false
         })
         ToastUtil.showLong(I18n.t('disconnect'))
         this._onRefresh(false)
         return
       }
       if (status === BtTransmitter.connected) {
-        _that._gotoSyncPage()
+        console.log('connected')
+        _that._saveLastConnectedDevice()
         _that.transmitter.stopScan()
+        if (config.productVersion === 'tp') {
+          let walletID = await this.wallet.getWalletId()
+          // skip to create wallet, only support tp's eos, the wallet id is 32 bytes of zero
+          if (parseInt(walletID, 16) === 0) {
+            D.supportedCoinTypes = () => {
+              return D.test.coin
+                ? [D.coin.test.eosJungle]
+                : [D.coin.main.eos]
+            }
+          }else {
+            D.supportedCoinTypes = () => {
+              return D.test.coin
+                ? [D.coin.test.btcTestNet3, D.coin.test.ethRinkeby, D.coin.test.eosJungle]
+                : [D.coin.main.btc, D.coin.main.eth, D.coin.main.eos]
+            }
+          }
+        }
       }
     })
   }
 
-  async _gotoSyncPage() {
+  async _saveLastConnectedDevice() {
     console.log('device connected')
     this.transmitter.stopScan()
-    this.setState({ connectDialogVisible: false })
     console.log('connected device info', this.connectDeviceInfo)
     await PreferenceUtil.setDefaultDevice(this.connectDeviceInfo)
-    this.setState({ waitingDialogVisible: true })
+    this.setState({dialogDesc: I18n.t('pleaseWait')})
   }
 
   _findDefaultDevice(autoConnect) {
@@ -157,7 +187,7 @@ export default class PairListPage extends BaseComponent {
     _that.transmitter.startScan((error, info) => {
       if (info.sn && info.sn.length === 12) {
         // filter device sn
-        if(info.sn.startsWith('ES12') || info.sn.startsWith('2')) {
+        if (info.sn.startsWith('ES12') || info.sn.startsWith('2')) {
           devices.add(info)
         }
       }
@@ -175,8 +205,8 @@ export default class PairListPage extends BaseComponent {
     return (
       <View
         style={[
-          customStyle.itemContainer,
-          { justifyContent: 'center', marginBottom: Dimen.SPACE }
+          styles.itemContainer,
+          {justifyContent: 'center', marginBottom: Dimen.SPACE}
         ]}>
         <Text
           style={{
@@ -194,8 +224,8 @@ export default class PairListPage extends BaseComponent {
   _connectDevice(rowData) {
     console.log('connect device sn is', rowData)
     this.transmitter.connect(rowData)
-    this.connectDeviceInfo = rowData
-    this.setState({ connectDialogVisible: true })
+    this.connectDeviceInfo = JSON.parse(JSON.stringify(rowData))
+    this.setState({connectDialogVisible: true, dialogDesc: I18n.t('connecting')})
   }
 
   _onRefresh(autoConnect) {
@@ -205,90 +235,79 @@ export default class PairListPage extends BaseComponent {
       deviceList: []
     })
     this._findDefaultDevice(autoConnect)
-    
   }
 
   render() {
-    let bgHeight = platform === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
-    let height = platform === 'ios' ? 64 : 56
+    let deviceH = Dimensions.get('window').height
+    let bgHeight = Platform.OS === 'ios' && !isIphoneX ? deviceH * 0.55 : deviceH * 0.5
+    let height = Platform.OS === 'ios' ? 64 : 56
     if (isIphoneX) {
       height = 88
     }
     return (
       <Container style={CommonStyle.safeAreaBottom}>
-        <View style={{ height: bgHeight, justifyContent: 'center', alignItems: 'center' }}>
-          <Image
-            source={require('../../imgs/bg_home.png')}
-            resizeMode={'stretch'}
-            style={{ height: bgHeight, alignContent: 'center', alignItems: 'center' }}>
-            <View style={{ height: height }}>
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  flexDirection: 'row'
-                }}
-                translucent={false}>
-                <StatusBar
-                  barStyle={platform === 'ios' ? 'light-content' : 'default'}
-                  backgroundColor={Color.DARK_PRIMARY}
-                  hidden={false}
-                />
-                <View
-                  style={{
-                    justifyContent: 'center',
-                    width: 48,
-                    height: height,
-                    marginTop: isIphoneX ? 20 : 0
-                  }}>
-                  {this.hasBackBtn ? (
-                    <Button
-                      transparent
-                      onPress={() => {
-                        this.props.navigation.pop()
-                      }}>
-                      <Icon name="ios-arrow-back" style={{ color: Color.TEXT_ICONS }} />
-                    </Button>
-                  ) : null}
-                </View>
-              </View>
-            </View>
+        <ImageBackground
+          source={require('../../imgs/bg_home.png')}
+          resizeMode={'stretch'}
+          style={{height: bgHeight, alignContent: 'center', alignItems: 'center'}}>
+          <View style={{height: height}}>
             <View
               style={{
-                marginTop: Dimen.MARGIN_VERTICAL
-              }}>
-              <Image
-                source={require('../../imgs/bluetooth_bg.png')}
-                style={{ width: 80, height: 80 }}
+                flex: 1,
+                backgroundColor: 'transparent',
+                flexDirection: 'row'
+              }}
+              translucent={false}>
+              <StatusBar
+                barStyle={Platform.OS === 'ios' ? 'light-content' : 'default'}
+                backgroundColor={Color.DARK_PRIMARY}
+                hidden={false}
               />
-            </View>
-            <View style={{}}>
-              <Text
+              <View
                 style={{
-                  textAlignVertical: 'center',
-                  textAlign: 'center',
-                  color: Color.TEXT_ICONS,
-                  fontSize: 25,
-                  marginTop: 30,
-                  backgroundColor: 'transparent'
+                  justifyContent: 'center',
+                  width: 48,
+                  height: height,
+                  marginTop: isIphoneX ? 20 : 0
                 }}>
-                {I18n.t('pairDevice')}
-              </Text>
-              <Text
-                style={{
-                  textAlignVertical: 'center',
-                  textAlign: 'center',
-                  color: Color.TEXT_ICONS,
-                  marginTop: Dimen.SPACE,
-                  backgroundColor: 'transparent'
-                }}>
-                {I18n.t('pairDeviceTip')}
-              </Text>
+              </View>
             </View>
-          </Image>
-        </View>
+          </View>
+          <View
+            style={{
+              marginTop: Dimen.MARGIN_VERTICAL
+            }}>
+            <Image
+              source={require('../../imgs/bluetooth_bg.png')}
+              style={{width: 80, height: 80}}
+            />
+          </View>
+          <View style={{}}>
+            <Text
+              style={{
+                textAlignVertical: 'center',
+                textAlign: 'center',
+                color: Color.TEXT_ICONS,
+                fontSize: 25,
+                marginTop: 30,
+                backgroundColor: 'transparent'
+              }}>
+              {I18n.t('pairDevice')}
+            </Text>
+            <Text
+              style={{
+                textAlignVertical: 'center',
+                textAlign: 'center',
+                color: Color.TEXT_ICONS,
+                marginTop: Dimen.SPACE,
+                backgroundColor: 'transparent'
+              }}>
+              {I18n.t('pairDeviceTip')}
+            </Text>
+          </View>
+        </ImageBackground>
 
-        <View style={customStyle.listView}>
+        <View style={styles.listView}>
           <List
             dataArray={this.state.deviceList}
             refreshControl={
@@ -304,27 +323,34 @@ export default class PairListPage extends BaseComponent {
             )}
           />
         </View>
-        <ProgressDialog
-          activityIndicatorColor={Color.ACCENT}
+        <Dialog
+          width={0.8}
           visible={this.state.connectDialogVisible}
-          message={I18n.t('connecting')}
-        />
-        <Dialog.Container visible={this.state.authenticateDialogVisible}>
-          <Dialog.Title>{I18n.t('pairCode')}</Dialog.Title>
-          <Dialog.Description>{this.state.pairCode}</Dialog.Description>
-          <Dialog.Description>{I18n.t('pleaseWait')}</Dialog.Description>
-        </Dialog.Container>
-        <ProgressDialog
-          activityIndicatorColor={Color.ACCENT}
-          visible={this.state.waitingDialogVisible}
-          message={I18n.t('pleaseWait')}
-        />
+          onTouchOutside={() => {
+          }}
+        >
+          <DialogContent style={CommonStyle.horizontalDialogContent}>
+            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+            <Text style={CommonStyle.horizontalDialogText}>{this.state.dialogDesc}</Text>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.authenticateDialogVisible}
+          onTouchOutside={() => {
+          }}
+          dialogTitle={<DialogTitle title={I18n.t('pairCode')}/>}
+        >
+          <DialogContent style={{alignItems: 'center'}}>
+            <Text style={styles.pairCodeText}>{this.state.pairCode}</Text>
+          </DialogContent>
+        </Dialog>
       </Container>
     )
   }
 }
 
-const customStyle = StyleSheet.create({
+const styles = StyleSheet.create({
   listView: {
     flex: 1,
     marginTop: Dimen.MARGIN_VERTICAL
@@ -334,8 +360,9 @@ const customStyle = StyleSheet.create({
     flexDirection: 'row',
     height: 20
   },
-  message: {
-    marginLeft: Dimen.MARGIN_HORIZONTAL,
+  pairCodeText: {
+    fontSize: Dimen.PRIMARY_TEXT,
+    color: Color.PRIMARY_TEXT,
     marginTop: Dimen.SPACE
   }
 })

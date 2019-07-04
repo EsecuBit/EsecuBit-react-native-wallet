@@ -29,22 +29,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "EsWallet.app"
+               BuildableName = "ESECUBIT.app"
                BlueprintName = "EsWallet"
-               ReferencedContainer = "container:EsWallet.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "EsWalletTests.xctest"
-               BlueprintName = "EsWalletTests"
                ReferencedContainer = "container:EsWallet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -56,22 +42,12 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "EsWalletTests.xctest"
-               BlueprintName = "EsWalletTests"
-               ReferencedContainer = "container:EsWallet.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "EsWallet.app"
+            BuildableName = "ESECUBIT.app"
             BlueprintName = "EsWallet"
             ReferencedContainer = "container:EsWallet.xcodeproj">
          </BuildableReference>
@@ -94,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "EsWallet.app"
+            BuildableName = "ESECUBIT.app"
             BlueprintName = "EsWallet"
             ReferencedContainer = "container:EsWallet.xcodeproj">
          </BuildableReference>
@@ -120,7 +96,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "EsWallet.app"
+            BuildableName = "ESECUBIT.app"
             BlueprintName = "EsWallet"
             ReferencedContainer = "container:EsWallet.xcodeproj">
          </BuildableReference>

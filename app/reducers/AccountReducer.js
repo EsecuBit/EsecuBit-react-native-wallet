@@ -1,6 +1,10 @@
 import ActionType from "../actions/ActionType"
 
-const initialState = { account: {}, accountCurrentUnit: '' }
+const initialState = {
+  account: {},
+  accountCurrentUnit: '',
+  address: ''
+}
 
 export default function accountReducer(state = initialState, action) {
   switch (action.type) {
@@ -13,6 +17,11 @@ export default function accountReducer(state = initialState, action) {
       return {
         ...state,
         accountCurrentUnit: action.unit
+      }
+    case ActionType.SET_ADDRESS:
+      return {
+        ...state,
+        address: action.address
       }
     default:
       return state

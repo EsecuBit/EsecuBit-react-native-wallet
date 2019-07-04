@@ -1,29 +1,52 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { StyleSheet, Platform } from 'react-native'
 import { Footer, FooterTab, Button, Text } from 'native-base'
-import PropTypes from 'prop-types'
 import { Dimen, Color } from '../common/Styles'
+import { D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
+import ToastUtil from "../utils/ToastUtil";
+import I18n from "../lang/i18n";
 
-const platform = Platform.OS
 const styles = StyleSheet.create({
   btnText: {
     flex: 1,
     textAlign: 'center',
     textAlignVertical: 'center',
     fontSize: Dimen.PRIMARY_TEXT,
-    marginTop: platform === 'ios' ? 15 : 0
+    marginTop: Platform.OS === 'ios' ? 15 : 0
   },
 })
-export default class FooterButton extends PureComponent {
+
+export default class FooterButton extends React.PureComponent {
+  static defaultProps = {
+    title: '',
+    disabled: true
+  }
+
+  constructor() {
+    super()
+    this.transmitter = new BtTransmitter()
+  }
+
+  async _handlerPress() {
+    if (!D.test.jsWallet) {
+      let state = await this.transmitter.getState()
+      if (state === BtTransmitter.disconnected) {
+        ToastUtil.showShort(I18n.t('pleaseConnectDevice'))
+        return
+      }
+    }
+    this.props.onPress()
+  }
+
   render() {
-    const { title, onPress, disabled } = this.props
+    const { title, disabled } = this.props
     return (
       <Footer>
         <FooterTab>
           <Button
             full
             style={{backgroundColor: disabled ? Color.DISABLE_BG : Color.ACCENT}}
-            onPress={onPress}
+            onPress={() => this._handlerPress()}
             disabled={disabled}>
             <Text style={[styles.btnText, {color: disabled ? Color.SECONDARY_TEXT : Color.TEXT_ICONS}]}>{title}</Text>
           </Button>
@@ -31,15 +54,4 @@ export default class FooterButton extends PureComponent {
       </Footer>
     )
   }
-}
-
-FooterButton.prototypes = {
-  title: PropTypes.string,
-  onPress: PropTypes.func,
-  disabled: PropTypes.bool
-}
-
-FooterButton.defaultProps = {
-  title: '',
-  disabled: false
 }

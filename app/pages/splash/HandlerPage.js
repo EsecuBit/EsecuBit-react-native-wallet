@@ -1,20 +1,22 @@
 import React, { Component } from 'react'
 import { View, Image, Dimensions } from 'react-native'
-import { EsWallet, D } from 'esecubit-wallet-sdk'
-import ToastUtil from '../../utils/ToastUtil'
-import { NavigationActions } from 'react-navigation'
+import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
+import { NavigationActions, StackActions } from 'react-navigation'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from '../../actions/SettingsAction'
-import { Unit, Coin } from '../../common/Constants'
+import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import I18n from '../../lang/i18n'
 
-const deviceW = Dimensions.get('window').width
 class HandlerPage extends Component {
+  static navigationOptions = {
+    header: null
+  }
   constructor(props) {
     super(props)
     this.esWallet = new EsWallet()
+    this.deviceW = Dimensions.get('window').width
   }
 
   render() {
@@ -22,7 +24,7 @@ class HandlerPage extends Component {
       <View style={{ flex: 1 }}>
         <Image
           source={require('../../imgs/ic_background.png')}
-          style={{ flex: 1, width: deviceW, height: deviceW }}
+          style={{ flex: 1, width: this.deviceW, height: this.deviceW }}
         />
       </View>
     )
@@ -31,64 +33,67 @@ class HandlerPage extends Component {
   componentDidMount() {
     this._getCurrencyPreference()
     this.esWallet.setTestSeed(
-      '90b41b9c4720b3f522a9e0d783c70fcabc43d5529f2d7d8ecc798da2c436259f052d697718e3297f1512c71e51b3d762099653d20d019cad931576f5d1c00775'
+      'ef3a397c6af3bce6f05b75dd8437f1552d17190eeb6b1b9e85872f207db5b5e5db4aade19ebdc47f90935cb5bec30cbab68dbce67a139f923ca697e04311284c'
     )
-    this._enterOfflineMode()
+    this.esWallet.enterOfflineMode()
+      .catch(error => {
+        this._gotoHomePage(true)
+        console.log('enter offline mode error', error)
+      })
     this._getLanguagePreference()
+    this._listenWalletStatus()
   }
 
   async _getLanguagePreference() {
     let languagePref = await PreferenceUtil.getLanguagePreference()
     if (languagePref) {
       I18n.locale = languagePref.label
-    }else {
+    } else {
       I18n.locale = 'en'
     }
   }
 
-  _enterOfflineMode() {
-    this.esWallet
-      .enterOfflineMode()
-      .then(() => {
-        const resetAction = NavigationActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({
-              routeName: 'Home',
-              params: { offlineMode: true }
-            })
-          ]
-        })
-        this.props.navigation.dispatch(resetAction)
-        console.log('can enter offline mode')
-      })
-      .catch(e => {
-        if (e === D.error.offlineModeNotAllowed) {
+  _listenWalletStatus() {
+    this.esWallet.listenStatus((error, status) => {
+      console.log('wallet status code', error, status)
+      if (error === D.error.succeed) {
+        if (status === D.status.syncing) {
+          this._gotoHomePage(true)
+          console.log('can enter offline mode')
+        }
+      }else {
+        if (error === D.error.offlineModeNotAllowed) {
           if (D.test.jsWallet) {
-            this.props.navigation.replace('Splash')
+            this._resetRouter('Splash')
           } else {
-            this.props.navigation.replace('PairList', { hasBackBtn: false })
+            this._resetRouter('PairList', { autoConnect: true })
           }
           console.warn('offlineModeNotAllowed')
-          return
+        }else {
+          this._gotoHomePage(true)
+          console.warn('other error, stop', error)
         }
-        if (
-          e === D.error.offlineModeUnnecessary ||
-          e === D.error.networkProviderError ||
-          e === D.error.networkUnavailable ||
-          e === D.error.invalidParams ||
-          e === D.error.unknown
-        ) {
-          console.warn('offlineModeUnnecessary')
-          this.props.navigation.replace('Home', { offlineMode: true })
-          if (e === D.error.unknown) {
-            ToastUtil.showErrorMsgShort(e)
-          }
-          return
-        }
-        console.warn('other error, stop', e)
-        ToastUtil.showErrorMsgShort(e)
+      }
+    })
+  }
+
+  _gotoHomePage(offlineMode) {
+    this._resetRouter('Home', { offlineMode: offlineMode })
+  }
+
+  _resetRouter(routeName, params) {
+    setTimeout(() => {
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({
+            routeName: routeName,
+            params: params
+          })
+        ]
       })
+      this.props.navigation.dispatch(resetAction)
+    }, 2000)
   }
 
   async _getCurrencyPreference() {
@@ -113,11 +118,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   setCryptoCurrencyUnit,
-  setLegalCurrencyUnit
+  setLegalCurrencyUnit,
 }
 
+
+
 const Handler = connect(
-  mapStateToProps,                            
+  mapStateToProps,
   mapDispatchToProps
 )(HandlerPage)
 export default Handler

@@ -13,3 +13,10 @@ export function setAccountCryptoCurrencyUnit(unit) {
     unit: unit
   }
 }
+
+export function setAddress(address) {
+  return {
+    type: ActionType.SET_ADDRESS,
+    address: address
+  }
+}

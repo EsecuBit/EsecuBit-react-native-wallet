@@ -1,11 +1,15 @@
 package com.excelsecu.eswallet;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 
 
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
-import com.excelsecu.eswallet.crypto.CryptoReactPackage;
+import com.excelsecu.rnwallet.crypto.CryptoReactPackage;
 import com.facebook.react.ReactApplication;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.excelsecu.rnwallet.BtDeviceReactPackage;
 import io.realm.react.RealmReactPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -32,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.asList(
               new MainReactPackage(),
+            new RNGestureHandlerPackage(),
               new RealmReactPackage(),
               new RNCameraPackage(),
               new VectorIconsPackage(),
@@ -39,6 +44,11 @@ public class MainApplication extends Application implements ReactApplication {
               new BtDeviceReactPackage(),
               new CryptoReactPackage()
       );
+    }
+
+    @Override
+    protected String getJSMainModuleName() {
+      return "index";
     }
   };
 
@@ -51,5 +61,11 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+  }
+
+  @Override
+  protected void attachBaseContext(Context base) {
+    super.attachBaseContext(base);
+    MultiDex.install(this);
   }
 }

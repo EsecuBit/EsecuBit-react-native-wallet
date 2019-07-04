@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <phone model="OPPO R9 Plustm A" write_default_type="1" delay="0" />
+    <phone model="SM-A9000" write_default_type="1" delay="0"  />
+    <phone model="Redmi Note 3" write_default_type="1" delay="0"  />
+    <phone model="OPPO A33M" write_default_type="0" delay="5"  />
+    <phone model="KIW-AL10" write_default_type="0" delay="5"  />
+    <phone model="ATH-AL00H" write_default_type="0" delay="5"  />
+    <phone model="MI MAX" write_default_type="0" delay="5"  />
+    <phone model="vivo X7Plus" write_default_type="1" delay="0"  />
+</config>

@@ -1,4 +1,5 @@
-import { StyleSheet, Platform, Dimensions } from 'react-native'
+import React from "react"
+import {StyleSheet, Platform, Dimensions } from 'react-native'
 const COLOR_PRIMARY = '#1D1D1D'
 const COLOR_DARK_PRIMARY = '#1D1D1D'
 const COLOR_LIGHT_PRIMARY = '#DED1A4'
@@ -22,6 +23,7 @@ const COLOR_SUCCESS = '#5cb85c'
 const COLOR_WARNING = '#f0ad4e'
 const COLOR_DANGER = '#d9534f'
 const COLOR_DISABLE_BG = '#CFCFCF'
+const COLOR_WHITE = '#FFF'
 
 export const Color = {
   PRIMARY: COLOR_PRIMARY,
@@ -46,7 +48,8 @@ export const Color = {
   SUCCESS: COLOR_SUCCESS,
   WARNING: COLOR_WARNING,
   DANGER: COLOR_DANGER,
-  DISABLE_BG: COLOR_DISABLE_BG
+  DISABLE_BG: COLOR_DISABLE_BG,
+  WHITE: COLOR_WHITE
 }
 
 const DIMEN_SECONDAT_TEXT = 14
@@ -56,7 +59,7 @@ const DIMEN_PADDING = 5
 const DIMEN_MARGIN_HORIZONTAL = 16
 const DIMEN_MARGIN_VERTICAL = 16
 const DIMEN_CORNER = 10
-const DIMEN_CARD_HEIGHT = 96
+const DIMEN_CARD_HEIGHT = 86
 const DIMEN_TOOLBAR_ANDROID = 56
 const DIMEN_TOOLBAR_IOS = 64
 const DIMEN_IPHONEX_SAFEAREA_PADDING = 34
@@ -126,11 +129,39 @@ export const CommonStyle = StyleSheet.create({
     marginLeft: DIMEN_MARGIN_HORIZONTAL + DIMEN_MARGIN_HORIZONTAL,
     height: DIMEN_TOOLBAR_ANDROID
   },
-  multlineInputAndroid: {
+  multilineInputAndroid: {
     height: 68
   },
-  multlineInputIOS: {
+  multilineInputIOS: {
     height: 68,
     paddingTop: 24
+  },
+  horizontalDialogContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Dimen.MARGIN_HORIZONTAL
+  },
+  verticalDialogContent: {
+    paddingTop: Dimen.MARGIN_VERTICAL,
+  },
+  horizontalDialogText: {
+    marginLeft: Dimen.MARGIN_HORIZONTAL,
+    marginRight: Dimen.MARGIN_HORIZONTAL,
+    fontSize: Dimen.SECONDARY_TEXT
+  },
+  verticalDialogText: {
+    fontSize: Dimen.SECONDARY_TEXT
+  },
+  iosTextInput: {
+    height: 40,
+    marginTop: Dimen.SPACE,
+    borderWidth: 0.8,
+    borderColor: Color.DISABLE_BG,
+    paddingLeft: Dimen.SPACE
+  },
+  androidTextInput: {
+    height: 40,
+    marginTop: Dimen.SPACE,
+    paddingLeft: Dimen.SPACE
   }
 })
