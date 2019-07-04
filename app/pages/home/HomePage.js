@@ -75,25 +75,21 @@ class HomePage extends Component {
     }
     this.deviceW = Dimensions.get('window').width
     this.timers = []
-    // prevent duplicate click
-    this.throttleFirst = false
   }
 
 
   _onFocus() {
-    this.props.navigation.addListener('willFocus', () => {
+    this.props.navigation.addListener('didFocus', () => {
       this._updateUI()
       this._initListener()
       this._listenWallet()
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
-      NetInfo.addEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
   }
 
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      NetInfo.removeEventListener('networkChange', this._handleConnectivityChange.bind(this))
     })
   }
 
@@ -184,7 +180,7 @@ class HomePage extends Component {
     this.setState({bluetoothConnectDialogVisible: true, bluetoothConnectDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.btTransmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.btTransmitter.connect(deviceInfo)
       }
     })
@@ -258,7 +254,7 @@ class HomePage extends Component {
     try {
       let accounts = await this.wallet.getAccounts()
       console.log('accounts', accounts)
-      await this.setState({accounts: accounts})
+      this.setState({accounts: accounts})
     } catch (error) {
       console.warn('getAccounts', error)
       ToastUtil.showErrorMsgShort(error)
@@ -299,7 +295,7 @@ class HomePage extends Component {
   async _hideAccount() {
     this.setState({hideAccountDialogVisible: false})
     await this.currentHideAccount.hideAccount()
-    await this._updateUI()
+    this._updateUI()
   }
 
   render() {

@@ -62,7 +62,7 @@ class PreferenceUtil {
     return await this.getCurrencyUnit(key)
   }
 
-  static async setDefaultDevice(obj: {}) {
+  static async setDefaultDevice(obj) {
     obj = JSON.stringify(obj)
     realmDB.saveOrUpdatePreference('sn', obj)
   }

@@ -1725,7 +1725,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.excelsecu.eswallet;
+				PRODUCT_BUNDLE_IDENTIFIER = eswallet;
 				PRODUCT_NAME = ESECUBIT;
 				PROVISIONING_PROFILE = "df628a32-278d-4d07-b968-195d5a1df7a4";
 				PROVISIONING_PROFILE_SPECIFIER = devlop_sz;
@@ -1777,7 +1777,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.excelsecu.eswallet;
+				PRODUCT_BUNDLE_IDENTIFIER = eswallet;
 				PRODUCT_NAME = ESECUBIT;
 				PROVISIONING_PROFILE = "8219a7fe-b21c-47c4-80c5-192047afe511";
 				PROVISIONING_PROFILE_SPECIFIER = appstore_sz;

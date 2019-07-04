@@ -98,7 +98,7 @@ export default class PairListPage extends Component {
 
   _onFocus() {
     // !!! do not change to didFocus, not working, seems it is a bug belong to react-navigation-redux-helpers
-    this.props.navigation.addListener('willFocus', async () => {
+    this.props.navigation.addListener('didFocus', async () => {
       this._listenTransmitter()
       await this.setState({deviceList: []})
       const {params} = this.props.navigation.state
@@ -140,6 +140,9 @@ export default class PairListPage extends Component {
         return
       }
       if (status === BtTransmitter.connected) {
+        console.log('connected')
+        _that._saveLastConnectedDevice()
+        _that.transmitter.stopScan()
         if (config.productVersion === 'tp') {
           let walletID = await this.wallet.getWalletId()
           // skip to create wallet, only support tp's eos, the wallet id is 32 bytes of zero
@@ -157,13 +160,11 @@ export default class PairListPage extends Component {
             }
           }
         }
-        _that._gotoSyncPage()
-        _that.transmitter.stopScan()
       }
     })
   }
 
-  async _gotoSyncPage() {
+  async _saveLastConnectedDevice() {
     console.log('device connected')
     this.transmitter.stopScan()
     console.log('connected device info', this.connectDeviceInfo)
@@ -223,7 +224,7 @@ export default class PairListPage extends Component {
   _connectDevice(rowData) {
     console.log('connect device sn is', rowData)
     this.transmitter.connect(rowData)
-    this.connectDeviceInfo = rowData
+    this.connectDeviceInfo = JSON.parse(JSON.stringify(rowData))
     this.setState({connectDialogVisible: true, dialogDesc: I18n.t('connecting')})
   }
 

@@ -285,7 +285,7 @@ class SettingsPage extends Component {
     this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('searchingDevice')})
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.transmitter.connect(deviceInfo)
       }
     })

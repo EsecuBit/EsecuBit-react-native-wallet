@@ -174,8 +174,6 @@ class EOSAccountDetailPage extends Component {
   _showRegisterDialog() {
     if (!this.account.isRegistered()) {
       this._isMounted && this.setState({showRegisterDialogVisible: true})
-    } else {
-      // this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('syncing')})
     }
   }
 
@@ -291,7 +289,7 @@ class EOSAccountDetailPage extends Component {
     })
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.transmitter.connect(deviceInfo)
       }
     })

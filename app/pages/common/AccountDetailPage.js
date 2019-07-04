@@ -185,7 +185,7 @@ class AccountDetailPage extends Component {
     })
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
-      if (deviceInfo.sn === info.sn) {
+      if (deviceInfo && deviceInfo.sn === info.sn) {
         this.transmitter.connect(deviceInfo)
       }
     })
