@@ -36,7 +36,12 @@ class AddressInput extends PureComponent {
       await this.setState({ checkAddressSuccess: true, checkAddressError: false })
     } catch (e) {
       console.warn('check Address error', address, e)
-      await this.setState({ checkAddressSuccess: false, checkAddressError: true })
+      // for eth, support no checksum address
+      if (e === D.error.noAddressCheckSum) {
+        await this.setState({ checkAddressSuccess: true, checkAddressError: false })
+      }else {
+        await this.setState({ checkAddressSuccess: false, checkAddressError: true })
+      }
     } finally {
       await this.setState({address: address})
       this.props.onChangeText(address)
