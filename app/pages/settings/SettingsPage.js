@@ -86,6 +86,10 @@ class SettingsPage extends Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    // clearTimeout
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
   }
 
   _listenWallet() {
