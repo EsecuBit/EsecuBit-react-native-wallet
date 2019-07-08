@@ -8,6 +8,9 @@ import I18n from "../../lang/i18n"
 import {CommonStyle, Dimen, Color} from "../../common/Styles"
 import ToastUtil from "../../utils/ToastUtil"
 import {connect} from "react-redux"
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class AddressDetailPage extends PureComponent {
 

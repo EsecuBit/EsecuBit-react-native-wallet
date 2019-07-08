@@ -17,6 +17,9 @@ import { D, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import {BigDecimal} from 'bigdecimal'
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 
 class EOSSendPage extends Component {

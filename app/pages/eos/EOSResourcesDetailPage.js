@@ -10,6 +10,9 @@ import { BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import StringUtil from "../../utils/StringUtil";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class EOSResourcesDetailPage extends Component {
   static navigationOptions = ({navigation, screenProps}) => {

@@ -9,6 +9,9 @@ import ToastUtil from "../../utils/ToastUtil";
 import { connect } from 'react-redux'
 import { withNavigation } from 'react-navigation'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 
 class EOSBPVotePage extends React.PureComponent {

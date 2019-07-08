@@ -7,6 +7,9 @@ import {Color, CommonStyle} from '../../common/Styles'
 import {NavigationActions, StackActions} from 'react-navigation'
 import {NetInfo, Platform, ActivityIndicator, Text} from 'react-native'
 import CoinUtil from "../../utils/CoinUtil";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 export default class SplashPage extends Component {
 

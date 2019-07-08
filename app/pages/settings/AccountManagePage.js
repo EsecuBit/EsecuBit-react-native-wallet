@@ -14,6 +14,9 @@ import {connect} from 'react-redux'
 import {Coin} from "../../common/Constants";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class AccountManagePage extends Component {
   static navigationOptions = ({navigation, screenProps}) => {

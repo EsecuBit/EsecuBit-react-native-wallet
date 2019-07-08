@@ -10,6 +10,9 @@ import { connect } from 'react-redux'
 import ToastUtil from "../../utils/ToastUtil";
 import { withNavigation } from 'react-navigation'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class EOSBuyRamPage extends React.PureComponent {
   constructor(props) {
