@@ -21,6 +21,9 @@ import {connect} from 'react-redux'
 import PreferenceUtil from '../../utils/PreferenceUtil'
 import StringUtil from "../../utils/StringUtil";
 import {Dropdown} from "react-native-material-dropdown";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 const deviceW = Dimensions.get('window').width
 const platform = Platform.OS

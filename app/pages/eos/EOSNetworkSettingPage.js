@@ -3,6 +3,9 @@ import { Container, Content, Body, ListItem, Text, Icon } from 'native-base'
 import { FlatList, View, StyleSheet, RefreshControl } from 'react-native'
 import BaseToolbar from '../../components/bar/BaseToolbar'
 import { Color, Dimen } from '../../common/Styles'
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 export default class EOSNetworkSettingPage extends Component {
   constructor(props) {

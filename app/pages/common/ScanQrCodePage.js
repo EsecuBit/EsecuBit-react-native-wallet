@@ -5,6 +5,9 @@ import { QRScannerView } from 'ac-qrcode-rn'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
 import {Color, Dimen} from '../../common/Styles'
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class ScanQrCodePage extends Component {
 

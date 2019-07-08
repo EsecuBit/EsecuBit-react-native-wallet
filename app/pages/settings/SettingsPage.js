@@ -21,6 +21,9 @@ import * as Progress from 'react-native-progress';
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import RealmDB from "esecubit-react-native-wallet-sdk/db/RealmDB";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 const btcUnit = ['BTC', 'mBTC']
 const ethUnit = ['ETH', 'GWei']

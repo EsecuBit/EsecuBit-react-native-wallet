@@ -7,6 +7,9 @@ import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class EOSKeyDetailPage extends Component {
 

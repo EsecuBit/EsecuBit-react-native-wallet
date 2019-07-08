@@ -31,6 +31,9 @@ import Dialog, {DialogButton, DialogTitle, DialogContent, DialogFooter} from 're
 import PreferenceUtil from "../../utils/PreferenceUtil";
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 
 class HomePage extends Component {

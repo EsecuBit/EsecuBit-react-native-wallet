@@ -148,10 +148,10 @@ android {
 
 dependencies {
     implementation "org.webkit:android-jsc:r241213"
+    implementation project(':react-native-screens')
     implementation project(':react-native-gesture-handler')
     implementation project(':esecubit-react-native-wallet-sdk')
     implementation project(':react-native-camera')
-    implementation project(':react-native-vector-icons')
     implementation project(':realm')
     implementation project(':react-native-i18n')
     implementation project(':react-native-vector-icons')

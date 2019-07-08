@@ -8,6 +8,9 @@ import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import I18n from '../../lang/i18n'
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class HandlerPage extends Component {
   static navigationOptions = {

@@ -21,6 +21,9 @@ import MemoInput from "../../components/input/MemoInput"
 import ETHDataInput from "../../components/input/ETHDataInput"
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class ETHSendPage extends Component {
 

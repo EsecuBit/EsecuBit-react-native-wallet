@@ -23,6 +23,9 @@ import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import EOSAccountNameInput from "../../components/input/EOSAccountNameInput";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class EOSBandWidthManagePage extends Component {
 

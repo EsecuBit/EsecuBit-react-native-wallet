@@ -18,6 +18,9 @@ import Dialog, { DialogContent, DialogTitle, DialogButton, DialogFooter } from '
 import StringUtil from "../../utils/StringUtil";
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import { useScreens } from 'react-native-screens';
+
+useScreens();
 
 class BTCSendPage extends Component {
 
