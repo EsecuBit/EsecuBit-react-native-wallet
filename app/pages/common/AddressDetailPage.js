@@ -18,6 +18,7 @@ class AddressDetailPage extends PureComponent {
     super()
     this.state = {
       address: "",
+      checkAddress: false,
       storeAddress: false,
       dialogVisible: false
     }
@@ -34,7 +35,7 @@ class AddressDetailPage extends PureComponent {
     if (D.isEos(this.coinType)) {
       this._getAccountName()
     } else {
-      this._getAddress(this.state.storeAddress)
+      this._getAddress(false, this.state.storeAddress)
     }
   }
 
@@ -70,15 +71,22 @@ class AddressDetailPage extends PureComponent {
 
   async _handleStoreAddress() {
     this._isMounted && await this.setState({storeAddress: !this.state.storeAddress})
-    if (this.state.storeAddress === true) {
-      this._getAddress(this.state.storeAddress)
+    if (this.state.storeAddress) {
+      this._getAddress(true, this.state.storeAddress)
     }
   }
 
-  async _getAddress(storeAddress) {
+  async _handleCheckAddress() {
+    this._isMounted && await this.setState({checkAddress: !this.state.checkAddress})
+    if (this.state.checkAddress) {
+      this._getAddress(true, false)
+    }
+  }
+
+  async _getAddress(showAddress, storeAddress) {
     try {
       this._isMounted && await this.setState({dialogVisible: true})
-      let address = await this.account.getAddress(storeAddress)
+      let address = await this.account.getAddress(showAddress, storeAddress)
       this._isMounted && this.setState({address: address.address})
     } catch (error) {
       console.warn("getAddress", error)
@@ -109,7 +117,7 @@ class AddressDetailPage extends PureComponent {
     return (
       <Dialog
         width={0.8}
-        height={465}
+        height={485}
         visible={this.state.dialogVisible}
         rounded
         onTouchOutside={() => this._hideDialog()}
@@ -124,6 +132,19 @@ class AddressDetailPage extends PureComponent {
               <QrCode value={this.state.address} size={240} bgColor="black" fgColor="white"/>
             </View>
           </TouchableWithoutFeedback>
+          <View style={styles.checkboxWrpper}>
+            <Left>
+              <CheckBox
+                style={{justifyContent: "center"}}
+                checked={this.state.checkAddress}
+                onPress={() => this._handleCheckAddress()}
+              />
+            </Left>
+            <Body style={{flex: 3}}>
+              <Text style={CommonStyle.privateText}>{D.isEos(this.account.coinType) ? I18n.t('checkAccount') : I18n.t("checkAddress")}</Text>
+            </Body>
+            <Right/>
+          </View>
           <View style={styles.checkboxWrpper}>
             <Left>
               <CheckBox
@@ -161,7 +182,7 @@ const styles = StyleSheet.create({
   checkboxWrpper: {
     marginLeft: Dimen.MARGIN_HORIZONTAL,
     marginTop: Dimen.SPACE,
-    height: 40,
+    height: 25,
     flexDirection: "row",
     justifyContent: "center"
   },
