@@ -10,6 +10,7 @@ import EOSProxyVotePage from "./EOSProxyVotePage";
 import {Color} from "../../common/Styles";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import EOSHadVotedPage from "./EOSHadVotedPage";
 
 
 class EOSVotePage extends Component {
@@ -31,6 +32,7 @@ class EOSVotePage extends Component {
       routes: [
         {key: 'BP', title: I18n.t('blockProducers')},
         {key: 'Proxy', title: I18n.t('proxy')},
+        {key: 'Voted', title: I18n.t('voted')}
       ],
     };
   }
@@ -67,6 +69,7 @@ class EOSVotePage extends Component {
           renderScene={SceneMap({
             BP: EOSBPVotePage,
             Proxy: EOSProxyVotePage,
+            Voted: EOSHadVotedPage
           })}
           renderTabBar={props =>
             <TabBar

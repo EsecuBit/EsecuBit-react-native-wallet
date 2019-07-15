@@ -6,6 +6,7 @@ import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
 import {Color, Dimen} from '../../common/Styles'
 import { useScreens } from 'react-native-screens';
+import {withNavigation} from 'react-navigation'
 
 useScreens();
 
@@ -23,6 +24,8 @@ class ScanQrCodePage extends Component {
     this._onFocus()
     this._onBlur()
   }
+
+
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
@@ -43,9 +46,9 @@ class ScanQrCodePage extends Component {
 
   _qrCodeReceived(e) {
     if (!this.hadReceiveResult) {
-      DeviceEventEmitter.emit('address', e.data)
-      this.props.navigation.pop()
+      e.data && DeviceEventEmitter.emit('address', e.data)
       this.hadReceiveResult = true
+      this.props.navigation.pop()
     }
   }
 
@@ -85,9 +88,9 @@ class ScanQrCodePage extends Component {
           iscorneroffset={false}
           cornerOffsetSize={0}
           scanBarAnimateTime={3000}
-          renderTopBarView={this._renderTopBar.bind(this)}
-          renderBottomMenuView={this._renderBottomBar.bind(this)}
-          onScanResultReceived={this._qrCodeReceived.bind(this)}
+          renderTopBarView={() => this._renderTopBar()}
+          renderBottomMenuView={() => this._renderBottomBar()}
+          onScanResultReceived={e => this._qrCodeReceived(e)}
         />
       </Container>
     )
@@ -96,4 +99,4 @@ class ScanQrCodePage extends Component {
 
 
 
-export default ScanQrCodePage
+export default withNavigation(ScanQrCodePage)
