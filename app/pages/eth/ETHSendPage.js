@@ -321,7 +321,6 @@ class ETHSendPage extends Component {
       && this.feeInput.isValidInput()
       && this.gasLimitInput.isValidInput()
       && this.ethDataInput.isValidInput()
-    console.log('result ', !result);
     this.setState({footerBtnDisable: !result})
 
   }

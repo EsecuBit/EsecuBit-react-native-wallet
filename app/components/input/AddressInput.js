@@ -28,6 +28,8 @@ class AddressInput extends PureComponent {
     })
   }
 
+  componentWillUnmount(): void {
+  }
 
   // @flow
   async _handleAddressInput(address: string) {
@@ -35,7 +37,7 @@ class AddressInput extends PureComponent {
       D.address.checkAddress(this.props.account.coinType, address)
       await this.setState({ checkAddressSuccess: true, checkAddressError: false })
     } catch (e) {
-      console.warn('check Address error', address, e)
+      console.warn('check address error', address, e)
       // for eth, support no checksum address
       if (e === D.error.noAddressCheckSum) {
         await this.setState({ checkAddressSuccess: true, checkAddressError: false })

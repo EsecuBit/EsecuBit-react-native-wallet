@@ -123,10 +123,11 @@ class SettingsPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
-      this._isMounted && this.setState({
+      this.setState({
         clearDataWaitingDialogVisible: false,
         limitValueDialogVisible: false,
-        updateVersionDialogVisible: false
+        updateVersionDialogVisible: false,
+        updateAppletDialogVisible: false
       })
     })
   }

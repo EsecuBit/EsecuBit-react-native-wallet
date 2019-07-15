@@ -147,6 +147,7 @@ class FeeInput extends PureComponent {
                 marginLeft: Dimen.SPACE,
                 paddingBottom: 12
               }}
+              lineWidth={0}
               data={this.state.feesTip}
               fontSize={14}
               itemTextStyle={{ textAlign: 'center', flex: 0 }}
@@ -169,7 +170,7 @@ class FeeInput extends PureComponent {
           <TouchableOpacity
             style={{ marginLeft: Dimen.SPACE, alignSelf: 'auto' }}
             onPress={this._changeFeeType.bind(this)}>
-            <Icon name="swap" style={{ color: Color.ACCENT }} />
+            <Icon name="swap" style={{ color: Color.ACCENT, marginRight: Dimen.SPACE }} />
           </TouchableOpacity>
         </Item>
       </CardItem>
