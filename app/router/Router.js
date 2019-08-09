@@ -13,6 +13,7 @@ const options = {
   headerTintColor: Color.ACCENT,
   headerTitleStyle: {
     fontSize: Dimen.PRIMARY_TEXT,
+    textAlignVertical: 'center'
   },
 }
 const EsecuBitNavigator = createStackNavigator(RouterConfig, {

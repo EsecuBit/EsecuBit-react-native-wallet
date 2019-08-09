@@ -1,0 +1,9 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:navigationBarColor" >#1D1D1D</item>
+        <item name="android:colorPrimary">#1D1D1D</item>
+    </style>
+</resources>

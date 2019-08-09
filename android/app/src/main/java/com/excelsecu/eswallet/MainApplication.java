@@ -8,6 +8,7 @@ import android.support.multidex.MultiDex;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.excelsecu.rnwallet.crypto.CryptoReactPackage;
 import com.facebook.react.ReactApplication;
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.excelsecu.rnwallet.BtDeviceReactPackage;
@@ -37,6 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.asList(
               new MainReactPackage(),
+            new SplashScreenReactPackage(),
             new RNScreensPackage(),
             new RNGestureHandlerPackage(),
               new RealmReactPackage(),
