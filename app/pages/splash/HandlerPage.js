@@ -9,6 +9,8 @@ import { connect } from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import I18n from '../../lang/i18n'
 import { useScreens } from 'react-native-screens';
+import SplashScreen from "react-native-splash-screen";
+
 
 useScreens();
 
@@ -24,12 +26,7 @@ class HandlerPage extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <Image
-          source={require('../../imgs/ic_background.png')}
-          style={{ flex: 1, width: this.deviceW, height: this.deviceW }}
-        />
-      </View>
+      <View/>
     )
   }
 
@@ -45,6 +42,10 @@ class HandlerPage extends Component {
       })
     this._getLanguagePreference()
     this._listenWalletStatus()
+  }
+
+  componentWillUnmount(): void {
+    SplashScreen.hide()
   }
 
   async _getLanguagePreference() {

@@ -107,7 +107,6 @@ export default class NewAccountPage extends Component {
       ToastUtil.showShort(msg)
       this.props.navigation.pop()
     } catch (error) {
-      this.isNeedDialog = false
       console.warn('newAccount Error', error)
       // this code snippet to fix error: RN android lost touches with E/unknown: Reactions: Got DOWN touch before receiving or CANCEL UP from last gesture
       // https://github.com/facebook/react-native/issues/17073#issuecomment-360010682
