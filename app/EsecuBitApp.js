@@ -1,3 +1,4 @@
+// must import at first
 import {} from './global'
 import React from 'react'
 import {StatusBar, Platform} from 'react-native'
@@ -13,8 +14,6 @@ export default class EsecuBitApp extends React.Component {
     super(props)
     config.initApp()
   }
-
-
 
   render() {
     return (

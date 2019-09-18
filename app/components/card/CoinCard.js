@@ -11,7 +11,6 @@ import { withNavigation } from "react-navigation"
 import CustomIcon from "../CustomIcon"
 import { Coin } from "../../common/Constants"
 import { D } from 'esecubit-wallet-sdk'
-import I18n from '../../lang/i18n'
 
 class CoinCard extends PureComponent{
   constructor() {

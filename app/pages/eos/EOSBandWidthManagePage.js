@@ -19,11 +19,12 @@ import {connect} from 'react-redux'
 import {withNavigation} from 'react-navigation'
 import ToastUtil from "../../utils/ToastUtil"
 import I18n from '../../lang/i18n'
-import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
+import Dialog, {DialogContent, DialogTitle, DialogFooter} from "react-native-popup-dialog";
 import EOSAccountNameInput from "../../components/input/EOSAccountNameInput";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';
+import {DialogButton} from "react-native-popup-dialog/src";
 
 useScreens();
 
@@ -35,6 +36,11 @@ class EOSBandWidthManagePage extends Component {
       headerLeft: (
         <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
           <Item title="home" iconName="ios-arrow-back" onPress={() => navigation.pop()}/>
+        </HeaderButtons>
+      ),
+      headerRight: (
+        <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
+          <Item title="help" iconName="ios-help-circle" onPress={() => navigation.pop()}/>
         </HeaderButtons>
       )
     }
@@ -54,7 +60,8 @@ class EOSBandWidthManagePage extends Component {
       netValue: '',
       transactionConfirmDialogVisible: false,
       receiver: '',
-      footBtnText: I18n.t('delegate')
+      footBtnText: I18n.t('delegate'),
+      refundDialogVisible: false
     }
     const {params} = props.navigation.state
     this.type = params.type
@@ -172,6 +179,12 @@ class EOSBandWidthManagePage extends Component {
     }
   }
 
+  _buildRefundFormData() {
+    return {
+      owner: this.props.account.label
+    }
+  }
+
   _showTransactionConfirmDialog() {
     this._isMounted && this.setState({
       transactionConfirmDialogVisible: true
@@ -182,6 +195,23 @@ class EOSBandWidthManagePage extends Component {
   async _handleAccountNameInput(text) {
     await this.setState({receiver: text})
     this._checkFormData()
+  }
+
+
+  async _refund() {
+    let form = this._buildRefundFormData()
+    try {
+      let result = await this.props.account.prepareRefund(form)
+      console.log('refund prepare result', result)
+      result = await this.props.account.buildTx(result)
+      console.log('refund build result', result)
+      await this.props.account.sendTx(result)
+      this.setState({refundDialogVisible: false})
+    } catch (e) {
+      console.warn('refund error', e)
+      this.setState({refundDialogVisible: false})
+      ToastUtil.showErrorMsgShort(e)
+    }
   }
 
   render() {
@@ -262,9 +292,33 @@ class EOSBandWidthManagePage extends Component {
             </Text>
           </DialogContent>
         </Dialog>
+        <Dialog
+          onTouchOutside={() => {}}
+          width={0.8}
+          visible={this.state.refundDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('refund')}/>}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                onPress={() => this.setState({refundDialogVisible: false})}
+                text={I18n.t('cancel')} />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                onPress={() => this._refund()}
+                text={I18n.t('confirm')} />
+            </DialogFooter>
+          }
+        >
+          <DialogContent style={CommonStyle.verticalDialogContent}>
+            <Text>{I18n.t('refundTip')}</Text>
+          </DialogContent>
+        </Dialog>
         <FooterButton
           title={this.state.footBtnText} disabled={this.state.disableFooterBtn}
-          onPress={() => this._showTransactionConfirmDialog()}/>
+          onPress={() => this.setState({refundDialogVisible: true})}/>
       </Container>
     )
   }
