@@ -18,6 +18,7 @@ import EOSVotePage from "../pages/eos/EOSVotePage"
 import AccountManagePage from "../pages/settings/AccountManagePage"
 import EOSAccountDetail from "../pages/eos/EOSAccountDetailPage";
 import EOSRamManagePage from "../pages/eos/EOSRamManagePage";
+import EOSUpdateAuthPage from "../pages/eos/EOSUpdateAuthPage";
 
 export default {
   Handler: {
@@ -79,5 +80,9 @@ export default {
   },
   EOSRamManage: {
     screen: EOSRamManagePage
+  },
+
+  EOSUpdateAuth: {
+    screen: EOSUpdateAuthPage
   }
 }
