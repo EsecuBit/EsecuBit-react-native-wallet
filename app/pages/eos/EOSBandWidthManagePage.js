@@ -31,6 +31,7 @@ useScreens();
 class EOSBandWidthManagePage extends Component {
 
   static navigationOptions = ({navigation, screenProps}) => {
+    const { params = {} } = navigation.state;
     return {
       title: I18n.t('bandwidthManage'),
       headerLeft: (
@@ -40,7 +41,7 @@ class EOSBandWidthManagePage extends Component {
       ),
       headerRight: (
         <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
-          <Item title="help" iconName="ios-help-circle" onPress={() => navigation.pop()}/>
+          <Item title="help" iconName="ios-help-circle" onPress={() => params.handleRefundDialog()}/>
         </HeaderButtons>
       )
     }
@@ -74,6 +75,8 @@ class EOSBandWidthManagePage extends Component {
     if (this.type === 'undelegate') {
       this.setState({footBtnText: I18n.t('undelegate')})
     }
+    // bind method to navigation
+    this.props.navigation.setParams({handleRefundDialog: this.showRefundTipDialog})
   }
 
   componentWillUnmount(): void {
@@ -89,12 +92,18 @@ class EOSBandWidthManagePage extends Component {
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+      this.setState({refundDialogVisible: false, transactionConfirmDialogVisible: false})
     })
   }
 
   onBackPress = () => {
+    this.setState({refundDialogVisible: false, transactionConfirmDialogVisible: false})
     this.props.navigation.pop()
     return true;
+  }
+
+  showRefundTipDialog = () => {
+    this.setState({refundDialogVisible: true})
   }
 
   async _handleCpuInput(text) {
@@ -318,7 +327,7 @@ class EOSBandWidthManagePage extends Component {
         </Dialog>
         <FooterButton
           title={this.state.footBtnText} disabled={this.state.disableFooterBtn}
-          onPress={() => this.setState({refundDialogVisible: true})}/>
+          onPress={() => this._showTransactionConfirmDialog()}/>
       </Container>
     )
   }
