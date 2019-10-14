@@ -5,9 +5,9 @@ import {Color, Dimen} from '../../common/Styles'
 import ToastUtil from '../../utils/ToastUtil'
 import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
-import HeaderButtons from "react-navigation-header-buttons";
-import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
-import { useScreens } from 'react-native-screens';
+import HeaderButtons from "react-navigation-header-buttons"
+import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton"
+import { useScreens } from 'react-native-screens'
 
 useScreens();
 
@@ -64,6 +64,8 @@ class EOSKeyDetailPage extends Component {
     return true;
   }
 
+
+
   async getPermission() {
     try {
       let keyDetail = await this.props.account.getPermissions()
@@ -83,7 +85,13 @@ class EOSKeyDetailPage extends Component {
     }
   }
 
+  async
+
   _gotoUpdateAuthPage(pubKey = "", keyType = 'active') {
+    if (!pubKey) {
+      ToastUtil.showShort(I18n.t('noPermissionCanbeUpdate'))
+      return
+    }
     this.props.navigation.navigate("EOSUpdateAuth", {pubKey: pubKey, keyType: keyType})
   }
 
