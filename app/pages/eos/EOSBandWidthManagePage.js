@@ -62,7 +62,8 @@ class EOSBandWidthManagePage extends Component {
       transactionConfirmDialogVisible: false,
       receiver: '',
       footBtnText: I18n.t('delegate'),
-      refundDialogVisible: false
+      refundDialogVisible: false,
+      refundTip: I18n.t('refundTip')
     }
     const {params} = props.navigation.state
     this.type = params.type
@@ -208,6 +209,7 @@ class EOSBandWidthManagePage extends Component {
 
 
   async _refund() {
+    this.setState({refundTip: I18n.t('pleaseInputPassword')})
     let form = this._buildRefundFormData()
     try {
       let result = await this.props.account.prepareRefund(form)
@@ -322,7 +324,7 @@ class EOSBandWidthManagePage extends Component {
           }
         >
           <DialogContent style={CommonStyle.verticalDialogContent}>
-            <Text>{I18n.t('refundTip')}</Text>
+            <Text>{this.state.refundTip}</Text>
           </DialogContent>
         </Dialog>
         <FooterButton
