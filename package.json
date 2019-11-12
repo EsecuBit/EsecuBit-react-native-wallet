@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "ac-qrcode-rn": "0.2.1",
-    "esecubit-react-native-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#develop",
+    "esecubit-react-native-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git",
     "esecubit-wallet-i18n": "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git",
     "jsc-android": "241213.1.0",
     "native-base": "2.12.1",

@@ -9,7 +9,7 @@ import {StyleSheet, BackHandler} from 'react-native'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import Dialog, {DialogButton, DialogContent, DialogTitle, DialogFooter} from "react-native-popup-dialog"
 import {withNavigation} from 'react-navigation'
-import {setAccount, setAccountCryptoCurrencyUnit} from "../../actions/AccountAction"
+import {setAccount, setAccountCryptoCurrencyUnit} from "esecubit-react-native-wallet-sdk/actions/AccountAction"
 import {connect} from 'react-redux'
 import {Coin} from "../../common/Constants";
 import HeaderButtons from "react-navigation-header-buttons";

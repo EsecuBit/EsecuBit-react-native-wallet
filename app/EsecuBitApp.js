@@ -1,21 +1,23 @@
-// must import at first
-import {} from './global'
+// must import global at first
+import {} from 'esecubit-react-native-wallet-sdk/global'
 import React from 'react'
 import {StatusBar, Platform} from 'react-native'
 import { Provider as StoreProvider } from 'react-redux'
-import store from './store'
 import AppNavigation from './AppNavigation'
 import { Root } from 'native-base'
-import config from "./config";
 import {Color} from "./common/Styles";
+import Config from "./Config";
+
 
 export default class EsecuBitApp extends React.Component {
   constructor(props) {
     super(props)
-    config.initApp()
+    Config.initApp()
   }
 
   render() {
+    // DON'T import store at the file header, please IMPORT IT inside the class
+    const {store} = require('esecubit-react-native-wallet-sdk/store')
     return (
       <Root>
         <StoreProvider store={store}>

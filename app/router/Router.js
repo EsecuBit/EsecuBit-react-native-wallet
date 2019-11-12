@@ -3,7 +3,6 @@ import {Easing, Animated} from "react-native"
 import {createStackNavigator} from 'react-navigation'
 import {Color, Dimen} from "../common/Styles";
 
-
 const options = {
   headerStyle: {
     backgroundColor: Color.PRIMARY,
@@ -50,4 +49,5 @@ const EsecuBitNavigator = createStackNavigator(RouterConfig, {
   swipeEnabled: true,
   animationEnabled: true
 })
+
 export default EsecuBitNavigator

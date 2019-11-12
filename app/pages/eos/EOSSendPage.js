@@ -66,17 +66,23 @@ class EOSSendPage extends Component {
 
   _onFocus() {
     this.props.navigation.addListener('willFocus', () => {
-      BackHandler.addEventListener('hardwareBackPress', this.onBackPress)
+      BackHandler.addEventListener('hardwareBackPress', this._onBackPress)
     })
   }
 
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
-      BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
+      this._hideDialog()
+      BackHandler.removeEventListener('hardwareBackPress', this._onBackPress)
     })
   }
 
-  onBackPress = () => {
+  _hideDialog() {
+    this.setState({transactionConfirmDialogVisible: false})
+  }
+
+  _onBackPress = () => {
+    this._hideDialog()
     this.props.navigation.pop()
     return true
   }

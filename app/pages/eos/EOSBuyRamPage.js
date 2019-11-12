@@ -1,5 +1,5 @@
 import React from 'react'
-import {Text, StyleSheet, View} from 'react-native'
+import {Text, StyleSheet, View, BackHandler, Keyboard} from 'react-native'
 import { Container, Card, Content, CheckBox} from "native-base";
 import ValueInput from "../../components/input/ValueInput";
 import EOSAccountNameInput from "../../components/input/EOSAccountNameInput";
@@ -43,7 +43,31 @@ class EOSBuyRamPage extends React.PureComponent {
     }
   }
 
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('didBlur', () => {
+      this._hideDialog()
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+
+  onBackPress = () => {
+    this._hideDialog()
+    return true;
+  }
+
+  _hideDialog() {
+    this.setState({transactionConfirmDialogVisible: false})
+  }
+
   _buy() {
+    Keyboard.dismiss()
     let formData = this._buildBuyRamForm()
     this.lockSend = true
     if (this.state.checkEOSUnit) {
@@ -87,7 +111,7 @@ class EOSBuyRamPage extends React.PureComponent {
   }
 
   _checkForm() {
-   let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
+    let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
     this.setState({footerBtnDisable: !result})
   }
 
