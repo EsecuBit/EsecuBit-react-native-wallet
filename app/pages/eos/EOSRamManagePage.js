@@ -48,6 +48,7 @@ class EOSRamManagePage extends React.PureComponent {
     })
   }
 
+
   onBackPress = () => {
     this.props.navigation.pop()
     return true;

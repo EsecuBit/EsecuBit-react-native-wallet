@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text} from 'react-native'
+import {View, StyleSheet, Text, BackHandler, Keyboard} from 'react-native'
 import { Container, Content, Card } from 'native-base'
 import { connect } from 'react-redux'
 import FooterButton from "../../components/FooterButton";
@@ -33,6 +33,29 @@ class EOSSellRamPage extends React.PureComponent {
     this._isMounted = true
   }
 
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('didBlur', () => {
+      this._hideDialog()
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+
+  onBackPress = () => {
+    this._hideDialog()
+    return true;
+  }
+
+  _hideDialog() {
+    this.setState({transactionConfirmDialogVisible: false})
+  }
+
   _checkForm() {
     let result = this.valueInput.isValidInput()
     this.setState({footerBtnDisable: !result})
@@ -46,6 +69,7 @@ class EOSSellRamPage extends React.PureComponent {
   }
 
   _sell() {
+    Keyboard.dismiss()
     let formData = this._buildSellRamForm()
     this.lockSend = true
     this.account.prepareBuyRam(formData)

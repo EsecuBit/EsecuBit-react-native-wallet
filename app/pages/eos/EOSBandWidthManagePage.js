@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Text, StyleSheet, BackHandler} from 'react-native'
+import {Text, StyleSheet, BackHandler, Keyboard} from 'react-native'
 import {
   View,
   Container,
@@ -60,6 +60,7 @@ class EOSBandWidthManagePage extends Component {
       cpuValue: '',
       netValue: '',
       transactionConfirmDialogVisible: false,
+      showValue: true,
       receiver: '',
       footBtnText: I18n.t('delegate'),
       refundDialogVisible: false,
@@ -92,15 +93,19 @@ class EOSBandWidthManagePage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
+      this._hideDialog()
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      this.setState({refundDialogVisible: false, transactionConfirmDialogVisible: false})
     })
   }
 
   onBackPress = () => {
-    this.setState({refundDialogVisible: false, transactionConfirmDialogVisible: false})
+    this._hideDialog()
     this.props.navigation.pop()
     return true;
+  }
+
+  _hideDialog() {
+    this.setState({refundDialogVisible: false, transactionConfirmDialogVisible: false})
   }
 
   showRefundTipDialog = () => {
@@ -148,6 +153,8 @@ class EOSBandWidthManagePage extends Component {
   }
 
   async _stake() {
+    Keyboard.dismiss()
+    this.setState({ showValue: true})
     let formData = this._buildStakeFormData()
     console.log('hello', this.state.cpuValue)
     if (!this.state.cpuValue) {
@@ -209,7 +216,9 @@ class EOSBandWidthManagePage extends Component {
 
 
   async _refund() {
-    this.setState({refundTip: I18n.t('pleaseInputPassword')})
+    Keyboard.dismiss()
+    await this.setState({ showValue: false})
+    this.setState({refundDialogVisible: false, transactionConfirmDialogVisible: true})
     let form = this._buildRefundFormData()
     try {
       let result = await this.props.account.prepareRefund(form)
@@ -217,10 +226,10 @@ class EOSBandWidthManagePage extends Component {
       result = await this.props.account.buildTx(result)
       console.log('refund build result', result)
       await this.props.account.sendTx(result)
-      this.setState({refundDialogVisible: false})
+      this.setState({transactionConfirmDialogVisible: false})
     } catch (e) {
       console.warn('refund error', e)
-      this.setState({refundDialogVisible: false})
+      this.setState({transactionConfirmDialogVisible: false})
       ToastUtil.showErrorMsgShort(e)
     }
   }
@@ -295,12 +304,16 @@ class EOSBandWidthManagePage extends Component {
           dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')}/>}>
           <DialogContent style={CommonStyle.verticalDialogContent}>
             <Text>{I18n.t('pleaseInputPassword')}</Text>
-            <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
-              {`${I18n.t(this.type)} `}
-              <Text style={{color: Color.DANGER}}>{`CPU: ${this.state.cpuValue} EOS `}</Text>
-              <Text style={{color: Color.DANGER}}>{`Net: ${this.state.netValue} EOS`}</Text>
-              <Text>{`\n${I18n.t('to1')} ${this.state.receiver}`}</Text>
-            </Text>
+            {
+              this.state.showValue && (
+                <Text style={{fontSize: Dimen.PRIMARY_TEXT, color: Color.PRIMARY_TEXT}}>
+                  {`${I18n.t(this.type)} `}
+                  <Text style={{color: Color.DANGER}}>{`\nCPU: ${this.state.cpuValue} EOS\n`}</Text>
+                  <Text style={{color: Color.DANGER}}>{`Net: ${this.state.netValue} EOS`}</Text>
+                  <Text>{`\n${I18n.t('to1')} ${this.state.receiver}`}</Text>
+                </Text>
+              )
+            }
           </DialogContent>
         </Dialog>
         <Dialog

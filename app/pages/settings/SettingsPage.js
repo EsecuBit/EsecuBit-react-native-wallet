@@ -10,13 +10,13 @@ import PreferenceUtil from '../../utils/PreferenceUtil'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, CommonStyle} from '../../common/Styles'
 import AppUtil from '../../utils/AppUtil'
-import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from '../../actions/SettingsAction'
+import {setCryptoCurrencyUnit, setLegalCurrencyUnit} from 'esecubit-react-native-wallet-sdk/actions/SettingsAction'
 import {connect} from 'react-redux'
 import CoinUtil from '../../utils/CoinUtil'
 import Dialog, {DialogContent, DialogTitle, DialogButton, DialogFooter} from 'react-native-popup-dialog'
 import {withNavigation, NavigationActions, StackActions} from 'react-navigation'
 import ValueInput from "../../components/input/ValueInput";
-import config from "../../config";
+import config from "../../Config";
 import * as Progress from 'react-native-progress';
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
@@ -58,19 +58,20 @@ class SettingsPage extends Component {
       ethIndex: 0,
       ethDialogVisible: false,
       disConnectDialogVisible: false,
-      updateVersionDialogVisible: false,
       updateAppletInfos: [],
-      updateDesc: '',
       updateAppletDialogVisible: false,
       changeLanguageIndex: 0,
       changeLanguageLabel: 'English',
       changeLanguageDialogVisible: false,
-      clearDataDialogVisible: false,
       clearDataWaitingDialogVisible: false,
-      progressDialogVisible: false,
-      progressDialogDesc: '',
       limitValueDialogVisible: false,
-      limitValue: ''
+      limitValue: '',
+      generalDialogVisible: false,
+      generalDialogDesc: '',
+      titleComponent: Component,
+      footerComponent: Component,
+      contentComponent: Component,
+      touchOutside: () => {}
     }
     this.lockUpgradeApplet = false
     this.coinTypes = D.supportedCoinTypes()
@@ -105,7 +106,7 @@ class SettingsPage extends Component {
           this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
         }
         if (status === D.status.syncFinish || status === D.status.syncing) {
-          this._isMounted && this.setState({progressDialogVisible: false})
+          this._isMounted && this.setState({generalDialogVisible: false})
         }
       }
     })
@@ -125,10 +126,9 @@ class SettingsPage extends Component {
       this.setState({
         clearDataWaitingDialogVisible: false,
         limitValueDialogVisible: false,
-        updateVersionDialogVisible: false,
-        updateAppletDialogVisible: false
       })
     })
+    this._hideGeneralDialog()
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
   }
 
@@ -136,11 +136,152 @@ class SettingsPage extends Component {
     this.setState({
       clearDataWaitingDialogVisible: false,
       limitValueDialogVisible: false,
-      updateVersionDialogVisible: false,
-      updateAppletDialogVisible: false
     })
     this.props.navigation.pop()
     return true
+  }
+
+  _showGeneralDialog(titleComponent, footerComponent, contentComponent, touchOutside = () => {}) {
+    this.setState({titleComponent: titleComponent, footerComponent: footerComponent, contentComponent: contentComponent, touchOutside: touchOutside})
+    this.setState({generalDialogVisible: true})
+  }
+
+  _hideGeneralDialog() {
+    this.setState({generalDialogVisible: false, generalDialogDesc: ''})
+  }
+
+  _renderProgressComponent() {
+    return (
+      <DialogContent style={CommonStyle.horizontalDialogContent}>
+        <ActivityIndicator color={Color.ACCENT} size={'large'}/>
+        <Text style={CommonStyle.horizontalDialogText}>{this.state.generalDialogDesc}</Text>
+      </DialogContent>
+    )
+  }
+
+  _showProgressDialog(desc) {
+    this.setState({generalDialogDesc: desc})
+    this._showGeneralDialog(null, null, this._renderProgressComponent())
+  }
+
+  _renderUpdateVersionComponent() {
+    let title = (
+      <DialogTitle title={I18n.t('versionUpdate')}/>
+    )
+    let footer = (
+      <DialogFooter>
+        <DialogButton
+          key="update_version_cancel"
+          style={{backgroundColor: Color.WHITE}}
+          textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+          text={I18n.t('cancel')}
+          onPress={this._checkForceUpdate.bind(this)}
+        />
+        <DialogButton
+          style={{backgroundColor: Color.WHITE}}
+          textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+          key="update_version_confirm"
+          text={I18n.t('confirm')}
+          onPress={() => this._gotoBrowser()}
+        />
+      </DialogFooter>
+    )
+    let content = (
+      <DialogContent>
+        <Text style={styles.updateDesc}>{this.state.generalDialogDesc}</Text>
+      </DialogContent>
+    )
+    return {title, footer, content}
+  }
+
+  _showUpdateVersionDialog() {
+    const {title, footer, content} = this._renderUpdateVersionComponent()
+    this._showGeneralDialog(title, footer, content)
+  }
+
+  _renderUpdateAppletComponent() {
+    let content = (
+      <DialogContent style={CommonStyle.verticalDialogContent}>
+        {
+          this.state.updateAppletInfos.map(it => {
+            return (
+              <View style={{marginBottom: Dimen.SPACE}}>
+                <View style={styles.updateAppletWrapper}>
+                  <Text>{it.name}</Text>
+                  <Text style={styles.versionText}>{it.version}</Text>
+                  <Text> -></Text>
+                  <Text style={styles.latestVersionText}>{it.latestVersion}</Text>
+                  <Button
+                    small
+                    transparent
+                    rounded
+                    bordered
+                    style={{borderColor: Color.ACCENT}}
+                    onPress={() => this._updateApplet(it)}
+                  >
+                    <Text
+                      style={styles.updateAppletText}>{I18n.t('upgrade')}</Text>
+                  </Button>
+                </View>
+                <View>
+                  {it.showProgress &&
+                  <Progress.Bar
+                    progress={it.progress}
+                    width={deviceW * 0.8 - 16 * 2.5}
+                    color={Color.SECONDARY_TEXT}/>}
+                </View>
+              </View>
+            )
+          })
+        }
+      </DialogContent>
+    )
+    let title = (
+      <DialogTitle title={I18n.t('versionUpdate')}/>
+    )
+    let touchOutside = () => !this.lockUpgradeApplet && this._hideGeneralDialog()
+    return {title, content, touchOutside}
+  }
+
+  _showUpdateAppletDialog() {
+    const {title, content, touchOutside} = this._renderUpdateAppletComponent()
+    this._showGeneralDialog(title, null, content, touchOutside)
+  }
+
+  _showClearDataDialog() {
+    const {title, footer, content} = this._renderClearDataComponent()
+    this._showGeneralDialog(title, footer, content)
+  }
+
+  _renderClearDataComponent() {
+    let title = (
+      <DialogTitle title={I18n.t('clearData')}/>
+    )
+    let footer = (
+      <DialogFooter>
+        <DialogButton
+          style={{backgroundColor: Color.WHITE}}
+          textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+          key="clear_data_cancel"
+          text={I18n.t('cancel')}
+          onPress={() => this._hideGeneralDialog()}
+        />
+        <DialogButton
+          style={{backgroundColor: Color.WHITE}}
+          textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+          key="clear_data_confirm"
+          text={I18n.t('confirm')}
+          onPress={() => this.clearData()}
+        />
+      </DialogFooter>
+    )
+
+    let content = (
+      <DialogContent>
+        <Text style={styles.updateDesc}>{I18n.t('clearDataDesc')}</Text>
+      </DialogContent>
+    )
+    return {title, footer, content}
   }
 
   async _getPreference() {
@@ -169,12 +310,12 @@ class SettingsPage extends Component {
     this.transmitter.listenStatus((error, status) => {
       if (error === D.error.succeed) {
         if (status === BtTransmitter.connecting) {
-          this.setState({progressDialogDesc: I18n.t('connecting'), cosVersion: cosVersion})
+          this.setState({generalDialogDesc: I18n.t('connecting'), cosVersion: cosVersion})
         } else if (status === BtTransmitter.disconnected) {
-          this.setState({progressDialogVisible: false, cosVersion: 'unknown'})
+          this.setState({generalDialogVisible: false, cosVersion: 'unknown'})
         } else if (status === BtTransmitter.connected) {
           this.transmitter.stopScan()
-          this._isMounted && this.setState({progressDialogDesc: I18n.t('initData')})
+          this._isMounted && this.setState({generalDialogDesc: I18n.t('initData')})
         }
       }
     })
@@ -220,10 +361,8 @@ class SettingsPage extends Component {
         this.info = info
         if (info && info.errorCode === Api.success) {
           if (info.data !== null) {
-            this.setState({
-              updateDesc: info.data.description,
-              updateVersionDialogVisible: true
-            })
+            this._showUpdateVersionDialog()
+            this.setState({generalDialogDesc: info.data.description})
           }
         }
         if (info && info.errorCode === Api.noNewApp) {
@@ -237,7 +376,7 @@ class SettingsPage extends Component {
   }
 
   _checkForceUpdate() {
-    this.setState({updateVersionDialogVisible: false})
+    this._hideGeneralDialog()
     if (this.info && this.info.data.isForceUpdate) {
       AppUtil.exitApp()
     }
@@ -247,11 +386,12 @@ class SettingsPage extends Component {
     if (this.info.data) {
       Linking.openURL(Api.baseUrl + this.info.data.downloadUrl)
     }
-    this.setState({updateVersionDialogVisible: false})
+    this._hideGeneralDialog()
   }
 
   async clearData() {
-    this.setState({clearDataDialogVisible: false, clearDataWaitingDialogVisible: true})
+    this._hideGeneralDialog()
+    this._showProgressDialog()
     try {
       // cancel the wallet listener to avoid repeated state，thus the ui will not be confused
       this.wallet.listenStatus(() => {
@@ -296,7 +436,8 @@ class SettingsPage extends Component {
   }
 
   async _findAndConnectDevice() {
-    this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('searchingDevice')})
+    await this.setState({generalDialogDesc: I18n.t('searchingDevice')})
+    this._showProgressDialog()
     let deviceInfo = await PreferenceUtil.getDefaultDevice()
     this.transmitter.startScan((error, info) => {
       if (deviceInfo && deviceInfo.sn === info.sn) {
@@ -307,7 +448,7 @@ class SettingsPage extends Component {
     this.findDeviceTimer = setTimeout(async () => {
       let state = await this.transmitter.getState()
       if (state === BtTransmitter.disconnected) {
-        this.setState({progressDialogVisible: false})
+        this._hideGeneralDialog()
         ToastUtil.showShort(I18n.t('noDeviceFound'))
         this.transmitter.stopScan()
       }
@@ -331,20 +472,22 @@ class SettingsPage extends Component {
 
   async _checkAppletVersion() {
     try {
-      this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('getVersion')})
+      await this.setState({generalDialogDesc: I18n.t('getVersion')})
+      this._showProgressDialog()
       let appletInfos = await this.wallet.getUpdateManager().getAppletList()
       console.log('applet infos 1', appletInfos)
-      this._isMounted && this.setState({progressDialogVisible: false, progressDialogDesc: ''})
+      this._isMounted && this._hideGeneralDialog()
       appletInfos = this.convertAppletInfos(appletInfos)
       if (appletInfos.length === 0) {
         ToastUtil.showShort(I18n.t('noNewApp'))
         return
       }
       console.log('applet infos 2', appletInfos)
-      this._isMounted && this.setState({updateAppletDialogVisible: true, updateAppletInfos: appletInfos})
+      this._isMounted && this.setState({updateAppletInfos: appletInfos})
+      this._showUpdateAppletDialog()
     } catch (e) {
       console.warn(e)
-      this._isMounted && this.setState({progressDialogVisible: false, progressDialogDesc: ''})
+      this._hideGeneralDialog()
       ToastUtil.showErrorMsgShort(e)
     }
   }
@@ -383,11 +526,11 @@ class SettingsPage extends Component {
           if ('HDWALLET' === appletInfo.name.toUpperCase()) {
             this.transmitter.disconnect()
             this._resetRouter()
-            this.setState({updateAppletDialogVisible: false})
+            this._hideGeneralDialog()
           }
         }
         if (appletInfos.length === 0) {
-          this.setState({updateAppletDialogVisible: false})
+          this._hideGeneralDialog()
         }
         this.setState({updateAppletInfos: appletInfos})
       })
@@ -399,7 +542,6 @@ class SettingsPage extends Component {
   }
 
   render() {
-    let that = this
     return (
       <Container style={[CommonStyle.safeAreaBottom, {backgroundColor: Color.CONTAINER_BG}]}>
         <Content style={{backgroundColor: Color.CONTAINER_BG}}>
@@ -513,7 +655,7 @@ class SettingsPage extends Component {
             <CardItem
               bordered
               button
-              onPress={() => this.setState({clearDataDialogVisible: true})}
+              onPress={() => this._showClearDataDialog()}
             >
               <Text>{I18n.t('clearData')}</Text>
             </CardItem>
@@ -727,63 +869,14 @@ class SettingsPage extends Component {
           </DialogContent>
         </Dialog>
 
-        {/* Update Version Dialog */}
         <Dialog
-          width={0.8}
-          visible={this.state.updateVersionDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
-          footer={
-            <DialogFooter>
-              <DialogButton
-                key="update_version_cancel"
-                style={{backgroundColor: Color.WHITE}}
-                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-                text={I18n.t('cancel')}
-                onPress={this._checkForceUpdate.bind(this)}
-              />
-              <DialogButton
-                style={{backgroundColor: Color.WHITE}}
-                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-                key="update_version_confirm"
-                text={I18n.t('confirm')}
-                onPress={() => this._gotoBrowser()}
-              />
-            </DialogFooter>
-          }>
-          <DialogContent>
-            <Text style={styles.updateDesc}>{this.state.updateDesc}</Text>
-          </DialogContent>
+          onTouchOutside={this.state.touchOutside}
+          width={0.9}
+          visible={this.state.generalDialogVisible}
+          dialogTitle={this.state.titleComponent}
+          footer={this.state.footerComponent}>
+          {this.state.contentComponent}
         </Dialog>
-        {/* Update Version Dialog */}
-
-        {/* Clear Data Dialog */}
-        <Dialog
-          width={0.8}
-          visible={this.state.clearDataDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('clearData')}/>}
-          footer={
-            <DialogFooter>
-              <DialogButton
-                style={{backgroundColor: Color.WHITE}}
-                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
-                key="clear_data_cancel"
-                text={I18n.t('cancel')}
-                onPress={() => this.setState({clearDataDialogVisible: false})}
-              />
-              <DialogButton
-                style={{backgroundColor: Color.WHITE}}
-                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
-                key="clear_data_confirm"
-                text={I18n.t('confirm')}
-                onPress={() => this.clearData()}
-              />
-            </DialogFooter>
-          }>
-          <DialogContent>
-            <Text style={styles.updateDesc}>{I18n.t('clearDataDesc')}</Text>
-          </DialogContent>
-        </Dialog>
-        {/* Clear Data Dialog */}
 
         {/* Clear Data Waiting Dialog */}
         <Dialog
@@ -828,60 +921,6 @@ class SettingsPage extends Component {
             <Text>{I18n.t('disconnectTip')}</Text>
           </DialogContent>
         </Dialog>
-        {/* Disconnect Dialog */}
-
-        {/*Bluetooth Connect Dialog*/}
-        <Dialog
-          width={0.8}
-          visible={this.state.progressDialogVisible}
-          onTouchOutside={() => {
-          }}
-        >
-          <DialogContent style={CommonStyle.horizontalDialogContent}>
-            <ActivityIndicator color={Color.ACCENT} size={'large'}/>
-            <Text style={CommonStyle.horizontalDialogText}>{this.state.progressDialogDesc}</Text>
-          </DialogContent>
-        </Dialog>
-        <Dialog
-          width={0.9}
-          visible={this.state.updateAppletDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('versionUpdate')}/>}
-          onTouchOutside={() => !this.lockUpgradeApplet && this.setState({updateAppletDialogVisible: false})}
-        >
-          <DialogContent style={CommonStyle.verticalDialogContent}>
-            {
-              that.state.updateAppletInfos.map(it => {
-                return (
-                  <View style={{marginBottom: Dimen.SPACE}}>
-                    <View style={styles.updateAppletWrapper}>
-                      <Text>{it.name}</Text>
-                      <Text style={styles.versionText}>{it.version}</Text>
-                      <Text> -></Text>
-                      <Text style={styles.latestVersionText}>{it.latestVersion}</Text>
-                      <Button
-                        small
-                        transparent
-                        rounded
-                        bordered
-                        style={{borderColor: Color.ACCENT}}
-                        onPress={() => this._updateApplet(it)}
-                      >
-                        <Text
-                          style={styles.updateAppletText}>{I18n.t('upgrade')}</Text>
-                      </Button>
-                    </View>
-                    <View>
-                      {it.showProgress &&
-                      <Progress.Bar progress={it.progress} width={deviceW * 0.8 - 16 * 2.5}
-                                    color={Color.SECONDARY_TEXT}/>}
-                    </View>
-                  </View>
-                )
-              })
-            }
-          </DialogContent>
-        </Dialog>
-        {/*Bluetooth Connect Dialog*/}
       </Container>
     )
   }

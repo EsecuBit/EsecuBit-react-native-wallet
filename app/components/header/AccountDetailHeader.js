@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
 import CoinUtil from '../../utils/CoinUtil'
 import {Coin} from "../../common/Constants";
-import config from "../../config";
+import config from "../../Config";
 
 
 class AccountDetailHeader extends PureComponent {

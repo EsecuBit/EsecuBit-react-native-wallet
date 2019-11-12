@@ -20,7 +20,7 @@ import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, isIphoneX, CommonStyle} from '../../common/Styles'
 import AppUtil from "../../utils/AppUtil";
-import config from "../../config"
+import config from "../../Config"
 import { useScreens } from 'react-native-screens';
 
 useScreens();
