@@ -112,6 +112,12 @@ class EOSBuyRamPage extends React.PureComponent {
 
   _checkForm() {
     let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
+    // when in bytes unit, decimal is not allowed
+    if (result && !this.state.checkEOSUnit) {
+      let isContainDecimal = this.valueInput.getValue().indexOf('.') !== -1
+      result = !isContainDecimal
+      if (isContainDecimal) this.valueInput.setError()
+    }
     this.setState({footerBtnDisable: !result})
   }
 
