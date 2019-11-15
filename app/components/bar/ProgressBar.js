@@ -48,15 +48,7 @@ export default class ProgressBar extends PureComponent<Props, State> {
     if (prevProps.progress <= 1 && this.props.progress !== prevProps.progress) {
       this.update(prevProps.progress)
     }
-    if (this.props.progress < 0.5) {
-      this.setState({ progressColor: Color.SUCCESS })
-    }
-    if (this.props.progress >= 0.5 && this.props.progress <= 0.8) {
-      this.setState({ progressColor: Color.WARNING })
-    }
-    if (this.props.progress > 0.8) {
-      this.setState({ progressColor: Color.DANGER })
-    }
+    this.setState({ progressColor: Color.SUCCESS })
   }
 
   update(progress: number) {
