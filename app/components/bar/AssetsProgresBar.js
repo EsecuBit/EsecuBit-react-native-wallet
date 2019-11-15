@@ -59,9 +59,9 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
     super(props)
     this.state = {
       total: props.total,
-      used: props.used,
       totalUnit: props.unit,
-      usedUnit: props.unit
+      usedUnit: props.unit,
+      remain: props.available
     }
   }
 
@@ -93,17 +93,17 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
     if (this.state.total >= 1000 * 1000 * 60 * 60) {
       this.setState({total: Number(this.state.total / (1000 * 1000 * 60 * 60)).toFixed(2).toString(), totalUnit: 'hr'})
     }
-    if (this.state.used >= 1000) {
-      this.setState({used: Number(this.state.used / 1000).toFixed(2).toString(), usedUnit: 'ms'})
+    if (this.state.remain >= 1000) {
+      this.setState({remain: Number(this.state.remain / 1000).toFixed(2).toString(), usedUnit: 'ms'})
     }
-    if (this.state.used >= 1000 * 1000) {
-      this.setState({used: Number(this.state.used / (1000 * 1000)).toFixed(2).toString(), usedUnit: 's'})
+    if (this.state.remain >= 1000 * 1000) {
+      this.setState({remain: Number(this.state.remain / (1000 * 1000)).toFixed(2).toString(), usedUnit: 's'})
     }
-    if (this.state.used >= 1000 * 1000 * 60) {
-      this.setState({used: Number(this.state.used / (1000 * 1000 * 60)).toFixed(2).toString(), usedUnit: 'min'})
+    if (this.state.remain >= 1000 * 1000 * 60) {
+      this.setState({remain: Number(this.state.remain / (1000 * 1000 * 60)).toFixed(2).toString(), usedUnit: 'min'})
     }
-    if (this.state.used >= 1000 * 1000 * 60 * 60) {
-      this.setState({used: Number(this.state.used / (1000 * 1000 * 60 * 60)).toFixed().toString(), usedUnit: 'hr'})
+    if (this.state.remain >= 1000 * 1000 * 60 * 60) {
+      this.setState({remain: Number(this.state.remain / (1000 * 1000 * 60 * 60)).toFixed().toString(), usedUnit: 'hr'})
     }
   }
 
@@ -117,21 +117,21 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
     if (this.state.total >= 1024 * 1024 * 1024) {
       this.setState({total: Number(this.state.total / (1024 * 1024 * 1024)).toFixed(2).toString(), totalUnit: 'G'})
     }
-    if (this.state.used >= 1024) {
-      this.setState({used: Number(this.state.used / 1024).toFixed(2).toString(), usedUnit: 'KB'})
+    if (this.state.remain >= 1024) {
+      this.setState({remain: Number(this.state.remain / 1024).toFixed(2).toString(), usedUnit: 'KB'})
     }
-    if (this.state.used >= 1024 * 1024) {
-      this.setState({used: Number(this.state.used / (1024 * 1024)).toFixed(2).toString(), usedUnit: 'M'})
+    if (this.state.remain >= 1024 * 1024) {
+      this.setState({remain: Number(this.state.remain / (1024 * 1024)).toFixed(2).toString(), usedUnit: 'M'})
     }
-    if (this.state.used >= 1024 * 1024 * 1024) {
-      this.setState({used: Number(this.state.used / (1024 * 1024 * 1024)).toFixed(2).toString(), usedUnit: 'G'})
+    if (this.state.remain >= 1024 * 1024 * 1024) {
+      this.setState({remain: Number(this.state.remain / (1024 * 1024 * 1024)).toFixed(2).toString(), usedUnit: 'G'})
     }
   }
 
   render() {
-    const {style, title, staked} = this.props
+    const {style, title, staked, available, total} = this.props
     let res =
-      this.state.used +
+      this.state.remain +
       ' ' +
       this.state.usedUnit +
       ' / ' +
@@ -149,7 +149,7 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
               <ProgressBar
                 style={style.progressBar}
                 width={deviceW - Dimen.MARGIN_HORIZONTAL - 50 - Dimen.SPACE}
-                progress={Number(this.props.used / this.props.total).toFixed(2)}
+                progress={Number(available / total).toFixed(2)}
                 radius={5}
                 ref={ref => {
                   this.progressBar = ref
@@ -162,7 +162,7 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
                   marginLeft: Dimen.SPACE,
                   width: 50
                 }}>
-                {(this.props.used * 100 / this.props.total).toFixed(1) + '%'}
+                {(available * 100 / total).toFixed(1) + '%'}
               </Text>
             </View>
           </View>

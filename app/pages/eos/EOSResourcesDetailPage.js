@@ -76,6 +76,8 @@ class EOSResourcesDetailPage extends Component {
   }
 
   render() {
+    let ramAvailable = this.props.account.resources && this.props.account.resources.ram.total - this.props.account.resources.ram.used
+    ramAvailable = ramAvailable < 0 ? '0' : ramAvailable
     return (
       <Container>
         <View style={{flex: 1}}>
@@ -117,13 +119,13 @@ class EOSResourcesDetailPage extends Component {
             title={'CPU'}
             unit='us'
             staked={this.state.cpuStaked}
-            used={this.props.account.resources ? this.props.account.resources.cpu.used : '0'}
+            available={this.props.account.resources ? this.props.account.resources.cpu.available : '0'}
             total={this.props.account.resources ? this.props.account.resources.cpu.max : '0'}/>
           <AssetsProgressBar
             title={'Network'}
             unit='bytes'
             staked={this.state.netStaked}
-            used={this.props.account.resources ? this.props.account.resources.net.used : '0'}
+            available={this.props.account.resources ? this.props.account.resources.net.available : '0'}
             total={this.props.account.resources ? this.props.account.resources.net.max : '0'}/>
           <AssetsProgressBar
             enablePress
@@ -131,7 +133,7 @@ class EOSResourcesDetailPage extends Component {
               this.props.navigation.navigate('EOSRamManage')
             }}
             title={'RAM'} unit='bytes'
-            used={this.props.account.resources ? this.props.account.resources.ram.used : '0'}
+            available={this.props.account.resources ? ramAvailable : '0'}
             total={this.props.account.resources ? this.props.account.resources.ram.total : '0'}/>
         </View>
       </Container>
