@@ -58,6 +58,12 @@ class EOSSellRamPage extends React.PureComponent {
 
   _checkForm() {
     let result = this.valueInput.isValidInput()
+    if (result) {
+      // when in bytes unit, decimal is not allowed
+      let isContainDecimal = this.valueInput.getValue().indexOf('.') !== -1
+      result = !isContainDecimal
+      if (isContainDecimal) this.valueInput.setError()
+    }
     this.setState({footerBtnDisable: !result})
   }
 
