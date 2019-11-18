@@ -12,9 +12,10 @@ export default class ValueInput extends PureComponent {
     placeholder: '',
     value: '',
     enablePercentageBar: true,
+    enableValueLabel: true,
     label: I18n.t('value'),
-    onChangeText: () => {
-    }
+    onChangeText: () => {},
+    onItemClick: () => {}
   }
 
   constructor(props) {
@@ -67,6 +68,10 @@ export default class ValueInput extends PureComponent {
     await this.setState({sendValueError: true, sendValueStatus: false})
   }
 
+  async setSuccess() {
+    await this.setState({sendValueError: false, sendValueStatus: true})
+  }
+
   blur() {
     this.input && this.input.blur()
   }
@@ -80,7 +85,7 @@ export default class ValueInput extends PureComponent {
           iconRight
           error={this.state.sendValueError}
           success={this.state.sendValueStatus}>
-          <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{this.props.label}</Text>
+          {this.props.enableValueLabel && <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{this.props.label}</Text>}
           <Input
             getRef={refs => this.input = refs}
             selectionColor={Color.ACCENT}
