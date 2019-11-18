@@ -25,6 +25,7 @@ import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';
 import {DialogButton} from "react-native-popup-dialog/src";
+import EOSValueInput from "../../components/input/EOSValueInput";
 
 useScreens();
 
@@ -114,41 +115,16 @@ class EOSBandWidthManagePage extends Component {
 
   async _handleCpuInput(text) {
     await this.setState({cpuValue: text})
-    let cpuTextInvalid = StringUtil.isInvalidValue(text)
-    if (text.indexOf('.') !== -1) {
-      let digit = text.length - text.indexOf('.') - 1
-      if (digit > 4) {
-        ToastUtil.showShort(I18n.t('invalidValue'))
-        cpuTextInvalid = true
-      }
-    }
-    await this.setState({cpuError: cpuTextInvalid, cpuStatus: !cpuTextInvalid && text !== ''})
     this._checkFormData()
   }
 
   async _handleNetInput(text) {
     await this.setState({netValue: text})
-    let netTextInvalid = StringUtil.isInvalidValue(text)
-    if (text.indexOf('.') !== -1) {
-      let digit = text.length - text.indexOf('.') - 1
-      if (digit > 4) {
-        ToastUtil.showShort(I18n.t('invalidValue'))
-        netTextInvalid = true
-      }
-    }
-    await this.setState({netError: netTextInvalid, netStatus: !netTextInvalid && text !== ''})
     this._checkFormData()
   }
 
   _checkFormData() {
-    let result = this.state.cpuStatus && this.state.netStatus
-    result = result && this.accountNameInput.isValidInput()
-    if (parseFloat(this.state.cpuValue) === 0 && parseFloat(this.state.netValue) === 0) {
-      result = false
-    }
-    if (isNaN(parseFloat(this.state.cpuValue)) && isNaN(parseFloat(this.state.netValue))) {
-      result = false
-    }
+    let result = this.cpuValueInput.isValidInput() && this.netValueInput.isValidInput() && this.accountNameInput.isValidInput()
     this.setState({disableFooterBtn: !result})
   }
 
@@ -250,21 +226,13 @@ class EOSBandWidthManagePage extends Component {
               </View>
               <Item stackedLabel>
                 <Label>CPU</Label>
-                <InputGroup iconRight error={this.state.cpuError}>
-                  <Input
-                    selectionColor={Color.ACCENT}
-                    keyboardType="numeric"
-                    placeholder="EOS"
-                    onChangeText={text => this._handleCpuInput(text)}
-                  />
-                  {this.state.cpuError ? (
-                    <Icon
-                      name="close-circle"
-                      style={{color: Color.DANGER}}
-                      onPress={() => this.setState({cpuValue: ''})}
-                    />
-                  ) : null}
-                </InputGroup>
+                <EOSValueInput
+                  placeholder="EOS"
+                  enablePercentageBar={false}
+                  enableValueLabel={false}
+                  ref={refs => (this.cpuValueInput = refs && refs.getWrappedInstance())}
+                  onChangeText={text => this._handleCpuInput(text)}
+                />
               </Item>
             </CardItem>
             <CardItem style={{flexDirection: 'column', alignItems: 'flex-start'}}>
@@ -277,21 +245,13 @@ class EOSBandWidthManagePage extends Component {
               </View>
               <Item stackedLabel last>
                 <Label>Network</Label>
-                <InputGroup iconRight error={this.state.netError}>
-                  <Input
-                    selectionColor={Color.ACCENT}
-                    keyboardType="numeric"
-                    placeholder="EOS"
-                    onChangeText={text => this._handleNetInput(text)}
-                  />
-                  {this.state.netError ? (
-                    <Icon
-                      name="close-circle"
-                      style={{color: Color.DANGER}}
-                      onPress={() => this.setState({netValue: ''})}
-                    />
-                  ) : null}
-                </InputGroup>
+                <EOSValueInput
+                  placeholder="EOS"
+                  enablePercentageBar={false}
+                  enableValueLabel={false}
+                  ref={refs => (this.netValueInput = refs && refs.getWrappedInstance())}
+                  onChangeText={text => this._handleNetInput(text)}
+                />
               </Item>
             </CardItem>
           </Card>
