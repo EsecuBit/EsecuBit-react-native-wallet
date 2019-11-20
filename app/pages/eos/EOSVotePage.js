@@ -32,7 +32,6 @@ class EOSVotePage extends Component {
       routes: [
         {key: 'BP', title: I18n.t('blockProducers')},
         {key: 'Proxy', title: I18n.t('proxy')},
-        {key: 'Voted', title: I18n.t('voted')}
       ],
     };
   }
@@ -69,7 +68,6 @@ class EOSVotePage extends Component {
           renderScene={SceneMap({
             BP: EOSBPVotePage,
             Proxy: EOSProxyVotePage,
-            Voted: EOSHadVotedPage
           })}
           renderTabBar={props =>
             <TabBar

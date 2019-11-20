@@ -1,15 +1,15 @@
 import React from 'react'
-import {View, StyleSheet, Text} from 'react-native'
-import {Card, Container, Content, Input, Item} from 'native-base'
+import {View, StyleSheet, Text, RefreshControl, TouchableWithoutFeedback} from 'react-native'
+import {Card, CheckBox, Container, Content, Input, Item, Left, List, Right, Thumbnail, Button} from 'native-base'
 import FooterButton from "../../components/FooterButton";
 import I18n from '../../lang/i18n'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
-import EOSAccountNameInput from "../../components/input/EOSAccountNameInput";
 import { connect } from 'react-redux'
 import ToastUtil from "../../utils/ToastUtil";
 import { withNavigation } from 'react-navigation'
-import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import { useScreens } from 'react-native-screens';
+import { D } from 'esecubit-react-native-wallet-sdk'
+import { ConfirmTipDialog } from "esecubit-react-native-wallet-components/dialog";
 
 useScreens();
 
@@ -19,11 +19,16 @@ class EOSProxyVotePage extends React.PureComponent {
     super()
     this.state = {
       proxyAccountName: '',
-      footerBtnDisable: true,
-      transactionConfirmDialogVisible: false
+      footerBtnDisable: false,
+      transactionConfirmDialogVisible: false,
+      refreshing: false,
+      proxies: [],
+      isSelectMode: true
     }
     // prevent duplicate send
     this.lockSend = false
+    // the proxy account
+    this.selectProxyer = ''
   }
 
   componentWillUnmount(): void {
@@ -32,6 +37,96 @@ class EOSProxyVotePage extends React.PureComponent {
 
   componentDidMount(): void {
     this._isMounted = true
+    this.getProxies(1)
+  }
+
+
+  async getProxies(pageNum) {
+    this.setState({refreshing: true})
+    let response = await this.props.account.getVoteProxies(pageNum)
+    let hadVoteProxy = this.props.account.resources.vote.proxy
+    this.selectProxyer = hadVoteProxy
+    response = response.slice(0, 100)
+    let proxies = []
+    response.map(it => {
+      let obj = {}
+      obj["account"] = it.account
+      obj["logo"] = it.logo_256_aloha
+      obj["rank"] = it.rank
+      obj["vote_count"] = it.vote_count
+      obj["is_selected"] = it.account === hadVoteProxy
+      proxies.push(obj)
+    })
+    this._refreshProxies(proxies)
+    this.setState({refreshing: false})
+  }
+
+  _refreshProxies(proxies) {
+    this.setState({proxies: D.copy(proxies)})
+  }
+
+  _refreshUI() {
+    let proxies = this.state.proxies
+    this._refreshProxies(proxies)
+  }
+
+  _selectProducer(it) {
+    let check = !it.is_selected
+    let proxies = this.state.proxies
+    proxies[it.rank - 1]["is_selected"]= check
+    // cancel other vote, it is single mode
+    proxies.map((proxy, index) => {
+      if (index !== it.rank -1) {
+        proxy.is_selected = false
+      }
+    })
+    if (check) {
+      this.selectProxyer = it.account
+    }else {
+      this.selectProxyer = ""
+    }
+    this._refreshProxies(proxies)
+    this._refreshUI()
+  }
+
+  _switchSelectMode() {
+    this.setState({isSelectMode: !this.state.isSelectMode})
+    this._refreshUI()
+  }
+
+  _renderRow(item) {
+    return (
+      <TouchableWithoutFeedback onLongPress={() => this._switchSelectMode()}>
+        <View>
+          <View style={{flexDirection: 'row', padding: Dimen.SPACE}}>
+            <Left style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{item.rank}</Text>
+              <Thumbnail source={{uri: item.logo}} small/>
+              <View style={{marginLeft: Dimen.MARGIN_HORIZONTAL, alignItems: 'flex-start'}}>
+                <Text style={CommonStyle.secondaryText}>{item.account}</Text>
+              </View>
+            </Left>
+            <Right style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
+              {this.state.isSelectMode ?
+                <Button
+                  bordered
+                  small
+                  style={{padding: Dimen.SPACE, borderColor: Color.ACCENT}}
+                  onPress={() => this._selectProducer(item)}>
+                  <Text style={CommonStyle.secondaryText}>{item.is_selected ? I18n.t('cancelVote') : I18n.t('vote')}</Text>
+                </Button>
+                : <Text style={CommonStyle.secondaryText}>{`${item.vote_count} vote`}</Text>}
+            </Right>
+          </View>
+          <View style={CommonStyle.divider}/>
+        </View>
+      </TouchableWithoutFeedback>
+    )
+  }
+
+  _onRefresh() {
+    this.setState({refreshing: true})
+    this.getProxies(1)
   }
 
   _handleAccountNameInput(text) {
@@ -48,7 +143,7 @@ class EOSProxyVotePage extends React.PureComponent {
 
   _buildProxyVoteForm() {
     return {
-      proxy: this.accountNameInput.getAccountName()
+      proxy: this.selectProxyer
     }
   }
 
@@ -90,23 +185,24 @@ class EOSProxyVotePage extends React.PureComponent {
   render() {
     return (
       <Container>
-        <Content padder>
-          <Text style={styles.hintText}>{I18n.t('proxyVoteTextHint')}</Text>
-          <EOSAccountNameInput
-            label={I18n.t('accountName')}
-            ref={ref => (this.accountNameInput = ref)}
-            onChangeText={text => this._handleAccountNameInput(text)}
-          />
-        </Content>
-        <Dialog
-          onTouchOutside={() => {}}
-          width={0.8}
+        <List
+          dataArray={this.state.proxies}
+          refreshControl={
+            <RefreshControl
+              title={I18n.t('loading')}
+              refreshing={this.state.refreshing}
+              onRefresh={() => this._onRefresh()}
+            />
+          }
+          renderRow={item => this._renderRow(item)}
+        />
+        <ConfirmTipDialog
           visible={this.state.transactionConfirmDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}>
-          <DialogContent style={CommonStyle.verticalDialogContent}>
+          title={I18n.t('transactionConfirm')}
+          content={
             <Text>{I18n.t('pleaseInputPassword')}</Text>
-          </DialogContent>
-        </Dialog>
+          }
+        />
         <FooterButton title={I18n.t('vote')} disabled={this.state.footerBtnDisable} onPress={() => this._showTransactionConfirmDialog()}/>
       </Container>
     );
