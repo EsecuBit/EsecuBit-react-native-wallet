@@ -1,15 +1,15 @@
 import React from 'react'
-import {View, StyleSheet, Text, FlatList} from 'react-native'
-import {Container, Content, List, Input, Item, Fab, Icon} from 'native-base'
+import {View, StyleSheet, Text, FlatList, RefreshControl, TouchableWithoutFeedback} from 'react-native'
+import {Container, Content, List, Input, Item, Fab, Icon, Thumbnail, Left, Body, Right, CheckBox} from 'native-base'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import FooterButton from "../../components/FooterButton";
 import I18n from "../../lang/i18n";
-import EOSAccountNameInput from "./../../components/input/EOSAccountNameInput";
 import ToastUtil from "../../utils/ToastUtil";
-import { connect } from 'react-redux'
-import { withNavigation } from 'react-navigation'
-import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
-import { useScreens } from 'react-native-screens';
+import {connect} from 'react-redux'
+import {withNavigation} from 'react-navigation'
+import {useScreens} from 'react-native-screens';
+import {D} from 'esecubit-react-native-wallet-sdk'
+import { ConfirmTipDialog } from "esecubit-react-native-wallet-components/dialog";
 
 useScreens();
 
@@ -19,11 +19,14 @@ class EOSBPVotePage extends React.PureComponent {
   constructor() {
     super()
     this.state = {
-      footerBtnDisable: true,
-      transactionConfirmDialogVisible: false
+      footerBtnDisable: false,
+      transactionConfirmDialogVisible: false,
+      refreshing: false,
+      producers: [],
+      isSelectMode: true,
     }
-
     this.lockSend = false
+    this.selectProducers = new Set()
   }
 
   _showTransactionConfirmDialog() {
@@ -34,8 +37,40 @@ class EOSBPVotePage extends React.PureComponent {
   }
 
 
+  async getProducers(pageNum) {
+    this.setState({refreshing: true})
+    let hadVotedProducers = this.props.account.resources.vote.producers
+    this.selectProducers = new Set(hadVotedProducers)
+    let response = await this.props.account.getVoteProducers(pageNum, 100)
+    let producers = []
+    response.map(it => {
+      let obj = {}
+      obj["name"] = it.owner
+      obj["logo"] = it.logo
+      obj["country"] = it.country
+      obj["percentage_votes"] = it.percentage_votes
+      obj["url"] = it.url
+      obj["rank"] = it.rank
+      obj["is_selected"] = hadVotedProducers.findIndex(item => item === it.owner) !== -1
+      producers.push(obj)
+    })
+    await this._refreshProducers(producers)
+    this.setState({refreshing: false})
+  }
+
+  async _refreshProducers(producers) {
+    this.setState({producers: D.copy(producers)})
+  }
+
+  async _refreshUI() {
+    let producers = this.state.producers
+    this._refreshProducers(producers)
+  }
+
+
   componentDidMount(): void {
     this._isMounted = true
+    this.getProducers(1)
   }
 
   componentWillUnmount(): void {
@@ -43,13 +78,18 @@ class EOSBPVotePage extends React.PureComponent {
   }
 
   _checkForm() {
-    let result = this.accountInput.isValidInput()
+    let result = this.selectProducers && this.selectProducers.length !== 0
     this.setState({footerBtnDisable: !result})
   }
 
   _buildBPVoteForm() {
+    let producersName = []
+    this.selectProducers.forEach(it => {
+      producersName.push(it)
+    })
+
     return {
-      producers: [this.accountInput.getAccountName()]
+      producers: producersName
     }
   }
 
@@ -80,27 +120,83 @@ class EOSBPVotePage extends React.PureComponent {
       })
   }
 
+  _switchSelectMode() {
+    this.setState({isSelectMode: !this.state.isSelectMode})
+    this._refreshUI()
+  }
+
+  _selectProducer(it) {
+    let check = !it.is_selected
+    let producers = this.state.producers
+    producers[it.rank - 1]["is_selected"]= check
+    if (check) {
+      this.selectProducers.add(it.name)
+    } else {
+      this.selectProducers.delete(it.name)
+    }
+    this._refreshProducers(producers)
+    this._refreshUI()
+  }
+
+
+  _renderRow(item) {
+    return (
+      <TouchableWithoutFeedback onLongPress={() => this._switchSelectMode()}>
+        <View>
+          <View style={{flexDirection: 'row', padding: Dimen.SPACE}}>
+            <Left style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={[CommonStyle.secondaryText, {marginRight: Dimen.SPACE}]}>{item.rank}</Text>
+              <Thumbnail source={{uri: item.logo}} small/>
+              <View style={{marginLeft: Dimen.MARGIN_HORIZONTAL, alignItems: 'flex-start'}}>
+                <Text style={CommonStyle.secondaryText}>{item.name}</Text>
+                <Text style={CommonStyle.secondaryText}>{item.country ? `(${item.country})` : ""}</Text>
+              </View>
+            </Left>
+            <Right style={{marginRight: Dimen.MARGIN_HORIZONTAL}}>
+              {this.state.isSelectMode ?
+                <CheckBox
+                  style={{width: 24, height: 24, justifyContent: 'center', alignItems: 'center', paddingTop: 3}}
+                  color={Color.ACCENT}
+                  onPress={() => this._selectProducer(item)}
+                  checked={item.is_selected}/>
+                : <Text style={CommonStyle.secondaryText}>{`${Number(item.percentage_votes).toFixed(2)}%`}</Text>}
+            </Right>
+          </View>
+          <View style={CommonStyle.divider}/>
+        </View>
+      </TouchableWithoutFeedback>
+    )
+  }
+
+  _onRefresh() {
+    this.getProducers(1)
+  }
 
   render() {
     return (
-      <Container>
-        <View style={{flex: 1}}>
-          <EOSAccountNameInput
-            label={I18n.t('accountName')}
-            ref={refs => this.accountInput = refs}
-            onChangeText={text => this._checkForm()}
-          />
-        </View>
-        <Dialog
-          onTouchOutside={() => {}}
-          width={0.8}
+      <Container style={CommonStyle.containerBg} padder>
+        <List
+          dataArray={this.state.producers}
+          refreshControl={
+            <RefreshControl
+              title={I18n.t('loading')}
+              refreshing={this.state.refreshing}
+              onRefresh={() => this._onRefresh()}
+            />
+          }
+          renderRow={item => this._renderRow(item)}
+        />
+        <ConfirmTipDialog
           visible={this.state.transactionConfirmDialogVisible}
-          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')} />}>
-          <DialogContent style={CommonStyle.verticalDialogContent}>
+          title={I18n.t('transactionConfirm')}
+          content={
             <Text>{I18n.t('pleaseInputPassword')}</Text>
-          </DialogContent>
-        </Dialog>
-        <FooterButton title={I18n.t('vote')} onPress={() => this._showTransactionConfirmDialog()} disabled={this.state.footerBtnDisable}/>
+          }
+        />
+        <FooterButton
+          title={I18n.t('vote')}
+          onPress={() => this._showTransactionConfirmDialog()}
+          disabled={this.state.footerBtnDisable}/>
       </Container>
     );
   }
