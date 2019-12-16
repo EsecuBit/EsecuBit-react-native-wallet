@@ -22,6 +22,7 @@ import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import RealmDB from "esecubit-react-native-wallet-sdk/db/RealmDB";
 import { useScreens } from 'react-native-screens';
+import { ConfirmTipDialog } from "esecubit-react-native-wallet-components/dialog";
 
 useScreens();
 
@@ -70,7 +71,8 @@ class SettingsPage extends Component {
       progressDialogVisible: false,
       progressDialogDesc: '',
       limitValueDialogVisible: false,
-      limitValue: ''
+      limitValue: '',
+      confirmTipDialogVisible: false
     }
     this.lockUpgradeApplet = false
     this.coinTypes = D.supportedCoinTypes()
@@ -107,6 +109,9 @@ class SettingsPage extends Component {
         if (status === D.status.syncFinish || status === D.status.syncing) {
           this._isMounted && this.setState({progressDialogVisible: false})
         }
+      }else {
+        ToastUtil.showErrorMsgShort(error)
+        this.setState({progressDialogVisible: false})
       }
     })
   }
@@ -122,23 +127,22 @@ class SettingsPage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
-      this.setState({
-        clearDataWaitingDialogVisible: false,
-        limitValueDialogVisible: false,
-        updateVersionDialogVisible: false,
-        updateAppletDialogVisible: false
-      })
+      this._hide()
     })
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
   }
 
-  onBackPress = () => {
+  _hide() {
     this.setState({
       clearDataWaitingDialogVisible: false,
       limitValueDialogVisible: false,
       updateVersionDialogVisible: false,
-      updateAppletDialogVisible: false
+      updateAppletDialogVisible: false,
     })
+  }
+
+  onBackPress = () => {
+    this._hide()
     this.props.navigation.pop()
     return true
   }
@@ -318,14 +322,16 @@ class SettingsPage extends Component {
   async limitValue() {
     try {
       if (this.valueInput.isValidInput()) {
+        this._isMounted && this.setState({limitValueDialogVisible: false, confirmTipDialogVisible: true})
         await this.wallet.setEosAmountLimit(this.state.limitValue)
-        this._isMounted && this.setState({limitValueDialogVisible: false})
         ToastUtil.showShort(I18n.t('successful'))
       } else {
         ToastUtil.showErrorMsgShort(D.error.invalidParams)
       }
     } catch (e) {
       ToastUtil.showErrorMsgShort(e)
+    }finally {
+      this.setState({confirmTipDialogVisible: false})
     }
   }
 
@@ -727,6 +733,14 @@ class SettingsPage extends Component {
           </DialogContent>
         </Dialog>
 
+        <ConfirmTipDialog
+          visible={this.state.confirmTipDialogVisible}
+          title={I18n.t('transactionConfirm')}
+          content={
+            <Text>{I18n.t('confirmTip')}</Text>
+          }
+        />
+
         {/* Update Version Dialog */}
         <Dialog
           width={0.8}
@@ -872,8 +886,9 @@ class SettingsPage extends Component {
                     </View>
                     <View>
                       {it.showProgress &&
-                      <Progress.Bar progress={it.progress} width={deviceW * 0.8 - 16 * 2.5}
-                                    color={Color.SECONDARY_TEXT}/>}
+                      <Progress.Bar
+                        progress={it.progress} width={deviceW * 0.8 - 16 * 2.5}
+                        color={Color.SECONDARY_TEXT}/>}
                     </View>
                   </View>
                 )

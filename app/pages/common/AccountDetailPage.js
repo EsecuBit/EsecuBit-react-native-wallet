@@ -127,20 +127,24 @@ class AccountDetailPage extends Component {
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
       console.log('account detail wallet status', error, status)
-      if (status === D.status.deviceChange) {
-        this._isDeviceChange = true
-        ToastUtil.showLong(I18n.t('deviceChange'))
-        this.transmitter.disconnect()
-        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
-      }
-      if (status === D.status.syncing || status === D.status.syncFinish) {
-        this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
-        if (!this._lock) {
-          this._gotoPage()
-          this._lock = true
+      if (error !== D.error.succeed) {
+        ToastUtil.showErrorMsgShort(error)
+        this.setState({bluetoothConnectDialogVisible: false})
+      } else {
+        if (status === D.status.deviceChange) {
+          this._isDeviceChange = true
+          ToastUtil.showLong(I18n.t('deviceChange'))
+          this.transmitter.disconnect()
+          this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+        }
+        if (status === D.status.syncing || status === D.status.syncFinish) {
+          this._isMounted && this.setState({bluetoothConnectDialogVisible: false})
+          if (!this._lock) {
+            this._gotoPage()
+            this._lock = true
+          }
         }
       }
-
     })
   }
 
