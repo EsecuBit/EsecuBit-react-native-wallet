@@ -133,13 +133,18 @@ class HomePage extends Component {
   _listenWallet() {
     this.wallet.listenStatus((error, status) => {
       console.log('home wallet status', error, status)
-      if (status === D.status.deviceChange) {
-        ToastUtil.showLong(I18n.t('deviceChange'))
-        this.btTransmitter.disconnect()
-        this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
-      }
-      if (status === D.status.syncFinish || status === D.status.syncing) {
+      if (error !== D.error.succeed) {
+        ToastUtil.showErrorMsgShort(error)
         this.setState({bluetoothConnectDialogVisible: false})
+      }else {
+        if (status === D.status.deviceChange) {
+          ToastUtil.showLong(I18n.t('deviceChange'))
+          this.btTransmitter.disconnect()
+          this.findDeviceTimer && clearTimeout(this.findDeviceTimer)
+        }
+        if (status === D.status.syncFinish || status === D.status.syncing) {
+          this.setState({bluetoothConnectDialogVisible: false})
+        }
       }
     })
   }

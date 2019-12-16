@@ -190,25 +190,23 @@ class EOSAccountDetailPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('didBlur', () => {
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
-      this._isMounted && this.setState({
-        progressDialogVisible: false,
-        showRegisterDialogVisible: false,
-        checkAddPermissionDialogVisible: false,
-        newPermissionList: [],
-        transactionDetailDialogVisible: false
-      })
+      this._hide()
+    })
+  }
+
+  _hide() {
+    this._isMounted && this.setState({
+      progressDialogVisible: false,
+      showRegisterDialogVisible: false,
+      checkAddPermissionDialogVisible: false,
+      newPermissionList: [],
+      transactionDetailDialogVisible: false
     })
   }
 
   onBackPress = () => {
     this.props.navigation.pop()
-    this._isMounted && this.setState({
-      progressDialogVisible: false,
-      showRegisterDialogVisible: false,
-      checkAddPermissionDialogVisible: false,
-      transactionDetailDialogVisible: false,
-      newPermissionList: []
-    })
+    this._hide()
     return true;
   }
 
@@ -254,6 +252,9 @@ class EOSAccountDetailPage extends Component {
             this._lock = true
           }
         }
+      }else {
+        ToastUtil.showErrorMsgShort(error)
+        this.setState({progressDialogVisible: false})
       }
     })
   }
@@ -277,7 +278,7 @@ class EOSAccountDetailPage extends Component {
       return
     }
     let deviceState = await this.transmitter.getState()
-    //soft wallet no need to connect hardware
+    // soft wallet no need to connect hardware
     if (deviceState === BtTransmitter.disconnected && !D.test.jsWallet) {
       this._findAndConnectDevice()
     } else {
@@ -623,6 +624,10 @@ class EOSAccountDetailPage extends Component {
       })
       if (this.state.importOwnerKeyText && this.state.importActiveKeyText) {
         ToastUtil.showShort(I18n.t("importMultipleKeyError"))
+        return
+      }
+      if (!this.state.importOwnerKeyText && !this.state.importActiveKeyText) {
+        ToastUtil.showErrorMsgShort(D.error.invalidParams)
         return
       }
       await this.account.importAccountByKeys(this.state.importNameText, this.state.importOwnerKeyText, this.state.importActiveKeyText)
