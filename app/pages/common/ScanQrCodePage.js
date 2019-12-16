@@ -18,6 +18,8 @@ class ScanQrCodePage extends Component {
   constructor(props) {
     super(props)
     this.hadReceiveResult = false
+    this._params = props.navigation.state.params
+    this._address = this._params ? this._params.address : ''
   }
 
   componentDidMount() {
@@ -40,6 +42,7 @@ class ScanQrCodePage extends Component {
   }
 
   onBackPress = () => {
+    DeviceEventEmitter.emit("address", this._address)
     this.props.navigation.pop()
     return true;
   };

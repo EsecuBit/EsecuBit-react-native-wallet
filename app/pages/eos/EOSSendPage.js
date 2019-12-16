@@ -34,7 +34,11 @@ class EOSSendPage extends Component {
       ),
       headerRight: (
         <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
-          <Item title="add" iconName="ios-qr-scanner" onPress={() => navigation.navigate('Scan')}/>
+          <Item title="add" iconName="ios-qr-scanner" onPress={() => {
+            let address = this.addressInput ? this.addressInput.getAddress() : ''
+            this.addressInput && this.addressInput.clear()
+            navigation.navigate('Scan', {address: address})
+          }}/>
         </HeaderButtons>
       )
     }

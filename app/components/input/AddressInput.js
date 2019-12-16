@@ -33,6 +33,18 @@ class AddressInput extends PureComponent {
 
   // @flow
   async _handleAddressInput(address: string) {
+    if (!address) {
+      return
+    }
+    let addrSplitIndex = address.indexOf(':')
+    if (addrSplitIndex !== -1) {
+      let paramSplitIndex = address.indexOf('?')
+      if (paramSplitIndex !== -1) {
+        address = address.slice(addrSplitIndex + 1, paramSplitIndex)
+      } else {
+        address = address.slice(addrSplitIndex + 1)
+      }
+    }
     try {
       D.address.checkAddress(this.props.account.coinType, address)
       await this.setState({ checkAddressSuccess: true, checkAddressError: false })
@@ -68,6 +80,14 @@ class AddressInput extends PureComponent {
     this.props.onChangeText('')
   }
 
+  handleKeyPress({ nativeEvent: { key: keyValue } }) {
+    if (keyValue === 'Backspace') {
+      if (this.state.address.length === 1) {
+        this.clear()
+      }
+    }
+  }
+
   render() {
     return (
       <CardItem>
@@ -83,6 +103,7 @@ class AddressInput extends PureComponent {
                 : CommonStyle.multilineInputIOS
             }
             multiline={true}
+            onKeyPress={e => this.handleKeyPress(e)}
             value={this.state.address}
             onChangeText={text => this._handleAddressInput(text)}
             keyboardType="email-address"
