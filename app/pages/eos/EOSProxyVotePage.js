@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text, RefreshControl, TouchableWithoutFeedback} from 'react-native'
+import {View, StyleSheet, Text, RefreshControl, TouchableWithoutFeedback, BackHandler} from 'react-native'
 import {Card, CheckBox, Container, Content, Input, Item, Left, List, Right, Thumbnail, Button} from 'native-base'
 import FooterButton from "../../components/FooterButton";
 import I18n from '../../lang/i18n'
@@ -9,7 +9,7 @@ import ToastUtil from "../../utils/ToastUtil";
 import { withNavigation } from 'react-navigation'
 import { useScreens } from 'react-native-screens';
 import { D } from 'esecubit-react-native-wallet-sdk'
-import { ConfirmTipDialog } from "esecubit-react-native-wallet-components/dialog";
+import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 
 useScreens();
 
@@ -29,6 +29,7 @@ class EOSProxyVotePage extends React.PureComponent {
     this.lockSend = false
     // the proxy account
     this.selectProxyer = ''
+    this.lockBackPress = false
   }
 
   componentWillUnmount(): void {
@@ -38,13 +39,38 @@ class EOSProxyVotePage extends React.PureComponent {
   componentDidMount(): void {
     this._isMounted = true
     this.getProxies(1)
+    this._onFocus()
+    this._onBlur()
+
+  }
+
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      this.setState({transactionConfirmDialogVisible: false})
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  onBackPress = () => {
+    this.setState({transactionConfirmDialogVisible: false})
+    if (!this.lockBackPress) {
+      this.props.navigation.pop()
+      return false
+    }
+    return true;
   }
 
 
   async getProxies(pageNum) {
     this.setState({refreshing: true})
     let response = await this.props.account.getVoteProxies(pageNum)
-    let hadVoteProxy = this.props.account.resources.vote.proxy
+    let hadVoteProxy = await this.getHadVoteProxy()
     this.selectProxyer = hadVoteProxy
     response = response.slice(0, 100)
     let proxies = []
@@ -69,6 +95,12 @@ class EOSProxyVotePage extends React.PureComponent {
     let proxies = this.state.proxies
     this._refreshProxies(proxies)
   }
+
+  async getHadVoteProxy() {
+    let response = await this.props.account.getLatestAccountInfo()
+    return response.resources.vote.proxy
+  }
+
 
   _selectProducer(it) {
     let check = !it.is_selected
@@ -157,6 +189,7 @@ class EOSProxyVotePage extends React.PureComponent {
 
   _proxyVote() {
     this.lockSend = true
+    this.lockBackPress = true
     let formData = this._buildProxyVoteForm()
     this.props.account.prepareVote(formData)
       .then(result => {
@@ -173,12 +206,14 @@ class EOSProxyVotePage extends React.PureComponent {
         ToastUtil.showLong(I18n.t('success'))
         this.props.navigation.pop()
         this.lockSend = false
+        this.lockBackPress = false
       })
       .catch(err => {
         console.log('proxy vote error', err)
         this._isMounted && this.setState({transactionConfirmDialogVisible: false})
         ToastUtil.showErrorMsgShort(err)
         this.lockSend = false
+        this.lockBackPress = false
       })
   }
 
@@ -196,13 +231,15 @@ class EOSProxyVotePage extends React.PureComponent {
           }
           renderRow={item => this._renderRow(item)}
         />
-        <ConfirmTipDialog
+        <Dialog
           visible={this.state.transactionConfirmDialogVisible}
-          title={I18n.t('transactionConfirm')}
-          content={
+          onTouchOutside={() => {}}
+          width={0.8}
+          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')}/>}>
+          <DialogContent style={CommonStyle.verticalDialogContent}>
             <Text>{I18n.t('pleaseInputPassword')}</Text>
-          }
-        />
+          </DialogContent>
+        </Dialog>
         <FooterButton title={I18n.t('vote')} disabled={this.state.footerBtnDisable} onPress={() => this._showTransactionConfirmDialog()}/>
       </Container>
     );
