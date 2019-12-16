@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text, FlatList, RefreshControl, TouchableWithoutFeedback} from 'react-native'
+import {View, StyleSheet, Text, FlatList, RefreshControl, TouchableWithoutFeedback, BackHandler} from 'react-native'
 import {Container, Content, List, Input, Item, Fab, Icon, Thumbnail, Left, Body, Right, CheckBox} from 'native-base'
 import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import FooterButton from "../../components/FooterButton";
@@ -9,7 +9,7 @@ import {connect} from 'react-redux'
 import {withNavigation} from 'react-navigation'
 import {useScreens} from 'react-native-screens';
 import {D} from 'esecubit-react-native-wallet-sdk'
-import { ConfirmTipDialog } from "esecubit-react-native-wallet-components/dialog";
+import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 
 useScreens();
 
@@ -26,6 +26,7 @@ class EOSBPVotePage extends React.PureComponent {
       isSelectMode: true,
     }
     this.lockSend = false
+    this.lockBackPress = false
     this.selectProducers = new Set()
   }
 
@@ -39,7 +40,7 @@ class EOSBPVotePage extends React.PureComponent {
 
   async getProducers(pageNum) {
     this.setState({refreshing: true})
-    let hadVotedProducers = this.props.account.resources.vote.producers
+    let hadVotedProducers = await this.getHadVoteProducer()
     this.selectProducers = new Set(hadVotedProducers)
     let response = await this.props.account.getVoteProducers(pageNum, 100)
     let producers = []
@@ -58,6 +59,11 @@ class EOSBPVotePage extends React.PureComponent {
     this.setState({refreshing: false})
   }
 
+  async getHadVoteProducer() {
+    let response = await this.props.account.getLatestAccountInfo()
+    return response.resources.vote.producers
+  }
+
   async _refreshProducers(producers) {
     this.setState({producers: D.copy(producers)})
   }
@@ -71,10 +77,34 @@ class EOSBPVotePage extends React.PureComponent {
   componentDidMount(): void {
     this._isMounted = true
     this.getProducers(1)
+    this._onFocus()
+    this._onBlur()
   }
 
   componentWillUnmount(): void {
     this._isMounted = false
+  }
+
+  _onFocus() {
+    this.props.navigation.addListener('willFocus', () => {
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  _onBlur() {
+    this.props.navigation.addListener('willBlur', () => {
+      this.setState({transactionConfirmDialogVisible: false})
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
+    })
+  }
+
+  onBackPress = () => {
+    this.setState({transactionConfirmDialogVisible: false})
+    if (!this.lockBackPress) {
+      this.props.navigation.pop()
+      return false
+    }
+    return true;
   }
 
   _checkForm() {
@@ -95,6 +125,7 @@ class EOSBPVotePage extends React.PureComponent {
 
   _bpVote() {
     this.lockSend = true
+    this.lockBackPress = true
     let formData = this._buildBPVoteForm()
     this.props.account.prepareVote(formData)
       .then(result => {
@@ -111,12 +142,14 @@ class EOSBPVotePage extends React.PureComponent {
         this._isMounted && this.setState({transactionConfirmDialogVisible: false})
         this.props.navigation.pop()
         this.lockSend = false
+        this.lockBackPress = false
       })
       .catch(err => {
         console.log('bp vote error', err)
         ToastUtil.showErrorMsgShort(err)
         this._isMounted && this.setState({transactionConfirmDialogVisible: false})
         this.lockSend = false
+        this.lockBackPress = false
       })
   }
 
@@ -128,7 +161,7 @@ class EOSBPVotePage extends React.PureComponent {
   _selectProducer(it) {
     let check = !it.is_selected
     let producers = this.state.producers
-    producers[it.rank - 1]["is_selected"]= check
+    producers[it.rank - 1]["is_selected"] = check
     if (check) {
       this.selectProducers.add(it.name)
     } else {
@@ -186,13 +219,16 @@ class EOSBPVotePage extends React.PureComponent {
           }
           renderRow={item => this._renderRow(item)}
         />
-        <ConfirmTipDialog
+        <Dialog
           visible={this.state.transactionConfirmDialogVisible}
-          title={I18n.t('transactionConfirm')}
-          content={
+          onTouchOutside={() => {}}
+          width={0.8}
+          dialogTitle={<DialogTitle title={I18n.t('transactionConfirm')}/>}>
+          <DialogContent style={CommonStyle.verticalDialogContent}>
             <Text>{I18n.t('pleaseInputPassword')}</Text>
-          }
-        />
+          </DialogContent>
+        </Dialog>
+
         <FooterButton
           title={I18n.t('vote')}
           onPress={() => this._showTransactionConfirmDialog()}
