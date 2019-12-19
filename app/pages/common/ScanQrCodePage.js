@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {BackHandler, Platform, View, DeviceEventEmitter } from 'react-native'
 import { Container } from 'native-base'
-import { QRScannerView } from 'ac-qrcode-rn'
+import QRScannerView from 'ac-qrcode-rn/QRScanner2'
 import { Icon, Button } from 'native-base'
 import I18n from '../../lang/i18n'
 import {Color, Dimen} from '../../common/Styles'
@@ -20,6 +20,9 @@ class ScanQrCodePage extends Component {
     this.hadReceiveResult = false
     this._params = props.navigation.state.params
     this._address = this._params ? this._params.address : ''
+    this.state = {
+      focusedScreen: false
+    }
   }
 
   componentDidMount() {
@@ -30,15 +33,22 @@ class ScanQrCodePage extends Component {
 
 
   _onFocus() {
-    this.props.navigation.addListener('willFocus', () => {
+    this.focusListener = this.props.navigation.addListener('willFocus', () => {
+      this.setState({focusedScreen: true})
       BackHandler.addEventListener("hardwareBackPress", this.onBackPress)
     })
   }
 
   _onBlur() {
-    this.props.navigation.addListener('willBlur', () => {
+    this.blurListener = this.props.navigation.addListener('willBlur', () => {
+      this.setState({focusedScreen: false})
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
     })
+  }
+
+  componentWillUnmount(): void {
+    this.focusListener && this.focusListener.remove()
+    this.blurListener && this.blurListener.remove()
   }
 
   onBackPress = () => {
@@ -80,21 +90,24 @@ class ScanQrCodePage extends Component {
     ) : null
   }
   render() {
+    const { focusedScreen} = this.state
     return (
       <Container>
+        {focusedScreen &&
         <QRScannerView
           hintTextPosition={Platform.OS === 'ios' ? 150 : 120}
           hintTextStyle={{ color: Color.WHITE, fontSize: Dimen.PRIMARY_TEXT, backgroundColor: 'transparent' }}
           maskColor={Color.MASK}
           hintText={I18n.t('qrCodeHintText')}
           borderWidth={0}
+          scanBarStyle={{backgroundColor: Color.SUCCESS}}
           iscorneroffset={false}
           cornerOffsetSize={0}
           scanBarAnimateTime={3000}
-          renderTopBarView={() => this._renderTopBar()}
-          renderBottomMenuView={() => this._renderBottomBar()}
-          onScanResultReceived={e => this._qrCodeReceived(e)}
-        />
+          renderHeaderView={() => this._renderTopBar()}
+          renderFooterView={() => this._renderBottomBar()}
+          onScanResult={e => this._qrCodeReceived(e)}
+        />}
       </Container>
     )
   }
