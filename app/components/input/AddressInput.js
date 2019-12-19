@@ -5,24 +5,36 @@ import { Dimen, Color, CommonStyle } from '../../common/Styles'
 import I18n from '../../lang/i18n'
 import { D } from 'esecubit-react-native-wallet-sdk'
 import { connect } from 'react-redux'
+import { useScreens } from 'react-native-screens';
+
+useScreens()
 
 class AddressInput extends PureComponent {
   static defaultProps = {
     value: '',
     placeHolder: '',
+    editable: true,
   }
+
+
 
   constructor(props) {
     super(props)
     this.state = {
       checkAddressSuccess: false,
       checkAddressError: false,
-      address: ''
+      address: '',
+      editable: !props.editable,
     }
   }
 
 
   componentDidMount() {
+    if (this.props.editable) {
+      setTimeout(() => {
+        this.setState({ editable: true });
+      }, 100);
+    }
     DeviceEventEmitter.addListener('address', address => {
       this._handleAddressInput(address)
     })
@@ -89,6 +101,7 @@ class AddressInput extends PureComponent {
   }
 
   render() {
+    const { editable } = this.state;
     return (
       <CardItem>
         <InputGroup iconRight success={this.state.checkAddressSuccess}>
@@ -96,6 +109,7 @@ class AddressInput extends PureComponent {
             {I18n.t('address')}
           </Text>
           <Input
+            editable={editable}
             selectionColor={Color.ACCENT}
             style={
               Platform.OS === 'android'
