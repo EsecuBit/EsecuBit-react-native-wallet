@@ -1,6 +1,6 @@
 {
   "name": "EsecuBit",
-  "version": "0.7.0",
+  "version": "0.7.3",
   "versionCode": 59,
   "cosVersion": "1.0",
   "author": "EsecuBit",
@@ -26,15 +26,16 @@
     "bundle-ios": "node node_modules/react-native/local-cli/cli.js bundle --entry-file index.js --platform ios --dev false --bundle-output ./ios/bundle/index.ios.jsbundle --assets-dest ./ios/bundle"
   },
   "dependencies": {
-    "ac-qrcode-rn": "0.2.1",
+    "ac-qrcode-rn": "git+https://github.com/sishuguojixuefu/react-native-qrcode-scanner.git",
+    "esecubit-react-native-wallet-components": "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-components.git",
     "esecubit-react-native-wallet-sdk": "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git",
     "esecubit-wallet-i18n": "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git",
     "jsc-android": "241213.1.0",
     "native-base": "2.12.1",
     "prop-types": "15.6.2",
     "react": "16.8.3",
-    "react-native": "0.59.8",
-    "react-native-camera": "2.5.1",
+    "react-native": "0.59.9",
+    "react-native-camera": "2.9.0",
     "react-native-gesture-handler": "1.3.0",
     "react-native-i18n": "2.0.15",
     "react-native-material-dialog": "0.7.6",
@@ -47,7 +48,6 @@
     "react-native-splash-screen": "3.2.0",
     "react-native-tab-view": "1.3.2",
     "react-native-vector-icons": "6.6.0",
-    "react-navigation": "3.11.0",
     "react-navigation-header-buttons": "2.3.1",
     "realm": "2.29.0",
     "redux-devtools-extension": "2.13.8"

@@ -93,7 +93,7 @@ android {
         release {
             keyAlias KEY_ALIAS
             keyPassword KEY_PASSWORD
-            storeFile file('../../../your.keystore')
+            storeFile file('./your.keystore')
             storePassword STORE_PASSWORD
         }
     }
@@ -104,7 +104,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "0.7.0"
+        versionName "0.7.3"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

@@ -615,9 +615,9 @@
     regenerator-runtime "^0.13.2"
 
 "@babel/runtime@^7.1.2":
-  version "7.7.2"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.7.2.tgz#111a78002a5c25fc8e3361bedc9529c696b85a6a"
-  integrity sha512-JONRbXbTXc9WQE2mAZd1p0Z3DZ/6vaQIkgYMSTP3KjRCyd7rCZCcfhCyX+YjwcKxcZ82UrxbRD358bpExNgrjw==
+  version "7.7.6"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.7.6.tgz#d18c511121aff1b4f2cd1d452f1bac9601dd830f"
+  integrity sha512-BWAJxpNVa0QlE5gZdWjSxXtemZyZ9RmrmVozxt3NUXeZhVIJ5ANyqmMc0JDrivBZyxUuQvFxlvH4OWWOogGfUw==
   dependencies:
     regenerator-runtime "^0.13.2"
 
@@ -728,10 +728,9 @@ absolute-path@^0.0.0:
   resolved "https://registry.yarnpkg.com/absolute-path/-/absolute-path-0.0.0.tgz#a78762fbdadfb5297be99b15d35a785b2f095bf7"
   integrity sha1-p4di+9rftSl76ZsV01p4Wy8JW/c=
 
-ac-qrcode-rn@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/ac-qrcode-rn/-/ac-qrcode-rn-0.2.1.tgz#77b826a45d535837862d7592c129998e1e655445"
-  integrity sha512-CoJZh3dXKEsN07h7VT3UByQs8dXRyfDs+fgQV+nGCp9NnpqFa7pMvRRIQ+TNF+0OL7wHtU6KacgVVXwghBxvrw==
+"ac-qrcode-rn@git+https://github.com/sishuguojixuefu/react-native-qrcode-scanner.git":
+  version "0.2.3"
+  resolved "git+https://github.com/sishuguojixuefu/react-native-qrcode-scanner.git#87c2579abbc93045f8af5561f6136ef1c0558d9a"
 
 accepts@~1.3.5, accepts@~1.3.7:
   version "1.3.7"
@@ -2948,9 +2947,9 @@ depd@~1.1.2:
   integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
 
 des.js@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/des.js/-/des.js-1.0.0.tgz#c074d2e2aa6a8a9a07dbd61f9a15c2cd83ec8ecc"
-  integrity sha1-wHTS4qpqipoH29YfmhXCzYPsjsw=
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/des.js/-/des.js-1.0.1.tgz#5382142e1bdc53f85d86d53e5f4aa7deb91e0843"
+  integrity sha512-Q0I4pfFrv2VPd34/vfLrFOoRmlYj3OV50i7fskps1jZWK1kApMWWT9G6RRUeYedLcBDIhnSDaUvJMb3AhUlaEA==
   dependencies:
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
@@ -3052,9 +3051,9 @@ electron-to-chromium@^1.3.47:
   integrity sha512-jNRFJpfNrYm5uJ4x0q9oYMOfbL0JPOlkNli8GS/5zEmCjnE5jAtoCo4BYajHiqSPqEeAjtTdItL4p7EZw+jSfg==
 
 elliptic@^6.0.0, elliptic@^6.4.0:
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.1.tgz#c380f5f909bf1b9b4428d028cd18d3b0efd6b52b"
-  integrity sha512-xvJINNLbTeWQjrl6X+7eQCrIy/YPv5XCpKW6kB5mKvtnGILoLDcySuwomfdzt0BMdLNVnuRNTuzKNHj0bva1Cg==
+  version "6.5.2"
+  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.2.tgz#05c5678d7173c049d8ca433552224a495d0e3762"
+  integrity sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==
   dependencies:
     bn.js "^4.4.0"
     brorand "^1.0.1"
@@ -3163,9 +3162,16 @@ escodegen@^1.9.1:
   optionalDependencies:
     source-map "~0.6.1"
 
+"esecubit-react-native-wallet-components@git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-components.git":
+  version "1.0.0"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-components.git#93a0665c2e7bfc6a730c19b07de19b15f89979cb"
+  dependencies:
+    react-native-popup-dialog "0.18.2"
+    react-navigation "3.11.0"
+
 "esecubit-react-native-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git":
   version "1.0.1"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#2b6f64c247fb58b44187b535fb769c5bd132f16d"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#83bee21de2dac671a4e87cfb5c67a3652d30ecc4"
   dependencies:
     assert "1.4.1"
     bigdecimal "0.6.1"
@@ -3175,7 +3181,6 @@ escodegen@^1.9.1:
     esecubit-wallet-sdk "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop"
     events "3.0.0"
     react-native-gesture-handler "1.3.0"
-    react-navigation "3.11.0"
     react-navigation-redux-helpers "3.0.2"
     react-redux "5.1.0"
     redux "4.0.1"
@@ -3186,11 +3191,11 @@ escodegen@^1.9.1:
 
 "esecubit-wallet-i18n@git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git":
   version "1.0.0"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git#de11937154be24d31f82ad63cf145715de186379"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git#5b15d31313053ed9985f94dbeca7bbffc1ece4f7"
 
 "esecubit-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop":
   version "0.9.3"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#8540c7bc22fbcd5f99045357c6cedfa3a8200edb"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#d1297d588f511588e63f337c8a43764d7f46f7be"
   dependencies:
     axios "^0.19.0"
     bech32 "^1.1.3"
@@ -4180,9 +4185,9 @@ hoist-non-react-statics@^2.3.1, hoist-non-react-statics@^2.5.0:
   integrity sha512-rqcy4pJo55FTTLWt+bU8ukscqHeE/e9KWvsOW2b/a3afxQZhwkQdT1rPPCJ0rYXdj4vNcasY8zHTH+jF/qStxw==
 
 hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.0.1, hoist-non-react-statics@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.0.tgz#b09178f0122184fb95acf525daaecb4d8f45958b"
-  integrity sha512-0XsbTXxgiaCDYDIWFcwkmerZPSwywfUqYmwT4jzewKTQSWoE6FCMoUVOeBJWK3E/CrWbxRG3m5GzY4lnIwGRBA==
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.1.tgz#101685d3aff3b23ea213163f6e8e12f4f111e19f"
+  integrity sha512-wbg3bpgA/ZqWrZuMOeJi8+SKMhr7X9TesL/rXMjTzh0p0JUBo3II8DHboYbuIXWRlttrUFxwcu/5kygrCw8fJw==
   dependencies:
     react-is "^16.7.0"
 
@@ -6841,9 +6846,9 @@ qs@~6.5.2:
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
 query-string@^6.4.2:
-  version "6.8.3"
-  resolved "https://registry.yarnpkg.com/query-string/-/query-string-6.8.3.tgz#fd9fb7ffb068b79062b43383685611ee47777d4b"
-  integrity sha512-llcxWccnyaWlODe7A9hRjkvdCKamEKTh+wH8ITdTc3OhchaqUZteiSCX/2ablWHVrkVIe04dntnaZJ7BdyW0lQ==
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-6.9.0.tgz#1c3b727c370cf00f177c99f328fda2108f8fa3dd"
+  integrity sha512-KG4bhCFYapExLsUHrFt+kQVEegF2agm4cpF/VNc6pZVthIfCc/GK8t8VyNIE3nyXG9DK3Tf2EGkxjR6/uRdYsA==
   dependencies:
     decode-uri-component "^0.2.0"
     split-on-first "^1.0.0"
@@ -6919,9 +6924,9 @@ react-devtools-core@^3.6.0:
     ws "^3.3.1"
 
 react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.6:
-  version "16.11.0"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.11.0.tgz#b85dfecd48ad1ce469ff558a882ca8e8313928fa"
-  integrity sha512-gbBVYR2p8mnriqAwWx9LbuUrShnAuSCNnuPGyc7GJrMVQtPDAh8iLpv7FRuMPFb56KkaVZIYSz1PrjI9q0QPCw==
+  version "16.12.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.12.0.tgz#2cc0fe0fba742d97fd527c42a13bec4eeb06241c"
+  integrity sha512-rPCkf/mWBtKc97aLL9/txD8DZdemK0vkA3JMLShjlJB3Pj3s+lpf1KaBzMfQrAmhMQB0n1cU/SUGgKKBCe837Q==
 
 react-is@^16.6.3:
   version "16.8.6"
@@ -6933,10 +6938,10 @@ react-lifecycles-compat@^3.0.0, react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-native-camera@2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-2.5.1.tgz#b7900fb57641a83712a49df701a358f8351568f6"
-  integrity sha512-CQhvyYO0MFJqK5XFCAeKqQ/lEExW3wcABCRXD9ldO0uOQkZqV9McPBWPW4RFsPo6dW4XuIAvmD3CTULsddBscQ==
+react-native-camera@2.9.0:
+  version "2.9.0"
+  resolved "https://registry.npmjs.org/react-native-camera/-/react-native-camera-2.9.0.tgz#5ef94a535dbbfd215d672deef8d0c45bf06b1f3a"
+  integrity sha512-S1vtsmCx2upnLK/4xYALHKB1itbujHemAIhQ+R0qxxEjb/8TYP7AJUjlxmBJ57tjYR3IaNCAeiashCCnEvGe5Q==
   dependencies:
     prop-types "^15.6.2"
 
@@ -7147,10 +7152,10 @@ react-native-vector-icons@^4.2.0:
     prop-types "^15.5.10"
     yargs "^8.0.2"
 
-react-native@0.59.8:
-  version "0.59.8"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.8.tgz#ade4141c777c60f5ec4889d9811d0f80a9d56547"
-  integrity sha512-x1T+/pEXrjgdH9uDzd5doJy5aFlBqW04j7ljDKIGALchhnvdFbtXXrUZ/1PfWHMrIdZxtaDt4tkSttp662GSQA==
+react-native@0.59.9:
+  version "0.59.9"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.9.tgz#c94ee4fa35121720c05235a2dd6cdd2784bf5177"
+  integrity sha512-/+8EgIZwFpYHyyJ7Zav7B6LHNrytwUQ+EKGT/QV7HSrgpf2Y5NZNeUYUHKiVKLYpBip1G32/LcAECQj37YRwGQ==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@react-native-community/cli" "^1.2.1"
