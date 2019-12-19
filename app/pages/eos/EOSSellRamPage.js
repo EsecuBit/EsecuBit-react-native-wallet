@@ -23,6 +23,7 @@ class EOSSellRamPage extends React.PureComponent {
     }
     this.account = props.account
     this.lockSend = true
+    this.lockBackPress = true
   }
 
   componentWillUnmount(): void {
@@ -31,6 +32,8 @@ class EOSSellRamPage extends React.PureComponent {
 
   componentDidMount(): void {
     this._isMounted = true
+    this._onFocus()
+    this._onBlur()
   }
 
   _onFocus() {
@@ -40,20 +43,20 @@ class EOSSellRamPage extends React.PureComponent {
   }
 
   _onBlur() {
-    this.props.navigation.addListener('didBlur', () => {
-      this._hideDialog()
+    this.props.navigation.addListener('willBlur', () => {
+      this.setState({transactionConfirmDialogVisible: false})
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
     })
   }
 
 
   onBackPress = () => {
-    this._hideDialog()
-    return true;
-  }
-
-  _hideDialog() {
     this.setState({transactionConfirmDialogVisible: false})
+    if (!this.lockBackPress) {
+      this.props.navigation.pop()
+      return false
+    }
+    return true;
   }
 
   _checkForm() {
@@ -78,6 +81,7 @@ class EOSSellRamPage extends React.PureComponent {
     Keyboard.dismiss()
     let formData = this._buildSellRamForm()
     this.lockSend = true
+    this.lockBackPress = true
     this.account.prepareBuyRam(formData)
       .then(result => {
         console.log('prepare sell ram result', result)
@@ -90,6 +94,7 @@ class EOSSellRamPage extends React.PureComponent {
       .then(() => {
         ToastUtil.showShort(I18n.t('success'))
         this.lockSend = false
+        this.lockBackPress = false
         this._isMounted && this.setState({transactionConfirmDialogVisible: false}, () => {
           this.props.navigation.pop()
         })
@@ -97,6 +102,7 @@ class EOSSellRamPage extends React.PureComponent {
       .catch(err => {
         ToastUtil.showErrorMsgShort(err)
         this.lockSend = false
+        this.lockBackPress = false
         this._isMounted && this.setState({transactionConfirmDialogVisible: false})
       })
 

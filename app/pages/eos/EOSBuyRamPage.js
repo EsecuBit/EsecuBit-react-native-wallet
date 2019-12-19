@@ -11,6 +11,8 @@ import ToastUtil from "../../utils/ToastUtil";
 import { withNavigation } from 'react-navigation'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import { useScreens } from 'react-native-screens';
+import {BigDecimal} from 'bigdecimal'
+import {D} from 'esecubit-react-native-wallet-sdk'
 
 useScreens();
 
@@ -26,10 +28,13 @@ class EOSBuyRamPage extends React.PureComponent {
     }
     this.account = props.account
     this.lockSend = false
+    this.lockBackPress = true
   }
 
   componentDidMount(): void {
     this._isMounted = true
+    this._onFocus()
+    this._onBlur()
   }
 
   componentWillUnmount(): void {
@@ -50,26 +55,28 @@ class EOSBuyRamPage extends React.PureComponent {
   }
 
   _onBlur() {
-    this.props.navigation.addListener('didBlur', () => {
-      this._hideDialog()
+    this.props.navigation.addListener('willBlur', () => {
+      this.setState({transactionConfirmDialogVisible: false})
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress)
     })
   }
 
 
   onBackPress = () => {
-    this._hideDialog()
+    this.setState({transactionConfirmDialogVisible: false})
+    if (!this.lockBackPress) {
+      this.props.navigation.pop()
+      return false
+    }
     return true;
   }
 
-  _hideDialog() {
-    this.setState({transactionConfirmDialogVisible: false})
-  }
 
   _buy() {
     Keyboard.dismiss()
     let formData = this._buildBuyRamForm()
     this.lockSend = true
+    this.lockBackPress = true
     if (this.state.checkEOSUnit) {
       formData['quant'] = this.valueInput.getValue()
     }else {
@@ -88,12 +95,13 @@ class EOSBuyRamPage extends React.PureComponent {
         this.lockSend = false
         ToastUtil.showShort(I18n.t('success'))
         this._isMounted && this.setState({transactionConfirmDialogVisible: false})
+        this.lockBackPress = false
         this.props.navigation.pop()
-
       })
       .catch(err => {
         ToastUtil.showErrorMsgShort(err)
         this._isMounted && this.setState({transactionConfirmDialogVisible: false})
+        this.lockBackPress = false
         this.lockSend = false
       })
   }
@@ -111,14 +119,42 @@ class EOSBuyRamPage extends React.PureComponent {
   }
 
   _checkForm() {
-    let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
+    let isValid = this.valueInput.isValidInput()
     // when in bytes unit, decimal is not allowed
-    if (result && !this.state.checkEOSUnit) {
+    if (isValid && !this.state.checkEOSUnit) {
       let isContainDecimal = this.valueInput.getValue().indexOf('.') !== -1
-      result = !isContainDecimal
+      isValid = !isContainDecimal
       if (isContainDecimal) this.valueInput.setError()
+    } else {
+      let value = this.valueInput.getValue()
+      // not allow to send 0 value, eos specification
+      if (Number(value) === '0') {
+        ToastUtil.showShort(I18n.t('notAllowToSend'))
+        isValid = false
+        this.valueInput.setError()
+      }
+
+      // eos unit maximum 4 decimal places
+      if (value.indexOf('.') !== -1) {
+        let digit = value.length - value.indexOf('.') - 1
+        if (digit > 4) {
+          ToastUtil.showShort(I18n.t('invalidValue'))
+          isValid = false
+          this.valueInput.setError()
+        }
+      }
+      // check balance is enough
+      if (isValid) {
+        value = new BigDecimal(value)
+        let balance = new BigDecimal(this.props.account.balance)
+        if (value.compareTo(balance) > 0) {
+          ToastUtil.showErrorMsgShort(D.error.balanceNotEnough)
+          this.valueInput.setError()
+          isValid = false
+        }
+      }
     }
-    this.setState({footerBtnDisable: !result})
+    this.setState({footerBtnDisable: !(isValid && this.accountNameInput.isValidInput())})
   }
 
   _showTransactionConfirmDialog() {
