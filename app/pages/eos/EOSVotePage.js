@@ -4,13 +4,12 @@ import {Container, Content, Item} from 'native-base'
 import I18n from '../../lang/i18n'
 import {connect} from 'react-redux'
 import {withNavigation} from 'react-navigation'
-import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import {TabView, SceneMap, TabBar, PagerScroll} from 'react-native-tab-view';
 import EOSBPVotePage from "./EOSBPVotePage";
 import EOSProxyVotePage from "./EOSProxyVotePage";
 import {Color} from "../../common/Styles";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
-import EOSHadVotedPage from "./EOSHadVotedPage";
 
 
 class EOSVotePage extends Component {
@@ -69,10 +68,12 @@ class EOSVotePage extends Component {
             BP: EOSBPVotePage,
             Proxy: EOSProxyVotePage,
           })}
+          renderPager={(props) => <PagerScroll {...props}/>}
           renderTabBar={props =>
             <TabBar
               {...props}
               style={{backgroundColor: Color.PRIMARY}}
+              swipeEnabled
               labelStyle={{color: Color.ACCENT}}
               indicatorStyle={{backgroundColor: Color.WHITE}}
             />
