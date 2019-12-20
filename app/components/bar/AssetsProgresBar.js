@@ -4,7 +4,6 @@ import ProgressBar from './ProgressBar'
 import {Dimen, Color} from '../../common/Styles'
 import {CardItem, Card} from 'native-base'
 
-const deviceW = Dimensions.get('window').width
 
 const styles = StyleSheet.create({
   container: {
@@ -18,10 +17,6 @@ const styles = StyleSheet.create({
   desc: {
     color: Color.PRIMARY,
     fontSize: Dimen.SECONDARY_TEXT
-  },
-  progressBar: {
-    overflow: 'hidden',
-    marginTop: Dimen.SPACE
   }
 })
 
@@ -129,7 +124,7 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
   }
 
   render() {
-    const {style, title, staked, available, total} = this.props
+    const {style, title, staked} = this.props
     let res =
       this.state.remain +
       ' ' +
@@ -139,17 +134,21 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
       ' ' +
       this.state.totalUnit
     let stakedAssets = staked === '' ? staked : ' ( ' + staked + ' EOS) '
+    let remain = this.props.available
+    let total = this.props.total
+    let remainPercent = Number((remain * 100 / total)).toFixed(1)
+    if (isNaN(remainPercent)) {
+      remainPercent = '0'
+    }
     return (
       <Card>
-        <CardItem button={this.props.enablePress} onPress={this.props.onPress}>
+        <CardItem button={this.props.enablePress} onPress={this.props.onPress} style={{padding: 0}}>
           <View style={style.container}>
             <Text style={style.title}>{title}</Text>
             <Text style={style.desc}>{res + stakedAssets}</Text>
             <View style={{flexDirection: 'row'}}>
               <ProgressBar
-                style={style.progressBar}
-                width={deviceW - Dimen.MARGIN_HORIZONTAL - 50 - Dimen.SPACE}
-                progress={Number(available / total).toFixed(2)}
+                progress={Number(remain / total).toFixed(2)}
                 radius={5}
                 ref={ref => {
                   this.progressBar = ref
@@ -160,9 +159,10 @@ export default class AssetsProgressBar extends PureComponent<Props, State> {
                   textAlign: 'center',
                   textAlignVertical: 'center',
                   marginLeft: Dimen.SPACE,
-                  width: 50
+                  paddingRight: Dimen.SPACE,
+                  width: 60
                 }}>
-                {(available * 100 / total).toFixed(1) + '%'}
+                {remainPercent + '%'}
               </Text>
             </View>
           </View>
