@@ -105,6 +105,7 @@ export default class StringUtil {
       ToastUtil.showShort(I18n.t('invalidValue'))
       return true
     }
+    if (/^0\d+$/.test(value)) return true
     return false
   }
 

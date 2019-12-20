@@ -252,8 +252,7 @@ class EOSAccountDetailPage extends Component {
             this._lock = true
           }
         }
-      }else {
-        ToastUtil.showErrorMsgShort(error)
+      } else {
         this.setState({progressDialogVisible: false})
       }
     })

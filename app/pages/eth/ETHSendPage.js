@@ -320,13 +320,11 @@ class ETHSendPage extends Component {
    *  check whether form data is valid
    */
   _checkFormData() {
-    let result = this.addressInput.isValidInput()
-      && this.valueInput.isValidInput()
-      && this.feeInput.isValidInput()
-      && this.gasLimitInput.isValidInput()
-      && this.ethDataInput.isValidInput()
-    this.setState({footerBtnDisable: !result})
-
+    let result = this.addressInput && this.addressInput.isValidInput()
+    result = result && this.valueInput && this.valueInput.isValidInput()
+    result = result && this.feeInput && this.feeInput.isValidInput()
+    this.setState({ footerBtnDisable: !result })
+    return result
   }
 
 

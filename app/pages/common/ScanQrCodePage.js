@@ -100,9 +100,10 @@ class ScanQrCodePage extends Component {
           maskColor={Color.MASK}
           hintText={I18n.t('qrCodeHintText')}
           borderWidth={0}
-          scanBarStyle={{backgroundColor: Color.SUCCESS}}
           iscorneroffset={false}
           cornerOffsetSize={0}
+          cornerStyle={ {height: 32, width: 32, borderWidth: 6, borderColor: Color.SUCCESS}}
+          scanBarStyle={{ marginHorizontal: 8, borderRadius: 2, backgroundColor: Color.SUCCESS}}
           scanBarAnimateTime={3000}
           renderHeaderView={() => this._renderTopBar()}
           renderFooterView={() => this._renderBottomBar()}

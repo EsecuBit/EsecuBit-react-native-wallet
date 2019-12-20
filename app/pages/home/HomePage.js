@@ -134,7 +134,9 @@ class HomePage extends Component {
     this.wallet.listenStatus((error, status) => {
       console.log('home wallet status', error, status)
       if (error !== D.error.succeed) {
-        ToastUtil.showErrorMsgShort(error)
+        if (error === D.error.networkUnavailable || D.error.networkConnectTimeout) {
+          ToastUtil.showErrorMsgShort(error)
+        }
         this.setState({bluetoothConnectDialogVisible: false})
       }else {
         if (status === D.status.deviceChange) {

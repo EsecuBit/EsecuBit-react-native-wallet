@@ -102,12 +102,12 @@ class EOSKeyDetailPage extends Component {
           <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
             <Text style={styles.keyTitle}>Owner Key</Text>
             <View style={{alignItems: 'flex-end', flexDirection: 'row', }}>
-              <Icon
-                name='edit'
-                type={'FontAwesome'}
-                style={{color: Color.DISABLE_BG, marginRight: Dimen.MARGIN_HORIZONTAL}}
-                onPress={() => this._gotoUpdateAuthPage(this.state.ownerKey, 'owner')}
-              />
+              {/*<Icon*/}
+              {/*  name='edit'*/}
+              {/*  type={'FontAwesome'}*/}
+              {/*  style={{color: Color.DISABLE_BG, marginRight: Dimen.MARGIN_HORIZONTAL}}*/}
+              {/*  onPress={() => this._gotoUpdateAuthPage(this.state.ownerKey, 'owner')}*/}
+              {/*/>*/}
               <Icon
                 name='copy' style={{color: Color.DISABLE_BG}}
                 onPress={() => this._setClipboardContent(this.state.ownerKey)}/>
@@ -123,12 +123,12 @@ class EOSKeyDetailPage extends Component {
           <View style={{flexDirection: 'row', alignItems: 'stretch', marginTop: Dimen.MARGIN_VERTICAL}}>
             <Text style={styles.keyTitle}>Active Key</Text>
             <View style={{alignItems: 'flex-end', flexDirection: 'row'}}>
-              <Icon
-                name='edit'
-                type={'FontAwesome'}
-                style={{color: Color.DISABLE_BG, marginRight: Dimen.MARGIN_HORIZONTAL}}
-                onPress={() => this._gotoUpdateAuthPage(this.state.activeKey, 'active')}
-              />
+              {/*<Icon*/}
+              {/*  name='edit'*/}
+              {/*  type={'FontAwesome'}*/}
+              {/*  style={{color: Color.DISABLE_BG, marginRight: Dimen.MARGIN_HORIZONTAL}}*/}
+              {/*  onPress={() => this._gotoUpdateAuthPage(this.state.activeKey, 'active')}*/}
+              {/*/>*/}
               <Icon
                 name='copy'
                 style={{color: Color.DISABLE_BG}}

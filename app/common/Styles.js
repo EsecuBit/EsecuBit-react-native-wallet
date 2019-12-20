@@ -8,7 +8,7 @@ const COLOR_ACCENT = '#EBBD36'
 const COLOR_PRIMARY_TEXT = '#333333'
 const COLOR_SECONDARY_TEXT = '#666666'
 const COLOR_HINT_TEXT = '#C0C0C0'
-const COLOR_DIVIDER = '#EBEBEB'
+const COLOR_DIVIDER = '#E9E9EF'
 const COLOR_SECTION = '#E9E9EF'
 const COLOR_INCREASE = '#00bfa5'
 const COLOR_REDUCED = '#e53935'
@@ -163,5 +163,8 @@ export const CommonStyle = StyleSheet.create({
     height: 40,
     marginTop: Dimen.SPACE,
     paddingLeft: Dimen.SPACE
+  },
+  containerBg: {
+    backgroundColor: COLOR_CONTAINER_BG
   }
 })
