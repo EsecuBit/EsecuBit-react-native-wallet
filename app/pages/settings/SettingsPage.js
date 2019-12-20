@@ -110,7 +110,6 @@ class SettingsPage extends Component {
           this._isMounted && this.setState({progressDialogVisible: false})
         }
       }else {
-        ToastUtil.showErrorMsgShort(error)
         this.setState({progressDialogVisible: false})
       }
     })
@@ -391,6 +390,9 @@ class SettingsPage extends Component {
             this._resetRouter()
             this.setState({updateAppletDialogVisible: false})
           }
+        }
+        if ('MANAGER' === appletInfo.name.toUpperCase()) {
+          ToastUtil.showShort(I18n.t('upgradeManagerAppletTip'))
         }
         if (appletInfos.length === 0) {
           this.setState({updateAppletDialogVisible: false})
