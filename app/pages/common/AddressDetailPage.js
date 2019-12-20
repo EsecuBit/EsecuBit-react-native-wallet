@@ -120,7 +120,7 @@ class AddressDetailPage extends PureComponent {
     return (
       <Dialog
         width={0.8}
-        height={485}
+        height={505}
         visible={this.state.dialogVisible}
         rounded
         onTouchOutside={() => this._hideDialog()}

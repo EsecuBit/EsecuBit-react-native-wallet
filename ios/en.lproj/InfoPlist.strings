@@ -8,3 +8,4 @@
 NSLocationAlwaysUsageDescription = "EsecuBit needs to open your location permissions";
 NSCameraUsageDescription = "EsecuBit requires your consent to access camera features, and if not allowed, you will not be able to use QR code scanning.";
 NSBluetoothPeripheralUsageDescription = "EsecuBit requires your consent to access Bluetooth features, and if not allowed, you will not be able to use Bluetooth connectivity peripherals";
+NSBluetoothAlwaysUsageDescription = "EsecuBit requires your consent to access Bluetooth features, and if not allowed, you will not be able to use Bluetooth connectivity peripherals";

@@ -115,7 +115,8 @@ class EOSSendPage extends Component {
   }
 
   _checkFormData() {
-    let result = this.accountNameInput.isValidInput() && this.valueInput.isValidInput()
+    let result = this.accountNameInput &&  this.accountNameInput.isValidInput()
+    result = result && this.valueInput && this.valueInput.isValidInput()
     let sendValue = this.valueInput.getValue()
     if (sendValue.indexOf('.') !== -1) {
       let digit = sendValue.length - sendValue.indexOf('.') - 1

@@ -11,7 +11,7 @@ export default {
 
   initApp() {
     // test net
-    D.test.coin = true
+    D.test.coin = false
     // enable hardware wallet, default software wallet
     D.test.jsWallet = false
     D.network.type = 'auto'

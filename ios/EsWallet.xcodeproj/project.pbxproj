@@ -1765,7 +1765,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 71;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5QZKZTWHM6;
 				ENABLE_BITCODE = NO;
@@ -1799,6 +1799,7 @@
 					"$(PROJECT_DIR)/EsWallet/libs",
 					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
+				MARKETING_VERSION = 0.7.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1821,7 +1822,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 71;
 				DEVELOPMENT_TEAM = V9QZ497YV9;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1854,6 +1855,7 @@
 					"$(PROJECT_DIR)/EsWallet/libs",
 					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
+				MARKETING_VERSION = 0.7.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
