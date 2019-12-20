@@ -10,6 +10,7 @@ import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import {withNavigation } from "react-navigation";
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import { useScreens } from 'react-native-screens';
+import {D} from "esecubit-react-native-wallet-sdk";
 
 useScreens();
 
@@ -82,6 +83,8 @@ class EOSSellRamPage extends React.PureComponent {
     let formData = this._buildSellRamForm()
     this.lockSend = true
     this.lockBackPress = true
+    let value = this.valueInput ? this.valueInput.getValue() : '0'
+    D.validValue(value)
     this.account.prepareBuyRam(formData)
       .then(result => {
         console.log('prepare sell ram result', result)

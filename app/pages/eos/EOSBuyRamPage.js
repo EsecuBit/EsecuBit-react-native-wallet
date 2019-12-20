@@ -77,6 +77,8 @@ class EOSBuyRamPage extends React.PureComponent {
     let formData = this._buildBuyRamForm()
     this.lockSend = true
     this.lockBackPress = true
+    let value = this.valueInput ? this.valueInput.getValue() : '0'
+    D.validValue(value)
     if (this.state.checkEOSUnit) {
       formData['quant'] = this.valueInput.getValue()
     }else {
