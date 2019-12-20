@@ -1,25 +1,26 @@
-import React, { PureComponent } from 'react'
-import { View, Easing, Animated, StyleSheet, Dimensions } from 'react-native'
-import { Color } from '../../common/Styles'
+import React, {PureComponent} from 'react'
+import {View, Easing, Animated, StyleSheet, Dimensions} from 'react-native'
+import {Color, Dimen} from '../../common/Styles'
 
 const styles = StyleSheet.create({
   background: {
     backgroundColor: '#BBBBBB',
     height: 6,
     overflow: 'hidden',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: Dimen.SPACE,
+    borderRadius: 5
   },
-  fill: {
-    height: 6
-  }
+  fill: {}
 })
+
+const deviceW = Dimensions.get('window').width
 
 type Props = {
   width: number,
   easing: ?any,
   style: ?StyleSheet.Styles,
   progress: number,
-  fillStyle: ?StyleSheet.Styles,
   easingDuration: ?number,
   radius: ?number
 }
@@ -40,7 +41,7 @@ export default class ProgressBar extends PureComponent<Props, State> {
     style: styles,
     easingDuration: 500,
     easing: Easing.inOut(Easing.ease),
-    width: Dimensions.get('window').width,
+    width: deviceW,
     radius: 5
   }
 
@@ -48,7 +49,7 @@ export default class ProgressBar extends PureComponent<Props, State> {
     if (prevProps.progress <= 1 && this.props.progress !== prevProps.progress) {
       this.update(prevProps.progress)
     }
-    this.setState({ progressColor: Color.SUCCESS })
+    this.setState({progressColor: Color.SUCCESS})
   }
 
   update(progress: number) {
@@ -64,25 +65,20 @@ export default class ProgressBar extends PureComponent<Props, State> {
   }
 
   render() {
+    const width = deviceW - Dimen.MARGIN_HORIZONTAL - 60 - Dimen.SPACE
     const fillWidth = this.state.progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [0, 1 * this.props.width]
+      outputRange: [0, 1 * width]
     })
     let progress = fillWidth._parent._value
-
+    if (isNaN(progress)) {
+      progress = '0'
+    }
     return (
-      <View style={{ height: 20, justifyContent: 'center', width: this.props.width }}>
-        <View style={[styles.background, this.props.style, { borderRadius: this.props.radius }]}>
+      <View style={{height: 20, justifyContent: 'center', width: width}}>
+        <View style={styles.background}>
           <Animated.View
-            style={[
-              styles.fill,
-              this.props.fillStyle,
-              {
-                width: progress * this.props.width,
-                backgroundColor: this.state.progressColor,
-                borderRadius: this.props.radius
-              }
-            ]}
+            style={{width: progress * width, backgroundColor: this.state.progressColor, borderRadius: 5, height: 6}}
           />
         </View>
       </View>
