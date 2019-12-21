@@ -21,5 +21,8 @@ export default {
     Provider.Crypto = CryptoNative
     RNProvider.Router.Config = RouterConfig
     RNProvider.Router.Router = Routers
+    D.supportedCoinTypes = () => {
+      return D.test.coin ? [D.coin.test.eosJungle] : [D.coin.main.eos]
+    }
   }
 }
