@@ -392,7 +392,7 @@ class SettingsPage extends Component {
           }
         }
         if ('MANAGER' === appletInfo.name.toUpperCase()) {
-          ToastUtil.showShort(I18n.t('upgradeManagerAppletTip'))
+          ToastUtil.showLong(I18n.t('upgradeManagerAppletTip'))
         }
         if (appletInfos.length === 0) {
           this.setState({updateAppletDialogVisible: false})
