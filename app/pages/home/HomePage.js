@@ -230,6 +230,11 @@ class HomePage extends Component {
       if (status === BtTransmitter.connected) {
         this.setState({deviceConnected: true, showDeviceConnectCard: false})
         this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
+        // make sure the bluetooth dialog can be close
+        let timer = setTimeout(() => {
+          this.setState({bluetoothConnectDialogVisible: false})
+        }, 5000)
+        this.timers.push(timer)
       }
       if (status === BtTransmitter.connecting) {
         this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
@@ -242,6 +247,11 @@ class HomePage extends Component {
       if (state === BtTransmitter.connected) {
         this.setState({deviceConnected: true, showDeviceConnectCard: false})
         this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
+        // make sure the bluetooth dialog can be close
+        let timer = setTimeout(() => {
+          this.setState({bluetoothConnectDialogVisible: false})
+        }, 5000)
+        this.timers.push(timer)
       }
     })
   }

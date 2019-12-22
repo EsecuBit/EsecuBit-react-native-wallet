@@ -178,6 +178,11 @@ class SettingsPage extends Component {
         } else if (status === BtTransmitter.connected) {
           this.transmitter.stopScan()
           this._isMounted && this.setState({progressDialogDesc: I18n.t('initData')})
+          // make sure the bluetooth dialog can be close
+          let timer = setTimeout(() => {
+            this.setState({progressDialogVisible: false})
+          }, 5000)
+          this.timers.push(timer)
         }
       }
     })

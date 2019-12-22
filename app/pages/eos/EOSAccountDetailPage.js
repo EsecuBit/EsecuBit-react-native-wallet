@@ -218,7 +218,11 @@ class EOSAccountDetailPage extends Component {
           this.transmitter.stopScan()
         } else if (status === BtTransmitter.connected) {
           this._isMounted && this.setState({progressDialogDesc: I18n.t('initData')})
-
+          // make sure the bluetooth dialog can be close
+          let timer = setTimeout(() => {
+            this.setState({progressDialogVisible: false})
+          }, 5000)
+          this.timers.push(timer)
         } else if (status === BtTransmitter.disconnected) {
           this.transmitter.stopScan()
           // if device has changed, app will auto disconnect. no need to toast
