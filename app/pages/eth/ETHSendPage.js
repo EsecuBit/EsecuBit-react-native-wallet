@@ -84,6 +84,7 @@ class ETHSendPage extends Component {
   }
 
   onBackPress = () => {
+    this.setState({transactionConfirmDialogVisible: false})
     this.props.navigation.pop()
     return true
   }
@@ -117,6 +118,7 @@ class ETHSendPage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
+      this.setState({transactionConfirmDialogVisible: false})
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     })
   }

@@ -29,6 +29,7 @@ class EOSBuyRamPage extends React.PureComponent {
     this.account = props.account
     this.lockSend = false
     this.lockBackPress = true
+    this.timers = []
   }
 
   componentDidMount(): void {
@@ -39,6 +40,9 @@ class EOSBuyRamPage extends React.PureComponent {
 
   componentWillUnmount(): void {
     this._isMounted = false
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
   }
 
   _buildBuyRamForm() {
@@ -78,7 +82,7 @@ class EOSBuyRamPage extends React.PureComponent {
     this.lockSend = true
     this.lockBackPress = true
     let value = this.valueInput ? this.valueInput.getValue() : '0'
-    D.validValue(value)
+    this.validValue(value)
     if (this.state.checkEOSUnit) {
       formData['quant'] = this.valueInput.getValue()
     }else {
@@ -120,6 +124,16 @@ class EOSBuyRamPage extends React.PureComponent {
     }
   }
 
+  validValue(value) {
+    let reg = /^(([1-9]\d*)|0)$/
+    if (!reg.test(value.toString())) throw D.error.invalidParams
+    let max = new BigDecimal(100000000)
+    let zero = new BigDecimal(0)
+    value = new BigDecimal(value)
+    if (value.compareTo(max) >= 0 || value.compareTo(zero) < 0) throw D.error.invalidParams
+  }
+
+
   _checkForm() {
     let isValid = this.valueInput.isValidInput()
     // when in bytes unit, decimal is not allowed
@@ -127,6 +141,19 @@ class EOSBuyRamPage extends React.PureComponent {
       let isContainDecimal = this.valueInput.getValue().indexOf('.') !== -1
       isValid = !isContainDecimal
       if (isContainDecimal) this.valueInput.setError()
+      let value = this.valueInput.getValue()
+      let reg = /^(([1-9]\d*)|0)$/
+      if (!reg.test(value.toString())) {
+        isValid = false
+        this.valueInput.setError()
+      }
+      let max = new BigDecimal(100000000)
+      let zero = new BigDecimal(0)
+      value = new BigDecimal(value)
+      if (value.compareTo(max) >= 0 || value.compareTo(zero) < 0) {
+        isValid = false
+        this.valueInput.setError()
+      }
     } else {
       let value = this.valueInput.getValue()
       // not allow to send 0 value, eos specification
@@ -160,17 +187,20 @@ class EOSBuyRamPage extends React.PureComponent {
   }
 
   _showTransactionConfirmDialog() {
-    this._isMounted && this.setState({
-      transactionConfirmDialogVisible: true
-    }, () => {
-      this._buy()
+    let timer = setTimeout(() => {
+      this.setState({
+        transactionConfirmDialogVisible: true
+      }, () => {
+        this._buy()
+      })
     })
+    this.timers.push(timer)
   }
 
 
   render(): React.ReactNode {
     return (
-      <Container>
+      <View style={{flex: 1}}>
         <Content padder>
           <Card>
             <EOSAccountNameInput
@@ -221,7 +251,7 @@ class EOSBuyRamPage extends React.PureComponent {
           </DialogContent>
         </Dialog>
         <FooterButton title={I18n.t('buy')} disabled={this.state.footerBtnDisable} onPress={() => this._showTransactionConfirmDialog()}/>
-      </Container>
+      </View>
     )
   }
 }

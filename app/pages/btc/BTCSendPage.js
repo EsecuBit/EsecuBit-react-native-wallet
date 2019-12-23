@@ -74,11 +74,13 @@ class BTCSendPage extends Component {
 
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
+      this.setState({transactionConfirmDialogVisible: false, deviceLimitDialogVisible: false})
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     })
   }
 
   onBackPress = () => {
+    this.setState({transactionConfirmDialogVisible: false, deviceLimitDialogVisible: false})
     this.props.navigation.pop()
     return true
   }
