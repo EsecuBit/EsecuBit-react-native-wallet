@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
 import {Container, Content, Item} from 'native-base'
 import I18n from '../../lang/i18n'
-import {SceneMap, TabBar, TabView} from "react-native-tab-view";
+import {PagerScroll, SceneMap, TabBar, TabView} from "react-native-tab-view";
 import {Color} from "../../common/Styles";
 import {BackHandler, Dimensions} from "react-native";
 import EOSBuyRamPage from "./EOSBuyRamPage";
 import EOSSellRamPage from "./EOSSellRamPage";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
+import {useScreens} from "react-native-screens";
+
+useScreens();
 
 class EOSRamManagePage extends React.PureComponent {
   static navigationOptions = ({navigation, screenProps}) => {
@@ -63,11 +66,13 @@ class EOSRamManagePage extends React.PureComponent {
             Buy: EOSBuyRamPage,
             Sell: EOSSellRamPage,
           })}
+          renderPager={(props) => <PagerScroll {...props}/>}
           renderTabBar={props =>
             <TabBar
               {...props}
               style={{backgroundColor: Color.PRIMARY}}
               labelStyle={{color: Color.ACCENT}}
+              swipeEnabled
               indicatorStyle={{backgroundColor: Color.WHITE}}
             />
           }

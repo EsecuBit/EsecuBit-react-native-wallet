@@ -10,6 +10,7 @@ import {Color, CommonStyle, Dimen} from "../../common/Styles";
 import {withNavigation } from "react-navigation";
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import { useScreens } from 'react-native-screens';
+import {BigDecimal} from 'bigdecimal'
 import {D} from "esecubit-react-native-wallet-sdk";
 
 useScreens();
@@ -25,10 +26,14 @@ class EOSSellRamPage extends React.PureComponent {
     this.account = props.account
     this.lockSend = true
     this.lockBackPress = true
+    this.timers = []
   }
 
   componentWillUnmount(): void {
     this._isMounted = false
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
   }
 
   componentDidMount(): void {
@@ -67,6 +72,19 @@ class EOSSellRamPage extends React.PureComponent {
       let isContainDecimal = this.valueInput.getValue().indexOf('.') !== -1
       result = !isContainDecimal
       if (isContainDecimal) this.valueInput.setError()
+      let value = this.valueInput.getValue()
+      let reg = /^(([1-9]\d*)|0)$/
+      if (!reg.test(value.toString())) {
+        result = false
+        this.valueInput.setError()
+      }
+      let max = new BigDecimal(100000000)
+      let zero = new BigDecimal(0)
+      value = new BigDecimal(value)
+      if (value.compareTo(max) >= 0 || value.compareTo(zero) < 0) {
+        result = false
+        this.valueInput.setError()
+      }
     }
     this.setState({footerBtnDisable: !result})
   }
@@ -84,7 +102,6 @@ class EOSSellRamPage extends React.PureComponent {
     this.lockSend = true
     this.lockBackPress = true
     let value = this.valueInput ? this.valueInput.getValue() : '0'
-    D.validValue(value)
     this.account.prepareBuyRam(formData)
       .then(result => {
         console.log('prepare sell ram result', result)
@@ -111,18 +128,39 @@ class EOSSellRamPage extends React.PureComponent {
 
   }
 
+  validValue (value) {
+    let reg = /^(([1-9]\d*)|0)$/
+    if (!reg.test(value.toString())) {
+      this.setState({footerBtnDisable: false})
+      ToastUtil.showErrorMsgShort(D.error.invalidParams)
+      return
+    }
+    let max = new BigDecimal(100000000)
+    let zero = new BigDecimal(0)
+    value = new BigDecimal(value)
+    if (value.compareTo(max) >= 0 || value.compareTo(zero) < 0) {
+      this.setState({footerBtnDisable: false})
+      ToastUtil.showErrorMsgShort(D.error.invalidParams)
+      return
+    }
+  }
+
   _showTransactionConfirmDialog() {
-    this._isMounted && this.setState({
-      transactionConfirmDialogVisible: true
-    })
-    this._sell()
+    let timer = setTimeout(() => {
+      this.setState({
+        transactionConfirmDialogVisible: true
+      }, () => {
+        this._sell()
+      })
+    },)
+    this.timers.push(timer)
   }
 
 
 
   render(): React.ReactNode {
     return (
-      <Container>
+      <View style={{flex: 1}}>
         <Content padder>
          <Card>
            <Text style={styles.hintText}>{I18n.t('amountOfRamToSell')}</Text>
@@ -132,6 +170,7 @@ class EOSSellRamPage extends React.PureComponent {
              ref={refs => this.valueInput = refs}
              onChangeText={text => {
                this.setState({ramValue: text})
+               this.validValue(text)
                this._checkForm()
              }}
            />
@@ -151,7 +190,7 @@ class EOSSellRamPage extends React.PureComponent {
           </DialogContent>
         </Dialog>
         <FooterButton title={I18n.t('sell')} disabled={this.state.footerBtnDisable} onPress={() => this._showTransactionConfirmDialog()}/>
-      </Container>
+      </View>
     )
   }
 }
