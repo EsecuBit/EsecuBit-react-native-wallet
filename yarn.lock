@@ -3195,7 +3195,7 @@ escodegen@^1.9.1:
 
 "esecubit-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop":
   version "0.9.3"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#ad3dbb9638c85e55dde5ec9712a7abb9e46de1dc"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#50517f673f152bc97ec71d0887d962ffe7d0f7a0"
   dependencies:
     axios "^0.19.0"
     bech32 "^1.1.3"
