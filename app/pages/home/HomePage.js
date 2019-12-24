@@ -233,7 +233,7 @@ class HomePage extends Component {
         // make sure the bluetooth dialog can be close
         let timer = setTimeout(() => {
           this.setState({bluetoothConnectDialogVisible: false})
-        }, 5000)
+        }, 8000)
         this.timers.push(timer)
       }
       if (status === BtTransmitter.connecting) {
@@ -250,7 +250,7 @@ class HomePage extends Component {
         // make sure the bluetooth dialog can be close
         let timer = setTimeout(() => {
           this.setState({bluetoothConnectDialogVisible: false})
-        }, 5000)
+        }, 8000)
         this.timers.push(timer)
       }
     })
