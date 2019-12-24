@@ -3191,11 +3191,11 @@ escodegen@^1.9.1:
 
 "esecubit-wallet-i18n@git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git":
   version "1.0.0"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git#5b15d31313053ed9985f94dbeca7bbffc1ece4f7"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git#e1c81862118e2ad46680f095ae00304053efb8fe"
 
 "esecubit-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop":
   version "0.9.3"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#3221ff2a57d41b3d5e6e29aa1be68d26bbe1b851"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#6917ccabfda34395084cafe1bf11f7bbf6f2dd28"
   dependencies:
     axios "^0.19.0"
     bech32 "^1.1.3"

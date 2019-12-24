@@ -23,6 +23,7 @@ import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import RealmDB from "esecubit-react-native-wallet-sdk/db/RealmDB";
 import { useScreens } from 'react-native-screens';
 import { ConfirmTipDialog } from "esecubit-react-native-wallet-components/dialog";
+import Config from "../../Config";
 
 useScreens();
 
@@ -63,6 +64,7 @@ class SettingsPage extends Component {
       updateAppletInfos: [],
       updateDesc: '',
       updateAppletDialogVisible: false,
+      updateAppletWarningDialogVisible: false,
       changeLanguageIndex: 0,
       changeLanguageLabel: 'English',
       changeLanguageDialogVisible: false,
@@ -137,6 +139,7 @@ class SettingsPage extends Component {
       limitValueDialogVisible: false,
       updateVersionDialogVisible: false,
       updateAppletDialogVisible: false,
+      updateAppletWarningDialogVisible: false
     })
   }
 
@@ -342,7 +345,7 @@ class SettingsPage extends Component {
   async _checkAppletVersion() {
     try {
       this._isMounted && this.setState({progressDialogVisible: true, progressDialogDesc: I18n.t('getVersion')})
-      let appletInfos = await this.wallet.getUpdateManager().getAppletList()
+      let appletInfos = await this.wallet.getUpdateManager().getAppletList(Config.productVersion)
       console.log('applet infos 1', appletInfos)
       this._isMounted && this.setState({progressDialogVisible: false, progressDialogDesc: ''})
       appletInfos = this.convertAppletInfos(appletInfos)
@@ -367,12 +370,24 @@ class SettingsPage extends Component {
       appletInfos[index]["index"] = index
     }
 
-    appletInfos = appletInfos.filter(it => it.upgradable)
+    appletInfos = appletInfos.filter(it => it.upgradable || !it.installed)
     // As long as there is one that needs to be updated, it will be displayed
     return appletInfos
   }
 
-  async _updateApplet(appletInfo) {
+  async _updateLib() {
+    ToastUtil.showLong(I18n.t('rebootTip'))
+    try {
+      this.setState({updateAppletWarningDialogVisible: false})
+      await this._updateApplet(this.appletInfos, this.libApplet, this.appletIndex)
+    } catch (e) {
+      this.lockUpgradeApplet = false
+      console.warn(e)
+      ToastUtil.showErrorMsgShort(e)
+    }
+  }
+
+  async _prepareUpdateApplet(appletInfo, index) {
     try {
       if (this.lockUpgradeApplet) {
         ToastUtil.showShort(I18n.t('waitUpgradeFinish'))
@@ -381,35 +396,54 @@ class SettingsPage extends Component {
       let appletInfos = this.state.updateAppletInfos
       appletInfos = this.convertAppletInfos(appletInfos)
       console.log('applet infos', appletInfos)
-      this.lockUpgradeApplet = true
-      await this.wallet.getUpdateManager().installUpgrade(appletInfo, (progressText, progress) => {
-        console.log('update applet progress', progress)
-        appletInfos[appletInfo.index].showProgress = true
-        appletInfos[appletInfo.index].progress = progress / 100
-
-        if (progress === 100) {
-          appletInfos[appletInfo.index].showProgress = false
-          appletInfos.splice(appletInfo.index, 1)
-          if ('HDWALLET' === appletInfo.name.toUpperCase()) {
-            this.transmitter.disconnect()
-            this._resetRouter()
-            this.setState({updateAppletDialogVisible: false})
-          }
-        }
-        if ('MANAGER' === appletInfo.name.toUpperCase()) {
-          ToastUtil.showLong(I18n.t('upgradeManagerAppletTip'))
-        }
-        if (appletInfos.length === 0) {
-          this.setState({updateAppletDialogVisible: false})
-        }
-        this.setState({updateAppletInfos: appletInfos})
-      })
-      this.lockUpgradeApplet = false
+      if (appletInfo.name.toUpperCase() === 'HDWALLET') {
+        ToastUtil.showLong(I18n.t('rebootTip'))
+      }
+      if (appletInfo.name.toUpperCase() === 'MANAGER') {
+        ToastUtil.showLong(I18n.t('upgradeManagerAppletTip'))
+      }
+      if (appletInfo.name.toUpperCase() === 'COMMON' || appletInfo.name === 'METHOD') {
+        this.libApplet = appletInfo || {}
+        this.appletInfos = appletInfos || {}
+        this.appletIndex = index || 0
+        this.setState({updateAppletWarningDialogVisible: true})
+      }else {
+        await this._updateApplet(appletInfos, appletInfo, index)
+      }
     } catch (e) {
       this.lockUpgradeApplet = false
       ToastUtil.showErrorMsgShort(e)
     }
   }
+
+  async _updateApplet(appletInfos, appletInfo, index) {
+    this.lockUpgradeApplet = true
+    await this.wallet.getUpdateManager().installUpgrade(appletInfos[index], (progressText, progress) => {
+      console.log('update applet progress', progress)
+      appletInfos[appletInfo.index].showProgress = true
+      appletInfos[appletInfo.index].progress = progress / 100
+
+      if (progress === 100) {
+        appletInfos[appletInfo.index].showProgress = false
+        appletInfos.splice(appletInfo.index, 1)
+        if ('HDWALLET' === appletInfo.name.toUpperCase() || 'COMMON' === appletInfo.name.toUpperCase() || 'METHOD' === appletInfo.name.toUpperCase()) {
+          this.setState({updateAppletInfos: []})
+          this.setState({updateAppletInfos: appletInfos, updateAppletDialogVisible: false})
+          this.transmitter.disconnect()
+          this._resetRouter("PairList")
+          return
+        }
+      }
+      if (appletInfos.length === 0) {
+        this.setState({updateAppletDialogVisible: false})
+      }
+      this.setState({updateAppletInfos: []})
+      this.setState({updateAppletInfos: appletInfos})
+    })
+    this.lockUpgradeApplet = false
+  }
+
+
 
   render() {
     let that = this
@@ -871,7 +905,7 @@ class SettingsPage extends Component {
         >
           <DialogContent style={CommonStyle.verticalDialogContent}>
             {
-              that.state.updateAppletInfos.map(it => {
+              that.state.updateAppletInfos.map((it, index) => {
                 return (
                   <View style={{marginBottom: Dimen.SPACE}}>
                     <View style={styles.updateAppletWrapper}>
@@ -879,17 +913,19 @@ class SettingsPage extends Component {
                       <Text style={styles.versionText}>{it.version}</Text>
                       <Text> -></Text>
                       <Text style={styles.latestVersionText}>{it.latestVersion}</Text>
-                      <Button
-                        small
-                        transparent
-                        rounded
-                        bordered
-                        style={{borderColor: Color.ACCENT}}
-                        onPress={() => this._updateApplet(it)}
-                      >
-                        <Text
-                          style={styles.updateAppletText}>{I18n.t('upgrade')}</Text>
-                      </Button>
+                      <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}>
+                        <Button
+                          small
+                          transparent
+                          rounded
+                          bordered
+                          style={{borderColor: Color.ACCENT}}
+                          onPress={() => this._prepareUpdateApplet(it, index)}
+                        >
+                          <Text
+                            style={styles.updateAppletText}>{I18n.t('upgrade')}</Text>
+                        </Button>
+                      </View>
                     </View>
                     <View>
                       {it.showProgress &&
@@ -901,6 +937,35 @@ class SettingsPage extends Component {
                 )
               })
             }
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          width={0.8}
+          visible={this.state.updateAppletWarningDialogVisible}
+          dialogTitle={<DialogTitle title={I18n.t('attention')}/>}
+          footer={
+            <DialogFooter>
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.DANGER, fontSize: Dimen.PRIMARY_TEXT}}
+                key="update_lib_cancel"
+                text={I18n.t('cancel')}
+                onPress={() => {
+                  this.lockUpgradeApplet = false
+                  this.setState({updateAppletWarningDialogVisible: false})
+                }}
+              />
+              <DialogButton
+                style={{backgroundColor: Color.WHITE}}
+                textStyle={{color: Color.ACCENT, fontSize: Dimen.PRIMARY_TEXT}}
+                key="update_lib_confirm"
+                text={I18n.t('confirm')}
+                onPress={() => this._updateLib()}
+              />
+            </DialogFooter>
+          }>
+          <DialogContent>
+            <Text style={styles.updateDesc}>{I18n.t('upgradeLibTip')}</Text>
           </DialogContent>
         </Dialog>
         {/*Bluetooth Connect Dialog*/}
