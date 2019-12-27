@@ -66,6 +66,13 @@ class EOSBPVotePage extends React.PureComponent {
 
   async _refreshProducers(producers) {
     this.setState({producers: D.copy(producers)})
+    // applet limit voting producer amount can not exceed 15
+    if (this.selectProducers.size > 15) {
+      ToastUtil.showShort(I18n.t('voteProducerTooMuchTip'))
+      this.setState({footerBtnDisable: true})
+    }else {
+      this.setState({footerBtnDisable: false})
+    }
   }
 
   async _refreshUI() {
@@ -124,9 +131,9 @@ class EOSBPVotePage extends React.PureComponent {
   }
 
   _bpVote() {
+    let formData = this._buildBPVoteForm()
     this.lockSend = true
     this.lockBackPress = true
-    let formData = this._buildBPVoteForm()
     this.props.account.prepareVote(formData)
       .then(result => {
         console.log('bp vote prepare result', result)

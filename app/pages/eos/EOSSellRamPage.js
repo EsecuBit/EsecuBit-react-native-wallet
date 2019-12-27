@@ -101,7 +101,6 @@ class EOSSellRamPage extends React.PureComponent {
     let formData = this._buildSellRamForm()
     this.lockSend = true
     this.lockBackPress = true
-    let value = this.valueInput ? this.valueInput.getValue() : '0'
     this.account.prepareBuyRam(formData)
       .then(result => {
         console.log('prepare sell ram result', result)

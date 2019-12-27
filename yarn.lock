@@ -3170,15 +3170,15 @@ escodegen@^1.9.1:
     react-navigation "3.11.0"
 
 "esecubit-react-native-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git":
-  version "1.0.1"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#0612ac410ab707c0df9272e96850149cce3db06e"
+  version "1.0.2"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#6c9272427d9ac13f7d64defc27929fde727fed85"
   dependencies:
     assert "1.4.1"
     bigdecimal "0.6.1"
     bigi "1.4.2"
     buffer "5.2.1"
     crypto-browserify "3.12.0"
-    esecubit-wallet-sdk "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop"
+    esecubit-wallet-sdk "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git"
     events "3.0.0"
     react-native-gesture-handler "1.3.0"
     react-navigation-redux-helpers "3.0.2"
@@ -3191,11 +3191,11 @@ escodegen@^1.9.1:
 
 "esecubit-wallet-i18n@git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git":
   version "1.0.0"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git#e1c81862118e2ad46680f095ae00304053efb8fe"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-i18n.git#edffda91d571319babc280c1ad0004dea315046a"
 
-"esecubit-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#develop":
-  version "0.9.3"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#50517f673f152bc97ec71d0887d962ffe7d0f7a0"
+"esecubit-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git":
+  version "0.9.4"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-wallet-sdk.git#1a1145b99431a6ef676cd24902a32f4645aad3d4"
   dependencies:
     axios "^0.19.0"
     bech32 "^1.1.3"

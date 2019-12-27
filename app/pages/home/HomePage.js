@@ -114,7 +114,6 @@ class HomePage extends Component {
   componentDidMount() {
     this._onFocus()
     this._onBlur()
-    this._initListener()
     this._listenWallet()
     this._updateUI()
     // delay to check app version
@@ -131,7 +130,7 @@ class HomePage extends Component {
   }
 
   _listenWallet() {
-    this.wallet.listenStatus((error, status) => {
+    this.wallet.listenStatus(async (error, status) => {
       console.log('home wallet status', error, status)
       if (error !== D.error.succeed) {
         if (error === D.error.networkUnavailable || D.error.networkConnectTimeout) {
@@ -146,6 +145,8 @@ class HomePage extends Component {
         }
         if (status === D.status.syncFinish || status === D.status.syncing) {
           this.setState({bluetoothConnectDialogVisible: false})
+          let isRealConnected = await this._checkIfRealConnected()
+          this.setState({deviceConnected: isRealConnected, showDeviceConnectCard: !isRealConnected})
         }
       }
     })
@@ -222,7 +223,8 @@ class HomePage extends Component {
 
   _initListener() {
     // device status
-    this.btTransmitter.listenStatus((error, status) => {
+    this.btTransmitter.listenStatus(async (error, status) => {
+      console.log('homepage transmitter1', error, status)
       if (status === BtTransmitter.disconnected) {
         console.log('status device disconnected', status)
         this.setState({deviceConnected: false, showDeviceConnectCard: true})
@@ -241,6 +243,7 @@ class HomePage extends Component {
       }
     })
     this.btTransmitter.getState().then(state => {
+      console.log('homepage transmitter2', state)
       if (state === BtTransmitter.disconnected) {
         this.setState({deviceConnected: false, showDeviceConnectCard: true})
       }
@@ -254,6 +257,16 @@ class HomePage extends Component {
         this.timers.push(timer)
       }
     })
+  }
+
+  async _checkIfRealConnected() {
+    try {
+      await this.wallet.getCosVersion()
+      return true
+    } catch (e) {
+      console.warn('get cos version', e)
+      return false
+    }
   }
 
   async _updateUI() {
