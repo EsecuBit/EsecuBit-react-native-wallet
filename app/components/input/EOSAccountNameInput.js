@@ -11,19 +11,26 @@ export default class EOSAccountNameInput extends PureComponent {
     value: '',
     placeHolder: '',
     label: I18n.t('accountName'),
-    onChangeText: () => {}
+    onChangeText: () => {},
+    editable: true,
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       checkAccountNameSuccess: false,
       checkAccountNameError: false,
-      accountName: ''
+      accountName: '',
+      editable: !props.editable,
     }
   }
 
   componentDidMount(): void {
+    if (this.props.editable) {
+      setTimeout(() => {
+        this.setState({ editable: true });
+      }, 100);
+    }
     DeviceEventEmitter.addListener('address', value => {
       this._handleAccountNameInput(value)
     })
@@ -31,11 +38,12 @@ export default class EOSAccountNameInput extends PureComponent {
 
   // @flow
   async _handleAccountNameInput(accountName: string) {
+    if (!accountName) {
+      return
+    }
     try {
       D.address.checkEosAddress(accountName)
-      let result = !!accountName
-      await this.setState({ accountName: accountName, checkAccountNameSuccess: result, checkAccountNameError: !result})
-      this.props.onChangeText(accountName)
+      await this.setState({ checkAccountNameSuccess: true, checkAccountNameError: false})
     }catch (e) {
       console.warn('check account name error', accountName, e)
       await this.setState({ checkAccountNameSuccess: false, checkAccountNameError: true })
@@ -44,6 +52,19 @@ export default class EOSAccountNameInput extends PureComponent {
       this.props.onChangeText(accountName)
     }
 
+  }
+
+  handleKeyPress({ nativeEvent: { key: keyValue } }) {
+    if (keyValue === 'Backspace') {
+      if (this.state.accountName.length === 1) {
+        this.clear()
+        this.setError()
+      }
+    }
+  }
+
+  setError() {
+    this.setState({ checkAccountNameSuccess: false, checkAccountNameError: true})
   }
 
   // @flow
@@ -61,6 +82,7 @@ export default class EOSAccountNameInput extends PureComponent {
   }
 
   render() {
+    const { editable } = this.state;
     return (
       <CardItem>
         <InputGroup iconRight success={this.state.checkAccountNameSuccess} error={this.state.checkAccountNameError}>
@@ -68,6 +90,7 @@ export default class EOSAccountNameInput extends PureComponent {
             {this.props.label}
           </Text>
           <Input
+            editable={editable}
             selectionColor={Color.ACCENT}
             style={
               Platform.OS === 'android'
@@ -75,6 +98,7 @@ export default class EOSAccountNameInput extends PureComponent {
                 : CommonStyle.multilineInputIOS
             }
             multiline={true}
+            onKeyPress={e => this.handleKeyPress(e)}
             maxLength={12}
             value={this.state.accountName}
             onChangeText={text => this._handleAccountNameInput(text)}

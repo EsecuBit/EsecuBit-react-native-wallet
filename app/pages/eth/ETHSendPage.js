@@ -22,6 +22,7 @@ import ETHDataInput from "../../components/input/ETHDataInput"
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';
+import {setScanAddress} from "esecubit-react-native-wallet-sdk/actions/SettingsAction";
 
 useScreens();
 
@@ -37,11 +38,8 @@ class ETHSendPage extends Component {
       ),
       headerRight: (
         <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
-          <Item title="add" iconName="ios-qr-scanner" onPress={() => {
-            let address = this.addressInput ? this.addressInput.getAddress() : ''
-            this.addressInput && this.addressInput.clear()
-            navigation.navigate('Scan', {address: address})
-          }}/>
+          <Item title="add" iconName="ios-qr-scanner" onPress={() => {navigation.navigate('Scan')}}/>
+
         </HeaderButtons>
       )
     }
@@ -119,6 +117,7 @@ class ETHSendPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       this.setState({transactionConfirmDialogVisible: false})
+      this.addressInput && this.addressInput.clear()
       BackHandler.removeEventListener('hardwareBackPress', this.onBackPress)
     })
   }
@@ -190,7 +189,7 @@ class ETHSendPage extends Component {
         this.transactionTotalCostCard.updateTransactionCost(value)
       })
       .catch(error => {
-        if (error === D.error.balanceNotEnough || error === D.error.valueIsDecimal) {
+        if (error === D.error.balanceNotEnough) {
           this.valueInput.setError()
         }
         this.setState({ footerBtnDisable: true })
@@ -325,6 +324,7 @@ class ETHSendPage extends Component {
     let result = this.addressInput && this.addressInput.isValidInput()
     result = result && this.valueInput && this.valueInput.isValidInput()
     result = result && this.feeInput && this.feeInput.isValidInput()
+    result = result && this.gasLimitInput && this.gasLimitInput.isValidInput()
     this.setState({ footerBtnDisable: !result })
     return result
   }
@@ -345,7 +345,10 @@ class ETHSendPage extends Component {
           <Card>
             <AddressInput
               ref={refs => this.addressInput = refs && refs.getWrappedInstance()}
-              onChangeText={text => this._checkFormData()}
+              onChangeText={text => {
+                this.props.setScanAddress(text)
+                this._checkFormData()
+              }}
             />
             <ValueInput
               ref={refs => this.valueInput = refs}
@@ -401,10 +404,14 @@ class ETHSendPage extends Component {
   }
 }
 
+const mapDispatchToProps = {
+  setScanAddress
+}
+
 const mapStateToProps = state => ({
   account: state.AccountReducer.account,
   ethUnit: state.SettingsReducer.ethUnit,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
 })
-export default connect(mapStateToProps)(ETHSendPage)
+export default connect(mapStateToProps, mapDispatchToProps)(ETHSendPage)
 

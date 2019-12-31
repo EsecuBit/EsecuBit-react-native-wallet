@@ -1,12 +1,13 @@
-import React, { Component } from 'react'
-import {BackHandler, Platform, View, DeviceEventEmitter } from 'react-native'
-import { Container } from 'native-base'
+import React, {Component} from 'react'
+import {BackHandler, Platform, View, DeviceEventEmitter, StyleSheet} from 'react-native'
+import {Container} from 'native-base'
 import QRScannerView from 'ac-qrcode-rn/QRScanner2'
-import { Icon, Button } from 'native-base'
+import {Icon, Button} from 'native-base'
 import I18n from '../../lang/i18n'
 import {Color, Dimen} from '../../common/Styles'
-import { useScreens } from 'react-native-screens';
+import {useScreens} from 'react-native-screens';
 import {withNavigation} from 'react-navigation'
+import {connect} from 'react-redux'
 
 useScreens();
 
@@ -15,11 +16,11 @@ class ScanQrCodePage extends Component {
   static navigationOptions = {
     header: null
   }
+
   constructor(props) {
     super(props)
     this.hadReceiveResult = false
-    this._params = props.navigation.state.params
-    this._address = this._params ? this._params.address : ''
+    this._address = props.scanAddress
     this.state = {
       focusedScreen: false
     }
@@ -29,7 +30,6 @@ class ScanQrCodePage extends Component {
     this._onFocus()
     this._onBlur()
   }
-
 
 
   _onFocus() {
@@ -66,15 +66,16 @@ class ScanQrCodePage extends Component {
   }
 
   _renderTopBar() {
-    return Platform.OS === 'ios'? null : (
+    return Platform.OS === 'ios' ? null : (
       <Button light transparent onPress={() => this.props.navigation.pop()}>
-        <Icon  name="md-close" color={Color.DIVIDER} />
+        <Icon name="md-close" color={Color.DIVIDER}/>
       </Button>
     )
   }
+
   _renderBottomBar() {
     return Platform.OS === 'ios' ? (
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{justifyContent: 'center', alignItems: 'center'}}>
         <View>
           <Button
             light
@@ -82,28 +83,29 @@ class ScanQrCodePage extends Component {
             onPress={() => this.props.navigation.pop()}>
             <Icon
               name="md-close"
-              style={{ backgroundColor: 'transparent', color: Color.ACCENT }}
+              style={{backgroundColor: 'transparent', color: Color.ACCENT}}
             />
           </Button>
         </View>
       </View>
     ) : null
   }
+
   render() {
-    const { focusedScreen} = this.state
+    const {focusedScreen} = this.state
     return (
       <Container>
         {focusedScreen &&
         <QRScannerView
           hintTextPosition={Platform.OS === 'ios' ? 150 : 120}
-          hintTextStyle={{ color: Color.WHITE, fontSize: Dimen.PRIMARY_TEXT, backgroundColor: 'transparent' }}
+          hintTextStyle={{color: Color.WHITE, fontSize: Dimen.PRIMARY_TEXT, backgroundColor: 'transparent'}}
           maskColor={Color.MASK}
           hintText={I18n.t('qrCodeHintText')}
           borderWidth={0}
           iscorneroffset={false}
           cornerOffsetSize={0}
-          cornerStyle={ {height: 32, width: 32, borderWidth: 6, borderColor: Color.SUCCESS}}
-          scanBarStyle={{ marginHorizontal: 8, borderRadius: 2, backgroundColor: Color.SUCCESS}}
+          cornerStyle={styles.conner}
+          scanBarStyle={styles.scanBar}
           scanBarAnimateTime={3000}
           renderHeaderView={() => this._renderTopBar()}
           renderFooterView={() => this._renderBottomBar()}
@@ -114,6 +116,23 @@ class ScanQrCodePage extends Component {
   }
 }
 
+const styles = StyleSheet.create({
+  conner: {
+    height: 32,
+    width: 32,
+    borderWidth: 6,
+    borderColor: Color.SUCCESS
+  },
+  scanBar: {
+    marginHorizontal: 8,
+    borderRadius: 2,
+    backgroundColor: Color.SUCCESS
+  }
+})
+
+const mapStateToProps = state => ({
+  scanAddress: state.AccountReducer.scanAddress
+})
 
 
-export default withNavigation(ScanQrCodePage)
+export default withNavigation(connect(mapStateToProps)(ScanQrCodePage))

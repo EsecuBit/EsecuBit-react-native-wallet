@@ -18,6 +18,7 @@ import {BigDecimal} from 'bigdecimal'
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';
+import {setScanAddress} from "esecubit-react-native-wallet-sdk/actions/SettingsAction";
 
 useScreens();
 
@@ -34,11 +35,7 @@ class EOSSendPage extends Component {
       ),
       headerRight: (
         <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
-          <Item title="add" iconName="ios-qr-scanner" onPress={() => {
-            let address = this.addressInput ? this.addressInput.getAddress() : ''
-            this.addressInput && this.addressInput.clear()
-            navigation.navigate('Scan', {address: address})
-          }}/>
+          <Item title="add" iconName="ios-qr-scanner" onPress={() => {navigation.navigate('Scan')}}/>
         </HeaderButtons>
       )
     }
@@ -54,6 +51,7 @@ class EOSSendPage extends Component {
       transactionConfirmDialogVisible: false
     }
     this.transmitter = new BtTransmitter()
+    this.timers = []
   }
 
   componentDidMount() {
@@ -65,6 +63,9 @@ class EOSSendPage extends Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    this.timers.map(it => {
+      it && clearTimeout(it)
+    })
   }
 
 
@@ -77,6 +78,7 @@ class EOSSendPage extends Component {
   _onBlur() {
     this.props.navigation.addListener('willBlur', () => {
       this._hideDialog()
+      this.accountNameInput && this.accountNameInput.clear()
       BackHandler.removeEventListener('hardwareBackPress', this._onBackPress)
     })
   }
@@ -92,6 +94,7 @@ class EOSSendPage extends Component {
   }
 
   async _handleAccountNameInput(text) {
+    this.props.setScanAddress(text)
     this.setState({ accountName: text })
     this._checkFormData()
   }
@@ -196,7 +199,10 @@ class EOSSendPage extends Component {
       sendValue: this.valueInput.getValue(),
       accountName: this.accountNameInput.getAccountName()
     })
-    this._isMounted && this.setState({ transactionConfirmDialogVisible: true })
+    let timer = setTimeout(() => {
+      this.setState({ transactionConfirmDialogVisible: true })
+    }, 300)
+    this.timers.push(timer)
   }
 
 
@@ -294,10 +300,15 @@ const styles = StyleSheet.create({
   }
 })
 
+const mapDispatchToProps = {
+  setScanAddress
+}
+
+
 const mapStateToProps = state => ({
   account: state.AccountReducer.account,
   legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
 
 })
 
-export default connect(mapStateToProps)(EOSSendPage)
+export default connect(mapStateToProps, mapDispatchToProps)(EOSSendPage)

@@ -145,8 +145,6 @@ class HomePage extends Component {
         }
         if (status === D.status.syncFinish || status === D.status.syncing) {
           this.setState({bluetoothConnectDialogVisible: false})
-          let isRealConnected = await this._checkIfRealConnected()
-          this.setState({deviceConnected: isRealConnected, showDeviceConnectCard: !isRealConnected})
         }
       }
     })
@@ -286,7 +284,12 @@ class HomePage extends Component {
   async _getAccounts() {
     try {
       let accounts = await this.wallet.getAccounts()
-      console.log('accounts', accounts)
+      let hash = {}
+      // filter the duplicate account
+      accounts = accounts.reduce((item, next) => {
+        hash[next.coinType +'_' + next.label] ? '' : hash[next.coinType +'_'+ next.label] = true && item.push(next)
+        return item
+      }, [])
       this.setState({accounts: accounts})
     } catch (error) {
       console.warn('getAccounts', error)

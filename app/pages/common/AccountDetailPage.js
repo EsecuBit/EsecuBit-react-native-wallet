@@ -616,7 +616,7 @@ class AccountDetailPage extends Component {
           console.log('updateTxComment success')
           this._getTxInfos()
         })
-        .catch(error => ToastUtil.showLong('UpdateTxComment Error', error))
+        .catch(error => ToastUtil.showLong('UpdateTxComment Error'))
     }
   }
 

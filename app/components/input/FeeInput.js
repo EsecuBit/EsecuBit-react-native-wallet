@@ -118,7 +118,14 @@ class FeeInput extends PureComponent {
 
   // @flow
   getFee(): string {
-    return this.state.selectedFee
+    if (this.state.currentFeeType === STANDARD_FEE_TYPE) {
+      return this.state.selectedFee
+    }else {
+      if (D.isEth(this.props.account.coinType)) {
+        return this.esWallet.convertValue(this.props.account.coinType, this.state.selectedFee, D.unit.eth.GWei, D.unit.eth.Wei)
+      }
+      return this.state.selectedFee
+    }
   }
 
   // @flow
