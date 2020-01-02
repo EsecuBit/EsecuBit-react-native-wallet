@@ -29,8 +29,7 @@ export default class GasLimitInput extends PureComponent {
 
   // @flow
   isValidInput(): boolean {
-    let result = this.state.checkGasLimitSuccess && !!this.state.gasLimit && this.state.gasLimit >= 21000 && this.state.gasLimit.indexOf('.') !== -1
-    console.log('result', result)
+    let result = this.state.checkGasLimitSuccess && !!this.state.gasLimit && this.state.gasLimit >= 21000
     return result
   }
 
@@ -46,6 +45,9 @@ export default class GasLimitInput extends PureComponent {
   // @flow
   async _checkGasLimit(text: string) {
     let result = (StringUtil.isInvalidValue(text) || text < 21000) || !Number.isInteger(Number(text))
+    if (text.indexOf(".") !== -1) {
+      result = true
+    }
     await this.setState({gasLimit: text})
     await this.setState({checkGasLimitError: result, checkGasLimitSuccess: !result && text >= 21000})
   }
