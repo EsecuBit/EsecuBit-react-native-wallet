@@ -91,7 +91,7 @@ class FeeInput extends PureComponent {
   async _changeFeeType() {
     // standard -> custom
     if (this.state.currentFeeType === STANDARD_FEE_TYPE) {
-      await this.setState({ currentFeeType: CUSTOM_FEE_TYPE, selectedFee: '' })
+      await this.setState({ currentFeeType: CUSTOM_FEE_TYPE, selectedFee: this.state.fees[0].toString()})
       this.props.onChangeText('')
     } else {
       await this.setState({
@@ -106,9 +106,6 @@ class FeeInput extends PureComponent {
   async _handleFeeInput(value: string) {
     await this.setState({selectedFee: value})
     this.props.onChangeText(value)
-    if (!this._checkFee(value)) {
-      this._clear()
-    }
   }
 
   // @flow
@@ -130,7 +127,7 @@ class FeeInput extends PureComponent {
 
   // @flow
   _checkFee(fee: string) {
-    return !StringUtil.isInvalidValue(fee)
+    return !StringUtil.isInvalidValue(fee) && fee !== ''
   }
 
   _clear() {

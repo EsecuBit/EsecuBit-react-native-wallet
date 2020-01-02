@@ -196,7 +196,7 @@ class BTCSendPage extends Component {
         this.transactionFeeCard.updateTransactionFee(value)
       })
       .catch(error => {
-        if (error === D.error.balanceNotEnough || error === D.error.valueIsDecimal) {
+        if (error === D.error.balanceNotEnough) {
           this.valueInput.setError()
         }
         console.warn('_calculateTotalCost error', error)
@@ -315,6 +315,8 @@ class BTCSendPage extends Component {
   _handleFeeInput() {
     if (this.feeInput.isValidInput()) {
       this._calculateTotalCost()
+    }else {
+      ToastUtil.showShort(I18n.t('invalidValue'))
     }
     this._checkFormData()
   }
