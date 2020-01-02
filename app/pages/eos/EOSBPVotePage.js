@@ -126,7 +126,7 @@ class EOSBPVotePage extends React.PureComponent {
     })
 
     return {
-      producers: producersName
+      producers: producersName.sort()
     }
   }
 
