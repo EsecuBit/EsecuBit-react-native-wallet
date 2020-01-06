@@ -69,6 +69,19 @@ class FeeInput extends PureComponent {
     }
   }
 
+  _toMinimumValueWithoutTip(coinType: string, value: string) {
+    let type = CoinUtil.getRealCoinType(coinType)
+    switch(type) {
+      case Coin.btc:
+        return value
+      case Coin.eth:
+        value = this.esWallet.convertValue(coinType, value, D.unit.eth.Wei, D.unit.eth.GWei)
+        return value
+      default:
+        throw D.error.coinNotSupported
+    }
+  }
+
   /**
    * get fee level, 3 level fee for BTC, 4 level for ETH
    * @returns {number} fee level
@@ -91,7 +104,8 @@ class FeeInput extends PureComponent {
   async _changeFeeType() {
     // standard -> custom
     if (this.state.currentFeeType === STANDARD_FEE_TYPE) {
-      await this.setState({ currentFeeType: CUSTOM_FEE_TYPE, selectedFee: this.state.fees[0].toString()})
+      let fee = this._toMinimumValueWithoutTip(this.props.account.coinType, this.state.fees[0].toString())
+      await this.setState({ currentFeeType: CUSTOM_FEE_TYPE, selectedFee: fee})
       this.props.onChangeText('')
     } else {
       await this.setState({
