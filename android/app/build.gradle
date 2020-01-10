@@ -103,8 +103,8 @@ android {
         applicationId "com.excelsecu.eswallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 81
-        versionName "0.8.1"
+        versionCode 82
+        versionName "0.8.2"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

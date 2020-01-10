@@ -402,7 +402,7 @@ class SettingsPage extends Component {
       if (appletInfo.name.toUpperCase() === 'MANAGER') {
         ToastUtil.showLong(I18n.t('upgradeManagerAppletTip'))
       }
-      if (appletInfo.name.toUpperCase() === 'COMMON' || appletInfo.name === 'METHOD') {
+      if (appletInfo.name.toUpperCase() === 'COMMON' || appletInfo.name.toUpperCase() === 'METHOD') {
         this.libApplet = appletInfo || {}
         this.appletInfos = appletInfos || {}
         this.appletIndex = index || 0
@@ -430,7 +430,7 @@ class SettingsPage extends Component {
           this.setState({updateAppletInfos: []})
           this.setState({updateAppletInfos: appletInfos, updateAppletDialogVisible: false})
           this.transmitter.disconnect()
-          this._resetRouter("PairList")
+          this._resetRouter()
           return
         }
       }
