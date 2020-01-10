@@ -115,6 +115,7 @@ class HomePage extends Component {
     this._onFocus()
     this._onBlur()
     this._listenWallet()
+    this._initListener()
     this._updateUI()
     // delay to check app version
     // let timer = setTimeout(() => {
@@ -224,17 +225,13 @@ class HomePage extends Component {
     this.btTransmitter.listenStatus(async (error, status) => {
       console.log('homepage transmitter1', error, status)
       if (status === BtTransmitter.disconnected) {
+        this.setState({bluetoothConnectDialogVisible: false})
         console.log('status device disconnected', status)
         this.setState({deviceConnected: false, showDeviceConnectCard: true})
       }
       if (status === BtTransmitter.connected) {
         this.setState({deviceConnected: true, showDeviceConnectCard: false})
         this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
-        // make sure the bluetooth dialog can be close
-        let timer = setTimeout(() => {
-          this.setState({bluetoothConnectDialogVisible: false})
-        }, 8000)
-        this.timers.push(timer)
       }
       if (status === BtTransmitter.connecting) {
         this.setState({bluetoothConnectDialogDesc: I18n.t('connecting')})
@@ -248,11 +245,6 @@ class HomePage extends Component {
       if (state === BtTransmitter.connected) {
         this.setState({deviceConnected: true, showDeviceConnectCard: false})
         this._isMounted && this.setState({bluetoothConnectDialogDesc: I18n.t('initData')})
-        // make sure the bluetooth dialog can be close
-        let timer = setTimeout(() => {
-          this.setState({bluetoothConnectDialogVisible: false})
-        }, 8000)
-        this.timers.push(timer)
       }
     })
   }
