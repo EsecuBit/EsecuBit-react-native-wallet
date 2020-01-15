@@ -9,4 +9,5 @@
 "open_bt_title_unauthorized" = "无蓝牙权限";
 "open_bt_message" = "EsWallet 需要使用蓝牙连接硬件钱包。";
 "open_bt_button" = "打开设置";
+"close" = "关闭";
 

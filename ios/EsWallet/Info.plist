@@ -47,12 +47,14 @@
 		</dict>
 	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string></string>
+	<string>EsecuBit需要您的同意才能访问蓝牙功能，若不允许，您将无法使用蓝牙连接外设功能</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>EsecuBit需要您的同意才能访问蓝牙功能，若不允许，您将无法使用蓝牙连接外设功能</string>
 	<key>NSCameraUsageDescription</key>
 	<string>EsecuBit需要您的同意才能访问相机功能，若不允许，您将无法使用二维码扫描功能</string>
 	<key>NSLocationAlwaysUsageDescription</key>
+	<string>EsecuBit需要打开您的定位权限</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>EsecuBit需要打开您的定位权限</string>
 	<key>UIAppFonts</key>
 	<array>

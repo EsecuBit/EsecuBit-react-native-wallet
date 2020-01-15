@@ -5,6 +5,7 @@
   Created by sekfung.lau on 2019/6/28.
   Copyright © 2019 Facebook. All rights reserved.
 */
+NSLocationWhenInUseUsageDescription = "EsecuBit needs to open your location permissions";
 NSLocationAlwaysUsageDescription = "EsecuBit needs to open your location permissions";
 NSCameraUsageDescription = "EsecuBit requires your consent to access camera features, and if not allowed, you will not be able to use QR code scanning.";
 NSBluetoothPeripheralUsageDescription = "EsecuBit requires your consent to access Bluetooth features, and if not allowed, you will not be able to use Bluetooth connectivity peripherals";

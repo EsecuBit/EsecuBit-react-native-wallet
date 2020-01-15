@@ -9,4 +9,5 @@
 "open_bt_title_unauthorized" = "Bluetooth is unauthorized";
 "open_bt_message" = "Bluetooth is necessary for connecting hardware wallet, please open it.";
 "open_bt_button" = "Go to Settings";
+"close" = "Close";
 
