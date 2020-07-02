@@ -16,13 +16,13 @@ import BigInteger from 'bigi'
 import {CommonStyle, Dimen, Color} from '../../common/Styles'
 import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import ToastUtil from '../../utils/ToastUtil'
-import StringUtil from '../../utils/StringUtil'
+import StringUtil from 'esecubit-react-native-wallet-sdk/utils/StringUtil'
 import AccountOperateBottomBar from '../../components/bar/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/header/AccountDetailHeader'
 import {connect} from 'react-redux'
-import CoinUtil from '../../utils/CoinUtil'
+import CoinUtil from 'esecubit-react-native-wallet-sdk/utils/CoinUtil'
 import {Coin} from '../../common/Constants'
-import PreferenceUtil from '../../utils/PreferenceUtil'
+import PreferenceUtil from 'esecubit-react-native-wallet-sdk/utils/PreferenceUtil'
 import { useScreens } from 'react-native-screens';
 
 useScreens();

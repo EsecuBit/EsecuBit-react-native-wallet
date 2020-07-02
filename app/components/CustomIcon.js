@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Icon } from "native-base"
-import CoinUtil from "../utils/CoinUtil"
+import CoinUtil from "esecubit-react-native-wallet-sdk/utils/CoinUtil"
 import { Coin } from "../common/Constants"
 import { Color } from '../common/Styles'
 import { Image } from 'react-native'
@@ -10,7 +10,7 @@ export default class CustomIcon extends Component {
   shouldComponentUpdate() {
     return false;
   }
-  
+
   render() {
     let coinType = CoinUtil.getRealCoinType(this.props.coinType)
     switch (coinType) {

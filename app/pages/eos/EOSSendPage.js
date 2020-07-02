@@ -12,7 +12,7 @@ import ToastUtil from '../../utils/ToastUtil'
 import I18n from '../../lang/i18n'
 import Dialog, {DialogContent, DialogTitle} from "react-native-popup-dialog";
 import BalanceHeader from "../../components/header/BalanceHeader";
-import StringUtil from "../../utils/StringUtil";
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil";
 import { D, BtTransmitter } from 'esecubit-react-native-wallet-sdk'
 import {BigDecimal} from 'bigdecimal'
 import HeaderButtons, {Item} from "react-navigation-header-buttons";

@@ -1,6 +1,6 @@
 import React from 'react'
 import ValueInput from "./ValueInput";
-import StringUtil from "../../utils/StringUtil";
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil";
 import ToastUtil from "../../utils/ToastUtil";
 import {BigDecimal} from 'bigdecimal'
 import {D} from 'esecubit-react-native-wallet-sdk'

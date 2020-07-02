@@ -1,5 +1,5 @@
 import { Toast } from 'native-base'
-import ErrorUtil from './ErrorUtil'
+import ErrorUtil from 'esecubit-react-native-wallet-sdk/utils/ErrorUtil'
 
 const TOAST_SHORT_DURATION = 2000
 const TOAST_LONG_DURATION = 4000

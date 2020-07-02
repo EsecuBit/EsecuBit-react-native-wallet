@@ -3,7 +3,8 @@ import { Platform } from 'react-native'
 import {CardItem, Icon, Input, InputGroup, Text} from "native-base"
 import {Color, CommonStyle, Dimen} from "../../common/Styles"
 import I18n from "../../lang/i18n"
-import StringUtil from "../../utils/StringUtil"
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil"
+import ToastUtil from "../../utils/ToastUtil";
 
 export default class GasLimitInput extends PureComponent {
 
@@ -43,10 +44,16 @@ export default class GasLimitInput extends PureComponent {
   }
 
   // @flow
-  async _checkGasLimit(text: string) {
-    let result = (StringUtil.isInvalidValue(text) || text < 21000) || !Number.isInteger(Number(text))
+  async _checkGasLimit(text) {
+    let isInvalid = StringUtil.isInvalidValue(text);
+    // 非数字，低于21000, 不合法
+    let result = ( isInvalid || text < 21000) || !Number.isInteger(Number(text))
+    // 含有小数点，不合法
     if (text.indexOf(".") !== -1) {
       result = true
+    }
+    if (result) {
+      ToastUtil.showErrorMsgShort(I18n.t('invalidValue'))
     }
     await this.setState({gasLimit: text})
     await this.setState({checkGasLimitError: result, checkGasLimitSuccess: !result && text >= 21000})

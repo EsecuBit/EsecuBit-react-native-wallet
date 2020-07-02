@@ -21,14 +21,14 @@ import I18n from '../../lang/i18n'
 import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import {Api} from '../../common/Constants'
 import ToastUtil from '../../utils/ToastUtil'
-import StringUtil from '../../utils/StringUtil'
+import StringUtil from 'esecubit-react-native-wallet-sdk/utils/StringUtil'
 import AppUtil from '../../utils/AppUtil'
 import {setAccount} from 'esecubit-react-native-wallet-sdk/actions/AccountAction'
 import {connect} from 'react-redux'
 import CoinCard from '../../components/card/CoinCard'
-import CoinUtil from '../../utils/CoinUtil'
+import CoinUtil from 'esecubit-react-native-wallet-sdk/utils/CoinUtil'
 import Dialog, {DialogButton, DialogTitle, DialogContent, DialogFooter} from 'react-native-popup-dialog'
-import PreferenceUtil from "../../utils/PreferenceUtil";
+import PreferenceUtil from "esecubit-react-native-wallet-sdk/utils/PreferenceUtil";
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';

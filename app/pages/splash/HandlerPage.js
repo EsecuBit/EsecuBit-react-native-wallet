@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { View, Image, Dimensions } from 'react-native'
 import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
 import { NavigationActions, StackActions } from 'react-navigation'
-import PreferenceUtil from '../../utils/PreferenceUtil'
+import PreferenceUtil from 'esecubit-react-native-wallet-sdk/utils/PreferenceUtil'
 import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from 'esecubit-react-native-wallet-sdk/actions/SettingsAction'
 import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
-import CoinUtil from '../../utils/CoinUtil'
+import CoinUtil from 'esecubit-react-native-wallet-sdk/utils/CoinUtil'
 import I18n from '../../lang/i18n'
 import { useScreens } from 'react-native-screens';
 import SplashScreen from "react-native-splash-screen";

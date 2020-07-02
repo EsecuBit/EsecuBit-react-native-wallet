@@ -5,10 +5,11 @@ import I18n from "../../lang/i18n";
 import { Dropdown } from 'react-native-material-dropdown'
 import { TouchableOpacity, Platform } from "react-native"
 import { D, EsWallet } from 'esecubit-react-native-wallet-sdk'
-import CoinUtil from "../../utils/CoinUtil"
+import CoinUtil from "esecubit-react-native-wallet-sdk/utils/CoinUtil"
 import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
-import StringUtil from "../../utils/StringUtil"
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil"
+import ToastUtil from "../../utils/ToastUtil";
 
 const STANDARD_FEE_TYPE = 'standard'
 const CUSTOM_FEE_TYPE = 'custom'
@@ -140,8 +141,12 @@ class FeeInput extends PureComponent {
   }
 
   // @flow
-  _checkFee(fee: string) {
-    return !StringUtil.isInvalidValue(fee) && fee !== ''
+  _checkFee(fee) {
+    let valid = !StringUtil.isInvalidValue(fee) && fee !== ''
+    if (!valid) {
+      ToastUtil.showErrorMsgShort(I18n.t('invalidValue'))
+    }
+    return valid
   }
 
   _clear() {

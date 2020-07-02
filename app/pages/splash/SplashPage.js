@@ -6,7 +6,7 @@ import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import {Color, CommonStyle} from '../../common/Styles'
 import {NavigationActions, StackActions} from 'react-navigation'
 import {NetInfo, Platform, ActivityIndicator, Text} from 'react-native'
-import CoinUtil from "../../utils/CoinUtil";
+import CoinUtil from "esecubit-react-native-wallet-sdk/utils/CoinUtil";
 import { useScreens } from 'react-native-screens';
 
 useScreens();

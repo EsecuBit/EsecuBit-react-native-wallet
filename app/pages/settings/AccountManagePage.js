@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Container, Content, Accordion, Text, CardItem, Item} from "native-base"
 import I18n from '../../lang/i18n'
 import {EsWallet, D} from 'esecubit-react-native-wallet-sdk'
-import CoinUtil from "../../utils/CoinUtil"
+import CoinUtil from "esecubit-react-native-wallet-sdk/utils/CoinUtil"
 import {View} from 'react-native'
 import CustomIcon from "../../components/CustomIcon"
 import {StyleSheet, BackHandler} from 'react-native'

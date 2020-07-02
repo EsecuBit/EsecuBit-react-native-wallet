@@ -15,7 +15,7 @@ import TransactionTotalCostCard from '../../components/card/TransactionTotalCost
 import TransactionFeeCard from '../../components/card/TransactionFeeCard'
 import BalanceHeader from '../../components/header/BalanceHeader'
 import Dialog, { DialogContent, DialogTitle, DialogButton, DialogFooter } from 'react-native-popup-dialog'
-import StringUtil from "../../utils/StringUtil";
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil";
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {setScanAddress} from 'esecubit-react-native-wallet-sdk/actions/SettingsAction'
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";

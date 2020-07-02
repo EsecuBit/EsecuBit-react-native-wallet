@@ -7,7 +7,7 @@ import {connect} from 'react-redux'
 import I18n from '../../lang/i18n'
 import {withNavigation} from 'react-navigation'
 import { BtTransmitter} from 'esecubit-react-native-wallet-sdk'
-import StringUtil from "../../utils/StringUtil";
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil";
 import HeaderButtons from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';

@@ -2,9 +2,10 @@ import React, {PureComponent} from 'react'
 import {Platform} from 'react-native'
 import {CardItem, Icon, Input, Text, InputGroup} from 'native-base'
 import {Dimen, Color, CommonStyle} from '../../common/Styles'
-import StringUtil from '../../utils/StringUtil'
+import StringUtil from 'esecubit-react-native-wallet-sdk/utils/StringUtil'
 import PercentageBar from '../bar/PercentageBar'
 import I18n from '../../lang/i18n'
+import ToastUtil from "../../utils/ToastUtil";
 
 export default class ValueInput extends PureComponent {
 
@@ -38,6 +39,9 @@ export default class ValueInput extends PureComponent {
   // @flow
   async _checkSendValue(text: string) {
     let result = StringUtil.isInvalidValue(text)
+    if (result) {
+      ToastUtil.showErrorMsgShort(I18n.t("invalidValue"))
+    }
     await this.setState({sendValueError: result, sendValueStatus: !result && !!text})
     if (result) {
       this.clear()

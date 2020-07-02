@@ -18,8 +18,8 @@ import ToastUtil from '../../utils/ToastUtil'
 import AccountOperateBottomBar from '../../components/bar/AccountOperateBottomBar'
 import AccountDetailHeader from '../../components/header/AccountDetailHeader'
 import {connect} from 'react-redux'
-import PreferenceUtil from '../../utils/PreferenceUtil'
-import StringUtil from "../../utils/StringUtil";
+import PreferenceUtil from 'esecubit-react-native-wallet-sdk/utils/PreferenceUtil'
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil";
 import {Dropdown} from "react-native-material-dropdown";
 import { useScreens } from 'react-native-screens';
 

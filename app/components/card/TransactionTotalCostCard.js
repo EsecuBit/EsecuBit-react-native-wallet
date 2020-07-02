@@ -5,8 +5,8 @@ import I18n from "../../lang/i18n"
 import { View } from "react-native"
 import { connect } from 'react-redux'
 import { EsWallet } from 'esecubit-react-native-wallet-sdk'
-import StringUtil from "../../utils/StringUtil"
-import CoinUtil from "../../utils/CoinUtil"
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil"
+import CoinUtil from "esecubit-react-native-wallet-sdk/utils/CoinUtil"
 
 class TransactionTotalCostCard extends PureComponent {
   constructor(props) {

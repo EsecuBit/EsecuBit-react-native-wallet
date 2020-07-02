@@ -14,7 +14,6 @@ import {
 } from 'native-base'
 import FooterButton from '../../components/FooterButton'
 import {Color, CommonStyle, Dimen} from '../../common/Styles'
-import StringUtil from '../../utils/StringUtil'
 import {connect} from 'react-redux'
 import {withNavigation} from 'react-navigation'
 import ToastUtil from "../../utils/ToastUtil"

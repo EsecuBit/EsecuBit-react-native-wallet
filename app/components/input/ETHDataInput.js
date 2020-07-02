@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react'
 import {CardItem, Icon, Input, InputGroup, Text} from "native-base"
 import {Color, CommonStyle, Dimen} from "../../common/Styles"
 import {Platform} from "react-native"
-import StringUtil from "../../utils/StringUtil"
+import StringUtil from "esecubit-react-native-wallet-sdk/utils/StringUtil"
+import ToastUtil from "../../utils/ToastUtil";
+import I18n from '../../lang/i18n'
 
 export default class ETHDataInput extends PureComponent {
 
@@ -40,6 +42,9 @@ export default class ETHDataInput extends PureComponent {
 
   async _checkData(data: string) {
     let result =  StringUtil.isHexString(data)
+    if (!result) {
+      ToastUtil.showErrorMsgShort(I18n.t('invalidValue'))
+    }
     await this.setState({checkDataSuccess: result, checkDataError: !result})
   }
 

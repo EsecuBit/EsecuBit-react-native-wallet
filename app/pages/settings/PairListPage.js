@@ -15,7 +15,7 @@ import {
 import {Container, List, ListItem, Button, Icon} from 'native-base'
 import I18n from '../../lang/i18n'
 import {D, EsWallet, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
-import PreferenceUtil from '../../utils/PreferenceUtil'
+import PreferenceUtil from 'esecubit-react-native-wallet-sdk/utils/PreferenceUtil'
 import Dialog, {DialogContent, DialogTitle} from 'react-native-popup-dialog'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, isIphoneX, CommonStyle} from '../../common/Styles'

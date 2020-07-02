@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 import { View, StyleSheet, Image, StatusBar, Platform, Dimensions, ImageBackground } from 'react-native'
 import { isIphoneX, Color, Dimen } from '../../common/Styles'
-import StringUtil from '../../utils/StringUtil'
+import StringUtil from 'esecubit-react-native-wallet-sdk/utils/StringUtil'
 import { Button, Icon, Text } from 'native-base'
 import Menu, { MenuItem } from 'react-native-material-menu'
 import I18n from '../../lang/i18n'
 import { connect } from 'react-redux'
 import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
-import CoinUtil from '../../utils/CoinUtil'
+import CoinUtil from 'esecubit-react-native-wallet-sdk/utils/CoinUtil'
 import {Coin} from "../../common/Constants";
 import config from "../../Config";
 
