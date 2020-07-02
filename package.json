@@ -17,11 +17,8 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "android-dev": "adb reverse tcp:8081 tcp:8081",
-    "rc-start": "npm start -- --reset-cache",
-    "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && npm cache verify",
-    "clean-start": "npm run verify && npm run rc-start",
-    "fresh-install": "rm -rf $TMPDIR/react-* && watchman watch-del-all && rm -rf ios/build/ModuleCache/* && rm -rf node_modules/ && npm cache verify && npm install",
-    "fresh-start": "npm run fresh-install && npm run rc-start",
+    "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && yarn cache clean",
+    "fresh-install": "rm -rf $TMPDIR/react-* && watchman watch-del-all && rm -rf ios/build/ModuleCache/* && rm -rf node_modules/ && yarn cache clean && yarn",
     "bundle-android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "bundle-ios": "node node_modules/react-native/local-cli/cli.js bundle --entry-file index.js --platform ios --dev false --bundle-output ./ios/bundle/index.ios.jsbundle --assets-dest ./ios/bundle"
   },
@@ -48,6 +45,7 @@
     "react-native-splash-screen": "3.2.0",
     "react-native-tab-view": "1.4.1",
     "react-native-vector-icons": "6.6.0",
+    "react-navigation": "3.11.0",
     "react-navigation-header-buttons": "2.3.1",
     "realm": "2.29.0",
     "redux-devtools-extension": "2.13.8"
