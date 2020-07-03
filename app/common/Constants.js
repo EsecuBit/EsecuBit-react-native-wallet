@@ -17,3 +17,5 @@ export const Coin = {
   eos: 'eos',
   legal: 'legal'
 }
+
+export const IOS_APP_STORE_URL = 'itms-apps://itunes.apple.com/app/id1494823973'

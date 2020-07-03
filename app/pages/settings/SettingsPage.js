@@ -1,11 +1,11 @@
 import React, {Component} from 'react'
-import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator} from 'react-native'
+import {StyleSheet, View, Dimensions, Linking, BackHandler, ActivityIndicator, Platform} from 'react-native'
 import {Container, Icon, Right, Card, CardItem, Text, Content, Button, Body} from 'native-base'
 import {SinglePickerMaterialDialog} from 'react-native-material-dialog'
 import I18n from '../../lang/i18n'
 import {EsWallet, D, BtTransmitter} from 'esecubit-react-native-wallet-sdk'
 import {version, cosVersion} from '../../../package.json'
-import {Api, Coin} from '../../common/Constants'
+import {Api, Coin, IOS_APP_STORE_URL} from '../../common/Constants'
 import PreferenceUtil from 'esecubit-react-native-wallet-sdk/utils/PreferenceUtil'
 import ToastUtil from '../../utils/ToastUtil'
 import {Color, Dimen, CommonStyle} from '../../common/Styles'
@@ -77,7 +77,6 @@ class SettingsPage extends Component {
       confirmTipDialogVisible: false
     }
     this.lockUpgradeApplet = false
-    this.coinTypes = D.supportedCoinTypes()
     this.wallet = new EsWallet()
     this.transmitter = new BtTransmitter()
     this.timers = []
@@ -89,6 +88,7 @@ class SettingsPage extends Component {
     this._listenWallet()
     this._onFocus()
     this._onBlur()
+
   }
 
   componentWillUnmount() {
@@ -171,6 +171,7 @@ class SettingsPage extends Component {
     }
   }
 
+
   _listenDeviceStatus() {
     this.transmitter.listenStatus((error, status) => {
       if (error === D.error.succeed) {
@@ -225,26 +226,30 @@ class SettingsPage extends Component {
   }
 
   _checkVersion() {
-    AppUtil.checkUpdate()
-      .then(info => {
-        console.log('update info', info)
-        this.info = info
-        if (info && info.errorCode === Api.success) {
-          if (info.data !== null) {
-            this.setState({
-              updateDesc: info.data.description,
-              updateVersionDialogVisible: true
-            })
+    if (Platform.OS === 'ios') {
+      Linking.openURL(IOS_APP_STORE_URL)
+    } else {
+      AppUtil.checkUpdate()
+        .then(info => {
+          console.log('update info', info)
+          this.info = info
+          if (info && info.errorCode === Api.success) {
+            if (info.data !== null) {
+              this.setState({
+                updateDesc: info.data.description,
+                updateVersionDialogVisible: true
+              })
+            }
           }
-        }
-        if (info && info.errorCode === Api.noNewApp) {
-          ToastUtil.showShort(I18n.t('noNewApp'))
-        }
-      })
-      .catch(e => {
-        console.log('setting checkVersion error', e)
-        ToastUtil.showErrorMsgShort(e)
-      })
+          if (info && info.errorCode === Api.noNewApp) {
+            ToastUtil.showShort(I18n.t('noNewApp'))
+          }
+        })
+        .catch(e => {
+          console.log('setting checkVersion error', e)
+          ToastUtil.showErrorMsgShort(e)
+        })
+    }
   }
 
   _checkForceUpdate() {
@@ -493,7 +498,7 @@ class SettingsPage extends Component {
                 </View>
               </Right>
             </CardItem>
-            {CoinUtil.contains(this.coinTypes, 'btc') ? (
+            {CoinUtil.contains(this.props.coinTypes, 'btc') ? (
               <CardItem bordered button onPress={() => this.setState({btcDialogVisible: true})}>
                 <Text>{I18n.t('btc')}</Text>
                 <Body/>
@@ -509,7 +514,7 @@ class SettingsPage extends Component {
             ) : (
               <View style={CommonStyle.divider}/>
             )}
-            {CoinUtil.contains(this.coinTypes, 'eth') ? (
+            {CoinUtil.contains(this.props.coinTypes, 'eth') ? (
               <CardItem bordered button onPress={() => this.setState({ethDialogVisible: true})}>
                 <Text>{I18n.t('eth')}</Text>
                 <Body/>
@@ -544,7 +549,7 @@ class SettingsPage extends Component {
               <Text>{I18n.t('language')}</Text>
             </CardItem>
             {
-              config.productVersion === 'tp' && (
+              config.productVersion === 'tp' && CoinUtil.contains(this.props.coinTypes, 'eos') && (
                 <CardItem
                   bordered
                   button
@@ -585,9 +590,13 @@ class SettingsPage extends Component {
               <Text>{I18n.t('checkAppVersion')}</Text>
             </CardItem>
             <View style={CommonStyle.divider}/>
-            <CardItem bordered button onPress={() => this._checkAppletVersion()}>
-              <Text>{I18n.t('checkAppletVersion')}</Text>
-            </CardItem>
+            {
+              D.wallet.s300 === this.props.walletName && (
+                <CardItem bordered button onPress={() => this._checkAppletVersion()}>
+                  <Text>{I18n.t('checkAppletVersion')}</Text>
+                </CardItem>
+              )
+            }
           </Card>
         </Content>
 
@@ -1007,7 +1016,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   btcUnit: state.SettingsReducer.btcUnit,
   ethUnit: state.SettingsReducer.ethUnit,
-  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
+  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit,
+  coinTypes: state.SettingsReducer.coinTypes,
+  walletName: state.SettingsReducer.walletName,
 })
 
 const mapDispatchToProps = {

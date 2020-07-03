@@ -19,11 +19,14 @@ import Dialog, {DialogTitle, DialogContent, DialogButton, DialogFooter} from "re
 import HeaderButtons, {Item} from "react-navigation-header-buttons";
 import {IoniconHeaderButton} from "../../components/button/IoniconHeaderButton";
 import { useScreens } from 'react-native-screens';
+import {connect} from 'react-redux'
+import {withNavigation} from 'react-navigation'
+
 
 useScreens();
 
 
-export default class NewAccountPage extends Component {
+class NewAccountPage extends Component {
   static navigationOptions = ({navigation, screenProps}) => {
     return {
       title: I18n.t('newAccount'),
@@ -41,8 +44,6 @@ export default class NewAccountPage extends Component {
       newAccountDialogVisible: false,
       newAccountWaitDialog: false
     }
-    //coinType
-    this.supportCoinType = D.supportedCoinTypes()
     this.newAccountType = ''
     this.btTransmitter = new BtTransmitter()
     this.wallet = new EsWallet()
@@ -76,7 +77,6 @@ export default class NewAccountPage extends Component {
     this.props.navigation.pop()
     return true;
   }
-
 
   async _newAccount() {
     let coinType = this.newAccountType
@@ -130,7 +130,7 @@ export default class NewAccountPage extends Component {
   _renderBTCAddAccount() {
     let coinType = ''
     let isSupportBTC = false
-    this.supportCoinType.map(it => {
+    this.props.coinTypes.map(it => {
       if (it.startsWith('btc')) {
         isSupportBTC = true
         coinType = it
@@ -172,7 +172,7 @@ export default class NewAccountPage extends Component {
     let _that = this
     let coinType = ''
     let isSupportETH = false
-    this.supportCoinType.map(it => {
+    this.props.coinTypes.map(it => {
       if (it.startsWith('eth')) {
         isSupportETH = true
         coinType = it
@@ -211,7 +211,7 @@ export default class NewAccountPage extends Component {
     let _that = this
     let coinType = ''
     let isSupportEOS = false
-    this.supportCoinType.map(it => {
+    this.props.coinTypes.map(it => {
       if (it.startsWith('eos')) {
         isSupportEOS = true
         coinType = it
@@ -310,3 +310,9 @@ export default class NewAccountPage extends Component {
     )
   }
 }
+
+const mapStateToProps = state => ({
+  coinTypes: state.SettingsReducer.coinTypes
+})
+
+export default withNavigation(connect(mapStateToProps)(NewAccountPage))

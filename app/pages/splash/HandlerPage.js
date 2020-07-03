@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
-import { View, Image, Dimensions } from 'react-native'
+import React, { PureComponent } from 'react'
+import { View } from 'react-native'
 import { EsWallet, D } from 'esecubit-react-native-wallet-sdk'
 import { NavigationActions, StackActions } from 'react-navigation'
 import PreferenceUtil from 'esecubit-react-native-wallet-sdk/utils/PreferenceUtil'
-import { setCryptoCurrencyUnit, setLegalCurrencyUnit } from 'esecubit-react-native-wallet-sdk/actions/SettingsAction'
+import { setCryptoCurrencyUnit, setLegalCurrencyUnit, setSupportedCoinTypes, setWalletName } from 'esecubit-react-native-wallet-sdk/actions/SettingsAction'
 import { Coin } from '../../common/Constants'
 import { connect } from 'react-redux'
 import CoinUtil from 'esecubit-react-native-wallet-sdk/utils/CoinUtil'
@@ -14,14 +14,14 @@ import SplashScreen from "react-native-splash-screen";
 
 useScreens();
 
-class HandlerPage extends Component {
+// 路由首先加载的空白页面，在进入首页之前，做一些资源加载和配置更新操作
+class HandlerPage extends PureComponent {
   static navigationOptions = {
     header: null
   }
   constructor(props) {
     super(props)
     this.esWallet = new EsWallet()
-    this.deviceW = Dimensions.get('window').width
   }
 
   render() {
@@ -31,21 +31,29 @@ class HandlerPage extends Component {
   }
 
   componentDidMount() {
-    this._getCurrencyPreference()
-    this.esWallet.setTestSeed(
-      'ef3a397c6af3bce6f05b75dd8437f1552d17190eeb6b1b9e85872f207db5b5e5db4aade19ebdc47f90935cb5bec30cbab68dbce67a139f923ca697e04311284c'
-    )
     this.esWallet.enterOfflineMode()
       .catch(error => {
         this._gotoHomePage(true)
         console.log('enter offline mode error', error)
       })
+    this._getCurrencyPreference()
+    this.esWallet.setTestSeed(
+      'ef3a397c6af3bce6f05b75dd8437f1552d17190eeb6b1b9e85872f207db5b5e5db4aade19ebdc47f90935cb5bec30cbab68dbce67a139f923ca697e04311284c'
+    )
     this._getLanguagePreference()
+    this._getSettings()
     this._listenWalletStatus()
   }
 
   componentWillUnmount(): void {
     SplashScreen.hide()
+  }
+
+  async _getSettings() {
+    let coinTypes = await this.esWallet.supportedCoinTypes()
+    this.props.setSupportedCoinTypes(coinTypes)
+    let walletName = await this.esWallet.getWalletName()
+    this.props.setWalletName(walletName)
   }
 
   async _getLanguagePreference() {
@@ -113,22 +121,17 @@ class HandlerPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  btcUnit: state.SettingsReducer.btcUnit,
-  ethUnit: state.SettingsReducer.ethUnit,
-  eosUnit: state.SettingsReducer.eosUnit,
-  legalCurrencyUnit: state.SettingsReducer.legalCurrencyUnit
-})
-
 const mapDispatchToProps = {
   setCryptoCurrencyUnit,
   setLegalCurrencyUnit,
+  setSupportedCoinTypes,
+  setWalletName
 }
 
 
 
 const Handler = connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(HandlerPage)
 export default Handler
