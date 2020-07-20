@@ -51,9 +51,11 @@ class HandlerPage extends PureComponent {
 
   async _getSettings() {
     let coinTypes = await this.esWallet.supportedCoinTypes()
-    this.props.setSupportedCoinTypes(coinTypes)
+    setSupportedCoinTypes(coinTypes)
+    console.debug('supported coin types', coinTypes)
     let walletName = await this.esWallet.getWalletName()
-    this.props.setWalletName(walletName)
+    setWalletName(walletName)
+    console.debug('current wallet name', walletName)
   }
 
   async _getLanguagePreference() {
@@ -73,7 +75,7 @@ class HandlerPage extends PureComponent {
           this._gotoHomePage(true)
           console.log('can enter offline mode')
         }
-      }else {
+      } else {
         if (error === D.error.offlineModeNotAllowed) {
           if (D.test.jsWallet) {
             this._resetRouter('Splash')
@@ -81,7 +83,7 @@ class HandlerPage extends PureComponent {
             this._resetRouter('PairList', { autoConnect: true })
           }
           console.warn('offlineModeNotAllowed')
-        }else {
+        } else {
           this._gotoHomePage(true)
           console.warn('other error, stop', error)
         }

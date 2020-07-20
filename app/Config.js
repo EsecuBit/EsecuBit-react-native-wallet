@@ -8,7 +8,7 @@ import I18n  from './lang/i18n'
 
 export default {
   // product version: [std, tp]
-  productVersion: "tp",
+  productVersion: "std",
 
   initApp() {
     // test net
