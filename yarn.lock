@@ -3177,7 +3177,7 @@ escodegen@^1.9.1:
 
 "esecubit-react-native-wallet-sdk@git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git":
   version "1.0.2"
-  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#520b0c0c451981d0bc6c2054e992500d542930e5"
+  resolved "git+https://github.com/EsecuBit/EsecuBit-react-native-wallet-sdk.git#0bdea311b584c45e26704f80e9d559571e55bf9b"
   dependencies:
     assert "1.4.1"
     bigdecimal "0.6.1"

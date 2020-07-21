@@ -591,7 +591,7 @@ class SettingsPage extends Component {
             </CardItem>
             <View style={CommonStyle.divider}/>
             {
-              (this.props.walletName && D.wallet.s300 === this.props.walletName ) && (
+              D.wallet.s300 === this.props.walletName && (
                 <CardItem bordered button onPress={() => this._checkAppletVersion()}>
                   <Text>{I18n.t('checkAppletVersion')}</Text>
                 </CardItem>
