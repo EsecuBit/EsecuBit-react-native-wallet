@@ -51,10 +51,12 @@ class HandlerPage extends PureComponent {
 
   async _getSettings() {
     let coinTypes = await this.esWallet.supportedCoinTypes()
-    setSupportedCoinTypes(coinTypes)
+    this.props.setSupportedCoinTypes(coinTypes)
     console.debug('supported coin types', coinTypes)
     let walletName = await this.esWallet.getWalletName()
-    setWalletName(walletName)
+    if (walletName) {
+      this.props.setWalletName(walletName)
+    }
     console.debug('current wallet name', walletName)
   }
 

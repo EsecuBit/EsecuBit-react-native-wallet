@@ -140,7 +140,7 @@ android {
                     // app包名称
                     outputFileName = "EsecuBit_v" + defaultConfig.versionName + "_" + createTime + "_" + buildType.name + ".apk"
                     ////指定release输出到指定文件夹
-                    variant.getPackageApplication().outputDirectory = new File(project.rootDir.toString())
+                    variant.getPackageApplication().outputDirectory = new File(project.rootDir.toString() + "../outputs")
                 }
             }
     }
