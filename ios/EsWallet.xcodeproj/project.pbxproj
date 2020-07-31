@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -75,6 +74,7 @@
 		E2C82433C0C4442ABF3D9857 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B8EF0E69187440C81E07F66 /* SimpleLineIcons.ttf */; };
 		ECC2005160FE462EB6027B9B /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */; };
 		F5E346C6EBDC473C8F3DBD94 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3CB3A5D45CE46659041E4AA /* libRNVectorIcons.a */; };
+		46413E54649647AD8004A536 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98C1CB02755B406EB4840BFF /* Fontisto.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -521,6 +521,7 @@
 		EAF3BA3940134A679EF78A9D /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		ED260BE86656485D87B61447 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		F716AC6B0AAF4197800BB7DC /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
+		98C1CB02755B406EB4840BFF /* Fontisto.ttf */ = {isa = PBXFileReference; name = "Fontisto.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -902,6 +903,7 @@
 				5351FDFA944544618ECB727C /* FontAwesome5_Brands.ttf */,
 				6B3B5238DD6B46A0BEE40F2D /* FontAwesome5_Regular.ttf */,
 				740E7453FFE04A99BEAC111B /* FontAwesome5_Solid.ttf */,
+				98C1CB02755B406EB4840BFF /* Fontisto.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1523,6 +1525,7 @@
 				A170A26B804745A99F9D2889 /* FontAwesome5_Brands.ttf in Resources */,
 				1F1FE2D8CB0F4487941C2015 /* FontAwesome5_Regular.ttf in Resources */,
 				A2667E21A48042FABEDDD1A5 /* FontAwesome5_Solid.ttf in Resources */,
+				46413E54649647AD8004A536 /* Fontisto.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1765,7 +1768,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 83;
+				CURRENT_PROJECT_VERSION = 85;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5QZKZTWHM6;
 				ENABLE_BITCODE = NO;
@@ -1799,7 +1802,7 @@
 					"$(PROJECT_DIR)/EsWallet/libs",
 					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1822,7 +1825,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 83;
+				CURRENT_PROJECT_VERSION = 85;
 				DEVELOPMENT_TEAM = V9QZ497YV9;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1855,7 +1858,7 @@
 					"$(PROJECT_DIR)/EsWallet/libs",
 					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
