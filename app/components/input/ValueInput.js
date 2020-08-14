@@ -40,7 +40,7 @@ export default class ValueInput extends PureComponent {
   async _checkSendValue(text: string) {
     let result = StringUtil.isInvalidValue(text)
     if (result) {
-      ToastUtil.showErrorMsgShort(I18n.t("invalidValue"))
+      ToastUtil.showShort(I18n.t("invalidValue"))
     }
     await this.setState({sendValueError: result, sendValueStatus: !result && !!text})
     if (result) {

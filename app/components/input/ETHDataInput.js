@@ -43,7 +43,7 @@ export default class ETHDataInput extends PureComponent {
   async _checkData(data: string) {
     let result =  StringUtil.isHexString(data)
     if (!result) {
-      ToastUtil.showErrorMsgShort(I18n.t('invalidValue'))
+      ToastUtil.showShort(I18n.t('invalidValue'))
     }
     await this.setState({checkDataSuccess: result, checkDataError: !result})
   }

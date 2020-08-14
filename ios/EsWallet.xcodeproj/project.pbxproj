@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -40,6 +41,7 @@
 		2D02E4C91E0B4AEC006451C7 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		2DCD954D1E0B4F2C00145EB5 /* EsWalletTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* EsWalletTests.m */; };
 		3B8F6B4738B04C4292F63829 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 49E783D7F8B54ABE82C65927 /* libz.tbd */; };
+		46413E54649647AD8004A536 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98C1CB02755B406EB4840BFF /* Fontisto.ttf */; };
 		4C419950539842E2A8A92B5E /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 49248DF3C7CB4E5A8E161654 /* Zocial.ttf */; };
 		5E72C2462CBD403996CDAB7A /* libRNScreens-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E6A630C06D634CE6B44FF8DB /* libRNScreens-tvOS.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
@@ -74,7 +76,6 @@
 		E2C82433C0C4442ABF3D9857 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B8EF0E69187440C81E07F66 /* SimpleLineIcons.ttf */; };
 		ECC2005160FE462EB6027B9B /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F2717458BF2496ABE7F4DD6 /* libRealmReact.a */; };
 		F5E346C6EBDC473C8F3DBD94 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3CB3A5D45CE46659041E4AA /* libRNVectorIcons.a */; };
-		46413E54649647AD8004A536 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98C1CB02755B406EB4840BFF /* Fontisto.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -495,6 +496,7 @@
 		8C6C05D525564C0B9ACDABD5 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		8D7F0B08CE9744D1AA8DDBF7 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		9686ABDE28544220965BEE52 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		98C1CB02755B406EB4840BFF /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		9B325E6421AC1A0D0026627F /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
 		A1E559E5AD134D9883EEAE55 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		A6359C97ACFA4483972FC5DF /* RealmReact.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RealmReact.xcodeproj; path = "../node_modules/realm/react-native/ios/RealmReact.xcodeproj"; sourceTree = "<group>"; };
@@ -521,7 +523,6 @@
 		EAF3BA3940134A679EF78A9D /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		ED260BE86656485D87B61447 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		F716AC6B0AAF4197800BB7DC /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
-		98C1CB02755B406EB4840BFF /* Fontisto.ttf */ = {isa = PBXFileReference; name = "Fontisto.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1768,7 +1769,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 85;
+				CURRENT_PROJECT_VERSION = 87;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 5QZKZTWHM6;
 				ENABLE_BITCODE = NO;
@@ -1802,7 +1803,7 @@
 					"$(PROJECT_DIR)/EsWallet/libs",
 					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
-				MARKETING_VERSION = 0.8.5;
+				MARKETING_VERSION = 0.8.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1825,7 +1826,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 85;
+				CURRENT_PROJECT_VERSION = 87;
 				DEVELOPMENT_TEAM = V9QZ497YV9;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1858,7 +1859,7 @@
 					"$(PROJECT_DIR)/EsWallet/libs",
 					"$(PROJECT_DIR)/EsWallet/CoreBitcoin",
 				);
-				MARKETING_VERSION = 0.8.5;
+				MARKETING_VERSION = 0.8.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

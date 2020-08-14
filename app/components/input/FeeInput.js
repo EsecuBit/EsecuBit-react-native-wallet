@@ -144,7 +144,7 @@ class FeeInput extends PureComponent {
   _checkFee(fee) {
     let valid = !StringUtil.isInvalidValue(fee) && fee !== ''
     if (!valid) {
-      ToastUtil.showErrorMsgShort(I18n.t('invalidValue'))
+      ToastUtil.showShort(I18n.t('invalidValue'))
     }
     return valid
   }

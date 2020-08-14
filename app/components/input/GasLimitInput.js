@@ -53,7 +53,7 @@ export default class GasLimitInput extends PureComponent {
       result = true
     }
     if (result) {
-      ToastUtil.showErrorMsgShort(I18n.t('invalidValue'))
+      ToastUtil.showShort(I18n.t('invalidValue'))
     }
     await this.setState({gasLimit: text})
     await this.setState({checkGasLimitError: result, checkGasLimitSuccess: !result && text >= 21000})
